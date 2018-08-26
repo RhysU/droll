@@ -49,24 +49,28 @@ def roll_party(dice: int, randgen: RandRange) -> Party:
     return Party(*__roll(dice, 0, len(Party._fields), randgen))
 
 
-Treasure = collections.namedtuple('Treasure', (
-    'sword',
-    'talisman',
-    'sceptre',
-    'tools',
-    # Nothing matches champion
-    'scroll',
-    # Non-hero-like items
-    'portal',
-    'bait',
-    'elixir',
-    'scale',
-    'ring',
-))
+_TREASURE = collections.OrderedDict(
+    sword=3,
+    talisman=3,
+    sceptre=3,
+    tools=3,
+    scroll=3,
+    elixir=3,
+    bait=4,
+    portal=4,
+    ring=4,
+    scale=6,
+)
+
+Treasure = collections.namedtuple('Treasure', _TREASURE.keys())
+
+TREASURE_INITIAL = Treasure(*_TREASURE.values())
 
 World = collections.namedtuple('World', (
+    'experience',
+    'ability',
     'level',
     'party',
     'treasure',
-    'ability',
+    'chest',
 ))
