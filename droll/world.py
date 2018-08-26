@@ -3,7 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import collections
-import random
+import functools
+import itertools
 import typing
 
 Level = collections.namedtuple('Level', (
@@ -32,6 +33,10 @@ def __roll(
 
 
 def roll_level(dice: int, randgen: RandRange) -> Level:
+    """Roll a new Level using given number of dice.
+
+    On Level N one should account for the number of extant dragons.
+    random.Random.randgen or random.randgen are accepted for randomness."""
     return Level(*__roll(dice, 0, len(Level._fields), randgen))
 
 
@@ -46,6 +51,9 @@ Party = collections.namedtuple('Party', (
 
 
 def roll_party(dice: int, randgen: RandRange) -> Party:
+    """Roll a new Party using given number of dice.
+
+    random.Random.randgen or random.randgen are accepted for randomness."""
     return Party(*__roll(dice, 0, len(Party._fields), randgen))
 
 
@@ -65,6 +73,25 @@ _TREASURE = collections.OrderedDict(
 Treasure = collections.namedtuple('Treasure', _TREASURE.keys())
 
 TREASURE_INITIAL = Treasure(*_TREASURE.values())
+
+Choice = typing.Callable[[typing.Sequence[typing.Any]], typing.Any]
+
+
+def add_treasure(
+        treasure: Treasure,
+        chest: Treasure,
+        choice: Choice,
+) -> typing.Tuple[Treasure, Treasure]:
+    seq = functools.reduce(
+        itertools.chain,
+        (itertools.repeat(t, chest[i])
+         for i, t in enumerate(Treasure._fields)),
+        [])
+    drawn = choice(tuple(seq))
+    # TODO Remove from chest
+    # TODO Update treasure
+    return drawn
+
 
 World = collections.namedtuple('World', (
     'experience',
