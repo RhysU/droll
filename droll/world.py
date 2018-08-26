@@ -3,6 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import collections
+import random
+import typing
 
 Level = collections.namedtuple('Level', (
     'goblin',
@@ -13,6 +15,26 @@ Level = collections.namedtuple('Level', (
     'dragon',
 ))
 
+RandRange = typing.Callable[[int, int], int]
+
+
+def __roll(
+        dice: int,
+        start: int,
+        stop: int,
+        randrange: RandRange
+) -> typing.List[int]:
+    assert dice >= 0
+    result = [0] * (stop - start)
+    for _ in range(dice):
+        result[randrange(start, stop)] += 1
+    return result
+
+
+def roll_level(dice: int, randgen: RandRange) -> Level:
+    return Level(*__roll(dice, 0, len(Level._fields), randgen))
+
+
 Party = collections.namedtuple('Party', (
     'fighter',
     'cleric',
@@ -21,6 +43,11 @@ Party = collections.namedtuple('Party', (
     'champion',
     'scroll',
 ))
+
+
+def roll_party(dice: int, randgen: RandRange) -> Party:
+    return Party(*__roll(dice, 0, len(Party._fields), randgen))
+
 
 Treasure = collections.namedtuple('Treasure', (
     'sword',
