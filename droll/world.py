@@ -138,7 +138,6 @@ def new_delve(world: World, randrange: RandRange) -> World:
     return world._replace(
         depth=0,
         ability=True,
-        level=roll_level(dice=1, randrange=randrange),
         party=roll_party(dice=7, randrange=randrange),
     )
 
