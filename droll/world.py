@@ -19,7 +19,7 @@ Level = collections.namedtuple('Level', (
 RandRange = typing.Callable[[int, int], int]
 
 
-def __roll(
+def _roll(
         dice: int,
         start: int,
         stop: int,
@@ -37,7 +37,7 @@ def roll_level(dice: int, randgen: RandRange) -> Level:
 
     On Level N one should account for the number of extant dragons.
     random.Random.randgen or random.randgen are accepted for randomness."""
-    return Level(*__roll(dice, 0, len(Level._fields), randgen))
+    return Level(*_roll(dice, 0, len(Level._fields), randgen))
 
 
 Party = collections.namedtuple('Party', (
@@ -54,21 +54,21 @@ def roll_party(dice: int, randgen: RandRange) -> Party:
     """Roll a new Party using given number of dice.
 
     random.Random.randgen or random.randgen are accepted for randomness."""
-    return Party(*__roll(dice, 0, len(Party._fields), randgen))
+    return Party(*_roll(dice, 0, len(Party._fields), randgen))
 
 
-_TREASURE = collections.OrderedDict(
-    sword=3,
-    talisman=3,
-    sceptre=3,
-    tools=3,
-    scroll=3,
-    elixir=3,
-    bait=4,
-    portal=4,
-    ring=4,
-    scale=6,
-)
+_TREASURE = collections.OrderedDict((
+    ('sword', 3),
+    ('talisman', 3),
+    ('sceptre', 3),
+    ('tools', 3),
+    ('scroll', 3),
+    ('elixir', 3),
+    ('bait', 4),
+    ('portal', 4),
+    ('ring', 4),
+    ('scale', 6),
+))
 
 Treasure = collections.namedtuple('Treasure', _TREASURE.keys())
 
@@ -77,20 +77,35 @@ TREASURE_INITIAL = Treasure(*_TREASURE.values())
 Choice = typing.Callable[[typing.Sequence[typing.Any]], typing.Any]
 
 
-def add_treasure(
-        treasure: Treasure,
-        chest: Treasure,
-        choice: Choice,
-) -> typing.Tuple[Treasure, Treasure]:
+def _draw(chest: Treasure, choice: Choice) -> typing.Tuple[Treasure, Treasure]:
     seq = functools.reduce(
         itertools.chain,
         (itertools.repeat(t, chest[i])
          for i, t in enumerate(Treasure._fields)),
         [])
-    drawn = choice(tuple(seq))
-    # TODO Remove from chest
-    # TODO Update treasure
-    return drawn
+    return choice(tuple(seq))
+
+
+def draw_treasure(
+        treasure: Treasure,
+        chest: Treasure,
+        choice: Choice,
+) -> typing.Tuple[Treasure, Treasure]:
+    drawn = _draw(chest=chest, choice=choice)
+    treasure = treasure._replace(**{drawn: getattr(treasure, drawn) + 1})
+    chest = chest._replace(**{drawn: getattr(chest, drawn) - 1})
+    return treasure, chest
+
+
+def replace_treasure(
+        treasure: Treasure,
+        chest: Treasure,
+        item: str,
+) -> typing.Tuple[Treasure, Treasure]:
+    assert getattr(treasure, item) > 1
+    treasure = treasure._replace(**{item: getattr(treasure, item) - 1})
+    chest = chest._replace(**{item: getattr(chest, item) + 1})
+    return treasure, chest
 
 
 World = collections.namedtuple('World', (
