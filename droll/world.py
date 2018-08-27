@@ -87,7 +87,7 @@ def _draw(chest: Treasure, randrange: RandRange) -> str:
     return seq[randrange(0, len(seq))]
 
 
-def draw_treasure(
+def _draw_treasure(
         treasure: Treasure,
         chest: Treasure,
         randrange: RandRange,
@@ -95,10 +95,10 @@ def draw_treasure(
     drawn = _draw(chest=chest, randrange=randrange)
     treasure = treasure._replace(**{drawn: getattr(treasure, drawn) + 1})
     chest = chest._replace(**{drawn: getattr(chest, drawn) - 1})
-    return treasure, chest
+    return drawn, treasure, chest
 
 
-def replace_treasure(
+def _replace_treasure(
         treasure: Treasure,
         chest: Treasure,
         item: str,
@@ -150,3 +150,20 @@ def next_level(world: World, randrange: RandRange) -> World:
     level = roll_level(dice=(next_depth - prior_dragons), randrange=randrange)
     level = level._replace(dragon=level.dragon + prior_dragons)
     return world._replace(depth=next_depth, level=level)
+
+# FIXME START BELOW HERE WITH TESTING
+
+
+def draw_treasure(
+        world: World,
+        randrange: RandRange
+) -> typing.Tuple[str, World]:
+    drawn, new_treasure, new_chest = _draw_treasure(
+            treasure=world.treasure, chest=world.chest, randrange=randrange)
+    return drawn, world._replace(treasure=new_treasure, chest=new_chest)
+
+
+def replace_treasure(world: World, item: str) -> World:
+    new_treasure, new_chest = _replace_treasure(
+            treasure=world.treasure, chest=world.chest, item=item)
+    return world._replace(treasure=new_treasure, chest=new_chest)
