@@ -19,9 +19,18 @@ def test_game_initial():
     assert 0 == sum(game.treasure)
     assert (6*3) + (4*3) + 6 == sum(game.chest)
 
+
 def test_delve_initial(state):
     game = droll.world.new_game()
     delve = droll.world.new_delve(game, state.randrange)
     assert 0 == delve.depth
     assert delve.ability is True
     assert 7 == sum(delve.party)
+
+
+def test_level_initial(state):
+    game = droll.world.new_game()
+    delve = droll.world.new_delve(game, state.randrange)
+    level = droll.world.next_level(delve, state.randrange)
+    assert 1 == level.depth
+    assert 1 == sum(level.level)

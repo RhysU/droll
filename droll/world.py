@@ -146,7 +146,7 @@ def next_level(world: World, randrange: RandRange) -> World:
     """Move one level deeper in the dungeon."""
     next_depth = world.depth + 1
     assert next_depth <= 10
-    prior_dragons = world.level.dragon
+    prior_dragons = 0 if world.level is None else world.level.dragon
     level = roll_level(dice=(next_depth - prior_dragons), randrange=randrange)
     level = level._replace(dragon=level.dragon + prior_dragons)
     return world._replace(depth=next_depth, level=level)
