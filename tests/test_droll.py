@@ -22,15 +22,15 @@ def test_game_initial():
 
 def test_delve_initial(state):
     game = droll.world.new_game()
-    delve = droll.world.new_delve(game, state.randrange)
-    assert 0 == delve.depth
-    assert delve.ability is True
-    assert 7 == sum(delve.party)
+    game = droll.world.new_delve(game, state.randrange)
+    assert 0 == game.depth
+    assert game.ability is True
+    assert 7 == sum(game.party)
 
 
 def test_level_initial(state):
     game = droll.world.new_game()
-    delve = droll.world.new_delve(game, state.randrange)
-    level = droll.world.next_level(delve, state.randrange)
-    assert 1 == level.depth
-    assert 1 == sum(level.level)
+    game = droll.world.new_delve(game, state.randrange)
+    game = droll.world.next_level(game, state.randrange)
+    assert 1 == game.depth
+    assert 1 == sum(game.level)
