@@ -1,22 +1,27 @@
-"""
-Sample Test
-"""
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-import droll.main
+import random
+
+import droll.world
 
 
-@pytest.fixture
-def sample_fixture():
-    """Setup test fixture"""
-    return 1
+@pytest.fixture(name='state')
+def _state():
+    return random.Random(4)
 
 
-def test_func(sample_fixture):
-    """Test the sample function"""
-    assert droll.main.sample_func(1) == 2
+def test_game_initial():
+    game = droll.world.new_game()
+    assert 0 == game.experience
+    assert 0 == sum(game.treasure)
+    assert (6*3) + (4*3) + 6 == sum(game.chest)
 
-
-def test_negative(sample_fixture):
-    """Negative test of sample function"""
-    assert droll.main.sample_func(-2) == -1
+def test_delve_initial(state):
+    game = droll.world.new_game()
+    delve = droll.world.new_delve(game, state.randrange)
+    assert 0 == delve.depth
+    assert delve.ability is True
+    assert 7 == sum(delve.party)
