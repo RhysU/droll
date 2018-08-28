@@ -137,15 +137,15 @@ def draw_treasure(
         randrange: RandRange
 ) -> typing.Tuple[str, World]:
     """Draw a single item from the chest into the player's treasures."""
-    drawn = _draw(chest=chest, randrange=randrange)
-    treasure = treasure._replace(**{drawn: getattr(treasure, drawn) + 1})
-    chest = chest._replace(**{drawn: getattr(chest, drawn) - 1})
+    drawn = _draw(chest=world.chest, randrange=randrange)
+    treasure = world.treasure._replace(**{drawn: getattr(world.treasure, drawn) + 1})
+    chest = world.chest._replace(**{drawn: getattr(world.chest, drawn) - 1})
     return drawn, world._replace(treasure=treasure, chest=chest)
 
 
 def replace_treasure(world: World, item: str) -> World:
     """Replace a single item from the player's treasures into the chest."""
-    assert getattr(treasure, item) > 1, "'{}' not in player's treasure".format(item)
-    treasure = treasure._replace(**{item: getattr(treasure, item) - 1})
-    chest = chest._replace(**{item: getattr(chest, item) + 1})
+    assert getattr(world.treasure, item) > 0, "'{}' not in player's treasure".format(item)
+    treasure = world.treasure._replace(**{item: getattr(world.treasure, item) - 1})
+    chest = world.chest._replace(**{item: getattr(world.chest, item) + 1})
     return world._replace(treasure=treasure, chest=chest)
