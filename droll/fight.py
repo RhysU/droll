@@ -53,7 +53,7 @@ _MANY_DEFAULT = Party(
         skeleton=False,
         ooze=False,
         chest=False,
-        potion=False,
+        potion=True,
         dragon=False,
     ),
 )
