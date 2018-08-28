@@ -26,7 +26,7 @@ def _roll(
         stop: int,
         randrange: RandRange
 ) -> typing.List[int]:
-    assert dice >= 0
+    assert dice >= 0, "At least one dice must be requested"
     result = [0] * (stop - start)
     for _ in range(dice):
         result[randrange(start, stop)] += 1
@@ -77,38 +77,6 @@ CHEST_INITIAL = Treasure(*_CHEST.values())
 
 TREASURE_INITIAL = Treasure(*([0] * len(_CHEST)))
 
-def _draw(chest: Treasure, randrange: RandRange) -> str:
-    seq = functools.reduce(
-        itertools.chain,
-        (itertools.repeat(t, chest[i])
-         for i, t in enumerate(Treasure._fields)),
-        [])
-    seq = tuple(seq)
-    return seq[randrange(0, len(seq))]
-
-
-def _draw_treasure(
-        treasure: Treasure,
-        chest: Treasure,
-        randrange: RandRange,
-) -> typing.Tuple[Treasure, Treasure]:
-    drawn = _draw(chest=chest, randrange=randrange)
-    treasure = treasure._replace(**{drawn: getattr(treasure, drawn) + 1})
-    chest = chest._replace(**{drawn: getattr(chest, drawn) - 1})
-    return drawn, treasure, chest
-
-
-def _replace_treasure(
-        treasure: Treasure,
-        chest: Treasure,
-        item: str,
-) -> typing.Tuple[Treasure, Treasure]:
-    assert getattr(treasure, item) > 1
-    treasure = treasure._replace(**{item: getattr(treasure, item) - 1})
-    chest = chest._replace(**{item: getattr(chest, item) + 1})
-    return treasure, chest
-
-
 World = collections.namedtuple('World', (
     'depth',
     'experience',
@@ -145,25 +113,39 @@ def new_delve(world: World, randrange: RandRange) -> World:
 def next_level(world: World, randrange: RandRange) -> World:
     """Move one level deeper in the dungeon."""
     next_depth = world.depth + 1
-    assert next_depth <= 10
+    assert next_depth <= 10, "Ten is the maximum delving depth"
     prior_dragons = 0 if world.level is None else world.level.dragon
     level = roll_level(dice=(next_depth - prior_dragons), randrange=randrange)
     level = level._replace(dragon=level.dragon + prior_dragons)
     return world._replace(depth=next_depth, level=level)
 
-# FIXME START BELOW HERE WITH TESTING
+
+# There are likely much, much faster implementations.
+def _draw(chest: Treasure, randrange: RandRange) -> str:
+    seq = functools.reduce(
+        itertools.chain,
+        (itertools.repeat(t, chest[i])
+         for i, t in enumerate(Treasure._fields)),
+        [])
+    seq = tuple(seq)
+    assert len(seq) > 1, "Presently no items remaining in the chest"
+    return seq[randrange(0, len(seq))]
 
 
 def draw_treasure(
         world: World,
         randrange: RandRange
 ) -> typing.Tuple[str, World]:
-    drawn, new_treasure, new_chest = _draw_treasure(
-            treasure=world.treasure, chest=world.chest, randrange=randrange)
-    return drawn, world._replace(treasure=new_treasure, chest=new_chest)
+    """Draw a single item from the chest into the player's treasures."""
+    drawn = _draw(chest=chest, randrange=randrange)
+    treasure = treasure._replace(**{drawn: getattr(treasure, drawn) + 1})
+    chest = chest._replace(**{drawn: getattr(chest, drawn) - 1})
+    return drawn, world._replace(treasure=treasure, chest=chest)
 
 
 def replace_treasure(world: World, item: str) -> World:
-    new_treasure, new_chest = _replace_treasure(
-            treasure=world.treasure, chest=world.chest, item=item)
-    return world._replace(treasure=new_treasure, chest=new_chest)
+    """Replace a single item from the player's treasures into the chest."""
+    assert getattr(treasure, item) > 1, "'{}' not in player's treasure".format(item)
+    treasure = treasure._replace(**{item: getattr(treasure, item) - 1})
+    chest = chest._replace(**{item: getattr(chest, item) + 1})
+    return world._replace(treasure=treasure, chest=chest)
