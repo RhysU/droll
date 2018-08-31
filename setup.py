@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Project Setup"""
 import os
 import sys
