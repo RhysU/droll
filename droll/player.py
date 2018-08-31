@@ -31,7 +31,7 @@ def __defeat_some(
     )
 
 
-def _defeat_one(
+def defeat_one(
         hero: str,
         world: World,
         randrange: RandRange,
@@ -43,7 +43,7 @@ def _defeat_one(
                          world=world, randrange=randrange, *defenders)
 
 
-def _defeat_all(
+def defeat_all(
         hero: str,
         world: World,
         randrange: RandRange,
@@ -79,7 +79,7 @@ def __open_some(
     return world
 
 
-def _open_one(
+def open_one(
         hero: str,
         world: World,
         randrange: RandRange,
@@ -91,7 +91,7 @@ def _open_one(
                        world=world, randrange=randrange, *chests)
 
 
-def _open_all(
+def open_all(
         hero: str,
         world: World,
         randrange: RandRange,
@@ -110,42 +110,42 @@ def _open_all(
 # Encodes default hero-vs-enemy capabilities
 _MANY_DEFAULT = Party(
     fighter=Level(
-        goblin=partial(_defeat_all, hero='fighter'),
-        skeleton=partial(_defeat_one, hero='fighter'),
-        ooze=partial(_defeat_one, hero='fighter'),
-        chest=partial(_open_one, hero='fighter'),
+        goblin=partial(defeat_all, hero='fighter'),
+        skeleton=partial(defeat_one, hero='fighter'),
+        ooze=partial(defeat_one, hero='fighter'),
+        chest=partial(open_one, hero='fighter'),
         potion=None,
         dragon=None,
     ),
     cleric=Level(
-        goblin=partial(_defeat_one, hero='cleric'),
-        skeleton=partial(_defeat_all, hero='cleric'),
-        ooze=partial(_defeat_one, hero='cleric'),
-        chest=partial(_open_one, hero='cleric'),
+        goblin=partial(defeat_one, hero='cleric'),
+        skeleton=partial(defeat_all, hero='cleric'),
+        ooze=partial(defeat_one, hero='cleric'),
+        chest=partial(open_one, hero='cleric'),
         potion=None,
         dragon=None,
     ),
     mage=Level(
-        goblin=partial(_defeat_one, hero='mage'),
-        skeleton=partial(_defeat_one, hero='mage'),
-        ooze=partial(_defeat_all, hero='mage'),
-        chest=partial(_open_one, hero='mage'),
+        goblin=partial(defeat_one, hero='mage'),
+        skeleton=partial(defeat_one, hero='mage'),
+        ooze=partial(defeat_all, hero='mage'),
+        chest=partial(open_one, hero='mage'),
         potion=None,
         dragon=None,
     ),
     thief=Level(
-        goblin=partial(_defeat_one, hero='thief'),
-        skeleton=partial(_defeat_one, hero='thief'),
-        ooze=partial(_defeat_one, hero='thief'),
-        chest=partial(_open_all, hero='thief'),
+        goblin=partial(defeat_one, hero='thief'),
+        skeleton=partial(defeat_one, hero='thief'),
+        ooze=partial(defeat_one, hero='thief'),
+        chest=partial(open_all, hero='thief'),
         potion=None,
         dragon=None,
     ),
     champion=Level(
-        goblin=partial(_defeat_all, hero='champion'),
-        skeleton=partial(_defeat_all, hero='champion'),
-        ooze=partial(_defeat_all, hero='champion'),
-        chest=partial(_open_all, hero='champion'),
+        goblin=partial(defeat_all, hero='champion'),
+        skeleton=partial(defeat_all, hero='champion'),
+        ooze=partial(defeat_all, hero='champion'),
+        chest=partial(open_all, hero='champion'),
         potion=None,
         dragon=None,
     ),
