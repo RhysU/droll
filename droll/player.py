@@ -18,7 +18,7 @@ def default_player() -> Party:
             skeleton=partial(defeat_one, hero='fighter'),
             ooze=partial(defeat_one, hero='fighter'),
             chest=partial(open_one, hero='fighter'),
-            potion=None,
+            potion=partial(quaff, hero='fighter'),
             dragon=None,
         ),
         cleric=Level(
@@ -26,7 +26,7 @@ def default_player() -> Party:
             skeleton=partial(defeat_all, hero='cleric'),
             ooze=partial(defeat_one, hero='cleric'),
             chest=partial(open_one, hero='cleric'),
-            potion=None,
+            potion=partial(quaff, hero='cleric'),
             dragon=None,
         ),
         mage=Level(
@@ -34,7 +34,7 @@ def default_player() -> Party:
             skeleton=partial(defeat_one, hero='mage'),
             ooze=partial(defeat_all, hero='mage'),
             chest=partial(open_one, hero='mage'),
-            potion=None,
+            potion=partial(quaff, hero='mage'),
             dragon=None,
         ),
         thief=Level(
@@ -42,7 +42,7 @@ def default_player() -> Party:
             skeleton=partial(defeat_one, hero='thief'),
             ooze=partial(defeat_one, hero='thief'),
             chest=partial(open_all, hero='thief'),
-            potion=None,
+            potion=partial(quaff, hero='thief'),
             dragon=None,
         ),
         champion=Level(
@@ -50,7 +50,7 @@ def default_player() -> Party:
             skeleton=partial(defeat_all, hero='champion'),
             ooze=partial(defeat_all, hero='champion'),
             chest=partial(open_all, hero='champion'),
-            potion=None,
+            potion=partial(quaff, hero='champion'),
             dragon=None,
         ),
         scroll=Level(
@@ -58,7 +58,7 @@ def default_player() -> Party:
             skeleton=None,
             ooze=None,
             chest=None,
-            potion=None,
+            potion=partial(quaff, hero='scroll'),
             dragon=None,
         ),
     )
@@ -160,11 +160,10 @@ def open_all(
                        world=world, randrange=randrange, *chests)
 
 
-# TODO Work very much in progress
 def quaff(
         hero: str,
         world: World,
-        randrange: RandRange,
+        _: RandRange,
         defender: str,
         *revived: typing.List[str]
 ) -> World:
@@ -180,13 +179,12 @@ def quaff(
     assert len(revived) == prior_defenders, (
         "Require exactly {} to revive".format(prior_defenders))
 
-    remaining_defenders = remaining(prior_defenders)
-    world = world._replace(
-        party=world.party._replace(**{hero: prior_heroes - 1}),
-        level=world.level._replace(**{defender: remaining_defenders}),
+    party = world.party
+    for die in revived:
+        party = party.replace(**{die: getattr(party, die) + 1})
+    return world._replace(
+        party=party,
+        level=world.level._replace(**{defender: 0}),
     )
-    for _ in range(prior_defenders - remaining_defenders):
-        world = draw_treasure(world, randrange)
-    return world
 
 # TODO No explicit defeat of the dragon
