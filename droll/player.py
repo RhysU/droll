@@ -18,7 +18,7 @@ def _defeat_some(
         _: RandRange,
         *defenders: typing.List[str]
 ) -> World:
-    """Update world after regular hero defeats exactly some defenders."""
+    """Update world after hero defeats exactly some defenders."""
     prior_heroes = getattr(world.party, hero)
     assert prior_heroes >= 1, "Require at least one {}".format(hero)
     defender, *_ = defenders
@@ -38,7 +38,7 @@ def _defeat_one(
         randrange: RandRange,
         *defenders: typing.List[str]
 ) -> World:
-    """Update world after regular hero defeats exactly one defender."""
+    """Update world after hero defeats exactly one defender."""
     return _defeat_some(remaining=lambda prior_defenders: prior_defenders - 1,
                         world=world, hero=hero, randrange=randrange, *defenders)
 
@@ -49,7 +49,7 @@ def _defeat_all(
         randrange: RandRange,
         *defenders: typing.List[str]
 ) -> World:
-    """Update world after regular hero defeats all of one type of defender."""
+    """Update world after hero defeats all of one type of defender."""
     return _defeat_some(remaining=lambda _: 0,
                         world=world, hero=hero, randrange=randrange, *defenders)
 
@@ -62,7 +62,7 @@ def _open_some(
         randrange: RandRange,
         *defenders: typing.List[str]
 ) -> World:
-    """Update world after regular hero open exactly some chests."""
+    """Update world after hero opens some chests."""
     prior_heroes = getattr(world.party, hero)
     assert prior_heroes >= 1, "Require at least one {}".format(hero)
     defender, *_ = defenders
@@ -85,7 +85,7 @@ def _open_one(
         randrange: RandRange,
         *defenders: typing.List[str]
 ) -> World:
-    """Update world after regular hero opens exactly one chest."""
+    """Update world after hero opens exactly one chest."""
     return _open_some(remaining=lambda prior_chests: prior_chests - 1,
                       world=world, hero=hero, randrange=randrange, *chests)
 
@@ -96,7 +96,7 @@ def _open_all(
         randrange: RandRange,
         *chests: typing.List[str]
 ) -> World:
-    """Update world after regular hero opens all chests."""
+    """Update world after hero opens all chests."""
     return _open_some(remaining=lambda _: 0,
                       world=world, hero=hero, randrange=randrange, *chests)
 
@@ -104,51 +104,51 @@ def _open_all(
 # Encodes default hero-vs-enemy capabilities
 _MANY_DEFAULT = Party(
     fighter=Level(
-        goblin=False,
-        skeleton=False,
-        ooze=False,
-        chest=False,
-        potion=True,
-        dragon=False,
+        goblin=_defeat_all,
+        skeleton=_defeat_one,
+        ooze=_defeat_one,
+        chest=_open_one,
+        potion=None,
+        dragon=None,
     ),
     cleric=Level(
-        goblin=False,
-        skeleton=False,
-        ooze=False,
-        chest=False,
-        potion=True,
-        dragon=False,
+        goblin=_defeat_one,
+        skeleton=_defeat_all,
+        ooze=_defeat_one,
+        chest=_open_one,
+        potion=None,
+        dragon=None,
     ),
     mage=Level(
-        goblin=False,
-        skeleton=False,
-        ooze=True,
-        chest=False,
-        potion=True,
-        dragon=False,
+        goblin=_defeat_one,
+        skeleton=_defeat_one,
+        ooze=_defeat_all,
+        chest=_open_one,
+        potion=None,
+        dragon=None,
     ),
     thief=Level(
-        goblin=False,
-        skeleton=False,
-        ooze=False,
-        chest=True,
-        potion=True,
-        dragon=False,
+        goblin=_defeat_one,
+        skeleton=_defeat_one,
+        ooze=_defeat_one,
+        chest=_open_all,
+        potion=None,
+        dragon=None,
     ),
     champion=Level(
-        goblin=False,
-        skeleton=False,
-        ooze=False,
-        chest=True,
-        potion=True,
-        dragon=False,
+        goblin=_defeat_all,
+        skeleton=_defeat_all,
+        ooze=_defeat_all,
+        chest=_open_all,
+        potion=None,
+        dragon=None,
     ),
     scroll=Level(
         goblin=None,
-        skeleton=False,
-        ooze=False,
-        chest=False,
-        potion=True,
-        dragon=False,
+        skeleton=None,
+        ooze=None,
+        chest=None,
+        potion=None,
+        dragon=None,
     ),
 )
