@@ -151,5 +151,4 @@ def replace_treasure(world: World, item: str) -> World:
     chest = world.chest._replace(**{item: getattr(world.chest, item) + 1})
     return world._replace(treasure=treasure, chest=chest)
 
-
 # TODO Update experience after retiring from a level

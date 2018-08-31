@@ -7,7 +7,6 @@ import typing
 
 from droll.world import Level, RandRange, Party, World
 
-
 _DEFEAT_NONSTANDARD = set(['chest', 'potion', 'dragon'])
 
 
@@ -24,12 +23,12 @@ def _defeat_some(
     assert prior_heroes >= 1, "Require at least one {}".format(hero)
     defender, *_ = defenders
     assert defender not in _DEFEAT_NONSTANDARD, (
-            "{} requires nonstandard handling".format(defender))
+        "{} requires nonstandard handling".format(defender))
     prior_defenders = getattr(world.level, defender)
     assert prior_defenders >= 1, "Expected at least one {}".format(defender)
     return world._replace(
-            party=world.party._replace(**{hero: prior_heroes - 1}),
-            level=world.level._replace(**{defender: remaining(prior_defenders)}),
+        party=world.party._replace(**{hero: prior_heroes - 1}),
+        level=world.level._replace(**{defender: remaining(prior_defenders)}),
     )
 
 
@@ -73,8 +72,8 @@ def _open_some(
     assert prior_defenders >= 1, "Expected at least one {}".format(defender)
     remaining_defenders = remaining(prior_defenders)
     world = world._replace(
-            party=world.party._replace(**{hero: prior_heroes - 1}),
-            level=world.level._replace(**{defender: remaining_defenders}),
+        party=world.party._replace(**{hero: prior_heroes - 1}),
+        level=world.level._replace(**{defender: remaining_defenders}),
     )
     for _ in range(prior_defenders - remaining_defenders):
         world = droll.world.draw_treasure(world, randrange)
@@ -102,6 +101,7 @@ def _open_all(
     """Update world after hero opens all chests."""
     return _open_some(hero=hero, remaining=lambda _: 0,
                       world=world, randrange=randrange, *chests)
+
 
 # TODO Quaffing one potions, including scrolls
 # TODO Quaffing all potions, including scrolls
