@@ -5,4 +5,5 @@ docs/_build
 .idea
 **/__pycache__/
 .pytest_cache
+*.swp
 .virtualenv
