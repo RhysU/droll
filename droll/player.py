@@ -13,9 +13,9 @@ _DEFEAT_NONSTANDARD = set(['chest', 'potion', 'dragon'])
 
 # Reduces boilerplate in _defeat_one and _defeat_all
 def _defeat_some(
+        hero: str,
         remaining: typing.Callable[[int], int],
         world: World,
-        hero: str,
         _: RandRange,
         *defenders: typing.List[str]
 ) -> World:
@@ -34,32 +34,33 @@ def _defeat_some(
 
 
 def _defeat_one(
-        world: World,
         hero: str,
+        world: World,
         randrange: RandRange,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero defeats exactly one defender."""
-    return _defeat_some(remaining=lambda prior_defenders: prior_defenders - 1,
-                        world=world, hero=hero, randrange=randrange, *defenders)
+    return _defeat_some(hero=hero,
+                        remaining=lambda prior_defenders: prior_defenders - 1,
+                        world=world, randrange=randrange, *defenders)
 
 
 def _defeat_all(
-        world: World,
         hero: str,
+        world: World,
         randrange: RandRange,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero defeats all of one type of defender."""
-    return _defeat_some(remaining=lambda _: 0,
-                        world=world, hero=hero, randrange=randrange, *defenders)
+    return _defeat_some(hero=hero, remaining=lambda _: 0,
+                        world=world, randrange=randrange, *defenders)
 
 
 # Reduces boilerplate in _open_one and _open_all
 def _open_some(
+        hero: str,
         remaining: typing.Callable[[int], int],
         world: World,
-        hero: str,
         randrange: RandRange,
         *defenders: typing.List[str]
 ) -> World:
@@ -81,25 +82,26 @@ def _open_some(
 
 
 def _open_one(
-        world: World,
         hero: str,
+        world: World,
         randrange: RandRange,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero opens exactly one chest."""
-    return _open_some(remaining=lambda prior_chests: prior_chests - 1,
-                      world=world, hero=hero, randrange=randrange, *chests)
+    return _open_some(hero=hero,
+                      remaining=lambda prior_chests: prior_chests - 1,
+                      world=world, randrange=randrange, *chests)
 
 
 def _open_all(
-        world: World,
         hero: str,
+        world: World,
         randrange: RandRange,
         *chests: typing.List[str]
 ) -> World:
     """Update world after hero opens all chests."""
-    return _open_some(remaining=lambda _: 0,
-                      world=world, hero=hero, randrange=randrange, *chests)
+    return _open_some(hero=hero, remaining=lambda _: 0,
+                      world=world, randrange=randrange, *chests)
 
 # TODO Quaffing one potions, including scrolls
 # TODO Quaffing all potions, including scrolls
