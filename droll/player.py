@@ -100,6 +100,10 @@ def _open_all(
     return _open_some(remaining=lambda _: 0,
                       world=world, hero=hero, randrange=randrange, *chests)
 
+# TODO Quaffing one potions, including scrolls
+# TODO Quaffing all potions, including scrolls
+# TODO No explicit defeat of the dragon
+
 
 # Encodes default hero-vs-enemy capabilities
 _MANY_DEFAULT = Party(
