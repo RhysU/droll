@@ -18,6 +18,8 @@ Level = collections.namedtuple('Level', (
     'dragon',
 ))
 
+# random.Random.randrange or random.randrange are accepted for randomness.
+# Note, too, that a deterministic function may be provided for testing.
 RandRange = typing.Callable[[int, int], int]
 
 
@@ -37,8 +39,7 @@ def _roll(
 def roll_level(dice: int, randrange: RandRange) -> Level:
     """Roll a new Level using given number of dice.
 
-    On Level N one should account for the number of extant dragons.
-    random.Random.randrange or random.randrange are accepted for randomness."""
+    On Level N one should account for the number of extant dragons."""
     return Level(*_roll(dice, 0, len(Level._fields), randrange))
 
 
@@ -53,9 +54,7 @@ Party = collections.namedtuple('Party', (
 
 
 def roll_party(dice: int, randrange: RandRange) -> Party:
-    """Roll a new Party using given number of dice.
-
-    random.Random.randrange or random.randrange are accepted for randomness."""
+    """Roll a new Party using given number of dice."""
     return Party(*_roll(dice, 0, len(Party._fields), randrange))
 
 
