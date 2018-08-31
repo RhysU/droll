@@ -5,11 +5,11 @@
 import pytest
 import random
 
-import droll.fight
+import droll.player
 
 @pytest.fixture(name='party')
 def _party():
-    return droll.fight.Party(*([1] * len(droll.fight.Party._fields)))
+    return droll.player.Party(*([1] * len(droll.player.Party._fields)))
 
 def test_fighter(party):
     pass

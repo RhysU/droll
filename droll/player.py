@@ -4,12 +4,53 @@
 
 import typing
 
-from droll.world import Level, Party
+from droll.world import Level, Party, World
+
+
+_DEFEAT_NONSTANDARD = set(['chest', 'potion', 'dragon'])
+
+
+# Reduces boilerplate in _defeat_one and _defeat_all
+def _defeat_some(
+        remaining: typing.Callable[[int], int],
+        world: World,
+        hero: str,
+        *defenders: typing.List[str]
+) -> World:
+    """Update world after regular hero defeats exactly some defenders."""
+    prior_heroes = getattr(world.party, hero)
+    assert prior_heroes >= 1, "Require at least one {}".format(hero)
+    defender, *_ = defenders
+    assert defender not in _DEFEAT_NONSTANDARD, (
+            "{} requires nonstandard handling".format(defender))
+    prior_defenders = getattr(world.level, defender)
+    assert prior_defenders >= 1, "Expected at least one {}".format(defender)
+    return world._replace(
+            party=world.party._replace(**{hero: prior_heroes - 1}),
+            level=world.level._replace(**{defender: remaining(prior_defenders)}),
+    )
+
+
+def _defeat_one(world: World, hero: str, *defenders: typing.List[str]) -> World:
+    """Update world after regular hero defeats exactly one defender."""
+    return _defeat_some(remaining=lambda prior_defenders: prior_defenders - 1,
+                        world=world,
+                        hero=hero,
+                        *defenders)
+
+
+def _defeat_all(world: World, hero: str, *defenders: typing.List[str]) -> World:
+    """Update world after regular hero defeats all of one type of defender."""
+    return _defeat_some(remaining=lambda _: 0,
+                        world=world,
+                        hero=hero,
+                        *defenders)
+
 
 # Encodes default hero-vs-enemy capabilities
 _MANY_DEFAULT = Party(
     fighter=Level(
-        goblin=True,
+        goblin=False,
         skeleton=False,
         ooze=False,
         chest=False,
@@ -18,7 +59,7 @@ _MANY_DEFAULT = Party(
     ),
     cleric=Level(
         goblin=False,
-        skeleton=True,
+        skeleton=False,
         ooze=False,
         chest=False,
         potion=True,
@@ -41,15 +82,15 @@ _MANY_DEFAULT = Party(
         dragon=False,
     ),
     champion=Level(
-        goblin=True,
-        skeleton=True,
-        ooze=True,
+        goblin=False,
+        skeleton=False,
+        ooze=False,
         chest=True,
         potion=True,
         dragon=False,
     ),
     scroll=Level(
-        goblin=False,
+        goblin=None,
         skeleton=False,
         ooze=False,
         chest=False,
@@ -57,13 +98,3 @@ _MANY_DEFAULT = Party(
         dragon=False,
     ),
 )
-
-def survivors(level: Level, defender: str, attacker: str, *, prowess = _MANY_DEFAULT):
-    assert defender != 'dragon'  # Special case
-    assert attacker != 'scroll'  # Special case
-    prior = getattr(level, defender)
-    assert prior >= 1
-    if getattr(getattr(prowess, attacker), defender):
-        return level._replace(**{defender: 0})
-    else:
-        return level._replace(**{defender: prior -1})
