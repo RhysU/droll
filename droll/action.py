@@ -10,14 +10,14 @@ from .world import Level, RandRange, Party, World, draw_treasure, roll_level
 
 
 def defeat_invalid(
-        _world: World, _randrange: RandRange, hero: str, target: str
+        world: World, randrange: RandRange, hero: str, target: str
 ) -> World:
     """Raise because the hero cannot defeat the specified target."""
     raise RuntimeError('Hero {} cannot defeat {}'.format(hero, target))
 
 
 def defeat_one(
-        world: World, _randrange: RandRange, hero: str, target: str
+        world: World, randrange: RandRange, hero: str, target: str
 ) -> World:
     """Update world after hero defeats exactly one defender."""
     return world._replace(
@@ -41,7 +41,7 @@ def __decrement_defender(level: Level, defender: str) -> Level:
 
 
 def defeat_all(
-        world: World, _randrange: RandRange, hero: str, target: str
+        world: World, randrange: RandRange, hero: str, target: str
 ) -> World:
     """Update world after hero defeats all of one type of defender."""
     return world._replace(
@@ -68,10 +68,7 @@ def open_one(
 
 
 def open_all(
-        world: World,
-        randrange: RandRange,
-        hero: str,
-        target: str,
+        world: World, randrange: RandRange, hero: str, target: str
 ) -> World:
     """Update world after hero opens all chests."""
     howmany = getattr(world.level, target)
@@ -86,10 +83,7 @@ def open_all(
 
 
 def quaff(
-        world: World,
-        _randrange: RandRange,
-        hero: str,
-        target: str,
+        world: World, randrange: RandRange, hero: str, target: str,
         *revived: typing.List[str]
 ) -> World:
     """Update world after hero quaffs all available potions.
@@ -110,10 +104,7 @@ def quaff(
 
 
 def reroll(
-        world: World,
-        randrange: RandRange,
-        hero: str,
-        target: str,
+        world: World, randrange: RandRange, hero: str, target: str,
         *targets: typing.List[str]
 ) -> World:
     """Update world after hero rerolls some number of targets."""

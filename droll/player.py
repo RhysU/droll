@@ -27,12 +27,9 @@ def apply(
         *additional: typing.List[str]
 ) -> World:
     """Apply hero to target within world, returning a new version."""
-    # Lookup appropriate action logic
     action = getattr(getattr(player.party, hero), target)
-
-    # Invoke action, using that not all methods take additional arguments
-    additional.insert(0, target)
-    return action(world=world, randrange=randrange, hero=hero, *additional)
+    return action(world=world, randrange=randrange,
+                  hero=hero, target=target, *additional)
 
 
 # Default
