@@ -15,6 +15,15 @@ class WorldError(RuntimeError):
     pass
 
 
+def __compress_str(namedtuple):
+    """A __str__(...) variant suppressing any False field."""
+    keyvalues=[]
+    for key, value in zip(namedtuple._fields, namedtuple):
+        if value:
+            keyvalues.append('{}={}'.format(key, value))
+    return '{}({})'.format(namedtuple.__class__.__name__, ', '.join(keyvalues))
+
+
 Level = collections.namedtuple('Level', (
     'goblin',
     'skeleton',
