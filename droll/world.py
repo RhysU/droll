@@ -154,13 +154,35 @@ def next_level(
     return world._replace(depth=next_depth, level=level)
 
 
-# TODO Upgrade hero's ability after hitting 5 experience points
-# TODO Retire understands town portals
-# TODO Retire understands rings of invisibility
 def retire(world: World) -> World:
-    """Retire to the tavern after completing the present level."""
-    if not defeated_level(world.level):
-        raise WorldError("Current level is not yet complete")
+    """Retire to the tavern after completing the present level.
+
+    If monsters or a dragon remains, either ring of invisibility or
+    a town portal will be used if available."""
+    # Apologies for the following convoluted mess...
+    if defeated_level(world.level):
+        # Player has defeated the level thus no special handling required.
+        pass
+    elif defeated_monsters(world.level):
+        # Player has defeated the level but a dragon remains.
+        # First attempt to use a ring then a portal (because portals are +2)
+        try:
+            world = __throw_if_no_ring_of_invisibility(world)
+        except WorldError:
+            try:
+                world = __throw_if_no_town_portal(world)
+            except WorldError:
+                raise WorldError("Dragon remains but neither a ring of"
+                                 " invisibility nor a town portal in hand.")
+    else:
+        # Player has not defeated neither monsters nor possibly a dragon.
+        try:
+            world = __throw_if_no_town_portal(world)
+        except WorldError:
+            raise WorldError('Monsters remain but no town portal in hand.')
+
+    # TODO Upgrade hero's ability after hitting 5 experience points
+    # Success above, so update the world in anticipation of the next delve
     return world._replace(
         depth=0,
         experience=world.depth,
