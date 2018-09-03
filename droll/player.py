@@ -26,7 +26,10 @@ def apply(
         target: str,
         *additional: typing.List[str]
 ) -> World:
-    """Apply hero to target within world, returning a new version."""
+    """Apply hero to target within world, returning a new version.
+
+    Varargs 'additional' permits passing more required information.
+    For example, what heros to revive when quaffing a potion."""
     action = getattr(getattr(player.party, hero), target)
     return action(world, randrange, hero, target, *additional)
 
