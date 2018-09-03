@@ -121,7 +121,7 @@ def new_game() -> World:
     )
 
 
-def new_delve(world: World, randrange: RandRange) -> World:
+def new_delve(world: World, randrange: RandRange, *, party_dice=7) -> World:
     """Establish a new delve within an existing game."""
     if world.delve == 3:
         raise WorldError("At most three delves are permitted.")
@@ -129,19 +129,25 @@ def new_delve(world: World, randrange: RandRange) -> World:
         delve=world.delve + 1,
         depth=0,
         ability=True,
-        party=roll_party(dice=7, randrange=randrange),
+        party=roll_party(dice=party_dice, randrange=randrange),
     )
 
 
-def next_level(world: World, randrange: RandRange, *, max_depth=10) -> World:
-    """Move one level deeper in the dungeon."""
+def next_level(
+        world: World, randrange: RandRange, *,
+        max_depth=10,
+        level_dice=7
+) -> World:
+    """Move one level deeper in the dungeon, retaining any partial dragons.
+
+    Adheres to the specified number of dice available in the game."""
     if not defeated_level(world.level):
         raise WorldError("Current level is not yet complete")
     next_depth = world.depth + 1
     if next_depth > max_depth:
         raise WorldError("The maximum depth is {}".format(max_depth))
     prior_dragons = 0 if world.level is None else world.level.dragon
-    level = roll_level(dice=min(7, next_depth - prior_dragons),
+    level = roll_level(dice=min(level_dice - prior_dragons, next_depth),
                        randrange=randrange)
     level = level._replace(dragon=level.dragon + prior_dragons)
     return world._replace(depth=next_depth, level=level)
