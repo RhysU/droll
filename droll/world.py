@@ -254,10 +254,12 @@ def replace_treasure(world: World, item: str) -> World:
 
 
 def __throw_if_no_ring_of_invisibility(world: World) -> World:
-    """Attempt to use a ring of invisibility to 'sneak' past a dragon."""
-    return replace_treasure(world, 'ring')
+    """Attempt to use a ring of invisibility towards sneaking past a dragon."""
+    world = replace_treasure(world, 'ring')
+    return world._replace(level=world.level._replace(dragon=0))
 
 
 def __throw_if_no_town_portal(world: World) -> World:
-    """Attempt to use a town portal to retire to town."""
+    """Attempt to use a town portal towards retiring to town."""
+    # No need to reset monsters/dragon as level will be wholly replaced
     return replace_treasure(world, 'portal')
