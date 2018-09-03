@@ -46,10 +46,10 @@ class Interactive:
 
     # Per IPython.lib.pretty to ease observing world changes
     def _repr_pretty_(self, p, cycle=False):
-        p.text(brief(self._world))
+        p.text(pretty(self._world))
 
 
-def brief(o: typing.Any) -> str:
+def pretty(o: typing.Any, *, omitted: typing.Set[str] = {'chest'}) -> str:
     """A __str__(...) variant suppressing False fields within namedtuples."""
     fields = getattr(o, '_fields', None)
     if fields is None:
@@ -57,6 +57,6 @@ def brief(o: typing.Any) -> str:
 
     keyvalues = []
     for field, value in zip(fields, o):
-        if value:
-            keyvalues.append('{}={}'.format(field, brief(value)))
+        if value and not field in omitted:
+            keyvalues.append('{}={}'.format(field, pretty(value)))
     return '{}({})'.format(o.__class__.__name__, ', '.join(keyvalues))
