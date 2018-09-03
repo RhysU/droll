@@ -16,13 +16,26 @@ Player = collections.namedtuple('Player', (
     'party',
 ))
 
+# TODO Don't use scroll artifact unless no scoll hero dice
+_HERO_ARTIFACTS = {
+    'sword': 'fighter',
+    'talisman': 'cleric',
+    'sceptre': 'mage',
+    'tools': 'thief',
+    'scroll': 'scroll',
+}
+
+
+# TODO Dragon bait turns all remaining dungeon dice into dragons
+# TODO Elixir can be swapped for any party dice
+
 
 def apply(
         player: Player,
         world: World,
         randrange: RandRange,
         noun: str,
-        target: str,
+        target: str = None,
         *additional
 ) -> World:
     """Apply noun to target within world, returning a new version.

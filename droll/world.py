@@ -203,10 +203,6 @@ def retire(world: World) -> World:
     )
 
 
-# TODO Dragon bait turns all remaining dungeon dice into dragons
-# TODO Elixir can be swapped for any party dice
-
-
 def score(world: World) -> int:
     """Compute the present score for the game, including all treasure."""
     return (
