@@ -100,7 +100,7 @@ def quaff(
         raise ActionError("Require exactly {} to revive".format(howmany))
     party = __decrement_hero(world.party, hero)
     for die in revived:
-        party = party.replace(**{die: getattr(party, die) + 1})
+        party = party._replace(**{die: getattr(party, die) + 1})
     return world._replace(
         party=party,
         level=__eliminate_defenders(world.level, target)

@@ -84,9 +84,13 @@ def test_champion(game):
     assert game.party.champion == 1
     assert game.level.goblin == 0
 
-    game = player.apply(player.DEFAULT, game, None, 'champion', 'ooze')
+    pre = game
+    game = player.apply(player.DEFAULT, game, None,
+                        'champion', 'potion', 'cleric', 'mage')
     assert game.party.champion == 0
-    assert game.level.ooze == 0
+    assert game.level.potion == 0
+    assert game.party.cleric == pre.party.cleric + 1
+    assert game.party.mage == pre.party.mage + 1
 
 
 def test_scroll(game):

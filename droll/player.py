@@ -28,8 +28,7 @@ def apply(
 ) -> World:
     """Apply hero to target within world, returning a new version."""
     action = getattr(getattr(player.party, hero), target)
-    return action(world=world, randrange=randrange,
-                  hero=hero, target=target, *additional)
+    return action(world, randrange, hero, target, *additional)
 
 
 # Default
