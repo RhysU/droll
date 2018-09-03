@@ -95,6 +95,7 @@ CHEST_INITIAL = Treasure(*_CHEST.values())
 TREASURE_INITIAL = Treasure(*([0] * len(_CHEST)))
 
 World = collections.namedtuple('World', (
+    'delve',
     'depth',
     'experience',
     'ability',
@@ -108,6 +109,7 @@ World = collections.namedtuple('World', (
 def new_game() -> World:
     """Establish a new game independent of a delve/level."""
     return World(
+        delve=0,
         depth=None,
         experience=0,
         ability=None,
@@ -120,7 +122,10 @@ def new_game() -> World:
 
 def new_delve(world: World, randrange: RandRange) -> World:
     """Establish a new delve within an existing game."""
+    if world.delve == 3:
+        raise WorldError("At most three delves are permitted.")
     return world._replace(
+        delve=world.delve + 1,
         depth=0,
         ability=True,
         party=roll_party(dice=7, randrange=randrange),
