@@ -15,15 +15,6 @@ class WorldError(RuntimeError):
     pass
 
 
-def __compress_str(namedtuple):
-    """A __str__(...) variant suppressing any False field."""
-    keyvalues=[]
-    for key, value in zip(namedtuple._fields, namedtuple):
-        if value:
-            keyvalues.append('{}={}'.format(key, value))
-    return '{}({})'.format(namedtuple.__class__.__name__, ', '.join(keyvalues))
-
-
 Level = collections.namedtuple('Level', (
     'goblin',
     'skeleton',
@@ -198,5 +189,3 @@ def replace_treasure(world: World, item: str) -> World:
         **{item: getattr(world.treasure, item) - 1})
     chest = world.chest._replace(**{item: getattr(world.chest, item) + 1})
     return world._replace(treasure=treasure, chest=chest)
-
-# TODO Update experience after retiring from a level
