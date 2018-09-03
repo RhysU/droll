@@ -176,7 +176,7 @@ def open_all(
     defender = __single_defender(defenders)
     howmany = getattr(world.level, defender)
     if not howmany:
-        raise RuntimeError("At least 1 required for opening")
+        raise RuntimeError("At least 1 {} required".format(defender))
     for _ in range(howmany):
         world = draw_treasure(world, randrange)
     return world._replace(
