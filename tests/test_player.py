@@ -2,8 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import pytest
 import random
+
+import pytest
 
 import droll.action as action
 import droll.player as player
@@ -21,10 +22,6 @@ def _game():
 @pytest.fixture(name='randrange')
 def _randrange():
     return random.Random(4).randrange
-
-
-# TODO Scroll
-# TODO Quaff
 
 
 def test_fighter(game):
@@ -55,7 +52,6 @@ def test_cleric(game, randrange):
 
 
 def test_mage(game):
-
     game = player.apply(player.DEFAULT, game, None, 'mage', 'ooze')
     assert game.party.mage == 1
     assert game.level.ooze == 0
@@ -84,14 +80,35 @@ def test_champion(game):
     assert game.party.champion == 1
     assert game.level.goblin == 0
 
-    pre = game
     game = player.apply(player.DEFAULT, game, None,
-                        'champion', 'potion', 'cleric', 'mage')
+                        'champion', 'potion', 'cleric', 'mage')  # Different
     assert game.party.champion == 0
     assert game.level.potion == 0
-    assert game.party.cleric == pre.party.cleric + 1
-    assert game.party.mage == pre.party.mage + 1
+    assert game.party.cleric == 3
+    assert game.party.mage == 3
 
 
 def test_scroll(game):
-    pass
+    game = player.apply(player.DEFAULT, game, None,
+                        'scroll', 'potion', 'fighter', 'fighter')  # Duplicate
+    assert game.party.scroll == 1
+    assert game.level.potion == 0
+    assert game.party.fighter == 4
+
+    # Consumed by canned_sequence just below
+    sequence = [0, 1, 2]
+
+    def canned_sequence(start, stop):
+        return start + sequence.pop(0)
+
+    game = player.apply(player.DEFAULT, game, canned_sequence,
+                        'scroll', 'chest', 'ooze', 'chest')
+    assert game.party.scroll == 0
+    assert game.level == world.Level(
+        goblin=3,
+        skeleton=3,
+        ooze=2,
+        chest=0,
+        potion=0,
+        dragon=2,
+    )

@@ -4,13 +4,13 @@
 """Functionality associated with player action mechanics."""
 
 import operator
-import typing
 
 from .world import Level, RandRange, Party, World, draw_treasure, roll_level
 
 
 class ActionError(RuntimeError):
     """Indicates attempts to take impossible actions."""
+    pass
 
 
 def defeat_invalid(
@@ -87,8 +87,7 @@ def open_all(
 
 
 def quaff(
-        world: World, randrange: RandRange, hero: str, target: str,
-        *revived: typing.List[str]
+        world: World, randrange: RandRange, hero: str, target: str, *revived
 ) -> World:
     """Update world after hero quaffs all available potions.
 
@@ -108,12 +107,11 @@ def quaff(
 
 
 def reroll(
-        world: World, randrange: RandRange, hero: str, target: str,
-        *targets: typing.List[str]
+        world: World, randrange: RandRange, hero: str, *targets
 ) -> World:
     """Update world after hero rerolls some number of targets."""
-    # Push target onto the front of targets all are processed identically
-    targets.insert(0, target)
+    if not targets:
+        raise ActionError('At least one target must be re-rolled.')
 
     # Remove requested target from the level
     reduced = world.level

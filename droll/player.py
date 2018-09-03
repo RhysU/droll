@@ -4,13 +4,12 @@
 """Functionality associated with player action mechanics."""
 
 import collections
-import typing
 
-from .world import Level, Party, RandRange, World
 from .action import (
     defeat_all, defeat_invalid, defeat_one,
     open_all, open_one, quaff, reroll
 )
+from .world import Level, Party, RandRange, World
 
 # Placeholder for further expansion
 Player = collections.namedtuple('Player', (
@@ -24,7 +23,7 @@ def apply(
         randrange: RandRange,
         hero: str,
         target: str,
-        *additional: typing.List[str]
+        *additional
 ) -> World:
     """Apply hero to target within world, returning a new version.
 
@@ -34,7 +33,6 @@ def apply(
     return action(world, randrange, hero, target, *additional)
 
 
-# Default
 DEFAULT = Player(
     party=Party(
         fighter=Level(
