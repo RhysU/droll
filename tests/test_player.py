@@ -22,6 +22,10 @@ def _randrange():
     return random.Random(4).randrange
 
 
+# TODO Scroll
+# TODO Quaff
+
+
 def test_fighter(game):
     game = player.apply(player.DEFAULT, game, None, 'fighter', 'goblin')
     assert game.party.fighter == 1
@@ -31,13 +35,14 @@ def test_fighter(game):
     assert game.level.ooze == 1
 
 
-def test_cleric(game):
+def test_cleric(game, randrange):
     game = player.apply(player.DEFAULT, game, None, 'cleric', 'skeleton')
     assert game.party.cleric == 1
     assert game.level.skeleton == 0
-    game = player.apply(player.DEFAULT, game, None, 'cleric', 'ooze')
+    game = player.apply(player.DEFAULT, game, randrange, 'cleric', 'chest')
     assert game.party.cleric == 0
-    assert game.level.ooze == 1
+    assert game.level.chest == 1
+    assert sum(game.treasure) == 1
 
 
 def test_mage(game):
@@ -54,10 +59,18 @@ def test_thief(game, randrange):
     assert game.party.thief == 1
     assert game.level.chest == 0
     assert sum(game.treasure) == 2
+    game = player.apply(player.DEFAULT, game, None, 'thief', 'ooze')
+    assert game.party.thief == 0
+    assert game.level.ooze == 1
 
 
 def test_champion(game):
-    pass
+    game = player.apply(player.DEFAULT, game, None, 'champion', 'goblin')
+    assert game.party.champion == 1
+    assert game.level.goblin == 0
+    game = player.apply(player.DEFAULT, game, None, 'champion', 'ooze')
+    assert game.party.champion == 0
+    assert game.level.ooze == 0
 
 
 def test_scroll(game):
