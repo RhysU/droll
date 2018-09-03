@@ -87,7 +87,7 @@ def open_all(
 
 
 def quaff(
-        world: World, randrange: RandRange, hero: str, target: str, *revived
+        world: World, randrange: RandRange, hero: str, target: str, *revivable
 ) -> World:
     """Update world after hero quaffs all available potions.
 
@@ -95,11 +95,11 @@ def quaff(
     howmany = getattr(world.level, target)
     if not howmany:
         raise ActionError("At least 1 {} required".format(target))
-    if not len(revived) == howmany:
+    if len(revivable) != howmany:
         raise ActionError("Require exactly {} to revive".format(howmany))
     party = __decrement_hero(world.party, hero)
-    for die in revived:
-        party = party._replace(**{die: getattr(party, die) + 1})
+    for revived in revivable:
+        party = party._replace(**{revived: getattr(party, revived) + 1})
     return world._replace(
         party=party,
         level=__eliminate_defenders(world.level, target)
