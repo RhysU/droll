@@ -41,6 +41,9 @@ def test_fighter(game):
 
 
 def test_cleric(game, randrange):
+    with pytest.raises(action.ActionError):
+        player.apply(player.DEFAULT, game, None, 'cleric', 'dragon')
+
     game = player.apply(player.DEFAULT, game, None, 'cleric', 'skeleton')
     assert game.party.cleric == 1
     assert game.level.skeleton == 0
@@ -52,6 +55,7 @@ def test_cleric(game, randrange):
 
 
 def test_mage(game):
+
     game = player.apply(player.DEFAULT, game, None, 'mage', 'ooze')
     assert game.party.mage == 1
     assert game.level.ooze == 0
