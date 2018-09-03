@@ -76,7 +76,7 @@ def roll_party(dice: int, randrange: RandRange) -> Party:
     return Party(*_roll(dice, 0, len(Party._fields), randrange))
 
 
-_CHEST = collections.OrderedDict((
+_RESERVE = collections.OrderedDict((
     ('sword', 3),
     ('talisman', 3),
     ('sceptre', 3),
@@ -89,11 +89,11 @@ _CHEST = collections.OrderedDict((
     ('scale', 6),
 ))
 
-Treasure = collections.namedtuple('Treasure', _CHEST.keys())
+Treasure = collections.namedtuple('Treasure', _RESERVE.keys())
 
-CHEST_INITIAL = Treasure(*_CHEST.values())
+RESERVE_INITIAL = Treasure(*_RESERVE.values())
 
-TREASURE_INITIAL = Treasure(*([0] * len(_CHEST)))
+TREASURE_INITIAL = Treasure(*([0] * len(_RESERVE)))
 
 World = collections.namedtuple('World', (
     'delve',
@@ -103,7 +103,7 @@ World = collections.namedtuple('World', (
     'level',
     'party',
     'treasure',
-    'chest',
+    'reserve',
 ))
 
 
@@ -117,7 +117,7 @@ def new_game() -> World:
         level=None,
         party=None,
         treasure=copy.deepcopy(TREASURE_INITIAL),
-        chest=copy.deepcopy(CHEST_INITIAL),
+        reserve=copy.deepcopy(RESERVE_INITIAL),
     )
 
 
@@ -169,31 +169,35 @@ def score(world: World) -> int:
 
 
 # There are likely much, much faster implementations.
-def _draw(chest: Treasure, randrange: RandRange) -> str:
+def _draw(reserve: Treasure, randrange: RandRange) -> str:
     seq = functools.reduce(
         itertools.chain,
-        (itertools.repeat(t, chest[i])
+        (itertools.repeat(t, reserve[i])
          for i, t in enumerate(Treasure._fields)),
         [])
     seq = tuple(seq)
-    assert len(seq) > 1, "Presently no items remaining in the chest"
+    assert len(seq) > 1, "Presently no items remaining in the reserve"
     return seq[randrange(0, len(seq))]
 
 
 def draw_treasure(world: World, randrange: RandRange) -> World:
-    """Draw a single item from the chest into the player's treasures."""
-    drawn = _draw(chest=world.chest, randrange=randrange)
+    """Draw a single item from the reserve into the player's treasures."""
+    drawn = _draw(reserve=world.reserve, randrange=randrange)
     treasure = world.treasure._replace(
         **{drawn: getattr(world.treasure, drawn) + 1})
-    chest = world.chest._replace(**{drawn: getattr(world.chest, drawn) - 1})
-    return world._replace(treasure=treasure, chest=chest)
+    reserve = world.reserve._replace(
+        **{drawn: getattr(world.reserve, drawn) - 1}
+    )
+    return world._replace(treasure=treasure, reserve=reserve)
 
 
 def replace_treasure(world: World, item: str) -> World:
-    """Replace a single item from the player's treasures into the chest."""
+    """Replace a single item from the player's treasures into the reserve."""
     assert getattr(world.treasure,
                    item) > 0, "'{}' not in player's treasure".format(item)
     treasure = world.treasure._replace(
         **{item: getattr(world.treasure, item) - 1})
-    chest = world.chest._replace(**{item: getattr(world.chest, item) + 1})
-    return world._replace(treasure=treasure, chest=chest)
+    reserve = world.reserve._replace(
+        **{item: getattr(world.reserve, item) + 1}
+    )
+    return world._replace(treasure=treasure, reserve=reserve)

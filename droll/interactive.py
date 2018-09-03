@@ -76,7 +76,7 @@ class Interactive:
         p.text(pretty(self._world))
 
 
-def pretty(o: typing.Any, *, omitted: typing.Set[str] = {'chest'}) -> str:
+def pretty(o: typing.Any, *, omitted: typing.Set[str] = {'reserve'}) -> str:
     """A __str__(...) variant suppressing False fields within namedtuples."""
     fields = getattr(o, '_fields', None)
     if fields is None:

@@ -18,7 +18,7 @@ def test_game_initial():
     game = droll.world.new_game()
     assert 0 == game.experience
     assert 0 == sum(game.treasure)
-    assert (6*3) + (4*3) + 6 == sum(game.chest)
+    assert (6*3) + (4*3) + 6 == sum(game.reserve)
 
 
 def test_delve_initial(state):
@@ -42,7 +42,7 @@ def test_draw_treasure(state):
     post = droll.world.draw_treasure(pre, state.randrange)
     assert sum(pre.treasure) == 0
     assert sum(post.treasure) == 1
-    assert sum(pre.chest) - sum(post.chest) == 1
+    assert sum(pre.reserve) - sum(post.reserve) == 1
 
 
 def test_replace_treasure():
@@ -51,4 +51,4 @@ def test_replace_treasure():
     post = droll.world.replace_treasure(pre, 'elixir')
     assert sum(pre.treasure) == 1
     assert sum(post.treasure) == 0
-    assert sum(post.chest) - sum(pre.chest) == 1
+    assert sum(post.reserve) - sum(pre.reserve) == 1
