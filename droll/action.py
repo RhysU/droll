@@ -33,7 +33,7 @@ def defeat_one(
 def __decrement_hero(party: Party, hero: str) -> Party:
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
-        raise ValueError("Require at least one hero {}".format(hero))
+        raise ActionError("Require at least one hero {}".format(hero))
     return party._replace(**{hero: prior_heroes - 1})
 
 
