@@ -78,9 +78,9 @@ def default_player() -> Player:
 
 def apply(
         player: Player,
-        hero: str,
         world: World,
         randrange: RandRange,
+        hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Apply hero to defenders within world, returning a new version."""
@@ -90,9 +90,9 @@ def apply(
 
 
 def defeat_one(
-        hero: str,
         world: World,
         randrange: RandRange,
+        hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero defeats exactly one defender."""
@@ -102,9 +102,9 @@ def defeat_one(
 
 
 def defeat_all(
-        hero: str,
         world: World,
         randrange: RandRange,
+        hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero defeats all of one type of defender."""
@@ -112,32 +112,37 @@ def defeat_all(
                          world=world, randrange=randrange, *defenders)
 
 
+def __decrement_hero(party: Party, hero: str) -> Party:
+    prior_heroes = getattr(party, hero)
+    if not prior_heroes:
+        raise RuntimeError("Require at least one {}".format(hero))
+    return party._replace(**{hero: prior_heroes - 1})
+
+
 # Reduces boilerplate in _defeat_one and _defeat_all
 def __defeat_some(
-        hero: str,
         remaining: typing.Callable[[int], int],
         world: World,
         _: RandRange,
+        hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero defeats exactly some defenders."""
-    prior_heroes = getattr(world.party, hero)
-    assert prior_heroes >= 1, "Require at least one {}".format(hero)
     defender, *_ = defenders
     assert defender not in {'chest', 'potion', 'dragon'}, (
         "{} requires nonstandard handling".format(defender))
     prior_defenders = getattr(world.level, defender)
     assert prior_defenders >= 1, "Expected at least one {}".format(defender)
     return world._replace(
-        party=world.party._replace(**{hero: prior_heroes - 1}),
+        party=__decrement_hero(world.party, hero),
         level=world.level._replace(**{defender: remaining(prior_defenders)}),
     )
 
 
 def defeat_invalid(
-        hero: str,
         world: World,
         _: RandRange,
+        hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Hero cannot defeat the specified defender.."""
@@ -148,9 +153,9 @@ def defeat_invalid(
 
 
 def open_one(
-        hero: str,
         world: World,
         randrange: RandRange,
+        hero: str,
         *chests: typing.List[str]
 ) -> World:
     """Update world after hero opens exactly one chest."""
@@ -160,9 +165,9 @@ def open_one(
 
 
 def open_all(
-        hero: str,
         world: World,
         randrange: RandRange,
+        hero: str,
         *chests: typing.List[str]
 ) -> World:
     """Update world after hero opens all chests."""
@@ -172,17 +177,15 @@ def open_all(
 
 # Reduces boilerplate in _open_one and _open_all
 def __open_some(
-        hero: str,
         remaining: typing.Callable[[int], int],
         world: World,
         randrange: RandRange,
+        hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero opens some chests.
 
     Notice defenders is required for consistency with defend_{one,all}."""
-    prior_heroes = getattr(world.party, hero)
-    assert prior_heroes >= 1, "Require at least one {}".format(hero)
     defender, *_ = defenders
     assert defender == 'chest', (
         "Special logic does not handle {}".format(defender))
@@ -190,7 +193,7 @@ def __open_some(
     assert prior_defenders >= 1, "Expected at least one {}".format(defender)
     remaining_defenders = remaining(prior_defenders)
     world = world._replace(
-        party=world.party._replace(**{hero: prior_heroes - 1}),
+        party=__decrement_hero(world.party, hero),
         level=world.level._replace(**{defender: remaining_defenders}),
     )
     for _ in range(prior_defenders - remaining_defenders):
@@ -198,18 +201,17 @@ def __open_some(
     return world
 
 
+# TODO Method signature is off relative to other actions
 def quaff(
-        hero: str,
         world: World,
         _: RandRange,
+        hero: str,
         defender: str,
         *revived: typing.List[str]
 ) -> World:
     """Update world after hero quaffs all available potions.
 
     Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
-    prior_heroes = getattr(world.party, hero)
-    assert prior_heroes >= 1, "Require at least one {}".format(hero)
     assert defender == 'potion', (
         "Special logic does not handle {}".format(defender))
     prior_defenders = getattr(world.level, defender)
@@ -217,7 +219,7 @@ def quaff(
     assert len(revived) == prior_defenders, (
         "Require exactly {} to revive".format(prior_defenders))
 
-    party = world.party
+    party = __decrement_hero(world.party, hero),
     for die in revived:
         party = party.replace(**{die: getattr(party, die) + 1})
     return world._replace(
@@ -227,14 +229,12 @@ def quaff(
 
 
 def reroll(
-        hero: str,
         world: World,
         randrange: RandRange,
+        hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero rerolls some number of defenders."""
-    prior_heroes = getattr(world.party, hero)
-    assert prior_heroes >= 1, "Require at least one {}".format(hero)
     assert defenders, "At least one defender must be provided"
 
     # Remove requested defenders from the level
@@ -249,5 +249,6 @@ def reroll(
     # Re-roll the necessary number of dice
     update = roll_level(dice=len(defenders), randrange=randrange)
     return world._replace(
+        party=__decrement_hero(world.party, hero),
         level=Level(*tuple(map(operator.add, level, update)))
     )
