@@ -22,28 +22,28 @@ In [2]: x = Interactive()
 In [3]: x
 Out[3]: (delve=1, depth=1, ability=True, level=(goblin=1), party=(fighter=1, cleric=1, mage=1, thief=1, scroll=3), treasure=())
 
-In [4]: x.hero('fighter', 'goblin')
+In [4]: x.apply('fighter', 'goblin')
 Out[4]: (delve=1, depth=1, ability=True, level=(), party=(cleric=1, mage=1, thief=1, scroll=3), treasure=())
 
 In [5]: x.descend()
 Out[5]: (delve=1, depth=2, ability=True, level=(skeleton=1, dragon=1), party=(cleric=1, mage=1, thief=1, scroll=3), treasure=())
 
-In [6]: x.hero('mage', 'skeleton')
+In [6]: x.apply('mage', 'skeleton')
 Out[6]: (delve=1, depth=2, ability=True, level=(dragon=1), party=(cleric=1, thief=1, scroll=3), treasure=())
 
 In [7]: x.descend()
 Out[7]: (delve=1, depth=3, ability=True, level=(skeleton=1, ooze=1, chest=1, dragon=1), party=(cleric=1, thief=1, scroll=3), treasure=())
 
-In [8]: x.hero('scroll', 'skeleton', 'ooze')
+In [8]: x.apply('scroll', 'skeleton', 'ooze')
 Out[8]: (delve=1, depth=3, ability=True, level=(goblin=1, chest=2, dragon=1), party=(cleric=1, thief=1, scroll=2), treasure=())
 
-In [9]: x.hero('scroll', 'goblin')
+In [9]: x.apply('scroll', 'goblin')
 Out[9]: (delve=1, depth=3, ability=True, level=(ooze=1, chest=2, dragon=1), party=(cleric=1, thief=1, scroll=1), treasure=())
 
-In [10]: x.hero('scroll', 'ooze')
+In [10]: x.apply('scroll', 'ooze')
 Out[10]: (delve=1, depth=3, ability=True, level=(chest=3, dragon=1), party=(cleric=1, thief=1), treasure=())
 
-In [11]: x.hero('thief', 'chest')
+In [11]: x.apply('thief', 'chest')
 Out[11]: (delve=1, depth=3, ability=True, level=(dragon=1), party=(cleric=1), treasure=(sceptre=1, elixir=1, scale=1))
 
 In [12]: x.retire()

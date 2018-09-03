@@ -27,15 +27,15 @@ class Interactive:
         raise NotImplementedError("FIXME")
         return self
 
+    def apply(self, hero, *nouns) -> 'Droll':
+        """Apply some named hero or treasure to some collection of nouns."""
+        self._world = droll.player.apply(
+            self._player, self._world, self._randrange, hero, *nouns)
+        return self
+
     def descend(self) -> 'Droll':
         """Descend to the next level (in contrast to retiring."""
         self._world = droll.world.next_level(self._world, self._randrange)
-        return self
-
-    def hero(self, hero, *nouns) -> 'Droll':
-        """Apply some named hero to some collection of nouns."""
-        self._world = droll.player.apply(
-            self._player, self._world, self._randrange, hero, *nouns)
         return self
 
     def retire(self) -> 'Droll':
