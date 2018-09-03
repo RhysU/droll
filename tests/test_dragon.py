@@ -49,4 +49,20 @@ def test_monsters_remain(game, randrange):
     )
     with pytest.raises(action.ActionError):
         player.apply(player.DEFAULT, game, randrange,
-                            'fighter', 'dragon', 'cleric', 'mage')
+                     'fighter', 'dragon', 'cleric', 'mage')
+
+
+def test_too_few_specified(game, randrange):
+    with pytest.raises(action.ActionError):
+        player.apply(player.DEFAULT, game, randrange,
+                     'fighter', 'dragon', 'cleric')
+
+    with pytest.raises(action.ActionError):
+        player.apply(player.DEFAULT, game, randrange,
+                     'fighter', 'dragon')
+
+
+def test_not_enough_distinct(game, randrange):
+    with pytest.raises(action.ActionError):
+        player.apply(player.DEFAULT, game, randrange,
+                     'fighter', 'dragon', 'mage', 'mage')
