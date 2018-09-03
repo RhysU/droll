@@ -19,7 +19,7 @@ def default_player() -> Party:
             ooze=partial(defeat_one, hero='fighter'),
             chest=partial(open_one, hero='fighter'),
             potion=partial(quaff, hero='fighter'),
-            dragon=None,
+            dragon=partial(defeat_invalid, hero='fighter'),
         ),
         cleric=Level(
             goblin=partial(defeat_one, hero='cleric'),
@@ -27,7 +27,7 @@ def default_player() -> Party:
             ooze=partial(defeat_one, hero='cleric'),
             chest=partial(open_one, hero='cleric'),
             potion=partial(quaff, hero='cleric'),
-            dragon=None,
+            dragon=partial(defeat_invalid, hero='cleric'),
         ),
         mage=Level(
             goblin=partial(defeat_one, hero='mage'),
@@ -35,7 +35,7 @@ def default_player() -> Party:
             ooze=partial(defeat_all, hero='mage'),
             chest=partial(open_one, hero='mage'),
             potion=partial(quaff, hero='mage'),
-            dragon=None,
+            dragon=partial(defeat_invalid, hero='mage'),
         ),
         thief=Level(
             goblin=partial(defeat_one, hero='thief'),
@@ -43,7 +43,7 @@ def default_player() -> Party:
             ooze=partial(defeat_one, hero='thief'),
             chest=partial(open_all, hero='thief'),
             potion=partial(quaff, hero='thief'),
-            dragon=None,
+            dragon=partial(defeat_invalid, hero='thief'),
         ),
         champion=Level(
             goblin=partial(defeat_all, hero='champion'),
@@ -51,15 +51,17 @@ def default_player() -> Party:
             ooze=partial(defeat_all, hero='champion'),
             chest=partial(open_all, hero='champion'),
             potion=partial(quaff, hero='champion'),
-            dragon=None,
+            dragon=partial(defeat_invalid, hero='champion'),
         ),
+        # Technically scrolls could re-roll potions,
+        # but doing so would be a really peculiar choice.
         scroll=Level(
             goblin=None,
             skeleton=None,
             ooze=None,
             chest=None,
             potion=partial(quaff, hero='scroll'),
-            dragon=None,
+            dragon=partial(defeat_invalid, hero='scroll'),
         ),
     )
 
@@ -107,6 +109,19 @@ def defeat_all(
     """Update world after hero defeats all of one type of defender."""
     return __defeat_some(hero=hero, remaining=lambda _: 0,
                          world=world, randrange=randrange, *defenders)
+
+
+def defeat_invalid(
+        hero: str,
+        world: World,
+        _: RandRange,
+        *defenders: typing.List[str]
+) -> World:
+    """Hero cannot defeat the specified defender.."""
+    prior_heroes = getattr(world.party, hero)
+    assert prior_heroes >= 1, "Require at least one {}".format(hero)
+    defender, *_ = defenders
+    raise RuntimeError('Hero {} cannot defeat {}'.format(hero, defender))
 
 
 # Reduces boilerplate in _open_one and _open_all
@@ -187,4 +202,4 @@ def quaff(
         level=world.level._replace(**{defender: 0}),
     )
 
-# TODO No explicit defeat of the dragon
+# TODO Stop using assertions and instead throw appropriate exceptions?
