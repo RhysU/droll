@@ -57,6 +57,7 @@ def roll_level(dice: int, randrange: RandRange) -> Level:
     """Roll a new Level using given number of dice.
 
     On Level N one should account for the number of extant dragons."""
+    assert dice >= 1, "At least one dice required (requested {})".format(dice)
     return Level(*_roll(dice, 0, len(Level._fields), randrange))
 
 
@@ -132,14 +133,16 @@ def new_delve(world: World, randrange: RandRange) -> World:
     )
 
 
-def next_level(world: World, randrange: RandRange) -> World:
+def next_level(world: World, randrange: RandRange, *, max_depth=10) -> World:
     """Move one level deeper in the dungeon."""
     if not defeated_level(world.level):
         raise WorldError("Current level is not yet complete")
     next_depth = world.depth + 1
-    assert next_depth <= 10, "Ten is the maximum delving depth"
+    if next_depth > max_depth:
+        raise WorldError("The maximum depth is {}".format(max_depth))
     prior_dragons = 0 if world.level is None else world.level.dragon
-    level = roll_level(dice=(next_depth - prior_dragons), randrange=randrange)
+    level = roll_level(dice=min(7, next_depth - prior_dragons),
+                       randrange=randrange)
     level = level._replace(dragon=level.dragon + prior_dragons)
     return world._replace(depth=next_depth, level=level)
 
