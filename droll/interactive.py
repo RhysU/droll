@@ -12,6 +12,8 @@ import droll.world
 
 
 class Interactive:
+    """Tracking of state associated with a single game."""
+
     def __init__(self, player=droll.player.DEFAULT, randrange=None):
         self._player = player
         self._randrange = (random.Random().randrange
@@ -20,32 +22,39 @@ class Interactive:
         self._world = droll.world.new_delve(self._world, self._randrange)
         self._world = droll.world.next_level(self._world, self._randrange)
 
-    def score(self) -> int:
-        return droll.world.score(self._world)
+    def ability(self, *nouns) -> 'Droll':
+        """Invoke the player's ability."""
+        raise NotImplementedError("FIXME")
+        return self
 
-    def hero(self, *nouns) -> 'Droll':
+    def hero(self, hero, *nouns) -> 'Droll':
+        """Apply some named hero to some collection of nouns."""
         self._world = droll.player.apply(
-            self._player, self._world, self._randrange, *nouns)
+            self._player, self._world, self._randrange, hero, *nouns)
         return self
 
     def retire(self) -> 'Droll':
+        """Retire from the dungeon after successfully completing a level."""
         self._world = droll.world.retire(self._world)
         return self
 
     def retreat(self) -> 'Droll':
+        """Retreat from the level at any time (e.g. after being defeated)."""
         self._world = droll.world.new_delve(self._world, self._randrange)
         return self
 
-    def treasure(self, *nouns) -> 'Droll':
+    def score(self) -> int:
+        """Compute current game score."""
+        return droll.world.score(self._world)
+
+    def treasure(self, treasure, *nouns) -> 'Droll':
+        """Apply some named treasure to some collection of nouns.."""
         raise NotImplementedError("FIXME")
         return self
 
-    def ability(self, *nouns) -> 'Droll':
-        raise NotImplementedError("FIXME")
-        return self
-
-    # Per IPython.lib.pretty to ease observing world changes
     def _repr_pretty_(self, p, cycle=False):
+        """Print per IPython.lib.pretty to ease observing world changes."""
+        assert not cycle
         p.text(pretty(self._world))
 
 
