@@ -126,3 +126,44 @@ def reroll(
         party=__decrement_hero(world.party, hero),
         level=Level(*tuple(map(operator.add, reduced, increased)))
     )
+
+
+# TODO Chests / Potions only after monsters defeated
+
+# TODO Does defeating a dragon but losing a level retain the dragon experience?
+
+
+def defeat_dragon(
+        world: World, randrange: RandRange, hero: str, target: str, *others,
+        min_length: int = 3,
+        min_heroes: int = 3,
+) -> World:
+    """Update world after hero defeats a dragon using three different heroes.
+
+    Additional required heroes are specified within variable-length others."""
+    # Simple prerequisites for attempting to defeat the dragon
+    if world.level.dragon < min_length:
+        raise ActionError("Enemy {} only comes at length {}"
+                          .format(target, min_length))
+    if sum(world.level) != world.level.dragon:
+        raise ActionError("Enemy {} only comes after all others defeated."
+                          .format(target))
+    if len(others) != min_heroes - 1:
+        raise ActionError("A total of {} heroes must be specified."
+                          .format(min_heroes))
+
+    # Confirm required number of distinct heroes available
+    party = __decrement_hero(world.party, hero)
+    distinct_heroes = {hero}
+    for other in others:
+        party = __decrement_hero(party, other)
+        distinct_heroes.add(other)
+    if len(distinct_heroes) != min_heroes:
+        raise ActionError("The {} heroes must all be distinct")
+
+    # Attempt was successful, so update experience and treasure
+    return draw_treasure(world, randrange)._replace(
+        experience=world.experience + 1,
+        party=party,
+        level=__eliminate_defenders(world.level, target)
+    )
