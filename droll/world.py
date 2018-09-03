@@ -133,6 +133,7 @@ def new_delve(world: World, randrange: RandRange, *, party_dice=7) -> World:
     )
 
 
+# TODO next_level understands rings of invisibility
 def next_level(
         world: World, randrange: RandRange, *,
         max_depth=10,
@@ -154,6 +155,8 @@ def next_level(
 
 
 # TODO Upgrade hero's ability after hitting 5 experience points
+# TODO Retire understands town portals
+# TODO Retire understands rings of invisibility
 def retire(world: World) -> World:
     """Retire to the tavern after completing the present level."""
     if not defeated_level(world.level):
@@ -163,6 +166,10 @@ def retire(world: World) -> World:
         experience=world.depth,
         level=None,
     )
+
+
+# TODO Dragon bait turns all remaining dungeon dice into dragons
+# TODO Elixir can be swapped for any party dice
 
 
 def score(world: World) -> int:
