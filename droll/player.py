@@ -3,14 +3,19 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
 
+import collections
 import operator
 import typing
-from functools import partial
 
 from droll.world import (
     Level, RandRange, Party, World,
     draw_treasure, roll_level
 )
+
+# Placeholder for further expansion
+Player = collections.namedtuple('Player', (
+    'party',
+))
 
 
 # TODO Work very much in progress
@@ -18,60 +23,60 @@ def default_player() -> Party:
     """Encodes default hero-vs-enemy capabilities."""
     return Party(
         fighter=Level(
-            goblin=partial(defeat_all, hero='fighter'),
-            skeleton=partial(defeat_one, hero='fighter'),
-            ooze=partial(defeat_one, hero='fighter'),
-            chest=partial(open_one, hero='fighter'),
-            potion=partial(quaff, hero='fighter'),
-            dragon=partial(defeat_invalid, hero='fighter'),
+            goblin=defeat_all,
+            skeleton=defeat_one,
+            ooze=defeat_one,
+            chest=open_one,
+            potion=quaff,
+            dragon=defeat_invalid,
         ),
         cleric=Level(
-            goblin=partial(defeat_one, hero='cleric'),
-            skeleton=partial(defeat_all, hero='cleric'),
-            ooze=partial(defeat_one, hero='cleric'),
-            chest=partial(open_one, hero='cleric'),
-            potion=partial(quaff, hero='cleric'),
-            dragon=partial(defeat_invalid, hero='cleric'),
+            goblin=defeat_one,
+            skeleton=defeat_all,
+            ooze=defeat_one,
+            chest=open_one,
+            potion=quaff,
+            dragon=defeat_invalid,
         ),
         mage=Level(
-            goblin=partial(defeat_one, hero='mage'),
-            skeleton=partial(defeat_one, hero='mage'),
-            ooze=partial(defeat_all, hero='mage'),
-            chest=partial(open_one, hero='mage'),
-            potion=partial(quaff, hero='mage'),
-            dragon=partial(defeat_invalid, hero='mage'),
+            goblin=defeat_one,
+            skeleton=defeat_one,
+            ooze=defeat_all,
+            chest=open_one,
+            potion=quaff,
+            dragon=defeat_invalid,
         ),
         thief=Level(
-            goblin=partial(defeat_one, hero='thief'),
-            skeleton=partial(defeat_one, hero='thief'),
-            ooze=partial(defeat_one, hero='thief'),
-            chest=partial(open_all, hero='thief'),
-            potion=partial(quaff, hero='thief'),
-            dragon=partial(defeat_invalid, hero='thief'),
+            goblin=defeat_one,
+            skeleton=defeat_one,
+            ooze=defeat_one,
+            chest=open_all,
+            potion=quaff,
+            dragon=defeat_invalid,
         ),
         champion=Level(
-            goblin=partial(defeat_all, hero='champion'),
-            skeleton=partial(defeat_all, hero='champion'),
-            ooze=partial(defeat_all, hero='champion'),
-            chest=partial(open_all, hero='champion'),
-            potion=partial(quaff, hero='champion'),
-            dragon=partial(defeat_invalid, hero='champion'),
+            goblin=defeat_all,
+            skeleton=defeat_all,
+            ooze=defeat_all,
+            chest=open_all,
+            potion=quaff,
+            dragon=defeat_invalid,
         ),
         # Technically scrolls could re-roll potions,
         # but doing so would be a really peculiar choice.
         scroll=Level(
-            goblin=partial(reroll, hero='scroll'),
-            skeleton=partial(reroll, hero='scroll'),
-            ooze=partial(reroll, hero='scroll'),
-            chest=partial(reroll, hero='scroll'),
-            potion=partial(quaff, hero='scroll'),
-            dragon=partial(defeat_invalid, hero='scroll'),
+            goblin=reroll,
+            skeleton=reroll,
+            ooze=reroll,
+            chest=reroll,
+            potion=quaff,
+            dragon=defeat_invalid,
         ),
     )
 
 
 def apply(
-        player: Level,
+        player: Player,
         hero: str,
         world: World,
         randrange: RandRange,
@@ -79,8 +84,8 @@ def apply(
 ) -> World:
     """Apply hero to defenders within world, returning a new version."""
     defender, *_ = defenders
-    action = getattr(getattr(player, hero), defender)
-    return action(world=world, randrange=randrange, *defenders)
+    action = getattr(getattr(player.party, hero), defender)
+    return action(hero=hero, world=world, randrange=randrange, *defenders)
 
 
 # Reduces boilerplate in _defeat_one and _defeat_all
