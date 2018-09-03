@@ -9,6 +9,12 @@ import functools
 import itertools
 import typing
 
+
+class WorldError(RuntimeError):
+    """Indicates attempts to make impossible world changes.."""
+    pass
+
+
 Level = collections.namedtuple('Level', (
     'goblin',
     'skeleton',
@@ -21,12 +27,12 @@ Level = collections.namedtuple('Level', (
 
 def defeated_monsters(level: Level) -> bool:
     """Are all non-dragon monsters on this level defeated?"""
-    return 0 == (level.goblin + level.skeleton + level.ooze)
+    return (level is None) or 0 == (level.goblin + level.skeleton + level.ooze)
 
 
 def defeated_level(level: Level) -> bool:
     """Are all monsters and any dragon on this level defected?"""
-    return defeated_monsters(level) and level.dragon < 3
+    return (level is None) or (defeated_monsters(level) and level.dragon < 3)
 
 
 # random.Random.randrange or random.randrange are accepted for randomness.
@@ -123,6 +129,8 @@ def new_delve(world: World, randrange: RandRange) -> World:
 
 def next_level(world: World, randrange: RandRange) -> World:
     """Move one level deeper in the dungeon."""
+    if not defeated_level(world.level):
+        raise WorldError("Current level is not yet complete")
     next_depth = world.depth + 1
     assert next_depth <= 10, "Ten is the maximum delving depth"
     prior_dragons = 0 if world.level is None else world.level.dragon
