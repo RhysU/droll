@@ -132,6 +132,9 @@ def reroll(
     )
 
 
+# TODO "Lift" treasures into heros by augumenting world prior to apply(...)
+
+
 # TODO Does defeating a dragon but losing a level retain the dragon experience?
 
 
