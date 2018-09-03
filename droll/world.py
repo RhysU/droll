@@ -132,16 +132,13 @@ def _draw(chest: Treasure, randrange: RandRange) -> str:
     return seq[randrange(0, len(seq))]
 
 
-def draw_treasure(
-        world: World,
-        randrange: RandRange
-) -> typing.Tuple[str, World]:
+def draw_treasure(world: World, randrange: RandRange) -> World:
     """Draw a single item from the chest into the player's treasures."""
     drawn = _draw(chest=world.chest, randrange=randrange)
     treasure = world.treasure._replace(
         **{drawn: getattr(world.treasure, drawn) + 1})
     chest = world.chest._replace(**{drawn: getattr(world.chest, drawn) - 1})
-    return drawn, world._replace(treasure=treasure, chest=chest)
+    return world._replace(treasure=treasure, chest=chest)
 
 
 def replace_treasure(world: World, item: str) -> World:

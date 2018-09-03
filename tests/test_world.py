@@ -36,15 +36,18 @@ def test_level_initial(state):
     assert 1 == sum(game.level)
 
 
-def test_treasure(state):
+def test_draw_treasure(state):
     pre = droll.world.new_game()
-    item, post = droll.world.draw_treasure(pre, state.randrange)
-    assert item in droll.world.Treasure._fields
-    assert sum(pre.treasure) == 0
+    post = droll.world.draw_treasure(pre, state.randrange)
     assert sum(pre.treasure) == 0
     assert sum(post.treasure) == 1
     assert sum(pre.chest) - sum(post.chest) == 1
 
-    reset = droll.world.replace_treasure(post, item)
-    assert pre.treasure == reset.treasure
-    assert pre.chest == reset.chest
+
+def test_replace_treasure():
+    pre = droll.world.new_game()
+    pre = pre._replace(treasure=pre.treasure._replace(elixir=1))
+    post = droll.world.replace_treasure(pre, 'elixir')
+    assert sum(pre.treasure) == 1
+    assert sum(post.treasure) == 0
+    assert sum(post.chest) - sum(pre.chest) == 1
