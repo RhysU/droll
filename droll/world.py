@@ -139,6 +139,17 @@ def next_level(world: World, randrange: RandRange) -> World:
     return world._replace(depth=next_depth, level=level)
 
 
+# TODO Upgrade hero's ability after hitting 5 experience points
+def retire(world: World) -> World:
+    """Retire to the tavern after completing the present level."""
+    if not defeated_level(world.level):
+        raise WorldError("Current level is not yet complete")
+    return world._replace(
+        depth=0,
+        experience=world.depth,
+    )
+
+
 # There are likely much, much faster implementations.
 def _draw(chest: Treasure, randrange: RandRange) -> str:
     seq = functools.reduce(
