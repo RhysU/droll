@@ -207,11 +207,12 @@ def draw_treasure(world: World, randrange: RandRange) -> World:
 
 def replace_treasure(world: World, item: str) -> World:
     """Replace a single item from the player's treasures into the reserve."""
-    assert getattr(world.treasure,
-                   item) > 0, "'{}' not in player's treasure".format(item)
-    treasure = world.treasure._replace(
-        **{item: getattr(world.treasure, item) - 1})
-    reserve = world.reserve._replace(
-        **{item: getattr(world.reserve, item) + 1}
+    prior_count = getattr(world.treasure, item)
+    if not prior_count:
+        raise WorldError("'{}' not in player's treasure".format(item))
+    return world._replace(
+        treasure=world.treasure._replace(
+            **{item: prior_count - 1}),
+        reserve=world.reserve._replace(
+            **{item: getattr(world.reserve, item) + 1})
     )
-    return world._replace(treasure=treasure, reserve=reserve)
