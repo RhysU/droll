@@ -27,6 +27,11 @@ class Interactive:
         raise NotImplementedError("FIXME")
         return self
 
+    def descend(self) -> 'Droll':
+        """Descend to the next level (in contrast to retiring."""
+        self._world = droll.world.next_level(self._world, self._randrange)
+        return self
+
     def hero(self, hero, *nouns) -> 'Droll':
         """Apply some named hero to some collection of nouns."""
         self._world = droll.player.apply(
@@ -40,6 +45,7 @@ class Interactive:
         self._world = droll.world.retire(self._world)
         try:
             self._world = droll.world.new_delve(self._world, self._randrange)
+            self._world = droll.world.next_level(self._world, self._randrange)
         except droll.world.WorldError:
             pass
         return self
@@ -50,6 +56,7 @@ class Interactive:
         Automatically starts a new delve, if possible."""
         try:
             self._world = droll.world.new_delve(self._world, self._randrange)
+            self._world = droll.world.next_level(self._world, self._randrange)
         except droll.world.WorldError:
             pass
         return self
