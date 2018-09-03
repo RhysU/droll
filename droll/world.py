@@ -161,6 +161,7 @@ def retire(world: World) -> World:
     return world._replace(
         depth=0,
         experience=world.depth,
+        level=None,
     )
 
 
