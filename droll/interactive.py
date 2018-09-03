@@ -34,13 +34,24 @@ class Interactive:
         return self
 
     def retire(self) -> 'Droll':
-        """Retire from the dungeon after successfully completing a level."""
+        """Retire from the dungeon after successfully completing a level.
+
+        Automatically starts a new delve, if possible."""
         self._world = droll.world.retire(self._world)
+        try:
+            self._world = droll.world.new_delve(self._world, self._randrange)
+        except droll.world.WorldError:
+            pass
         return self
 
     def retreat(self) -> 'Droll':
-        """Retreat from the level at any time (e.g. after being defeated)."""
-        self._world = droll.world.new_delve(self._world, self._randrange)
+        """Retreat from the level at any time (e.g. after being defeated).
+
+        Automatically starts a new delve, if possible."""
+        try:
+            self._world = droll.world.new_delve(self._world, self._randrange)
+        except droll.world.WorldError:
+            pass
         return self
 
     def score(self) -> int:
