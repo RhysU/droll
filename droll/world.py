@@ -216,3 +216,13 @@ def replace_treasure(world: World, item: str) -> World:
         reserve=world.reserve._replace(
             **{item: getattr(world.reserve, item) + 1})
     )
+
+
+def __throw_if_no_ring_of_invisibility(world: World) -> World:
+    """Attempt to use a ring of invisibility to 'sneak' past a dragon."""
+    return replace_treasure(world, 'ring')
+
+
+def __throw_if_no_town_portal(world: World) -> World:
+    """Attempt to use a town portal to retire to town."""
+    return replace_treasure(world, 'portal')
