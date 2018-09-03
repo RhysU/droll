@@ -89,116 +89,100 @@ def apply(
     return action(hero=hero, world=world, randrange=randrange, *defenders)
 
 
+def __decrement_hero(party: Party, hero: str) -> Party:
+    prior_heroes = getattr(party, hero)
+    if not prior_heroes:
+        raise RuntimeError("Require at least one hero {}".format(hero))
+    return party._replace(**{hero: prior_heroes - 1})
+
+
+def __decrement_defender(level: Level, defender: str) -> Level:
+    prior_defenders = getattr(level, defender)
+    if not prior_defenders:
+        raise RuntimeError("Require at least one defender {}".format(defender))
+    return level._replace(**{defender: prior_defenders - 1})
+
+
+def __eliminate_defenders(level: Level, defender: str) -> Level:
+    prior_defenders = getattr(level, defender)
+    if not prior_defenders:
+        raise RuntimeError("Require at least one defender {}".format(defender))
+    return level._replace(**{defender: 0})
+
+
+def __single_defender(defenders: typing.List[str]) -> str:
+    if len(defenders) != 1:
+        raise RuntimeError("Exactly one defender must be specified.")
+    return defenders[0]
+
+
 def defeat_one(
         world: World,
-        randrange: RandRange,
+        _randrange: RandRange,
         hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero defeats exactly one defender."""
-    return __defeat_some(hero=hero,
-                         remaining=lambda prior_defenders: prior_defenders - 1,
-                         world=world, randrange=randrange, *defenders)
+    return world._replace(
+        party=__decrement_hero(world.party, hero),
+        level=__decrement_defender(world.level, __single_defender(defenders)),
+    )
 
 
 def defeat_all(
         world: World,
-        randrange: RandRange,
+        _randrange: RandRange,
         hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Update world after hero defeats all of one type of defender."""
-    return __defeat_some(hero=hero, remaining=lambda _: 0,
-                         world=world, randrange=randrange, *defenders)
-
-
-def __decrement_hero(party: Party, hero: str) -> Party:
-    prior_heroes = getattr(party, hero)
-    if not prior_heroes:
-        raise RuntimeError("Require at least one {}".format(hero))
-    return party._replace(**{hero: prior_heroes - 1})
-
-
-# Reduces boilerplate in _defeat_one and _defeat_all
-def __defeat_some(
-        remaining: typing.Callable[[int], int],
-        world: World,
-        _: RandRange,
-        hero: str,
-        *defenders: typing.List[str]
-) -> World:
-    """Update world after hero defeats exactly some defenders."""
-    defender, *_ = defenders
-    assert defender not in {'chest', 'potion', 'dragon'}, (
-        "{} requires nonstandard handling".format(defender))
-    prior_defenders = getattr(world.level, defender)
-    assert prior_defenders >= 1, "Expected at least one {}".format(defender)
     return world._replace(
         party=__decrement_hero(world.party, hero),
-        level=world.level._replace(**{defender: remaining(prior_defenders)}),
+        level=__eliminate_defenders(world.level, __single_defender(defenders)),
     )
 
 
 def defeat_invalid(
-        world: World,
-        _: RandRange,
+        _world: World,
+        _randrange: RandRange,
         hero: str,
         *defenders: typing.List[str]
 ) -> World:
     """Hero cannot defeat the specified defender.."""
-    prior_heroes = getattr(world.party, hero)
-    assert prior_heroes >= 1, "Require at least one {}".format(hero)
-    defender, *_ = defenders
-    raise RuntimeError('Hero {} cannot defeat {}'.format(hero, defender))
+    raise RuntimeError('Hero {} cannot defeat {}'.format(
+        hero, __single_defender(defenders)))
 
 
 def open_one(
         world: World,
         randrange: RandRange,
         hero: str,
-        *chests: typing.List[str]
+        *defenders: typing.List[str]
 ) -> World:
     """Update world after hero opens exactly one chest."""
-    return __open_some(hero=hero,
-                       remaining=lambda prior_chests: prior_chests - 1,
-                       world=world, randrange=randrange, *chests)
+    return draw_treasure(world, randrange)._replace(
+        party=__decrement_hero(world.party, hero),
+        level=__decrement_defender(world.level, __single_defender(defenders))
+    )
 
 
 def open_all(
         world: World,
         randrange: RandRange,
         hero: str,
-        *chests: typing.List[str]
-) -> World:
-    """Update world after hero opens all chests."""
-    return __open_some(hero=hero, remaining=lambda _: 0,
-                       world=world, randrange=randrange, *chests)
-
-
-# Reduces boilerplate in _open_one and _open_all
-def __open_some(
-        remaining: typing.Callable[[int], int],
-        world: World,
-        randrange: RandRange,
-        hero: str,
         *defenders: typing.List[str]
 ) -> World:
-    """Update world after hero opens some chests.
-
-    Notice defenders is required for consistency with defend_{one,all}."""
-    defender, *_ = defenders
-    assert defender == 'chest', (
-        "Special logic does not handle {}".format(defender))
-    prior_defenders = getattr(world.level, defender)
-    assert prior_defenders >= 1, "Expected at least one {}".format(defender)
-    remaining_defenders = remaining(prior_defenders)
-    world = world._replace(
-        party=__decrement_hero(world.party, hero),
-        level=world.level._replace(**{defender: remaining_defenders}),
-    )
-    for _ in range(prior_defenders - remaining_defenders):
+    """Update world after hero opens all chests."""
+    defender = __single_defender(defenders)
+    howmany = getattr(world.level, defender)
+    if not howmany:
+        raise RuntimeError("At least 1 required for opening")
+    for _ in range(howmany):
         world = draw_treasure(world, randrange)
-    return world
+    return world._replace(
+        party=__decrement_hero(world.party, hero),
+        level=__eliminate_defenders(world.level, defender),
+    )
 
 
 # TODO Method signature is off relative to other actions
