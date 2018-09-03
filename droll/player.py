@@ -76,17 +76,21 @@ def default_player() -> Player:
     )
 
 
-def apply(
+def play(
         player: Player,
         world: World,
         randrange: RandRange,
         hero: str,
-        *defenders: typing.List[str]
+        target: str,
+        *additional: typing.List[str]
 ) -> World:
-    """Apply hero to defenders within world, returning a new version."""
-    defender, *_ = defenders
-    action = getattr(getattr(player.party, hero), defender)
-    return action(hero=hero, world=world, randrange=randrange, *defenders)
+    """Apply hero to target within world, returning a new version."""
+    # Lookup appropriate action logic
+    action = getattr(getattr(player.party, hero), target)
+
+    # Invoke action, using that not all methods take additional arguments
+    additional.insert(0, target)
+    return action(world=world, randrange=randrange, hero=hero, *additional)
 
 
 def __decrement_hero(party: Party, hero: str) -> Party:
@@ -110,59 +114,40 @@ def __eliminate_defenders(level: Level, defender: str) -> Level:
     return level._replace(**{defender: 0})
 
 
-def __single_defender(defenders: typing.List[str]) -> str:
-    if len(defenders) != 1:
-        raise RuntimeError("Exactly one defender must be specified.")
-    return defenders[0]
-
-
 def defeat_one(
-        world: World,
-        _randrange: RandRange,
-        hero: str,
-        *defenders: typing.List[str]
+        world: World, _randrange: RandRange, hero: str, target: str
 ) -> World:
     """Update world after hero defeats exactly one defender."""
     return world._replace(
         party=__decrement_hero(world.party, hero),
-        level=__decrement_defender(world.level, __single_defender(defenders)),
+        level=__decrement_defender(world.level, target)
     )
 
 
 def defeat_all(
-        world: World,
-        _randrange: RandRange,
-        hero: str,
-        *defenders: typing.List[str]
+        world: World, _randrange: RandRange, hero: str, target: str
 ) -> World:
     """Update world after hero defeats all of one type of defender."""
     return world._replace(
         party=__decrement_hero(world.party, hero),
-        level=__eliminate_defenders(world.level, __single_defender(defenders)),
+        level=__eliminate_defenders(world.level, target)
     )
 
 
 def defeat_invalid(
-        _world: World,
-        _randrange: RandRange,
-        hero: str,
-        *defenders: typing.List[str]
+        _world: World, _randrange: RandRange, hero: str, target: str
 ) -> World:
     """Hero cannot defeat the specified defender.."""
-    raise RuntimeError('Hero {} cannot defeat {}'.format(
-        hero, __single_defender(defenders)))
+    raise RuntimeError('Hero {} cannot defeat {}'.format(hero, target))
 
 
 def open_one(
-        world: World,
-        randrange: RandRange,
-        hero: str,
-        *defenders: typing.List[str]
+        world: World, randrange: RandRange, hero: str, target: str
 ) -> World:
     """Update world after hero opens exactly one chest."""
     return draw_treasure(world, randrange)._replace(
         party=__decrement_hero(world.party, hero),
-        level=__decrement_defender(world.level, __single_defender(defenders))
+        level=__decrement_defender(world.level, target)
     )
 
 
@@ -170,45 +155,41 @@ def open_all(
         world: World,
         randrange: RandRange,
         hero: str,
-        *defenders: typing.List[str]
+        target: str,
 ) -> World:
     """Update world after hero opens all chests."""
-    defender = __single_defender(defenders)
-    howmany = getattr(world.level, defender)
+    howmany = getattr(world.level, target)
     if not howmany:
-        raise RuntimeError("At least 1 {} required".format(defender))
+        raise RuntimeError("At least 1 {} required".format(target))
     for _ in range(howmany):
         world = draw_treasure(world, randrange)
     return world._replace(
         party=__decrement_hero(world.party, hero),
-        level=__eliminate_defenders(world.level, defender),
+        level=__eliminate_defenders(world.level, target),
     )
 
 
-# TODO Method signature is off relative to other actions
 def quaff(
         world: World,
         _: RandRange,
         hero: str,
-        defender: str,
+        target: str,
         *revived: typing.List[str]
 ) -> World:
     """Update world after hero quaffs all available potions.
 
     Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
-    assert defender == 'potion', (
-        "Special logic does not handle {}".format(defender))
-    prior_defenders = getattr(world.level, defender)
-    assert prior_defenders >= 1, "Expected at least one {}".format(defender)
-    assert len(revived) == prior_defenders, (
-        "Require exactly {} to revive".format(prior_defenders))
-
-    party = __decrement_hero(world.party, hero),
+    howmany = getattr(world.level, target)
+    if not howmany:
+        raise RuntimeError("At least 1 {} required".format(target))
+    if not len(revived) == howmany:
+        raise RuntimeError("Require exactly {} to revive".format(howmany))
+    party = __decrement_hero(world.party, hero)
     for die in revived:
         party = party.replace(**{die: getattr(party, die) + 1})
     return world._replace(
         party=party,
-        level=world.level._replace(**{defender: 0}),
+        level=__eliminate_defenders(world.level, target)
     )
 
 
@@ -216,23 +197,23 @@ def reroll(
         world: World,
         randrange: RandRange,
         hero: str,
-        *defenders: typing.List[str]
+        target: str,
+        *targets: typing.List[str]
 ) -> World:
-    """Update world after hero rerolls some number of defenders."""
-    assert defenders, "At least one defender must be provided"
+    """Update world after hero rerolls some number of targets."""
+    # Push target onto the front of targets all are processed identically
+    targets.insert(0, target)
 
-    # Remove requested defenders from the level
-    level = world.level
-    for defender in defenders:
-        assert defender not in {'potion', 'dragon'}, (
-            "{} cannot be rerolled".format(defender))
-        prior_defenders = getattr(world.level, defender)
-        assert prior_defenders >= 1, "Expected at least one {}".format(defender)
-        level = level._replace(**{defender: prior_defenders - 1})
+    # Remove requested target from the level
+    reduced = world.level
+    for target in targets:
+        if target in {'potion', 'dragon'}:
+            raise RuntimeError("{} cannot be rerolled".format(target))
+        reduced = __decrement_defender(reduced, target)
 
-    # Re-roll the necessary number of dice
-    update = roll_level(dice=len(defenders), randrange=randrange)
+    # Re-roll the necessary number of dice then add to anything left fixed
+    increased = roll_level(dice=len(targets), randrange=randrange)
     return world._replace(
         party=__decrement_hero(world.party, hero),
-        level=Level(*tuple(map(operator.add, level, update)))
+        level=Level(*tuple(map(operator.add, reduced, increased)))
     )
