@@ -18,59 +18,60 @@ Player = collections.namedtuple('Player', (
 ))
 
 
-# TODO Work very much in progress
-def default_player() -> Party:
+def default_player() -> Player:
     """Encodes default hero-vs-enemy capabilities."""
-    return Party(
-        fighter=Level(
-            goblin=defeat_all,
-            skeleton=defeat_one,
-            ooze=defeat_one,
-            chest=open_one,
-            potion=quaff,
-            dragon=defeat_invalid,
-        ),
-        cleric=Level(
-            goblin=defeat_one,
-            skeleton=defeat_all,
-            ooze=defeat_one,
-            chest=open_one,
-            potion=quaff,
-            dragon=defeat_invalid,
-        ),
-        mage=Level(
-            goblin=defeat_one,
-            skeleton=defeat_one,
-            ooze=defeat_all,
-            chest=open_one,
-            potion=quaff,
-            dragon=defeat_invalid,
-        ),
-        thief=Level(
-            goblin=defeat_one,
-            skeleton=defeat_one,
-            ooze=defeat_one,
-            chest=open_all,
-            potion=quaff,
-            dragon=defeat_invalid,
-        ),
-        champion=Level(
-            goblin=defeat_all,
-            skeleton=defeat_all,
-            ooze=defeat_all,
-            chest=open_all,
-            potion=quaff,
-            dragon=defeat_invalid,
-        ),
-        # Technically scrolls could re-roll potions,
-        # but doing so would be a really peculiar choice.
-        scroll=Level(
-            goblin=reroll,
-            skeleton=reroll,
-            ooze=reroll,
-            chest=reroll,
-            potion=quaff,
-            dragon=defeat_invalid,
+    return Player(
+        party=Party(
+            fighter=Level(
+                goblin=defeat_all,
+                skeleton=defeat_one,
+                ooze=defeat_one,
+                chest=open_one,
+                potion=quaff,
+                dragon=defeat_invalid,
+            ),
+            cleric=Level(
+                goblin=defeat_one,
+                skeleton=defeat_all,
+                ooze=defeat_one,
+                chest=open_one,
+                potion=quaff,
+                dragon=defeat_invalid,
+            ),
+            mage=Level(
+                goblin=defeat_one,
+                skeleton=defeat_one,
+                ooze=defeat_all,
+                chest=open_one,
+                potion=quaff,
+                dragon=defeat_invalid,
+            ),
+            thief=Level(
+                goblin=defeat_one,
+                skeleton=defeat_one,
+                ooze=defeat_one,
+                chest=open_all,
+                potion=quaff,
+                dragon=defeat_invalid,
+            ),
+            champion=Level(
+                goblin=defeat_all,
+                skeleton=defeat_all,
+                ooze=defeat_all,
+                chest=open_all,
+                potion=quaff,
+                dragon=defeat_invalid,
+            ),
+            # Technically scrolls could re-roll potions,
+            # but doing so would be a really peculiar choice.
+            scroll=Level(
+                goblin=reroll,
+                skeleton=reroll,
+                ooze=reroll,
+                chest=reroll,
+                potion=quaff,
+                dragon=defeat_invalid,
+            ),
         ),
     )
 
@@ -86,28 +87,6 @@ def apply(
     defender, *_ = defenders
     action = getattr(getattr(player.party, hero), defender)
     return action(hero=hero, world=world, randrange=randrange, *defenders)
-
-
-# Reduces boilerplate in _defeat_one and _defeat_all
-def __defeat_some(
-        hero: str,
-        remaining: typing.Callable[[int], int],
-        world: World,
-        _: RandRange,
-        *defenders: typing.List[str]
-) -> World:
-    """Update world after hero defeats exactly some defenders."""
-    prior_heroes = getattr(world.party, hero)
-    assert prior_heroes >= 1, "Require at least one {}".format(hero)
-    defender, *_ = defenders
-    assert defender not in {'chest', 'potion', 'dragon'}, (
-        "{} requires nonstandard handling".format(defender))
-    prior_defenders = getattr(world.level, defender)
-    assert prior_defenders >= 1, "Expected at least one {}".format(defender)
-    return world._replace(
-        party=world.party._replace(**{hero: prior_heroes - 1}),
-        level=world.level._replace(**{defender: remaining(prior_defenders)}),
-    )
 
 
 def defeat_one(
@@ -133,6 +112,28 @@ def defeat_all(
                          world=world, randrange=randrange, *defenders)
 
 
+# Reduces boilerplate in _defeat_one and _defeat_all
+def __defeat_some(
+        hero: str,
+        remaining: typing.Callable[[int], int],
+        world: World,
+        _: RandRange,
+        *defenders: typing.List[str]
+) -> World:
+    """Update world after hero defeats exactly some defenders."""
+    prior_heroes = getattr(world.party, hero)
+    assert prior_heroes >= 1, "Require at least one {}".format(hero)
+    defender, *_ = defenders
+    assert defender not in {'chest', 'potion', 'dragon'}, (
+        "{} requires nonstandard handling".format(defender))
+    prior_defenders = getattr(world.level, defender)
+    assert prior_defenders >= 1, "Expected at least one {}".format(defender)
+    return world._replace(
+        party=world.party._replace(**{hero: prior_heroes - 1}),
+        level=world.level._replace(**{defender: remaining(prior_defenders)}),
+    )
+
+
 def defeat_invalid(
         hero: str,
         world: World,
@@ -144,6 +145,29 @@ def defeat_invalid(
     assert prior_heroes >= 1, "Require at least one {}".format(hero)
     defender, *_ = defenders
     raise RuntimeError('Hero {} cannot defeat {}'.format(hero, defender))
+
+
+def open_one(
+        hero: str,
+        world: World,
+        randrange: RandRange,
+        *chests: typing.List[str]
+) -> World:
+    """Update world after hero opens exactly one chest."""
+    return __open_some(hero=hero,
+                       remaining=lambda prior_chests: prior_chests - 1,
+                       world=world, randrange=randrange, *chests)
+
+
+def open_all(
+        hero: str,
+        world: World,
+        randrange: RandRange,
+        *chests: typing.List[str]
+) -> World:
+    """Update world after hero opens all chests."""
+    return __open_some(hero=hero, remaining=lambda _: 0,
+                       world=world, randrange=randrange, *chests)
 
 
 # Reduces boilerplate in _open_one and _open_all
@@ -172,29 +196,6 @@ def __open_some(
     for _ in range(prior_defenders - remaining_defenders):
         world = draw_treasure(world, randrange)
     return world
-
-
-def open_one(
-        hero: str,
-        world: World,
-        randrange: RandRange,
-        *chests: typing.List[str]
-) -> World:
-    """Update world after hero opens exactly one chest."""
-    return __open_some(hero=hero,
-                       remaining=lambda prior_chests: prior_chests - 1,
-                       world=world, randrange=randrange, *chests)
-
-
-def open_all(
-        hero: str,
-        world: World,
-        randrange: RandRange,
-        *chests: typing.List[str]
-) -> World:
-    """Update world after hero opens all chests."""
-    return __open_some(hero=hero, remaining=lambda _: 0,
-                       world=world, randrange=randrange, *chests)
 
 
 def quaff(
