@@ -18,6 +18,17 @@ Level = collections.namedtuple('Level', (
     'dragon',
 ))
 
+
+def defeated_monsters(level: Level) -> bool:
+    """Are all non-dragon monsters on this level defeated?"""
+    return 0 == (level.goblin + level.skeleton + level.ooze)
+
+
+def defeated_level(level: Level) -> bool:
+    """Are all monsters and any dragon on this level defected?"""
+    return defeated_monsters(level) and level.dragon < 3
+
+
 # random.Random.randrange or random.randrange are accepted for randomness.
 # Note, too, that a deterministic function may be provided for testing.
 RandRange = typing.Callable[[int, int], int]

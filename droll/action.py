@@ -5,7 +5,8 @@
 
 import operator
 
-from .world import Level, RandRange, Party, World, draw_treasure, roll_level
+from .world import (Level, RandRange, Party, World,
+                    defeated_monsters, draw_treasure, roll_level)
 
 
 class ActionError(RuntimeError):
@@ -62,9 +63,12 @@ def __eliminate_defenders(level: Level, defender: str) -> Level:
 
 
 def open_one(
-        world: World, randrange: RandRange, hero: str, target: str
+        world: World, randrange: RandRange, hero: str, target: str,
+        after_monsters=True,
 ) -> World:
     """Update world after hero opens exactly one chest."""
+    if after_monsters and not defeated_monsters(world.level):
+        raise ActionError("Monsters must be defeated before opening.")
     return draw_treasure(world, randrange)._replace(
         party=__decrement_hero(world.party, hero),
         level=__decrement_defender(world.level, target)
@@ -72,9 +76,12 @@ def open_one(
 
 
 def open_all(
-        world: World, randrange: RandRange, hero: str, target: str
+        world: World, randrange: RandRange, hero: str, target: str,
+        after_monsters=True,
 ) -> World:
     """Update world after hero opens all chests."""
+    if after_monsters and not defeated_monsters(world.level):
+        raise ActionError("Monsters must be defeated before opening.")
     howmany = getattr(world.level, target)
     if not howmany:
         raise ActionError("At least 1 {} required".format(target))
@@ -87,7 +94,8 @@ def open_all(
 
 
 def quaff(
-        world: World, randrange: RandRange, hero: str, target: str, *revivable
+        world: World, randrange: RandRange, hero: str, target: str, *revivable,
+        after_monsters=True
 ) -> World:
     """Update world after hero quaffs all available potions.
 
@@ -97,6 +105,8 @@ def quaff(
         raise ActionError("At least 1 {} required".format(target))
     if len(revivable) != howmany:
         raise ActionError("Require exactly {} to revive".format(howmany))
+    if after_monsters and not defeated_monsters(world.level):
+        raise ActionError("Monsters must be defeated before quaffing.")
     party = __decrement_hero(world.party, hero)
     for revived in revivable:
         party = party._replace(**{revived: getattr(party, revived) + 1})
@@ -136,7 +146,7 @@ def reroll(
 def defeat_dragon(
         world: World, randrange: RandRange, hero: str, target: str, *others,
         min_length: int = 3,
-        min_heroes: int = 3,
+        min_heroes: int = 3
 ) -> World:
     """Update world after hero defeats a dragon using three different heroes.
 

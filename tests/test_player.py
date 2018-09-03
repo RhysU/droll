@@ -19,6 +19,12 @@ def _game():
     )
 
 
+def __remove_monsters(game: world.World) -> world.World:
+    return game._replace(
+        level=game.level._replace(goblin=0, skeleton=0, ooze=0)
+    )
+
+
 @pytest.fixture(name='randrange')
 def _randrange():
     return random.Random(4).randrange
@@ -45,6 +51,7 @@ def test_cleric(game, randrange):
     assert game.party.cleric == 1
     assert game.level.skeleton == 0
 
+    game = __remove_monsters(game)  # Required for opening chest
     game = player.apply(player.DEFAULT, game, randrange, 'cleric', 'chest')
     assert game.party.cleric == 0
     assert game.level.chest == 1
@@ -62,15 +69,17 @@ def test_mage(game):
 
 
 def test_thief(game, randrange):
-    game = player.apply(player.DEFAULT, game, randrange, 'thief', 'chest')
+    game = player.apply(player.DEFAULT, game, None, 'thief', 'ooze')
     assert game.party.thief == 1
+    assert game.level.ooze == 1
+
+    game = __remove_monsters(game)  # Required for opening chest
+    game = player.apply(player.DEFAULT, game, randrange, 'thief', 'chest')
+    assert game.party.thief == 0
     assert game.level.chest == 0
     assert sum(game.treasure) == 2
 
-    game = player.apply(player.DEFAULT, game, None, 'thief', 'ooze')
-    assert game.party.thief == 0
-    assert game.level.ooze == 1
-
+    game = game._replace(party=game.party._replace(thief=1))  # Add one
     with pytest.raises(action.ActionError):
         player.apply(player.DEFAULT, game, None, 'thief', 'chest')
 
@@ -80,6 +89,7 @@ def test_champion(game):
     assert game.party.champion == 1
     assert game.level.goblin == 0
 
+    game = __remove_monsters(game)  # Required for drinking potion
     game = player.apply(player.DEFAULT, game, None,
                         'champion', 'potion', 'cleric', 'mage')  # Different
     assert game.party.champion == 0
@@ -88,13 +98,20 @@ def test_champion(game):
     assert game.party.mage == 3
 
 
-def test_scroll(game):
+def test_scroll_quaff(game):
+    with pytest.raises(action.ActionError):
+        player.apply(player.DEFAULT, game, None,
+                     'scroll', 'potion', 'fighter', 'fighter')  # Too soon
+
+    game = __remove_monsters(game)  # Required for drinking potions
     game = player.apply(player.DEFAULT, game, None,
                         'scroll', 'potion', 'fighter', 'fighter')  # Duplicate
     assert game.party.scroll == 1
     assert game.level.potion == 0
     assert game.party.fighter == 4
 
+
+def test_scroll_reroll(game):
     # Consumed by canned_sequence just below
     sequence = [0, 1, 2]
 
@@ -103,12 +120,12 @@ def test_scroll(game):
 
     game = player.apply(player.DEFAULT, game, canned_sequence,
                         'scroll', 'chest', 'ooze', 'chest')
-    assert game.party.scroll == 0
+    assert game.party.scroll == 1
     assert game.level == world.Level(
         goblin=3,
         skeleton=3,
         ooze=2,
         chest=0,
-        potion=0,
+        potion=2,
         dragon=2,
     )
