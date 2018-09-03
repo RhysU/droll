@@ -36,8 +36,9 @@ def apply(
 ) -> World:
     """Apply noun to target within world, returning a new version.
 
+    Also covers hero-like artifacts (i.e. not rings/portals/bait/scales).
     Varargs 'additional' permits passing more required information.
-    For example, what heros to revive when quaffing a potion."""
+    For example, what heroes to revive when quaffing a potion."""
     if target is None:
         assert noun == 'bait', "Presently, only 'bait' has no direct object(s)."
         return bait_dragon(world)
