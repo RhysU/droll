@@ -176,3 +176,8 @@ def defeat_dragon(
         party=party,
         level=__eliminate_defenders(world.level, target)
     )
+
+
+def bait_dragon(world: World) -> World:
+    """Convert all monster faces into dragon dice."""
+    raise NotImplementedError("FIXME")

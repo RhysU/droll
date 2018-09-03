@@ -6,28 +6,24 @@
 import collections
 
 from .action import (
-    defeat_all, defeat_dragon, defeat_one,
-    open_all, open_one, quaff, reroll
+    ActionError, defeat_all, defeat_dragon, defeat_one,
+    open_all, open_one, quaff, reroll, bait_dragon
 )
-from .world import Level, Party, RandRange, World
+from .world import Level, Party, RandRange, World, replace_treasure
 
 # Placeholder for further expansion
 Player = collections.namedtuple('Player', (
     'party',
 ))
 
-# TODO Don't use scroll artifact unless no scoll hero dice
-_HERO_ARTIFACTS = {
-    'sword': 'fighter',
-    'talisman': 'cleric',
-    'sceptre': 'mage',
-    'tools': 'thief',
-    'scroll': 'scroll',
-}
-
-
-# TODO Dragon bait turns all remaining dungeon dice into dragons
-# TODO Elixir can be swapped for any party dice
+_HERO_ARTIFACTS = Party(
+    fighter='sword',
+    cleric='talisman',
+    mage='sceptre',
+    thief='tools',
+    champion=None,
+    scroll='scroll'
+)
 
 
 def apply(
@@ -42,6 +38,20 @@ def apply(
 
     Varargs 'additional' permits passing more required information.
     For example, what heros to revive when quaffing a potion."""
+    if target is None:
+        assert noun == 'bait', "Presently, only 'bait' has no direct object(s)."
+        return bait_dragon(world)
+
+    # Consume an artifact if hero of requested type is not available.
+    if getattr(world.party, noun) == 0:
+        artifact = getattr(_HERO_ARTIFACTS, noun, None)
+        if artifact is not None and getattr(world.treasure, artifact) == 0:
+            raise ActionError("Neither hero {} nor artifact {} available"
+                              .format(noun, artifact))
+        world = replace_treasure(world, artifact)
+
+    # TODO Elixir can be swapped for any party dice
+
     action = getattr(getattr(player.party, noun), target)
     return action(world, randrange, noun, target, *additional)
 
