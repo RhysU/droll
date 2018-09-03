@@ -46,7 +46,7 @@ def _roll(
         stop: int,
         randrange: RandRange
 ) -> typing.List[int]:
-    assert dice >= 0, "At least one dice must be requested"
+    assert dice >= 0, "At least one die must be requested"
     result = [0] * (stop - start)
     for _ in range(dice):
         result[randrange(start, stop)] += 1
