@@ -3,10 +3,14 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
 
+import operator
 import typing
 from functools import partial
 
-from droll.world import Level, RandRange, Party, World, draw_treasure
+from droll.world import (
+    Level, RandRange, Party, World,
+    draw_treasure, roll_level
+)
 
 
 # TODO Work very much in progress
@@ -56,10 +60,10 @@ def default_player() -> Party:
         # Technically scrolls could re-roll potions,
         # but doing so would be a really peculiar choice.
         scroll=Level(
-            goblin=None,
-            skeleton=None,
-            ooze=None,
-            chest=None,
+            goblin=partial(reroll, hero='scroll'),
+            skeleton=partial(reroll, hero='scroll'),
+            ooze=partial(reroll, hero='scroll'),
+            chest=partial(reroll, hero='scroll'),
             potion=partial(quaff, hero='scroll'),
             dragon=partial(defeat_invalid, hero='scroll'),
         ),
@@ -202,4 +206,29 @@ def quaff(
         level=world.level._replace(**{defender: 0}),
     )
 
-# TODO Stop using assertions and instead throw appropriate exceptions?
+
+def reroll(
+        hero: str,
+        world: World,
+        randrange: RandRange,
+        *defenders: typing.List[str]
+) -> World:
+    """Update world after hero rerolls some number of defenders."""
+    prior_heroes = getattr(world.party, hero)
+    assert prior_heroes >= 1, "Require at least one {}".format(hero)
+    assert defenders, "At least one defender must be provided"
+
+    # Remove requested defenders from the level
+    level = world.level
+    for defender in defenders:
+        assert defender not in {'potion', 'dragon'}, (
+            "{} cannot be rerolled".format(defender))
+        prior_defenders = getattr(world.level, defender)
+        assert prior_defenders >= 1, "Expected at least one {}".format(defender)
+        level = level._replace(**{defender: prior_defenders - 1})
+
+    # Re-roll the necessary number of dice
+    update = roll_level(dice=len(defenders), randrange=randrange)
+    return world._replace(
+        level=Level(*tuple(map(operator.add, level, update)))
+    )
