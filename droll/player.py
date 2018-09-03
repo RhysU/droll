@@ -18,7 +18,7 @@ Player = collections.namedtuple('Player', (
 ))
 
 
-def play(
+def apply(
         player: Player,
         world: World,
         randrange: RandRange,

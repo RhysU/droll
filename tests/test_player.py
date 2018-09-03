@@ -5,23 +5,33 @@
 import pytest
 import random
 
-import droll.player
+import droll.player as player
+import droll.world as world
 
-@pytest.fixture(name='party')
-def _party():
-    return droll.player.Party(*([1] * len(droll.player.Party._fields)))
 
-def test_fighter(party):
+@pytest.fixture(name='world')
+def _world():
+    return world.new_game()._replace(
+        level=world.Level(*([2] * len(world.Level._fields))),
+        party=world.Party(*([2] * len(world.Party._fields))),
+    )
+
+
+def test_fighter(world):
     pass
 
-def test_cleric(party):
+
+def test_cleric(world):
     pass
 
-def test_mage(party):
+
+def test_mage(world):
     pass
 
-def test_thief(party):
+
+def test_thief(world):
     pass
 
-def test_champion(party):
+
+def test_champion(world):
     pass
