@@ -14,13 +14,6 @@ class ActionError(RuntimeError):
     pass
 
 
-def defeat_invalid(
-        world: World, randrange: RandRange, hero: str, target: str
-) -> World:
-    """Raise because the hero cannot defeat the specified target."""
-    raise ActionError('Hero {} cannot defeat {}'.format(hero, target))
-
-
 def defeat_one(
         world: World, randrange: RandRange, hero: str, target: str
 ) -> World:

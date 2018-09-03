@@ -6,7 +6,7 @@
 import collections
 
 from .action import (
-    defeat_all, defeat_invalid, defeat_one,
+    defeat_all, defeat_dragon, defeat_one,
     open_all, open_one, quaff, reroll
 )
 from .world import Level, Party, RandRange, World
@@ -41,7 +41,7 @@ DEFAULT = Player(
             ooze=defeat_one,
             chest=open_one,
             potion=quaff,
-            dragon=defeat_invalid,
+            dragon=defeat_dragon,
         ),
         cleric=Level(
             goblin=defeat_one,
@@ -49,7 +49,7 @@ DEFAULT = Player(
             ooze=defeat_one,
             chest=open_one,
             potion=quaff,
-            dragon=defeat_invalid,
+            dragon=defeat_dragon,
         ),
         mage=Level(
             goblin=defeat_one,
@@ -57,7 +57,7 @@ DEFAULT = Player(
             ooze=defeat_all,
             chest=open_one,
             potion=quaff,
-            dragon=defeat_invalid,
+            dragon=defeat_dragon,
         ),
         thief=Level(
             goblin=defeat_one,
@@ -65,7 +65,7 @@ DEFAULT = Player(
             ooze=defeat_one,
             chest=open_all,
             potion=quaff,
-            dragon=defeat_invalid,
+            dragon=defeat_dragon,
         ),
         champion=Level(
             goblin=defeat_all,
@@ -73,7 +73,7 @@ DEFAULT = Player(
             ooze=defeat_all,
             chest=open_all,
             potion=quaff,
-            dragon=defeat_invalid,
+            dragon=defeat_dragon,
         ),
         # Technically scrolls could re-roll potions,
         # but doing so would be a really peculiar choice.
@@ -83,7 +83,7 @@ DEFAULT = Player(
             ooze=reroll,
             chest=reroll,
             potion=quaff,
-            dragon=defeat_invalid,
+            dragon=defeat_dragon,
         ),
     ),
 )
