@@ -138,8 +138,6 @@ def reroll(
     )
 
 
-# TODO Chests / Potions only after monsters defeated
-
 # TODO Does defeating a dragon but losing a level retain the dragon experience?
 
 
