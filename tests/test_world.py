@@ -143,3 +143,89 @@ def test_retire_dragon(state):
     assert post3.experience == pre.depth + pre.experience
     assert post3.treasure.ring == 0
     assert post3.treasure.portal == 1
+
+
+def test_next_level_simple(state):
+    pre = droll.world.new_game()
+    pre = droll.world.new_delve(pre, state.randrange)
+    pre = pre._replace(
+        depth=3,
+        level=droll.world.Level(
+            goblin=0,
+            skeleton=0,
+            ooze=0,
+            chest=2,
+            potion=5,
+            dragon=0),
+    )
+    post = droll.world.next_level(pre, state.randrange)
+    assert post.depth == pre.depth + 1
+
+
+def test_next_level_monsters(state):
+    pre = droll.world.new_game()
+    pre = droll.world.new_delve(pre, state.randrange)
+    pre = pre._replace(
+        depth=3,
+        level=droll.world.Level(
+            goblin=0,
+            skeleton=1,
+            ooze=0,
+            chest=2,
+            potion=5,
+            dragon=1),
+    )
+    assert pre.depth > 0
+
+    # Neither town portal nor ring of invisibility
+    with pytest.raises(droll.world.WorldError):
+        droll.world.next_level(pre, state.randrange)
+
+    # Ring of invisibility
+    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=0))
+    with pytest.raises(droll.world.WorldError):
+        droll.world.next_level(pre, state.randrange)
+
+    # Town portal
+    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=0))
+    with pytest.raises(droll.world.WorldError):
+        droll.world.next_level(pre, state.randrange)
+
+
+def test_next_level_dragon(state):
+    pre = droll.world.new_game()
+    pre = droll.world.new_delve(pre, state.randrange)
+    pre = pre._replace(
+        depth=3,
+        level=droll.world.Level(
+            goblin=0,
+            skeleton=0,
+            ooze=0,
+            chest=2,
+            potion=5,
+            dragon=3),
+    )
+    assert pre.depth > 0
+
+    # Neither town portal nor ring of invisibility
+    with pytest.raises(droll.world.WorldError):
+        droll.world.next_level(pre, state.randrange)
+
+    # Ring of invisibility
+    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=0))
+    post1 = droll.world.next_level(pre, state.randrange)
+    assert post1.depth == pre.depth + 1
+    assert post1.treasure.ring == 0
+    assert post1.treasure.portal == 0
+
+    # Town portal
+    pre = pre._replace(treasure=pre.treasure._replace(ring=0, portal=1))
+    with pytest.raises(droll.world.WorldError):
+        droll.world.next_level(pre, state.randrange)
+
+    # Both should consume the ring of invisibility
+    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=1))
+    post3 = droll.world.next_level(pre, state.randrange)
+    assert post3.depth == pre.depth + 1
+    assert post3.treasure.ring == 0
+    assert post3.treasure.portal == 1

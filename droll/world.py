@@ -133,7 +133,6 @@ def new_delve(world: World, randrange: RandRange, *, party_dice=7) -> World:
     )
 
 
-# TODO next_level understands rings of invisibility
 def next_level(
         world: World, randrange: RandRange, *,
         max_depth=10,
@@ -141,9 +140,23 @@ def next_level(
 ) -> World:
     """Move one level deeper in the dungeon, retaining any partial dragons.
 
+    If necessary, a ring of invisibility will be used to sneak past a dragon.
     Adheres to the specified number of dice available in the game."""
-    if not defeated_level(world.level):
-        raise WorldError("Current level is not yet complete")
+    # Apologies for the following convoluted mess...  See the unit tests.
+    if defeated_level(world.level):
+        # Player has defeated the level thus no special handling required.
+        pass
+    elif defeated_monsters(world.level):
+        # Player has defeated the level but a dragon remains.
+        try:
+            world = __throw_if_no_ring_of_invisibility(world)
+        except WorldError:
+            raise WorldError("Dragon remains but a ring of"
+                             " invisibility is not in hand.")
+    else:
+        raise WorldError('Must defeat enemies to proceed to next level.')
+
+    # Success above, so update the world in anticipation of the next level
     next_depth = world.depth + 1
     if next_depth > max_depth:
         raise WorldError("The maximum depth is {}".format(max_depth))
@@ -159,7 +172,7 @@ def retire(world: World) -> World:
 
     If monsters or a dragon remains, either ring of invisibility or
     a town portal will be used if available."""
-    # Apologies for the following convoluted mess...
+    # Apologies for the following convoluted mess...  See the unit tests.
     if defeated_level(world.level):
         # Player has defeated the level thus no special handling required.
         pass
