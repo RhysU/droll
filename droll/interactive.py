@@ -44,7 +44,7 @@ class Interactive:
         raise NotImplementedError("FIXME")
         return self
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Short representation eases manually observing world changes."""
         return brief(self._world)
 
