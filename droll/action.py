@@ -9,11 +9,15 @@ import typing
 from .world import Level, RandRange, Party, World, draw_treasure, roll_level
 
 
+class ActionError(RuntimeError):
+    """Indicates attempts to take impossible actions."""
+
+
 def defeat_invalid(
         world: World, randrange: RandRange, hero: str, target: str
 ) -> World:
     """Raise because the hero cannot defeat the specified target."""
-    raise RuntimeError('Hero {} cannot defeat {}'.format(hero, target))
+    raise ActionError('Hero {} cannot defeat {}'.format(hero, target))
 
 
 def defeat_one(
@@ -53,7 +57,7 @@ def defeat_all(
 def __eliminate_defenders(level: Level, defender: str) -> Level:
     prior_defenders = getattr(level, defender)
     if not prior_defenders:
-        raise RuntimeError("Require at least one defender {}".format(defender))
+        raise ActionError("Require at least one defender {}".format(defender))
     return level._replace(**{defender: 0})
 
 
@@ -73,7 +77,7 @@ def open_all(
     """Update world after hero opens all chests."""
     howmany = getattr(world.level, target)
     if not howmany:
-        raise RuntimeError("At least 1 {} required".format(target))
+        raise ActionError("At least 1 {} required".format(target))
     for _ in range(howmany):
         world = draw_treasure(world, randrange)
     return world._replace(
@@ -91,9 +95,9 @@ def quaff(
     Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
     howmany = getattr(world.level, target)
     if not howmany:
-        raise RuntimeError("At least 1 {} required".format(target))
+        raise ActionError("At least 1 {} required".format(target))
     if not len(revived) == howmany:
-        raise RuntimeError("Require exactly {} to revive".format(howmany))
+        raise ActionError("Require exactly {} to revive".format(howmany))
     party = __decrement_hero(world.party, hero)
     for die in revived:
         party = party.replace(**{die: getattr(party, die) + 1})
@@ -115,7 +119,7 @@ def reroll(
     reduced = world.level
     for target in targets:
         if target in {'potion', 'dragon'}:
-            raise RuntimeError("{} cannot be rerolled".format(target))
+            raise ActionError("{} cannot be rerolled".format(target))
         reduced = __decrement_defender(reduced, target)
 
     # Re-roll the necessary number of dice then add to anything left fixed
