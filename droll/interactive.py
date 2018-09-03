@@ -44,9 +44,9 @@ class Interactive:
         raise NotImplementedError("FIXME")
         return self
 
-    def __str__(self) -> str:
-        """Short representation eases manually observing world changes."""
-        return brief(self._world)
+    # Per IPython.lib.pretty to ease observing world changes
+    def _repr_pretty_(self, p, cycle=False):
+        p.text(brief(self._world))
 
 
 def brief(o: typing.Any) -> str:
