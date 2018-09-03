@@ -4,6 +4,7 @@
 """Functionality associated with player action mechanics."""
 
 import operator
+import typing
 
 from .world import (Level, RandRange, Party, World,
                     defeated_monsters, draw_treasure, roll_level)
@@ -136,6 +137,7 @@ def reroll(
 
 def defeat_dragon(
         world: World, randrange: RandRange, hero: str, target: str, *others,
+        disallowed_heroes: typing.Iterable[str] = ('scroll'),
         min_length: int = 3,
         min_heroes: int = 3
 ) -> World:
@@ -161,6 +163,9 @@ def defeat_dragon(
         distinct_heroes.add(other)
     if len(distinct_heroes) != min_heroes:
         raise ActionError("The {} heroes must all be distinct")
+    if distinct_heroes & set(disallowed_heroes):
+        raise ActionError("Heroes {} cannot defeat {}"
+                          .format(disallowed_heroes, target))
 
     # Attempt was successful, so update experience and treasure
     return draw_treasure(world, randrange)._replace(
