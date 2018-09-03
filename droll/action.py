@@ -148,7 +148,7 @@ def defeat_dragon(
     if world.level.dragon < min_length:
         raise ActionError("Enemy {} only comes at length {}"
                           .format(target, min_length))
-    if sum(world.level) != world.level.dragon:
+    if not defeated_monsters(world.level):
         raise ActionError("Enemy {} only comes after all others defeated."
                           .format(target))
     if len(others) != min_heroes - 1:

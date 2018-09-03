@@ -7,6 +7,7 @@ import random
 
 import pytest
 
+import droll.action as action
 import droll.player as player
 import droll.world as world
 
@@ -18,8 +19,8 @@ def _game():
             goblin=0,
             skeleton=0,
             ooze=0,
-            chest=0,
-            potion=0,
+            chest=1,
+            potion=2,
             dragon=3,
         ),
         party=world.Party(*([2] * len(world.Party._fields))),
@@ -40,3 +41,12 @@ def test_successful(game, randrange):
     assert game.level.dragon == 0
     assert game.experience == 1
     assert sum(game.treasure) == 1
+
+
+def test_monsters_remain(game, randrange):
+    game = game._replace(
+        level=game.level._replace(goblin=1)
+    )
+    with pytest.raises(action.ActionError):
+        player.apply(player.DEFAULT, game, randrange,
+                            'fighter', 'dragon', 'cleric', 'mage')
