@@ -70,6 +70,19 @@ def default_player() -> Party:
     )
 
 
+def apply(
+        player: Level,
+        hero: str,
+        world: World,
+        randrange: RandRange,
+        *defenders: typing.List[str]
+) -> World:
+    """Apply hero to defenders within world, returning a new version."""
+    defender, *_ = defenders
+    action = getattr(getattr(player, hero), defender)
+    return action(world=world, randrange=randrange, *defenders)
+
+
 # Reduces boilerplate in _defeat_one and _defeat_all
 def __defeat_some(
         hero: str,
