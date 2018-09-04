@@ -39,12 +39,18 @@ def apply(
         return action(world, randrange, noun, target, *additional)
 
     # Consume an artifact if hero of requested type is not available.
+    # Implementation adds a phantom hero prior to it being consumed.
     if getattr(world.party, noun) == 0:
         artifact = getattr(player.artifacts, noun, None)
-        if artifact is not None and getattr(world.treasure, artifact) == 0:
+        if artifact is None:
+            pass
+        elif getattr(world.treasure, artifact):
+            world = replace_treasure(world, artifact)._replace(
+                party=world.party._replace(**{noun: 1})
+            )
+        else:
             raise DrollError("Neither hero {} nor artifact {} available"
                              .format(noun, artifact))
-        world = replace_treasure(world, artifact)
 
     # Apply a hero (or hero-like artifact) to some collection of targets.
     action = getattr(getattr(player.party, noun), target)

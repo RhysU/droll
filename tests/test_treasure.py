@@ -46,3 +46,20 @@ def test_bait(game, randrange):
 
     with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange, 'bait')
+
+
+# Should behave identically to test_fighter inside test_player.py,
+def test_sword(game):
+    game = game._replace(treasure=game.treasure._replace(sword=2))
+    game = player.apply(player.DEFAULT, game, None, 'fighter', 'goblin')
+    assert game.treasure.sword == 1
+    assert game.party.fighter == 0
+    assert game.level.goblin == 0
+
+    game = player.apply(player.DEFAULT, game, None, 'fighter', 'ooze')
+    assert game.treasure.sword == 0
+    assert game.party.fighter == 0
+    assert game.level.ooze == 1
+
+    with pytest.raises(error.DrollError):
+        player.apply(player.DEFAULT, game, None, 'fighter', 'ooze')
