@@ -38,6 +38,7 @@ def apply(
         action = getattr(player, noun)
         return action(world, randrange, noun, target, *additional)
 
+    # TODO Permit approach to work when attacking dragons
     # Consume an artifact if hero of requested type is not available.
     # Implementation adds a phantom hero prior to it being consumed.
     if getattr(world.party, noun) == 0:
