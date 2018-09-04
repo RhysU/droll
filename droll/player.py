@@ -11,19 +11,12 @@ from .action import (
 )
 from .world import Level, Party, RandRange, World, replace_treasure
 
-# Placeholder for further expansion
 Player = collections.namedtuple('Player', (
+    'bait',
+    'elixir',
+    'artifacts',
     'party',
 ))
-
-_HERO_ARTIFACTS = Party(
-    fighter='sword',
-    cleric='talisman',
-    mage='sceptre',
-    thief='tools',
-    champion=None,
-    scroll='scroll'
-)
 
 
 def apply(
@@ -39,34 +32,35 @@ def apply(
     Also covers hero-like artifacts (i.e. not rings/portals/bait/scales).
     Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
-
-    # TODO Migrate to Player
-    if target is None:
-        if noun != 'bait':
-            raise ActionError('Unknown noun {} lacking a target'.format(noun))
-        return bait_dragon(world)
-
-    # TODO Migrate to Player
-    if noun == 'elixir':
-        if not additional:
-            raise ActionError('Noun {} accepts only one target'.format(noun))
-        return elixir(world, target)
+    # One-off handling of some treasures
+    if noun in {'bait', 'elixir'}:
+        action = getattr(player, noun)
+        return action(world, randrange, noun, target, *additional)
 
     # Consume an artifact if hero of requested type is not available.
     if getattr(world.party, noun) == 0:
-        artifact = getattr(_HERO_ARTIFACTS, noun, None)
+        artifact = getattr(player.artifacts, noun, None)
         if artifact is not None and getattr(world.treasure, artifact) == 0:
             raise ActionError("Neither hero {} nor artifact {} available"
                               .format(noun, artifact))
         world = replace_treasure(world, artifact)
 
-    # TODO Elixir can be swapped for any party dice
-
+    # Apply a hero (or hero-like artifact) to some collection of targets.
     action = getattr(getattr(player.party, noun), target)
     return action(world, randrange, noun, target, *additional)
 
 
 DEFAULT = Player(
+    bait=bait_dragon,
+    elixir=elixir,
+    artifacts=Party(
+        fighter='sword',
+        cleric='talisman',
+        mage='sceptre',
+        thief='tools',
+        champion=None,
+        scroll='scroll',
+    ),
     party=Party(
         fighter=Level(
             goblin=defeat_all,
