@@ -33,3 +33,16 @@ def test_elixir(game, randrange):
 
     with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange, 'elixir', 'mage')
+
+
+def test_bait(game, randrange):
+    game = game._replace(treasure=game.treasure._replace(bait=2))
+    game = player.apply(player.DEFAULT, game, randrange, 'bait', 'dragon')
+    assert game.treasure.bait == 1
+    assert game.level.goblin == 0
+    assert game.level.skeleton == 0
+    assert game.level.ooze == 0
+    assert game.level.dragon == 8
+
+    with pytest.raises(error.DrollError):
+        player.apply(player.DEFAULT, game, randrange, 'bait')

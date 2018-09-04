@@ -197,7 +197,7 @@ def bait_dragon(
 
     # Increment the number of targets (i.e. dragons)
     return world._replace(
-        level=level._replace({target: getattr(level, target) + new_targets})
+        level=level._replace(**{target: getattr(level, target) + new_targets})
     )
 
 
