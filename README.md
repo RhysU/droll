@@ -53,9 +53,8 @@ Out[12]: (delve=2, depth=1, experience=3, ability=True, level=(goblin=1), party=
 
 ## What is implemented?
 
-Not much more than default player semantics (i.e. no abilities, no
-promotion after experience level 5, no use of treasure items though
-items can be collected).
+Not much more than default player semantics and treasures (i.e. no abilities, no
+promotion after experience level 5).
 
 ## Why implement it?
 
