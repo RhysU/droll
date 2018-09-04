@@ -174,16 +174,37 @@ def defeat_dragon(
 
 
 def bait_dragon(
-        world: World, randrange: RandRange, noun: str, target: str
+        world: World, randrange: RandRange, noun: str,
+        target: typing.Optional[str] = None, *,
+        defenders: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze')
 ) -> World:
     """Convert all monster faces into dragon dice."""
-    raise NotImplementedError("FIXME")
+    # Confirm well-formed request optionally containing a target
+    target = 'dragon' if target is None else target
+    if target != 'dragon':
+        raise DrollError('Cannot {} a {}'.format(noun, target))
+    world = replace_treasure(world, noun)
+
+    # Compute how many new dragons will be produced and remove sources
+    new_targets = 0
+    level = world.level
+    for defender in defenders:
+        new_targets += getattr(world.level, defender)
+        level = level._replace(**{defender: 0})
+    if not new_targets:
+        raise DrollError("At least one of {} required for '{}'"
+                         .format(defenders, noun))
+
+    # Increment the number of targets (i.e. dragons)
+    return world._replace(
+        level=level._replace({target: getattr(level, target) + new_targets})
+    )
 
 
 def elixir(
         world: World, randrange: RandRange, noun: str, target: str
 ) -> World:
     """Add one hero die of any requested type.."""
-    return replace_treasure(world, 'elixir')._replace(
+    return replace_treasure(world, noun)._replace(
         party=__increment_hero(world.party, target)
     )
