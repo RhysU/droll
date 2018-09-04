@@ -132,12 +132,6 @@ def reroll(
     )
 
 
-# TODO "Lift" treasures into heroes by augumenting world prior to apply(...)
-
-
-# TODO Does defeating a dragon but losing a level retain the dragon experience?
-
-
 def defeat_dragon(
         world: World, randrange: RandRange, hero: str, target: str, *others,
         disallowed_heroes: typing.Iterable[str] = ('scroll'),
