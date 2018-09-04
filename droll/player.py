@@ -6,9 +6,10 @@
 import collections
 
 from .action import (
-    ActionError, defeat_all, defeat_dragon, defeat_one,
+    defeat_all, defeat_dragon, defeat_one,
     open_all, open_one, quaff, reroll, bait_dragon, elixir
 )
+from .error import DrollError
 from .world import Level, Party, RandRange, World, replace_treasure
 
 Player = collections.namedtuple('Player', (
@@ -41,8 +42,8 @@ def apply(
     if getattr(world.party, noun) == 0:
         artifact = getattr(player.artifacts, noun, None)
         if artifact is not None and getattr(world.treasure, artifact) == 0:
-            raise ActionError("Neither hero {} nor artifact {} available"
-                              .format(noun, artifact))
+            raise DrollError("Neither hero {} nor artifact {} available"
+                             .format(noun, artifact))
         world = replace_treasure(world, artifact)
 
     # Apply a hero (or hero-like artifact) to some collection of targets.

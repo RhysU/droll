@@ -7,7 +7,7 @@ import random
 
 import pytest
 
-import droll.action as action
+import droll.error as error
 import droll.player as player
 import droll.world as world
 
@@ -47,22 +47,22 @@ def test_monsters_remain(game, randrange):
     game = game._replace(
         level=game.level._replace(goblin=1)
     )
-    with pytest.raises(action.ActionError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange,
                      'fighter', 'dragon', 'cleric', 'mage')
 
 
 def test_too_few_specified(game, randrange):
-    with pytest.raises(action.ActionError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange,
                      'fighter', 'dragon', 'cleric')
 
-    with pytest.raises(action.ActionError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange,
                      'fighter', 'dragon')
 
 
 def test_not_enough_distinct(game, randrange):
-    with pytest.raises(action.ActionError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange,
                      'fighter', 'dragon', 'mage', 'mage')

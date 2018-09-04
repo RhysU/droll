@@ -7,6 +7,7 @@ import random
 
 import pytest
 
+import droll.error as error
 import droll.player as player
 import droll.world as world
 
@@ -30,5 +31,5 @@ def test_elixir(game, randrange):
     assert game.party.cleric == 3
     assert game.treasure.elixir == 0
 
-    with pytest.raises(world.WorldError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange, 'elixir', 'mage')

@@ -7,7 +7,7 @@ import random
 
 import pytest
 
-import droll.action as action
+import droll.error as error
 import droll.player as player
 import droll.world as world
 
@@ -40,12 +40,12 @@ def test_fighter(game):
     assert game.party.fighter == 0
     assert game.level.ooze == 1
 
-    with pytest.raises(action.ActionError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, None, 'fighter', 'ooze')
 
 
 def test_cleric(game, randrange):
-    with pytest.raises(action.ActionError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, None, 'cleric', 'dragon')
 
     game = player.apply(player.DEFAULT, game, None, 'cleric', 'skeleton')
@@ -81,7 +81,7 @@ def test_thief(game, randrange):
     assert sum(game.treasure) == 2
 
     game = game._replace(party=game.party._replace(thief=1))  # Add one
-    with pytest.raises(action.ActionError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, None, 'thief', 'chest')
 
 
@@ -100,7 +100,7 @@ def test_champion(game):
 
 
 def test_scroll_quaff(game):
-    with pytest.raises(action.ActionError):
+    with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, None,
                      'scroll', 'potion', 'fighter', 'fighter')  # Too soon
 

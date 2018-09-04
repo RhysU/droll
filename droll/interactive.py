@@ -7,6 +7,7 @@ Specifically, state is mutated and string representations aid tracking state."""
 import random
 import typing
 
+import droll.error
 import droll.player
 import droll.world
 
@@ -46,7 +47,7 @@ class Interactive:
         try:
             self._world = droll.world.new_delve(self._world, self._randrange)
             self._world = droll.world.next_level(self._world, self._randrange)
-        except droll.world.WorldError:
+        except droll.error.DrollError:
             pass
         return self
 
@@ -57,7 +58,7 @@ class Interactive:
         try:
             self._world = droll.world.new_delve(self._world, self._randrange)
             self._world = droll.world.next_level(self._world, self._randrange)
-        except droll.world.WorldError:
+        except droll.error.DrollError:
             pass
         return self
 

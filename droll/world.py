@@ -9,11 +9,7 @@ import functools
 import itertools
 import typing
 
-
-class WorldError(RuntimeError):
-    """Indicates attempts to make impossible world changes.."""
-    pass
-
+from .error import DrollError
 
 Level = collections.namedtuple('Level', (
     'goblin',
@@ -124,7 +120,7 @@ def new_game() -> World:
 def new_delve(world: World, randrange: RandRange, *, party_dice=7) -> World:
     """Establish a new delve within an existing game."""
     if world.delve == 3:
-        raise WorldError("At most three delves are permitted.")
+        raise DrollError("At most three delves are permitted.")
     return world._replace(
         delve=world.delve + 1,
         depth=0,
@@ -150,16 +146,16 @@ def next_level(
         # Player has defeated the level but a dragon remains.
         try:
             world = __throw_if_no_ring_of_invisibility(world)
-        except WorldError:
-            raise WorldError("Dragon remains but a ring of"
+        except DrollError:
+            raise DrollError("Dragon remains but a ring of"
                              " invisibility is not in hand.")
     else:
-        raise WorldError('Must defeat enemies to proceed to next level.')
+        raise DrollError('Must defeat enemies to proceed to next level.')
 
     # Success above, so update the world in anticipation of the next level
     next_depth = world.depth + 1
     if next_depth > max_depth:
-        raise WorldError("The maximum depth is {}".format(max_depth))
+        raise DrollError("The maximum depth is {}".format(max_depth))
     prior_dragons = 0 if world.level is None else world.level.dragon
     level = roll_level(dice=min(level_dice - prior_dragons, next_depth),
                        randrange=randrange)
@@ -181,18 +177,18 @@ def retire(world: World) -> World:
         # First attempt to use a ring then a portal (because portals are +2)
         try:
             world = __throw_if_no_ring_of_invisibility(world)
-        except WorldError:
+        except DrollError:
             try:
                 world = __throw_if_no_town_portal(world)
-            except WorldError:
-                raise WorldError("Dragon remains but neither a ring of"
+            except DrollError:
+                raise DrollError("Dragon remains but neither a ring of"
                                  " invisibility nor a town portal in hand.")
     else:
         # Player has not defeated neither monsters nor possibly a dragon.
         try:
             world = __throw_if_no_town_portal(world)
-        except WorldError:
-            raise WorldError('Monsters remain but no town portal in hand.')
+        except DrollError:
+            raise DrollError('Monsters remain but no town portal in hand.')
 
     # TODO Upgrade hero's ability after hitting 5 experience points
     # Success above, so update the world in anticipation of the next delve
@@ -240,7 +236,7 @@ def replace_treasure(world: World, item: str) -> World:
     """Replace a single item from the player's treasures into the reserve."""
     prior_count = getattr(world.treasure, item)
     if not prior_count:
-        raise WorldError("'{}' not in player's treasure".format(item))
+        raise DrollError("'{}' not in player's treasure".format(item))
     return world._replace(
         treasure=world.treasure._replace(
             **{item: prior_count - 1}),
