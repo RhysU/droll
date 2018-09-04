@@ -7,7 +7,8 @@ import operator
 import typing
 
 from .world import (Level, RandRange, Party, World,
-                    defeated_monsters, draw_treasure, roll_level)
+                    defeated_monsters, draw_treasure,
+                    replace_treasure, roll_level)
 
 
 class ActionError(RuntimeError):
@@ -30,6 +31,10 @@ def __decrement_hero(party: Party, hero: str) -> Party:
     if not prior_heroes:
         raise ActionError("Require at least one hero {}".format(hero))
     return party._replace(**{hero: prior_heroes - 1})
+
+
+def __increment_hero(party: Party, hero: str) -> Party:
+    return party._replace(**{hero: getattr(party, hero) + 1})
 
 
 def __decrement_defender(level: Level, defender: str) -> Level:
@@ -103,7 +108,7 @@ def quaff(
         raise ActionError("Monsters must be defeated before quaffing.")
     party = __decrement_hero(world.party, hero)
     for revived in revivable:
-        party = party._replace(**{revived: getattr(party, revived) + 1})
+        party = __increment_hero(party, revived)
     return world._replace(
         party=party,
         level=__eliminate_defenders(world.level, target)
@@ -183,4 +188,6 @@ def elixir(
         world: World, randrange: RandRange, noun: str, target: str
 ) -> World:
     """Add one hero die of any requested type.."""
-    raise NotImplementedError("FIXME")
+    return replace_treasure(world, 'elixir')._replace(
+        party=__increment_hero(world.party, target)
+    )
