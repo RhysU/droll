@@ -175,3 +175,8 @@ def defeat_dragon(
 def bait_dragon(world: World) -> World:
     """Convert all monster faces into dragon dice."""
     raise NotImplementedError("FIXME")
+
+
+def elixir(world: World, target: str) -> World:
+    """Add one hero die of any requested type.."""
+    raise NotImplementedError("FIXME")

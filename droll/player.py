@@ -7,7 +7,7 @@ import collections
 
 from .action import (
     ActionError, defeat_all, defeat_dragon, defeat_one,
-    open_all, open_one, quaff, reroll, bait_dragon
+    open_all, open_one, quaff, reroll, bait_dragon, elixir
 )
 from .world import Level, Party, RandRange, World, replace_treasure
 
@@ -39,9 +39,18 @@ def apply(
     Also covers hero-like artifacts (i.e. not rings/portals/bait/scales).
     Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
+
+    # TODO Migrate to Player
     if target is None:
-        assert noun == 'bait', "Presently, only 'bait' has no direct object(s)."
+        if noun != 'bait':
+            raise ActionError('Unknown noun {} lacking a target'.format(noun))
         return bait_dragon(world)
+
+    # TODO Migrate to Player
+    if noun == 'elixir':
+        if not additional:
+            raise ActionError('Noun {} accepts only one target'.format(noun))
+        return elixir(world, target)
 
     # Consume an artifact if hero of requested type is not available.
     if getattr(world.party, noun) == 0:
