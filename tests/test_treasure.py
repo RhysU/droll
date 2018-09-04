@@ -16,7 +16,7 @@ import droll.world as world
 def _game():
     return world.new_game()._replace(
         level=world.Level(*([2] * len(world.Level._fields))),
-        party=world.Party(*([2] * len(world.Party._fields))),
+        party=world.Party(*([0] * len(world.Party._fields))),
     )
 
 
@@ -28,7 +28,7 @@ def _randrange():
 def test_elixir(game, randrange):
     game = game._replace(treasure=game.treasure._replace(elixir=1))
     game = player.apply(player.DEFAULT, game, randrange, 'elixir', 'cleric')
-    assert game.party.cleric == 3
+    assert game.party.cleric == 1
     assert game.treasure.elixir == 0
 
     with pytest.raises(error.DrollError):
