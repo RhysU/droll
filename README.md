@@ -116,43 +116,46 @@ In [23]: x.apply('cleric', 'dragon', 'thief', 'champion')  # Three heroes requir
 Out[23]: (delve=2, depth=4, experience=5, ability=True, level=(chest=1), party=(), treasure=(bait=1, scale=1))
 
 In [24]: x.retire()
-Out[24]: (delve=3, depth=1, experience=4, ability=True, level=(chest=1), party=(fighter=3, thief=1, champion=2, scroll=1), treasure=(bait=1, scale=1))
+Out[24]: (delve=3, depth=1, experience=9, ability=True, level=(chest=1), party=(fighter=3, thief=1, champion=2, scroll=1), treasure=(bait=1, scale=1))
 
 In [25]: x.apply('fighter', 'chest')
-Out[25]: (delve=3, depth=1, experience=4, ability=True, level=(), party=(fighter=2, thief=1, champion=2, scroll=1), treasure=(bait=1, portal=1, scale=1))
+Out[25]: (delve=3, depth=1, experience=9, ability=True, level=(), party=(fighter=2, thief=1, champion=2, scroll=1), treasure=(bait=1, portal=1, scale=1))
 
 In [26]: x.descend()
-Out[26]: (delve=3, depth=2, experience=4, ability=True, level=(ooze=1, chest=1), party=(fighter=2, thief=1, champion=2, scroll=1), treasure=(bait=1, portal=1, scale=1))
+Out[26]: (delve=3, depth=2, experience=9, ability=True, level=(ooze=1, chest=1), party=(fighter=2, thief=1, champion=2, scroll=1), treasure=(bait=1, portal=1, scale=1))
 
 In [27]: x.apply('fighter', 'ooze')
-Out[27]: (delve=3, depth=2, experience=4, ability=True, level=(chest=1), party=(fighter=1, thief=1, champion=2, scroll=1), treasure=(bait=1, portal=1, scale=1))
+Out[27]: (delve=3, depth=2, experience=9, ability=True, level=(chest=1), party=(fighter=1, thief=1, champion=2, scroll=1), treasure=(bait=1, portal=1, scale=1))
 
 In [28]: x.apply('champion', 'chest')
-Out[28]: (delve=3, depth=2, experience=4, ability=True, level=(), party=(fighter=1, thief=1, champion=1, scroll=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
+Out[28]: (delve=3, depth=2, experience=9, ability=True, level=(), party=(fighter=1, thief=1, champion=1, scroll=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
 
 In [29]: x.descend()
-Out[29]: (delve=3, depth=3, experience=4, ability=True, level=(goblin=2, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
+Out[29]: (delve=3, depth=3, experience=9, ability=True, level=(goblin=2, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
 
 In [30]: x.apply('fighter', 'goblin')
-Out[30]: (delve=3, depth=3, experience=4, ability=True, level=(dragon=1), party=(thief=1, champion=1, scroll=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
+Out[30]: (delve=3, depth=3, experience=9, ability=True, level=(dragon=1), party=(thief=1, champion=1, scroll=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
 
 In [31]: x.descend()
-Out[31]: (delve=3, depth=4, experience=4, ability=True, level=(goblin=1, skeleton=1, potion=1, dragon=2), party=(thief=1, champion=1, scroll=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
+Out[31]: (delve=3, depth=4, experience=9, ability=True, level=(goblin=1, skeleton=1, potion=1, dragon=2), party=(thief=1, champion=1, scroll=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
 
 In [32]: x.apply('scroll', 'goblin', 'skeleton')
-Out[32]: (delve=3, depth=4, experience=4, ability=True, level=(goblin=1, chest=1, potion=1, dragon=2), party=(thief=1, champion=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
+Out[32]: (delve=3, depth=4, experience=9, ability=True, level=(goblin=1, chest=1, potion=1, dragon=2), party=(thief=1, champion=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
 
 In [33]: x.apply('thief', 'goblin')
-Out[33]: (delve=3, depth=4, experience=4, ability=True, level=(chest=1, potion=1, dragon=2), party=(champion=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
+Out[33]: (delve=3, depth=4, experience=9, ability=True, level=(chest=1, potion=1, dragon=2), party=(champion=1), treasure=(talisman=1, bait=1, portal=1, scale=1))
 
 In [34]: x.apply('champion', 'chest')
-Out[34]: (delve=3, depth=4, experience=4, ability=True, level=(potion=1, dragon=2), party=(), treasure=(talisman=2, bait=1, portal=1, scale=1))
+Out[34]: (delve=3, depth=4, experience=9, ability=True, level=(potion=1, dragon=2), party=(), treasure=(talisman=2, bait=1, portal=1, scale=1))
 
 In [35]: x.descend()
-Out[35]: (delve=3, depth=5, experience=4, ability=True, level=(skeleton=2, potion=1, dragon=4), party=(), treasure=(talisman=2, bait=1, portal=1, scale=1))
+Out[35]: (delve=3, depth=5, experience=9, ability=True, level=(skeleton=2, potion=1, dragon=4), party=(), treasure=(talisman=2, bait=1, portal=1, scale=1))
 
-In [36]: x.retire()  # Consumes the town portal correctly, but notice experience handling incorrect!
-Out[36]: (delve=3, experience=5, ability=True, party=(), treasure=(talisman=2, bait=1, scale=1))
+In [36]: x.retire()  # Consumes the town portal and escapes.  No new delve as we had three.
+Out[36]: (delve=3, experience=14, ability=True, party=(), treasure=(talisman=2, bait=1, scale=1))
+
+In [37]: x.score()
+Out[37]: 18
 ```
 
 ## Testing

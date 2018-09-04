@@ -194,7 +194,7 @@ def retire(world: World) -> World:
     # Success above, so update the world in anticipation of the next delve
     return world._replace(
         depth=0,
-        experience=world.depth,
+        experience=world.experience + world.depth,
         level=None,
     )
 
