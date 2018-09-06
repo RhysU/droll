@@ -3,6 +3,7 @@ docs/_build
 *.egg-info/
 .eggs/
 .idea
+*.iml
 **/__pycache__/
 .pytest_cache
 *.swp
