@@ -43,6 +43,48 @@ def test_successful(game, randrange):
     assert sum(game.treasure) == 1
 
 
+def test_treasure_slot1(game, randrange):
+    game = game._replace(treasure=game.treasure._replace(sword=7))
+    game = game._replace(party=game.party._replace(fighter=0))
+    game = player.apply(player.DEFAULT, game, randrange,  # Notice sword!
+                        'fighter', 'dragon', 'cleric', 'mage')
+    assert game.treasure.sword == 6
+    assert game.party.fighter == 0
+    assert game.party.cleric == 1
+    assert game.party.mage == 1
+    assert game.level.dragon == 0
+    assert game.experience == 1
+    assert sum(game.treasure) == 7
+
+
+def test_treasure_slot2(game, randrange):
+    game = game._replace(treasure=game.treasure._replace(talisman=7))
+    game = game._replace(party=game.party._replace(cleric=0))
+    game = player.apply(player.DEFAULT, game, randrange,  # Notice talisman!
+                        'fighter', 'dragon', 'cleric', 'mage')
+    assert game.treasure.talisman == 6
+    assert game.party.fighter == 1
+    assert game.party.cleric == 0
+    assert game.party.mage == 1
+    assert game.level.dragon == 0
+    assert game.experience == 1
+    assert sum(game.treasure) == 7
+
+
+def test_treasure_slot2(game, randrange):
+    game = game._replace(treasure=game.treasure._replace(sceptre=7))
+    game = game._replace(party=game.party._replace(mage=0))
+    game = player.apply(player.DEFAULT, game, randrange,  # Notice talisman!
+                        'fighter', 'dragon', 'cleric', 'mage')
+    assert game.treasure.sceptre == 6
+    assert game.party.fighter == 1
+    assert game.party.cleric == 1
+    assert game.party.mage == 0
+    assert game.level.dragon == 0
+    assert game.experience == 1
+    assert sum(game.treasure) == 7
+
+
 def test_monsters_remain(game, randrange):
     game = game._replace(
         level=game.level._replace(goblin=1)

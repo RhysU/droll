@@ -9,7 +9,6 @@ from .action import (
     defeat_all, defeat_dragon, defeat_one,
     open_all, open_one, quaff, reroll, bait_dragon, elixir
 )
-from .error import DrollError
 from .world import Level, Party, RandRange, World, replace_treasure
 
 Player = collections.namedtuple('Player', (
@@ -30,7 +29,7 @@ def apply(
 ) -> World:
     """Apply noun to target within world, returning a new version.
 
-    Also covers hero-like artifacts (i.e. not rings/portals/bait/scales).
+    Processes hero-like artifacts (i.e. not rings/portals/scales).
     Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
     # One-off handling of some treasures
@@ -38,24 +37,39 @@ def apply(
         action = getattr(player, noun)
         return action(world, randrange, noun, target, *additional)
 
-    # TODO Permit approach to work when attacking dragons
-    # Consume an artifact if hero of requested type is not available.
-    # Implementation adds a phantom hero prior to it being consumed.
-    if getattr(world.party, noun) == 0:
-        artifact = getattr(player.artifacts, noun, None)
-        if artifact is None:
-            pass
-        elif getattr(world.treasure, artifact):
-            world = replace_treasure(world, artifact)._replace(
-                party=world.party._replace(**{noun: 1})
-            )
-        else:
-            raise DrollError("Neither hero {} nor artifact {} available"
-                             .format(noun, artifact))
+    # Many treasures behave exactly like party members, so
+    # convert into party members prior to action invocation.
+    prior_treasure = world.treasure
+    world = world._replace(
+        party=world.party._replace(**{
+            hero: getattr(world.party, hero) + getattr(prior_treasure, artifact)
+            for hero, artifact in player.artifacts._asdict().items()
+            if artifact is not None
+        })
+    )
 
-    # Apply a hero (or hero-like artifact) to some collection of targets.
+    # Apply a hero (possibly phantom per above) to some collection of targets.
     action = getattr(getattr(player.party, noun), target)
-    return action(world, randrange, noun, target, *additional)
+    world = action(world, randrange, noun, target, *additional)
+
+    # Undo the prior transformation by subtracting prior_treasure.
+    world = world._replace(
+        party=world.party._replace(**{
+            hero: getattr(world.party, hero) - getattr(prior_treasure, artifact)
+            for hero, artifact in player.artifacts._asdict().items()
+            if artifact is not None
+        })
+    )
+
+    # Consume treasure equivalent to any hero which has gone negative.
+    for hero, quantity in world.party._asdict().items():
+        if quantity >= 0:
+            continue
+        for _ in range(-min(0, quantity)):
+            world = replace_treasure(world, getattr(player.artifacts, hero))
+        world = world._replace(party=world.party._replace(**{hero: 0}))
+
+    return world
 
 
 DEFAULT = Player(
