@@ -125,6 +125,7 @@ def new_delve(world: World, randrange: RandRange, *, party_dice=7) -> World:
         delve=world.delve + 1,
         depth=0,
         ability=True,
+        level=None,
         party=roll_party(dice=party_dice, randrange=randrange),
     )
 
