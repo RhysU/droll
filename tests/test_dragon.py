@@ -57,7 +57,7 @@ def test_treasure_slot1(game, randrange):
     assert sum(game.treasure) == 7
 
 
-def test_treasure_slot2(game, randrange):
+def test_treasure_slot3(game, randrange):
     game = game._replace(treasure=game.treasure._replace(talisman=7))
     game = game._replace(party=game.party._replace(cleric=0))
     game = player.apply(player.DEFAULT, game, randrange,  # Notice talisman!
