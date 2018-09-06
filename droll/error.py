@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Error types and supporting functionality.."""
 
+
 class DrollError(RuntimeError):
     """Indicates attempts to take impossible actions."""
     pass

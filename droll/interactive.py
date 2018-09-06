@@ -85,6 +85,6 @@ def pretty(o: typing.Any, *, omitted: typing.Set[str] = {'reserve'}) -> str:
 
     keyvalues = []
     for field, value in zip(fields, o):
-        if value and not field in omitted:
+        if value and field not in omitted:
             keyvalues.append('{}={}'.format(field, pretty(value)))
     return '({})'.format(', '.join(keyvalues))
