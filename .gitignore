@@ -1,4 +1,6 @@
+build
 .cache/
+dist
 docs/_build
 *.egg-info/
 .eggs/
