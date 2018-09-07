@@ -5,23 +5,23 @@
 
 Specifically, state is mutated and string representations aid tracking state."""
 import random
-import typing
 
-import droll.error
-import droll.player
-import droll.world
+from . import brief
+from . import error
+from . import player
+from . import world
 
 
 class Interactive:
     """Tracking of state associated with a single game."""
 
-    def __init__(self, player=droll.player.DEFAULT, randrange=None):
+    def __init__(self, player=player.DEFAULT, randrange=None):
         self._player = player
         self._randrange = (random.Random().randrange
                            if randrange is None else randrange)
-        self._world = droll.world.new_game()
-        self._world = droll.world.new_delve(self._world, self._randrange)
-        self._world = droll.world.next_level(self._world, self._randrange)
+        self._world = world.new_game()
+        self._world = world.new_delve(self._world, self._randrange)
+        self._world = world.next_level(self._world, self._randrange)
 
     def ability(self, *nouns) -> 'Droll':
         """Invoke the player's ability."""
@@ -30,24 +30,24 @@ class Interactive:
 
     def apply(self, hero, *nouns) -> 'Droll':
         """Apply some named hero or treasure to some collection of nouns."""
-        self._world = droll.player.apply(
+        self._world = player.apply(
             self._player, self._world, self._randrange, hero, *nouns)
         return self
 
     def descend(self) -> 'Droll':
         """Descend to the next level (in contrast to retiring."""
-        self._world = droll.world.next_level(self._world, self._randrange)
+        self._world = world.next_level(self._world, self._randrange)
         return self
 
     def retire(self) -> 'Droll':
         """Retire from the dungeon after successfully completing a level.
 
         Automatically starts a new delve, if possible."""
-        self._world = droll.world.retire(self._world)
+        self._world = world.retire(self._world)
         try:
-            self._world = droll.world.new_delve(self._world, self._randrange)
-            self._world = droll.world.next_level(self._world, self._randrange)
-        except droll.error.DrollError:
+            self._world = world.new_delve(self._world, self._randrange)
+            self._world = world.next_level(self._world, self._randrange)
+        except error.DrollError:
             pass
         return self
 
@@ -56,15 +56,15 @@ class Interactive:
 
         Automatically starts a new delve, if possible."""
         try:
-            self._world = droll.world.new_delve(self._world, self._randrange)
-            self._world = droll.world.next_level(self._world, self._randrange)
-        except droll.error.DrollError:
+            self._world = world.new_delve(self._world, self._randrange)
+            self._world = world.next_level(self._world, self._randrange)
+        except error.DrollError:
             pass
         return self
 
     def score(self) -> int:
         """Compute current game score."""
-        return droll.world.score(self._world)
+        return world.score(self._world)
 
     def treasure(self, treasure, *nouns) -> 'Droll':
         """Apply some named treasure to some collection of nouns.."""
@@ -74,17 +74,4 @@ class Interactive:
     def _repr_pretty_(self, p, cycle=False):
         """Print per IPython.lib.pretty to ease observing world changes."""
         assert not cycle
-        p.text(pretty(self._world))
-
-
-def pretty(o: typing.Any, *, omitted: typing.Set[str] = {'reserve'}) -> str:
-    """A __str__(...) variant suppressing False fields within namedtuples."""
-    fields = getattr(o, '_fields', None)
-    if fields is None:
-        return str(o)
-
-    keyvalues = []
-    for field, value in zip(fields, o):
-        if value and field not in omitted:
-            keyvalues.append('{}={}'.format(field, pretty(value)))
-    return '({})'.format(', '.join(keyvalues))
+        p.text(brief(self._world))

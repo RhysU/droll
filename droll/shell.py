@@ -6,9 +6,9 @@ import cmd
 import random
 import typing
 
-import droll.error
-import droll.player
-import droll.world
+from . import brief
+from . import player
+from . import world
 
 
 # TODO Initialize superclass, including stdin/stdout
@@ -43,7 +43,7 @@ import droll.world
 class Shell(cmd.Cmd):
     """"FIXME"""
 
-    def __init__(self, player=droll.player.DEFAULT, randrange=None):
+    def __init__(self, player=player.DEFAULT, randrange=None):
         super(Shell, self).__init__()
         self.prompt = '(droll) '
         self._player = player
@@ -51,17 +51,17 @@ class Shell(cmd.Cmd):
                            if randrange is None else randrange)
 
     def preloop(self):
-        self._world = droll.world.new_game()
-        self._world = droll.world.new_delve(self._world, self._randrange)
-        self._world = droll.world.next_level(self._world, self._randrange)
+        self._world = world.new_game()
+        self._world = world.new_delve(self._world, self._randrange)
+        self._world = world.next_level(self._world, self._randrange)
 
     # FIXME Not outputting score
     def postloop(self):
-        score = droll.world.score((self._world))
+        score = world.score((self._world))
         print("Score: ".format(score))
 
     def postcmd(self, stop, line):
-        print(pretty(self._world))
+        print(brief(self._world))
         return stop
 
     def do_EOF(self, line):
@@ -71,16 +71,3 @@ class Shell(cmd.Cmd):
 def parse(line: str) -> typing.Tuple[str]:
     """Split a line into a tuple of whitespace-delimited tokens."""
     return tuple(line.split())
-
-
-def pretty(o: typing.Any, *, omitted: typing.Set[str] = {'reserve'}) -> str:
-    """A __str__(...) variant suppressing False fields within namedtuples."""
-    fields = getattr(o, '_fields', None)
-    if fields is None:
-        return str(o)
-
-    keyvalues = []
-    for field, value in zip(fields, o):
-        if value and field not in omitted:
-            keyvalues.append('{}={}'.format(field, pretty(value)))
-    return '({})'.format(', '.join(keyvalues))
