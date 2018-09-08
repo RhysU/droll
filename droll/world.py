@@ -122,7 +122,7 @@ def new_game() -> World:
 
 def new_delve(world: World, randrange: RandRange, *, party_dice=7) -> World:
     """Establish a new delve within an existing game."""
-    if world.delve > 3:
+    if world.delve >= 3:
         raise DrollError("At most three delves are permitted.")
     return world._replace(
         delve=world.delve + 1,
