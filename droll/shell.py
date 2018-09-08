@@ -11,10 +11,6 @@ from . import player
 from . import world
 
 
-# TODO Initialize superclass, including stdin/stdout
-# TODO Initialize on starting loop
-# TODO Pretty print state of world after each command
-# TODO Properly handle EOF
 # TODO Disable empty line repeating prior command
 # TODO Suggest descend() after a level is completed
 # TODO Display DrollErrors in a non-fatal manner
@@ -45,26 +41,29 @@ class Shell(cmd.Cmd):
 
     def __init__(self, player=player.DEFAULT, randrange=None):
         super(Shell, self).__init__()
-        self.prompt = '(droll) '
         self._player = player
         self._randrange = (random.Random().randrange
                            if randrange is None else randrange)
+        self._world = None
 
     def preloop(self):
-        self._world = world.new_game()
-        self._world = world.new_delve(self._world, self._randrange)
-        self._world = world.next_level(self._world, self._randrange)
-
-    # FIXME Not outputting score
-    def postloop(self):
-        score = world.score((self._world))
-        print("Score: ".format(score))
+        w = world.new_game()
+        w = world.new_delve(w, self._randrange)
+        w = world.next_level(w, self._randrange)
+        self._world = w
+        self.__update_prompt()
 
     def postcmd(self, stop, line):
         print(brief(self._world))
+        self.__update_prompt()
         return stop
 
+    def __update_prompt(self):
+        score = world.score(self._world) if self._world else 0
+        self.prompt = '(droll {:-2d}) '.format(score)
+
     def do_EOF(self, line):
+        print()
         return True
 
 
