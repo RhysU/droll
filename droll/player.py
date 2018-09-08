@@ -5,6 +5,7 @@
 
 import collections
 
+from .error import DrollError
 from .action import (
     defeat_all, defeat_dragon, defeat_one,
     open_all, open_one, quaff, reroll, bait_dragon, elixir
@@ -32,10 +33,13 @@ def apply(
     Processes hero-like artifacts (i.e. not rings/portals/scales).
     Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
-    # One-off handling of some treasures
+    # One-off handling of some treasures, with error wrapping to aid usability
     if noun in {'bait', 'elixir'}:
-        action = getattr(player, noun)
-        return action(world, randrange, noun, target, *additional)
+        try:
+            action = getattr(player, noun)
+            return action(world, randrange, noun, target, *additional)
+        except AttributeError as cause:
+            raise DrollError(str(cause)) from cause
 
     # Many treasures behave exactly like party members, so
     # convert into party members prior to action invocation.
@@ -49,8 +53,11 @@ def apply(
     )
 
     # Apply a hero (possibly phantom per above) to some collection of targets.
-    action = getattr(getattr(player.party, noun), target)
-    world = action(world, randrange, noun, target, *additional)
+    try:
+        action = getattr(getattr(player.party, noun), target)
+        world = action(world, randrange, noun, target, *additional)
+    except AttributeError as cause:
+        raise DrollError(str(cause)) from cause
 
     # Undo the prior transformation by subtracting prior_treasure.
     world = world._replace(
