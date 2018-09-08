@@ -29,7 +29,8 @@ from . import world
 # TODO Permit multiple players within a single shell?
 
 
-_NOUNS = list(sorted(itertools.chain(
+# Trailing space causes tab completion to insert token separators
+_NOUNS = list(i + ' ' for i in sorted(itertools.chain(
     world.Level._fields,
     world.Party._fields,
     world.Treasure._fields,
