@@ -222,6 +222,7 @@ def _draw(reserve: Treasure, randrange: RandRange) -> str:
     return seq[randrange(0, len(seq))]
 
 
+# AttributeErrors from getattr(...) mistakes desired as logic semi-internal
 def draw_treasure(world: World, randrange: RandRange) -> World:
     """Draw a single item from the reserve into the player's treasures."""
     drawn = _draw(reserve=world.reserve, randrange=randrange)
@@ -233,6 +234,7 @@ def draw_treasure(world: World, randrange: RandRange) -> World:
     return world._replace(treasure=treasure, reserve=reserve)
 
 
+# AttributeErrors from getattr(...) mistakes desired as logic semi-internal
 def replace_treasure(world: World, item: str) -> World:
     """Replace a single item from the player's treasures into the reserve."""
     prior_count = getattr(world.treasure, item)
