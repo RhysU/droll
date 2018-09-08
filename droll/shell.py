@@ -63,6 +63,7 @@ class Shell(cmd.Cmd):
         self.prompt = '(droll {:-2d}) '.format(score)
 
     def do_EOF(self, line):
+        """End-of-file causes shell exit."""
         print()
         return True
 
