@@ -43,12 +43,16 @@ class Shell(cmd.Cmd):
     # SETUP BELOW HERE
     ##################
 
-    def __init__(self, player=player.DEFAULT, randrange=None):
+    def __init__(self, *, player=player.DEFAULT, randrange=None):
         super(Shell, self).__init__()
         self._player = player
         self._randrange = (random.Random().randrange
                            if randrange is None else randrange)
         self._world = None
+
+    def summary(self) -> str:
+        """Brief, string description of the present game state."""
+        return '(None)' if self._world is None else brief(self._world)
 
     def preloop(self):
         """Prepare a new game, delve, and dungeon."""
@@ -63,7 +67,7 @@ class Shell(cmd.Cmd):
         """Print game state after each commmand."""
         print()
         if line != 'EOF':
-            print(brief(self._world))
+            print(self.summary())
         self._update_prompt()
         return stop
 
