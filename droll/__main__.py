@@ -5,6 +5,8 @@
 
 from .shell import Shell
 
+# TODO Permit specifying seeds
+# TODO Permit specifying different players
 if __name__ == '__main__':
     s = Shell()
     s.cmdloop()
