@@ -21,6 +21,8 @@ Player = collections.namedtuple('Player', (
 
 
 # TODO Implicitly map treasures into the associated heroes
+# TODO Implicitly map portals into retire operations
+# TODO Implicitly map rings into next_dungeon operations
 def apply(
         player: Player,
         world: World,
