@@ -12,6 +12,7 @@ from . import error
 from . import player
 from . import world
 
+# TODO Score seemingly not updated
 # TODO Suggest descend() after a level is completed
 # TODO Display DrollErrors in a non-fatal manner
 # TODO Tab complete all possibilities
@@ -80,12 +81,12 @@ class Shell(cmd.Cmd):
         """Empty line causes no action to occur."""
         pass
 
-    def _completenouns(self, text):
-        return [i for i in _NOUNS if i.startswith(text)]
-
     def completenames(self, text, *ignored):
         return (super(Shell, self).completenames(text, *ignored) +
-                self._completenouns(text))
+                [i for i in _NOUNS if i.startswith(text)])
+
+    def completedefault(self, text, line, begidx, endidx):
+        return [i for i in _NOUNS if i.startswith(text)]
 
     ####################
     # ACTIONS BELOW HERE
