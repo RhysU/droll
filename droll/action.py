@@ -15,10 +15,10 @@ from .world import (Level, RandRange, Party, World,
 def defeat_one(
         world: World, randrange: RandRange, hero: str, target: str
 ) -> World:
-    """Update world after hero defeats exactly one defender."""
+    """Update world after hero handles exactly one target."""
     return world._replace(
         party=__decrement_hero(world.party, hero),
-        level=__decrement_defender(world.level, target)
+        level=__decrement_target(world.level, target)
     )
 
 
@@ -33,28 +33,28 @@ def __increment_hero(party: Party, hero: str) -> Party:
     return party._replace(**{hero: getattr(party, hero) + 1})
 
 
-def __decrement_defender(level: Level, defender: str) -> Level:
-    prior_defenders = getattr(level, defender)
-    if not prior_defenders:
-        raise ValueError("Require at least one defender {}".format(defender))
-    return level._replace(**{defender: prior_defenders - 1})
+def __decrement_target(level: Level, target: str) -> Level:
+    prior_targets = getattr(level, target)
+    if not prior_targets:
+        raise ValueError("Require at least one target {}".format(target))
+    return level._replace(**{target: prior_targets - 1})
 
 
 def defeat_all(
         world: World, randrange: RandRange, hero: str, target: str
 ) -> World:
-    """Update world after hero defeats all of one type of defender."""
+    """Update world after hero handles all of one type of target."""
     return world._replace(
         party=__decrement_hero(world.party, hero),
-        level=__eliminate_defenders(world.level, target)
+        level=__eliminate_targets(world.level, target)
     )
 
 
-def __eliminate_defenders(level: Level, defender: str) -> Level:
-    prior_defenders = getattr(level, defender)
-    if not prior_defenders:
-        raise DrollError("Require at least one defender {}".format(defender))
-    return level._replace(**{defender: 0})
+def __eliminate_targets(level: Level, target: str) -> Level:
+    prior_targets = getattr(level, target)
+    if not prior_targets:
+        raise DrollError("Require at least one target {}".format(target))
+    return level._replace(**{target: 0})
 
 
 def open_one(
@@ -66,7 +66,7 @@ def open_one(
         raise DrollError("Monsters must be defeated before opening.")
     return draw_treasure(world, randrange)._replace(
         party=__decrement_hero(world.party, hero),
-        level=__decrement_defender(world.level, target)
+        level=__decrement_target(world.level, target)
     )
 
 
@@ -84,7 +84,7 @@ def open_all(
         world = draw_treasure(world, randrange)
     return world._replace(
         party=__decrement_hero(world.party, hero),
-        level=__eliminate_defenders(world.level, target),
+        level=__eliminate_targets(world.level, target),
     )
 
 
@@ -107,7 +107,7 @@ def quaff(
         party = __increment_hero(party, revived)
     return world._replace(
         party=party,
-        level=__eliminate_defenders(world.level, target)
+        level=__eliminate_targets(world.level, target)
     )
 
 
@@ -123,7 +123,7 @@ def reroll(
     for target in targets:
         if target in {'potion', 'dragon'}:
             raise DrollError("{} cannot be rerolled".format(target))
-        reduced = __decrement_defender(reduced, target)
+        reduced = __decrement_target(reduced, target)
 
     # Re-roll the necessary number of dice then add to anything left fixed
     increased = roll_level(dice=len(targets), randrange=randrange)
@@ -139,7 +139,7 @@ def defeat_dragon(
         min_length: int = 3,
         min_heroes: int = 3
 ) -> World:
-    """Update world after hero defeats a dragon using three different heroes.
+    """Update world after hero handles a dragon using multiple distinct heroes.
 
     Additional required heroes are specified within variable-length others."""
     # Simple prerequisites for attempting to defeat the dragon
@@ -169,14 +169,15 @@ def defeat_dragon(
     return draw_treasure(world, randrange)._replace(
         experience=world.experience + 1,
         party=party,
-        level=__eliminate_defenders(world.level, target)
+        level=__eliminate_targets(world.level, target)
     )
 
 
 def bait_dragon(
         world: World, randrange: RandRange, noun: str,
-        target: typing.Optional[str] = None, *,
-        defenders: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze')
+        target: typing.Optional[str] = None,
+        *,
+        enemies: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze')
 ) -> World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target
@@ -188,12 +189,12 @@ def bait_dragon(
     # Compute how many new dragons will be produced and remove sources
     new_targets = 0
     level = world.level
-    for defender in defenders:
-        new_targets += getattr(world.level, defender)
-        level = level._replace(**{defender: 0})
+    for enemy in enemies:
+        new_targets += getattr(world.level, enemy)
+        level = level._replace(**{enemy: 0})
     if not new_targets:
         raise DrollError("At least one of {} required for '{}'"
-                         .format(defenders, noun))
+                         .format(enemies, noun))
 
     # Increment the number of targets (i.e. dragons)
     return world._replace(
