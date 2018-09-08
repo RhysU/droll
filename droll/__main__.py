@@ -8,10 +8,13 @@ import random
 from .shell import Shell
 
 # TODO Permit specifying different players
+# TODO Picking up the random seed could be much simpler
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='droll', description=__doc__)
     parser.add_argument('--seed', metavar='N', type=int, nargs=1, default=None,
                         help='an integer to seed random number generation')
     arguments = parser.parse_args()
-    s = Shell(randrange=random.Random(*arguments.seed).randrange)
+    randseed = arguments.seed if arguments.seed else ()
+    randrange = random.Random(*randseed).randrange
+    s = Shell(randrange=randrange)
     s.cmdloop()
