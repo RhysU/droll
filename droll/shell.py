@@ -121,7 +121,7 @@ class ShellManager:
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if not isinstance(exc_val, error.DrollError):
+        if isinstance(exc_val, error.DrollError):
             print(exc_val)
             return True
 
