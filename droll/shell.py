@@ -13,10 +13,7 @@ from . import player
 from . import world
 
 # TODO Accept constructor flag causing pdb on unexpected exception
-# TODO Score seemingly not updated
 # TODO Suggest descend() after a level is completed
-# TODO Display DrollErrors in a non-fatal manner
-# TODO Tab complete all possibilities
 # TODO Tab complete heros/monsters only when sensible
 # TODO Tab complete only monsters left in the current level
 # TODO Exit after all delves exhausted
@@ -40,7 +37,7 @@ _NOUNS = list(i + ' ' for i in sorted(itertools.chain(
 
 
 class Shell(cmd.Cmd):
-    """"FIXME"""
+    """"REPL permitting playing a game via tab-completion shell."""
 
     ##################
     # SETUP BELOW HERE
@@ -65,7 +62,8 @@ class Shell(cmd.Cmd):
     def postcmd(self, stop, line):
         """Print game state after each commmand."""
         print()
-        print(brief(self._world))
+        if line != 'EOF':
+            print(brief(self._world))
         self._update_prompt()
         return stop
 
@@ -76,7 +74,6 @@ class Shell(cmd.Cmd):
 
     def do_EOF(self, line):
         """End-of-file causes shell exit."""
-        print()
         return True
 
     def emptyline(self):
