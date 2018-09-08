@@ -12,6 +12,7 @@ from . import error
 from . import player
 from . import world
 
+# TODO Accept constructor flag causing pdb on unexpected exception
 # TODO Score seemingly not updated
 # TODO Suggest descend() after a level is completed
 # TODO Display DrollErrors in a non-fatal manner
