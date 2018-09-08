@@ -116,6 +116,7 @@ class Shell(cmd.Cmd):
         Automatically starts a new delve, if possible."""
         with ShellManager():
             no_arguments(line)
+            self._world = world.retire(self._world)
         try:
             self._world = world.new_delve(self._world, self._randrange)
             self._world = world.next_level(self._world, self._randrange)
