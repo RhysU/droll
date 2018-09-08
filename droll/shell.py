@@ -11,7 +11,6 @@ from . import player
 from . import world
 
 
-# TODO Disable empty line repeating prior command
 # TODO Suggest descend() after a level is completed
 # TODO Display DrollErrors in a non-fatal manner
 # TODO Tab complete all possibilities
@@ -21,6 +20,7 @@ from . import world
 # TODO Emit score after end of the game
 # TODO Context-dependent help, in that only feasible options suggested
 # TODO Context-dependent help, suggested whenever empty input received
+# TODO Context-dependent help, after hitting an empty line
 # TODO Permit one-level of undo
 # TODO Permit saving world state to file
 # TODO Permit loading world state from file
@@ -66,6 +66,9 @@ class Shell(cmd.Cmd):
         """End-of-file causes shell exit."""
         print()
         return True
+
+    def emptyline(self):
+        pass
 
 
 def parse(line: str) -> typing.Tuple[str]:
