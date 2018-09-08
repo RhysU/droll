@@ -3,17 +3,20 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of the shell (at least driving with basic commands)."""
 
+import random
 import typing
 
 from droll.shell import Shell
 
 
 def test_initial():
+    """Before preloop(...) is run, summary(...) is well-defined."""
     s = Shell()
     assert s.summary() == "(None)"
 
 
 def test_EOF():
+    """Confirm providing EOF exits cmdloop(...)."""
     s = Shell()
     assert not s.cmdqueue
     s.cmdqueue.append('EOF')
@@ -21,6 +24,7 @@ def test_EOF():
     assert s.lastcmd == ''
 
 
+# Strategy for testing, further below, will turn docstrings into assertions
 def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     """Parse input like the following into (summary, command) tuples:
 
@@ -40,6 +44,7 @@ def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     return zip(summaries, commands)
 
 
+# Confirm the parsing helper above is doing hat is required.
 def test_summary_command():
     """Confirm parse_summary_command(...) helper working as required."""
     sc = parse_summary_command(parse_summary_command.__doc__)
@@ -114,3 +119,11 @@ def test_simple():
     (delve=2, depth=1, experience=5, ability=True, dungeon=(ooze=1), party=(fighter=1, cleric=2, mage=3, scroll=1), treasure=())
     (droll  5) EOF
     """
+    # Drive the game according to the script in the above docstring.
+    s = Shell(randrange=random.Random(4).randrange)
+    s.preloop()
+    parsed = parse_summary_command(test_simple.__doc__)
+    for index, (expected_summary, following_command) in enumerate(parsed):
+        assert expected_summary == s.summary(), (
+            "Summary mismatch at {}".format(index))
+        s.onecmd(following_command)
