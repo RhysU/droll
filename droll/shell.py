@@ -64,6 +64,7 @@ class Shell(cmd.Cmd):
 
     def postcmd(self, stop, line):
         """Print game state after each commmand."""
+        print()
         print(brief(self._world))
         self._update_prompt()
         return stop
@@ -117,11 +118,8 @@ class Shell(cmd.Cmd):
         with ShellManager():
             no_arguments(line)
             self._world = world.retire(self._world)
-        try:
             self._world = world.new_delve(self._world, self._randrange)
             self._world = world.next_level(self._world, self._randrange)
-        except error.DrollError:
-            pass
 
     def do_retreat(self, line):
         """Retreat from the level at any time (e.g. after being defeated).
@@ -129,11 +127,8 @@ class Shell(cmd.Cmd):
         Automatically starts a new delve, if possible."""
         with ShellManager():
             no_arguments(line)
-        try:
             self._world = world.new_delve(self._world, self._randrange)
             self._world = world.next_level(self._world, self._randrange)
-        except error.DrollError:
-            pass
 
 
 class ShellManager:
