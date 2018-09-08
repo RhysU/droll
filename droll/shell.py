@@ -28,17 +28,13 @@ from . import world
 # TODO Do not descend on new_delve to permit rerolling
 # TODO Permit multiple players within a single shell?
 
-# TODO ability
-# TODO apply
-# TODO descend
-# TODO retire
-# TODO retreat
-# TODO score
-# TODO treasure
-
 
 class Shell(cmd.Cmd):
     """"FIXME"""
+
+    ##################
+    # SETUP BELOW HERE
+    ##################
 
     def __init__(self, player=player.DEFAULT, randrange=None):
         super(Shell, self).__init__()
@@ -52,7 +48,8 @@ class Shell(cmd.Cmd):
         w = world.new_delve(w, self._randrange)
         w = world.next_level(w, self._randrange)
         self._world = w
-        self._update_prompt()
+        # Causes printing of initial world state
+        self.postcmd(stop=False, line='')
 
     def postcmd(self, stop, line):
         print(brief(self._world))
@@ -71,6 +68,51 @@ class Shell(cmd.Cmd):
     def emptyline(self):
         pass
 
+    ####################
+    # ACTIONS BELOW HERE
+    ####################
+
+    def do_ability(self, line):
+        """Invoke the player's ability."""
+        with ShellManager():
+            raise error.DrollError("NotYetImplemented")
+
+    def default(self, line):
+        """Apply some named hero or treasure to some collection of nouns."""
+        with ShellManager():
+            self._world = player.apply(
+                self._player, self._world, self._randrange, *parse(line))
+
+    def do_descend(self, line):
+        """Descend to the next level (in contrast to retiring)."""
+        with ShellManager():
+            no_arguments(line)
+            self._world = world.next_level(self._world, self._randrange)
+
+    def do_retire(self, line):
+        """Retire from the dungeon after successfully completing a level.
+
+        Automatically starts a new delve, if possible."""
+        with ShellManager():
+            no_arguments(line)
+        try:
+            self._world = world.new_delve(self._world, self._randrange)
+            self._world = world.next_level(self._world, self._randrange)
+        except error.DrollError:
+            pass
+
+    def do_retreat(self, line):
+        """Retreat from the level at any time (e.g. after being defeated).
+
+        Automatically starts a new delve, if possible."""
+        with ShellManager():
+            no_arguments(line)
+        try:
+            self._world = world.new_delve(self._world, self._randrange)
+            self._world = world.next_level(self._world, self._randrange)
+        except error.DrollError:
+            pass
+
 
 class ShellManager:
     """Print DrollErrors while propagating other exceptions."""
@@ -87,3 +129,9 @@ class ShellManager:
 def parse(line: str) -> typing.Tuple[str]:
     """Split a line into a tuple of whitespace-delimited tokens."""
     return tuple(line.split())
+
+
+def no_arguments(line):
+    """Raise DrollError if line is non-empty."""
+    if line:
+        raise error.DrollError('Command accepts no arguments.')
