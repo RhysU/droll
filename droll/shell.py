@@ -7,6 +7,7 @@ import random
 import typing
 
 from . import brief
+from . import error
 from . import player
 from . import world
 
@@ -51,14 +52,14 @@ class Shell(cmd.Cmd):
         w = world.new_delve(w, self._randrange)
         w = world.next_level(w, self._randrange)
         self._world = w
-        self.__update_prompt()
+        self._update_prompt()
 
     def postcmd(self, stop, line):
         print(brief(self._world))
-        self.__update_prompt()
+        self._update_prompt()
         return stop
 
-    def __update_prompt(self):
+    def _update_prompt(self):
         score = world.score(self._world) if self._world else 0
         self.prompt = '(droll {:-2d}) '.format(score)
 
@@ -69,6 +70,18 @@ class Shell(cmd.Cmd):
 
     def emptyline(self):
         pass
+
+
+class ShellManager:
+    """Print DrollErrors while propagating other exceptions."""
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not isinstance(exc_val, error.DrollError):
+            print(exc_val)
+            return True
 
 
 def parse(line: str) -> typing.Tuple[str]:
