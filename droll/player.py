@@ -5,12 +5,12 @@
 
 import collections
 
-from .error import DrollError
 from .action import (
     defeat_all, defeat_dragon, defeat_one,
     open_all, open_one, quaff, reroll, bait_dragon, elixir
 )
-from .world import Level, Party, RandRange, World, replace_treasure
+from .error import DrollError
+from .world import Dungeon, Party, RandRange, World, replace_treasure
 
 Player = collections.namedtuple('Player', (
     'bait',
@@ -91,7 +91,7 @@ DEFAULT = Player(
         scroll='scroll',
     ),
     party=Party(
-        fighter=Level(
+        fighter=Dungeon(
             goblin=defeat_all,
             skeleton=defeat_one,
             ooze=defeat_one,
@@ -99,7 +99,7 @@ DEFAULT = Player(
             potion=quaff,
             dragon=defeat_dragon,
         ),
-        cleric=Level(
+        cleric=Dungeon(
             goblin=defeat_one,
             skeleton=defeat_all,
             ooze=defeat_one,
@@ -107,7 +107,7 @@ DEFAULT = Player(
             potion=quaff,
             dragon=defeat_dragon,
         ),
-        mage=Level(
+        mage=Dungeon(
             goblin=defeat_one,
             skeleton=defeat_one,
             ooze=defeat_all,
@@ -115,7 +115,7 @@ DEFAULT = Player(
             potion=quaff,
             dragon=defeat_dragon,
         ),
-        thief=Level(
+        thief=Dungeon(
             goblin=defeat_one,
             skeleton=defeat_one,
             ooze=defeat_one,
@@ -123,7 +123,7 @@ DEFAULT = Player(
             potion=quaff,
             dragon=defeat_dragon,
         ),
-        champion=Level(
+        champion=Dungeon(
             goblin=defeat_all,
             skeleton=defeat_all,
             ooze=defeat_all,
@@ -133,7 +133,7 @@ DEFAULT = Player(
         ),
         # Technically scrolls could re-roll potions,
         # but doing so would be a really peculiar choice.
-        scroll=Level(
+        scroll=Dungeon(
             goblin=reroll,
             skeleton=reroll,
             ooze=reroll,

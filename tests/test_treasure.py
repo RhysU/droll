@@ -15,7 +15,7 @@ import droll.world as world
 @pytest.fixture(name='game')
 def _game():
     return world.new_game()._replace(
-        level=world.Level(*([2] * len(world.Level._fields))),
+        dungeon=world.Dungeon(*([2] * len(world.Dungeon._fields))),
         party=world.Party(*([0] * len(world.Party._fields))),
     )
 
@@ -39,10 +39,10 @@ def test_bait(game, randrange):
     game = game._replace(treasure=game.treasure._replace(bait=2))
     game = player.apply(player.DEFAULT, game, randrange, 'bait', 'dragon')
     assert game.treasure.bait == 1
-    assert game.level.goblin == 0
-    assert game.level.skeleton == 0
-    assert game.level.ooze == 0
-    assert game.level.dragon == 8
+    assert game.dungeon.goblin == 0
+    assert game.dungeon.skeleton == 0
+    assert game.dungeon.ooze == 0
+    assert game.dungeon.dragon == 8
 
     with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange, 'bait')
@@ -54,12 +54,12 @@ def test_sword(game):
     game = player.apply(player.DEFAULT, game, None, 'fighter', 'goblin')
     assert game.treasure.sword == 1
     assert game.party.fighter == 0
-    assert game.level.goblin == 0
+    assert game.dungeon.goblin == 0
 
     game = player.apply(player.DEFAULT, game, None, 'fighter', 'ooze')
     assert game.treasure.sword == 0
     assert game.party.fighter == 0
-    assert game.level.ooze == 1
+    assert game.dungeon.ooze == 1
 
     with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, None, 'fighter', 'ooze')

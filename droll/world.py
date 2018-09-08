@@ -11,7 +11,7 @@ import typing
 
 from .error import DrollError
 
-Level = collections.namedtuple('Level', (
+Dungeon = collections.namedtuple('Dungeon', (
     'goblin',
     'skeleton',
     'ooze',
@@ -21,14 +21,17 @@ Level = collections.namedtuple('Level', (
 ))
 
 
-def defeated_monsters(level: Level) -> bool:
-    """Are all non-dragon monsters on this level defeated?"""
-    return (level is None) or 0 == (level.goblin + level.skeleton + level.ooze)
+def defeated_monsters(dungeon: Dungeon) -> bool:
+    """Are all non-dragon monsters on this dungeon defeated?"""
+    return (dungeon is None) or 0 == (dungeon.goblin +
+                                      dungeon.skeleton +
+                                      dungeon.ooze)
 
 
-def defeated_level(level: Level) -> bool:
-    """Are all monsters and any dragon on this level defected?"""
-    return (level is None) or (defeated_monsters(level) and level.dragon < 3)
+def defeated_dungeon(dungeon: Dungeon) -> bool:
+    """Are all monsters and any dragon on this dungeon defected?"""
+    return (dungeon is None) or (defeated_monsters(dungeon) and
+                                 dungeon.dragon < 3)
 
 
 # random.Random.randrange or random.randrange are accepted for randomness.
@@ -49,12 +52,12 @@ def _roll(
     return result
 
 
-def roll_level(dice: int, randrange: RandRange) -> Level:
-    """Roll a new Level using given number of dice.
+def roll_dungeon(dice: int, randrange: RandRange) -> Dungeon:
+    """Roll a new Dungeon using given number of dice.
 
-    On Level N one should account for the number of extant dragons."""
+    On Dungeon N one should account for the number of extant dragons."""
     assert dice >= 1, "At least one dice required (requested {})".format(dice)
-    return Level(*_roll(dice, 0, len(Level._fields), randrange))
+    return Dungeon(*_roll(dice, 0, len(Dungeon._fields), randrange))
 
 
 Party = collections.namedtuple('Party', (
@@ -96,7 +99,7 @@ World = collections.namedtuple('World', (
     'depth',
     'experience',
     'ability',
-    'level',
+    'dungeon',
     'party',
     'treasure',
     'reserve',
@@ -104,13 +107,13 @@ World = collections.namedtuple('World', (
 
 
 def new_game() -> World:
-    """Establish a new game independent of a delve/level."""
+    """Establish a new game independent of a delve/dungeon."""
     return World(
         delve=0,
         depth=None,
         experience=0,
         ability=None,
-        level=None,
+        dungeon=None,
         party=None,
         treasure=copy.deepcopy(TREASURE_INITIAL),
         reserve=copy.deepcopy(RESERVE_INITIAL),
@@ -125,56 +128,56 @@ def new_delve(world: World, randrange: RandRange, *, party_dice=7) -> World:
         delve=world.delve + 1,
         depth=0,
         ability=True,
-        level=None,
+        dungeon=None,
         party=roll_party(dice=party_dice, randrange=randrange),
     )
 
 
-def next_level(
+def next_dungeon(
         world: World, randrange: RandRange, *,
         max_depth=10,
-        level_dice=7
+        dungeon_dice=7
 ) -> World:
-    """Move one level deeper in the dungeon, retaining any partial dragons.
+    """Move one dungeon deeper in the dungeon, retaining any partial dragons.
 
     If necessary, a ring of invisibility will be used to sneak past a dragon.
     Adheres to the specified number of dice available in the game."""
     # Apologies for the following convoluted mess...  See the unit tests.
-    if defeated_level(world.level):
-        # Player has defeated the level thus no special handling required.
+    if defeated_dungeon(world.dungeon):
+        # Player has defeated the dungeon thus no special handling required.
         pass
-    elif defeated_monsters(world.level):
-        # Player has defeated the level but a dragon remains.
+    elif defeated_monsters(world.dungeon):
+        # Player has defeated the dungeon but a dragon remains.
         try:
             world = __throw_if_no_ring_of_invisibility(world)
         except DrollError:
             raise DrollError("Dragon remains but a ring of"
                              " invisibility is not in hand.")
     else:
-        raise DrollError('Must defeat enemies to proceed to next level.')
+        raise DrollError('Must defeat enemies to proceed to next dungeon.')
 
-    # Success above, so update the world in anticipation of the next level
+    # Success above, so update the world in anticipation of the next dungeon
     next_depth = world.depth + 1
     if next_depth > max_depth:
         raise DrollError("The maximum depth is {}".format(max_depth))
-    prior_dragons = 0 if world.level is None else world.level.dragon
-    level = roll_level(dice=min(level_dice - prior_dragons, next_depth),
-                       randrange=randrange)
-    level = level._replace(dragon=level.dragon + prior_dragons)
-    return world._replace(depth=next_depth, level=level)
+    prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
+    dungeon = roll_dungeon(dice=min(dungeon_dice - prior_dragons, next_depth),
+                           randrange=randrange)
+    dungeon = dungeon._replace(dragon=dungeon.dragon + prior_dragons)
+    return world._replace(depth=next_depth, dungeon=dungeon)
 
 
 def retire(world: World) -> World:
-    """Retire to the tavern after completing the present level.
+    """Retire to the tavern after completing the present dungeon.
 
     If monsters or a dragon remains, either ring of invisibility or
     a town portal will be used if available."""
     # Apologies for the following convoluted mess...  See the unit tests.
-    if defeated_level(world.level):
-        # Player has defeated the level thus no special handling required.
+    if defeated_dungeon(world.dungeon):
+        # Player has defeated the dungeon thus no special handling required.
         pass
-    elif defeated_monsters(world.level):
-        # Player has defeated the level but a dragon remains.
+    elif defeated_monsters(world.dungeon):
+        # Player has defeated the dungeon but a dragon remains.
         # First attempt to use a ring then a portal (because portals are +2)
         try:
             world = __throw_if_no_ring_of_invisibility(world)
@@ -196,7 +199,7 @@ def retire(world: World) -> World:
     return world._replace(
         depth=0,
         experience=world.experience + world.depth,
-        level=None,
+        dungeon=None,
     )
 
 
@@ -249,10 +252,10 @@ def replace_treasure(world: World, item: str) -> World:
 def __throw_if_no_ring_of_invisibility(world: World) -> World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     world = replace_treasure(world, 'ring')
-    return world._replace(level=world.level._replace(dragon=0))
+    return world._replace(dungeon=world.dungeon._replace(dragon=0))
 
 
 def __throw_if_no_town_portal(world: World) -> World:
     """Attempt to use a town portal towards retiring to town."""
-    # No need to reset monsters/dragon as level will be wholly replaced
+    # No need to reset monsters/dragon as dungeon will be wholly replaced
     return replace_treasure(world, 'portal')

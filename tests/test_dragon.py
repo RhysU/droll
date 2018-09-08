@@ -15,7 +15,7 @@ import droll.world as world
 @pytest.fixture(name='game')
 def _game():
     return world.new_game()._replace(
-        level=world.Level(
+        dungeon=world.Dungeon(
             goblin=0,
             skeleton=0,
             ooze=0,
@@ -38,7 +38,7 @@ def test_successful(game, randrange):
     assert game.party.fighter == 1
     assert game.party.cleric == 1
     assert game.party.mage == 1
-    assert game.level.dragon == 0
+    assert game.dungeon.dragon == 0
     assert game.experience == 1
     assert sum(game.treasure) == 1
 
@@ -52,7 +52,7 @@ def test_treasure_slot1(game, randrange):
     assert game.party.fighter == 0
     assert game.party.cleric == 1
     assert game.party.mage == 1
-    assert game.level.dragon == 0
+    assert game.dungeon.dragon == 0
     assert game.experience == 1
     assert sum(game.treasure) == 7
 
@@ -66,7 +66,7 @@ def test_treasure_slot3(game, randrange):
     assert game.party.fighter == 1
     assert game.party.cleric == 0
     assert game.party.mage == 1
-    assert game.level.dragon == 0
+    assert game.dungeon.dragon == 0
     assert game.experience == 1
     assert sum(game.treasure) == 7
 
@@ -80,14 +80,14 @@ def test_treasure_slot2(game, randrange):
     assert game.party.fighter == 1
     assert game.party.cleric == 1
     assert game.party.mage == 0
-    assert game.level.dragon == 0
+    assert game.dungeon.dragon == 0
     assert game.experience == 1
     assert sum(game.treasure) == 7
 
 
 def test_monsters_remain(game, randrange):
     game = game._replace(
-        level=game.level._replace(goblin=1)
+        dungeon=game.dungeon._replace(goblin=1)
     )
     with pytest.raises(error.DrollError):
         player.apply(player.DEFAULT, game, randrange,

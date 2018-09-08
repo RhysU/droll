@@ -13,15 +13,15 @@ from . import player
 from . import world
 
 # TODO Accept constructor flag causing pdb on unexpected exception
-# TODO Suggest descend() after a level is completed
+# TODO Suggest descend() after a dungeon is completed
 # TODO Tab complete heros/monsters only when sensible
-# TODO Tab complete only monsters left in the current level
+# TODO Tab complete only monsters left in the current dungeon
 # TODO Exit after all delves exhausted
 # TODO Emit score after end of the game
 # TODO Context-dependent help, in that only feasible options suggested
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
-# TODO Permit one-level of undo
+# TODO Permit one-dungeon of undo
 # TODO Permit saving world state to file
 # TODO Permit loading world state from file
 # TODO Do not descend on new_delve to permit rerolling
@@ -30,7 +30,7 @@ from . import world
 
 # Trailing space causes tab completion to insert token separators
 _NOUNS = list(i + ' ' for i in sorted(itertools.chain(
-    world.Level._fields,
+    world.Dungeon._fields,
     world.Party._fields,
     world.Treasure._fields,
 )))
@@ -51,10 +51,10 @@ class Shell(cmd.Cmd):
         self._world = None
 
     def preloop(self):
-        """Prepare a new game, delve, and level."""
+        """Prepare a new game, delve, and dungeon."""
         w = world.new_game()
         w = world.new_delve(w, self._randrange)
-        w = world.next_level(w, self._randrange)
+        w = world.next_dungeon(w, self._randrange)
         self._world = w
         # Causes printing of initial world state
         self.postcmd(stop=False, line='')
@@ -103,29 +103,29 @@ class Shell(cmd.Cmd):
                 self._player, self._world, self._randrange, *parse(line))
 
     def do_descend(self, line):
-        """Descend to the next level (in contrast to retiring)."""
+        """Descend to the next dungeon (in contrast to retiring)."""
         with ShellManager():
             no_arguments(line)
-            self._world = world.next_level(self._world, self._randrange)
+            self._world = world.next_dungeon(self._world, self._randrange)
 
     def do_retire(self, line):
-        """Retire from the dungeon after successfully completing a level.
+        """Retire from the dungeon after successfully completing a dungeon.
 
         Automatically starts a new delve, if possible."""
         with ShellManager():
             no_arguments(line)
             self._world = world.retire(self._world)
             self._world = world.new_delve(self._world, self._randrange)
-            self._world = world.next_level(self._world, self._randrange)
+            self._world = world.next_dungeon(self._world, self._randrange)
 
     def do_retreat(self, line):
-        """Retreat from the level at any time (e.g. after being defeated).
+        """Retreat from the dungeon at any time (e.g. after being defeated).
 
         Automatically starts a new delve, if possible."""
         with ShellManager():
             no_arguments(line)
             self._world = world.new_delve(self._world, self._randrange)
-            self._world = world.next_level(self._world, self._randrange)
+            self._world = world.next_dungeon(self._world, self._randrange)
 
 
 class ShellManager:
