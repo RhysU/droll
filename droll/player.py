@@ -20,6 +20,7 @@ Player = collections.namedtuple('Player', (
 ))
 
 
+# TODO Implicitly map treasures into the associated heroes
 def apply(
         player: Player,
         world: World,
