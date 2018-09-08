@@ -7,8 +7,10 @@ import random
 
 from .shell import Shell
 
+# TODO Move into a method instead of __name__ block
 # TODO Permit specifying different players
 # TODO Picking up the random seed could be much simpler
+# TODO Install a binary with 'python setup.py develop'
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='droll', description=__doc__)
     parser.add_argument('--seed', metavar='N', type=int, nargs=1, default=None,
