@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """A REPL permitting playing a game via a tab-completion shell."""
 import cmd
+import itertools
 import random
 import typing
 
@@ -10,7 +11,6 @@ from . import brief
 from . import error
 from . import player
 from . import world
-
 
 # TODO Suggest descend() after a level is completed
 # TODO Display DrollErrors in a non-fatal manner
@@ -29,6 +29,13 @@ from . import world
 # TODO Permit multiple players within a single shell?
 
 
+_NOUNS = list(sorted(itertools.chain(
+    world.Level._fields,
+    world.Party._fields,
+    world.Treasure._fields,
+)))
+
+
 class Shell(cmd.Cmd):
     """"FIXME"""
 
@@ -44,6 +51,7 @@ class Shell(cmd.Cmd):
         self._world = None
 
     def preloop(self):
+        """Prepare a new game, delve, and level."""
         w = world.new_game()
         w = world.new_delve(w, self._randrange)
         w = world.next_level(w, self._randrange)
@@ -52,11 +60,13 @@ class Shell(cmd.Cmd):
         self.postcmd(stop=False, line='')
 
     def postcmd(self, stop, line):
+        """Print game state after each commmand."""
         print(brief(self._world))
         self._update_prompt()
         return stop
 
     def _update_prompt(self):
+        """Compute a prompt including the current score."""
         score = world.score(self._world) if self._world else 0
         self.prompt = '(droll {:-2d}) '.format(score)
 
@@ -66,7 +76,15 @@ class Shell(cmd.Cmd):
         return True
 
     def emptyline(self):
+        """Empty line causes no action to occur."""
         pass
+
+    def _completenouns(self, text):
+        return [i for i in _NOUNS if i.startswith(text)]
+
+    def completenames(self, text, *ignored):
+        return (super(Shell, self).completenames(text, *ignored) +
+                self._completenouns(text))
 
     ####################
     # ACTIONS BELOW HERE
