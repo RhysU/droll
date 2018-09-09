@@ -55,10 +55,9 @@ class Shell(cmd.Cmd):
         return '(None)' if self._world is None else brief(self._world)
 
     def preloop(self):
-        """Prepare a new game, delve, and dungeon."""
+        """Prepare a new game and start the first delve."""
         w = world.new_game()
         w = world.new_delve(w, self._randrange)
-        w = world.next_dungeon(w, self._randrange)
         self._world = w
         # Causes printing of initial world state
         self.postcmd(stop=False, line='')
@@ -120,7 +119,6 @@ class Shell(cmd.Cmd):
             no_arguments(line)
             self._world = world.retire(self._world)
             self._world = world.new_delve(self._world, self._randrange)
-            self._world = world.next_dungeon(self._world, self._randrange)
 
     def do_retreat(self, line):
         """Retreat from the dungeon at any time (e.g. after being defeated).

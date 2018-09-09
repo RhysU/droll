@@ -173,6 +173,8 @@ def retire(world: World) -> World:
     If monsters or a dragon remains, either ring of invisibility or
     a town portal will be used if available."""
     # Apologies for the following convoluted mess...  See the unit tests.
+    if world.depth == 0:
+        raise DrollError("Descend at least once prior to retiring.")
     if defeated_dungeon(world.dungeon):
         # Player has defeated the dungeon thus no special handling required.
         pass

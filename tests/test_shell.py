@@ -64,6 +64,9 @@ def test_summary_command():
 def test_simple():
     """Runs the following scenario:
 
+    (delve=1, ability=True, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), treasure=())
+    (droll  0) descend
+
     (delve=1, depth=1, ability=True, dungeon=(goblin=1), party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), treasure=())
     (droll  0) cleric goblin
 
@@ -116,7 +119,7 @@ def test_simple():
     (delve=1, depth=5, ability=True, dungeon=(), party=(), treasure=())
     (droll  0) retire
 
-    (delve=2, depth=1, experience=5, ability=True, dungeon=(ooze=1), party=(fighter=1, cleric=2, mage=3, scroll=1), treasure=())
+    (delve=2, experience=5, ability=True, party=(fighter=1, cleric=2, mage=3, scroll=1), treasure=())
     (droll  5) EOF
     """
     # Drive the game according to the script in the above docstring.
