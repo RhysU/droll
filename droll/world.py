@@ -209,7 +209,7 @@ def score(world: World) -> int:
             world.experience +
             sum(world.treasure) +  # Each piece of treasure is +1 point
             world.treasure.portal +  # Portals are each +1 point (2 total)
-            world.treasure.scale // 2  # Pairs of scales are +1 point
+            2 * (world.treasure.scale // 2)  # Pairs of scales are +2 points
     )
 
 

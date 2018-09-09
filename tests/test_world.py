@@ -230,3 +230,28 @@ def test_next_dungeon_dragon(state):
     assert post3.depth == pre.depth + 1
     assert post3.treasure.ring == 0
     assert post3.treasure.portal == 1
+
+
+def test_score():
+    world = droll.world.World(
+        delve=3,
+        depth=1,
+        experience=15,
+        ability=None,
+        dungeon=None,
+        party=None,
+        treasure=droll.world.Treasure(
+            sword=0,
+            talisman=0,
+            sceptre=0,
+            tools=0,
+            scroll=0,
+            elixir=0,
+            bait=1,
+            portal=0,
+            ring=0,
+            scale=2,
+        ),
+        reserve=None,
+    )
+    assert 20 == droll.world.score(world)
