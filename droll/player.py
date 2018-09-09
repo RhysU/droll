@@ -36,6 +36,11 @@ def apply(
     Processes hero-like artifacts (i.e. not rings/portals/scales).
     Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
+    # Convert any artifacts in the command into any corresponding hero types
+    noun = partify(noun, player.artifacts)
+    target = partify(target, player.artifacts)
+    additional = tuple(partify(i, player.artifacts) for i in additional)
+
     # One-off handling of some treasures, with error wrapping to aid usability
     if noun in {'bait', 'elixir'}:
         try:
@@ -80,6 +85,16 @@ def apply(
         world = world._replace(party=world.party._replace(**{hero: 0}))
 
     return world
+
+
+def partify(token: str, artifacts: Party):
+    """Possibly convert tokens from treasures into associated party members."""
+    if token is None:
+        return None
+    for party, artifact in artifacts._asdict().items():
+        if token == artifact:
+            return party
+    return token
 
 
 DEFAULT = Player(
