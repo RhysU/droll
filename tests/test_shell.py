@@ -108,7 +108,7 @@ def test_simple():
     (droll  1) champion ooze
 
     (delve=1, depth=5, ability=True, dungeon=(goblin=1, skeleton=2), party=(fighter=1), treasure=(talisman=1))
-    (droll  1) cleric skeleton
+    (droll  1) talisman skeleton
 
     (delve=1, depth=5, ability=True, dungeon=(goblin=1), party=(fighter=1), treasure=())
     (droll  0) fighter goblin
