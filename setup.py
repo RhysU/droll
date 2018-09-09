@@ -87,5 +87,10 @@ setup(
     cmdclass={
         'test': PyTest,
         'doc': BuildDocs
-    }
+    },
+    entry_points={
+        'console_scripts': [
+            'droll=droll.__main__:main',
+        ],
+    },
 )
