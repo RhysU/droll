@@ -4,19 +4,23 @@
 """Command-line version of droll."""
 import argparse
 import random
+import sys
 
 from .shell import Shell
 
-# TODO Move into a method instead of __name__ block
-# TODO Permit specifying different players
-# TODO Picking up the random seed could be much simpler
-# TODO Install a binary with 'python setup.py develop'
-if __name__ == '__main__':
+
+def main(args=None):
     parser = argparse.ArgumentParser(prog='droll', description=__doc__)
     parser.add_argument('--seed', metavar='N', type=int, nargs=1, default=None,
                         help='an integer to seed random number generation')
-    arguments = parser.parse_args()
+    arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
     randrange = random.Random(*randseed).randrange
     s = Shell(randrange=randrange)
     s.cmdloop()
+
+
+# TODO Permit specifying different players
+# TODO Picking up the random seed could be much simpler
+if __name__ == '__main__':
+    main(sys.argv[1:])
