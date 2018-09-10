@@ -120,23 +120,26 @@ def new_game() -> World:
     )
 
 
-def new_delve(world: World, randrange: RandRange, *, party_dice=7) -> World:
+def new_delve(
+        world: World, randrange: RandRange, *,
+        _party_dice=7
+) -> World:
     """Establish a new delve within an existing game."""
     if world.delve >= 3:
         raise DrollError("At most three delves are permitted.")
     return world._replace(
-        delve=world.delve + 1,
+        delve=(world.delve if world.delve else 0) + 1,
         depth=0,
         ability=True,
         dungeon=None,
-        party=roll_party(dice=party_dice, randrange=randrange),
+        party=roll_party(dice=_party_dice, randrange=randrange),
     )
 
 
 def next_dungeon(
         world: World, randrange: RandRange, *,
-        max_depth=10,
-        dungeon_dice=7
+        _max_depth=10,
+        _dungeon_dice=7
 ) -> World:
     """Move one dungeon deeper in the dungeon, retaining any partial dragons.
 
@@ -157,11 +160,11 @@ def next_dungeon(
         raise DrollError('Must defeat enemies to proceed to next dungeon.')
 
     # Success above, so update the world in anticipation of the next dungeon
-    next_depth = world.depth + 1
-    if next_depth > max_depth:
-        raise DrollError("The maximum depth is {}".format(max_depth))
+    next_depth = (world.depth if world.depth else 0) + 1
+    if next_depth > _max_depth:
+        raise DrollError("The maximum depth is {}".format(_max_depth))
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
-    dungeon = roll_dungeon(dice=min(dungeon_dice - prior_dragons, next_depth),
+    dungeon = roll_dungeon(dice=min(_dungeon_dice - prior_dragons, next_depth),
                            randrange=randrange)
     dungeon = dungeon._replace(dragon=dungeon.dragon + prior_dragons)
     return world._replace(depth=next_depth, dungeon=dungeon)

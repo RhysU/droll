@@ -8,8 +8,8 @@ import typing
 
 from .error import DrollError
 from .world import (Dungeon, RandRange, Party, World,
-                    defeated_monsters, draw_treasure,
-                    replace_treasure, roll_dungeon)
+                    defeated_monsters, defeated_dungeon, draw_treasure,
+                    next_dungeon, replace_treasure, roll_dungeon)
 
 
 def defeat_one(
@@ -203,10 +203,29 @@ def bait_dragon(
     )
 
 
+# TODO Do not move to the next dungeon-- simply defeat the dragon
+def ring(
+        world: World, randrange: RandRange, noun: str,
+        target: typing.Optional[str] = None,
+) -> World:
+    """Use a ring of invisibility to sneak past a dragon."""
+    target = 'dragon' if target is None else target
+    if target != 'dragon':
+        raise DrollError('Cannot {} a {}'.format(noun, target))
+
+    dragon_present = (defeated_monsters(world.dungeon) and
+                      not defeated_dungeon(world.dungeon))
+    if not dragon_present:
+        raise DrollError('A dragon must be present to use a {}'.format(noun))
+
+    # next_dungeon performs the replace_treasure(...) call
+    return next_dungeon(world=world, randrange=randrange)
+
+
 def elixir(
         world: World, randrange: RandRange, noun: str, target: str
 ) -> World:
-    """Add one hero die of any requested type.."""
+    """Add one hero die of any requested type."""
     return replace_treasure(world, noun)._replace(
         party=__increment_hero(world.party, target)
     )
