@@ -179,12 +179,12 @@ def retire(world: World) -> World:
     if world.depth == 0:
         raise DrollError("Descend at least once prior to retiring.")
 
-    # Apologies for the convoluted mess... See the unit tests.
-    if defeated_dungeon(world.dungeon):
-        # Player has defeated the dungeon thus no special handling required.
-        pass
-    elif defeated_monsters(world.dungeon):
-        # Player has defeated the dungeon but a dragon remains.
+    if not defeated_monsters(world.dungeon):
+        try:
+            world = apply_portal(world)
+        except DrollError:
+            raise DrollError('Monsters remain but no town portal in hand.')
+    elif blocking_dragon(world.dungeon):
         # First attempt to use a ring then a portal (because portals are +2)
         try:
             world = apply_ring(world)
@@ -194,12 +194,6 @@ def retire(world: World) -> World:
             except DrollError:
                 raise DrollError("Dragon remains but neither a ring of"
                                  " invisibility nor a town portal in hand.")
-    else:
-        # Player has not defeated neither monsters nor possibly a dragon.
-        try:
-            world = apply_portal(world)
-        except DrollError:
-            raise DrollError('Monsters remain but no town portal in hand.')
 
     # TODO Upgrade hero's ability after hitting 5 experience points
     # Success above, so update the world in anticipation of the next delve
