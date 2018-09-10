@@ -57,7 +57,7 @@ class Shell(cmd.Cmd):
     def preloop(self):
         """Prepare a new game and start the first delve."""
         w = world.new_game()
-        w = world.new_delve(w, self._randrange)
+        w = world.next_delve(w, self._randrange)
         self._world = w
         # Causes printing of initial world state
         self.postcmd(stop=False, line='')
@@ -118,7 +118,7 @@ class Shell(cmd.Cmd):
         with ShellManager():
             no_arguments(line)
             self._world = world.retire(self._world)
-            self._world = world.new_delve(self._world, self._randrange)
+            self._world = world.next_delve(self._world, self._randrange)
 
     def do_retreat(self, line):
         """Retreat from the dungeon at any time (e.g. after being defeated).
@@ -126,7 +126,7 @@ class Shell(cmd.Cmd):
         Automatically starts a new delve, if possible."""
         with ShellManager():
             no_arguments(line)
-            self._world = world.new_delve(self._world, self._randrange)
+            self._world = world.next_delve(self._world, self._randrange)
 
 
 class ShellManager:

@@ -125,7 +125,7 @@ def new_game() -> World:
     )
 
 
-def new_delve(
+def next_delve(
         world: World, randrange: RandRange, *,
         _party_dice=7
 ) -> World:
