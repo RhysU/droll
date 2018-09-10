@@ -213,7 +213,6 @@ def ring(
     return world.apply_ring(world=game, noun=noun)
 
 
-# TODO Something is amiss on direct portal usage
 def portal(
         game: world.World, randrange: world.RandRange, noun: str,
         target: typing.Optional[str] = None,
