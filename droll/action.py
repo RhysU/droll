@@ -6,34 +6,32 @@
 import operator
 import typing
 
-from .error import DrollError
-from .world import (Dungeon, RandRange, Party, World,
-                    defeated_monsters, apply_ring, apply_portal, retire,
-                    draw_treasure, replace_treasure, roll_dungeon)
+from . import error
+from . import world
 
 
 def defeat_one(
-        world: World, randrange: RandRange, hero: str, target: str
-) -> World:
-    """Update world after hero handles exactly one target."""
-    return world._replace(
-        party=__decrement_hero(world.party, hero),
-        dungeon=__decrement_target(world.dungeon, target)
+        game: world.World, randrange: world.RandRange, hero: str, target: str
+) -> world.World:
+    """Update game after hero handles exactly one target."""
+    return game._replace(
+        party=__decrement_hero(game.party, hero),
+        dungeon=__decrement_target(game.dungeon, target)
     )
 
 
-def __decrement_hero(party: Party, hero: str) -> Party:
+def __decrement_hero(party: world.Party, hero: str) -> world.Party:
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
-        raise DrollError("Require at least one hero {}".format(hero))
+        raise error.DrollError("Require at least one hero {}".format(hero))
     return party._replace(**{hero: prior_heroes - 1})
 
 
-def __increment_hero(party: Party, hero: str) -> Party:
+def __increment_hero(party: world.Party, hero: str) -> world.Party:
     return party._replace(**{hero: getattr(party, hero) + 1})
 
 
-def __decrement_target(dungeon: Dungeon, target: str) -> Dungeon:
+def __decrement_target(dungeon: world.Dungeon, target: str) -> world.Dungeon:
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise ValueError("Require at least one target {}".format(target))
@@ -41,193 +39,194 @@ def __decrement_target(dungeon: Dungeon, target: str) -> Dungeon:
 
 
 def defeat_all(
-        world: World, randrange: RandRange, hero: str, target: str
-) -> World:
-    """Update world after hero handles all of one type of target."""
-    return world._replace(
-        party=__decrement_hero(world.party, hero),
-        dungeon=__eliminate_targets(world.dungeon, target)
+        game: world.World, randrange: world.RandRange, hero: str, target: str
+) -> world.World:
+    """Update game after hero handles all of one type of target."""
+    return game._replace(
+        party=__decrement_hero(game.party, hero),
+        dungeon=__eliminate_targets(game.dungeon, target)
     )
 
 
-def __eliminate_targets(dungeon: Dungeon, target: str) -> Dungeon:
+def __eliminate_targets(dungeon: world.Dungeon, target: str) -> world.Dungeon:
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise DrollError("Require at least one target {}".format(target))
+        raise error.DrollError("Require at least one target {}".format(target))
     return dungeon._replace(**{target: 0})
 
 
 def open_one(
-        world: World, randrange: RandRange, hero: str, target: str,
-        after_monsters=True,
-) -> World:
-    """Update world after hero opens exactly one chest."""
-    if after_monsters and not defeated_monsters(world.dungeon):
-        raise DrollError("Monsters must be defeated before opening.")
-    return draw_treasure(world, randrange)._replace(
-        party=__decrement_hero(world.party, hero),
-        dungeon=__decrement_target(world.dungeon, target)
+        game: world.World, randrange: world.RandRange, hero: str, target: str,
+        *, _after_monsters=True
+) -> world.World:
+    """Update game after hero opens exactly one chest."""
+    if _after_monsters and not world.defeated_monsters(game.dungeon):
+        raise error.DrollError("Monsters must be defeated before opening.")
+    return world.draw_treasure(game, randrange)._replace(
+        party=__decrement_hero(game.party, hero),
+        dungeon=__decrement_target(game.dungeon, target)
     )
 
 
 def open_all(
-        world: World, randrange: RandRange, hero: str, target: str,
-        after_monsters=True,
-) -> World:
-    """Update world after hero opens all chests."""
-    if after_monsters and not defeated_monsters(world.dungeon):
-        raise DrollError("Monsters must be defeated before opening.")
-    howmany = getattr(world.dungeon, target)
+        game: world.World, randrange: world.RandRange, hero: str, target: str,
+        *, _after_monsters=True
+) -> world.World:
+    """Update game after hero opens all chests."""
+    if _after_monsters and not world.defeated_monsters(game.dungeon):
+        raise error.DrollError("Monsters must be defeated before opening.")
+    howmany = getattr(game.dungeon, target)
     if not howmany:
-        raise DrollError("At least 1 {} required".format(target))
+        raise error.DrollError("At least 1 {} required".format(target))
     for _ in range(howmany):
-        world = draw_treasure(world, randrange)
-    return world._replace(
-        party=__decrement_hero(world.party, hero),
-        dungeon=__eliminate_targets(world.dungeon, target),
+        game = world.draw_treasure(game, randrange)
+    return game._replace(
+        party=__decrement_hero(game.party, hero),
+        dungeon=__eliminate_targets(game.dungeon, target),
     )
 
 
 def quaff(
-        world: World, randrange: RandRange, hero: str, target: str, *revivable,
-        after_monsters=True
-) -> World:
-    """Update world after hero quaffs all available potions.
+        game: world.World, randrange: world.RandRange, hero: str, target: str,
+        *revivable, _after_monsters=True
+) -> world.World:
+    """Update game after hero quaffs all available potions.
 
     Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
-    howmany = getattr(world.dungeon, target)
+    howmany = getattr(game.dungeon, target)
     if not howmany:
-        raise DrollError("At least 1 {} required".format(target))
+        raise error.DrollError("At least 1 {} required".format(target))
     if len(revivable) != howmany:
-        raise DrollError("Require exactly {} to revive".format(howmany))
-    if after_monsters and not defeated_monsters(world.dungeon):
-        raise DrollError("Monsters must be defeated before quaffing.")
-    party = __decrement_hero(world.party, hero)
+        raise error.DrollError("Require exactly {} to revive".format(howmany))
+    if _after_monsters and not world.defeated_monsters(game.dungeon):
+        raise error.DrollError("Monsters must be defeated before quaffing.")
+    party = __decrement_hero(game.party, hero)
     for revived in revivable:
         party = __increment_hero(party, revived)
-    return world._replace(
+    return game._replace(
         party=party,
-        dungeon=__eliminate_targets(world.dungeon, target)
+        dungeon=__eliminate_targets(game.dungeon, target)
     )
 
 
 def reroll(
-        world: World, randrange: RandRange, hero: str, *targets
-) -> World:
-    """Update world after hero rerolls some number of targets."""
+        game: world.World, randrange: world.RandRange, hero: str, *targets
+) -> world.World:
+    """Update game after hero rerolls some number of targets."""
     if not targets:
-        raise DrollError('At least one target must be re-rolled.')
+        raise error.DrollError('At least one target must be re-rolled.')
 
     # Remove requested target from the dungeon
-    reduced = world.dungeon
+    reduced = game.dungeon
     for target in targets:
         if target in {'potion', 'dragon'}:
-            raise DrollError("{} cannot be rerolled".format(target))
+            raise error.DrollError("{} cannot be rerolled".format(target))
         reduced = __decrement_target(reduced, target)
 
     # Re-roll the necessary number of dice then add to anything left fixed
-    increased = roll_dungeon(dice=len(targets), randrange=randrange)
-    return world._replace(
-        party=__decrement_hero(world.party, hero),
-        dungeon=Dungeon(*tuple(map(operator.add, reduced, increased)))
+    increased = world.roll_dungeon(dice=len(targets), randrange=randrange)
+    return game._replace(
+        party=__decrement_hero(game.party, hero),
+        dungeon=world.Dungeon(*tuple(map(operator.add, reduced, increased)))
     )
 
 
 def defeat_dragon(
-        world: World, randrange: RandRange, hero: str, target: str, *others,
-        disallowed_heroes: typing.Iterable[str] = ('scroll'),
-        min_length: int = 3,
-        min_heroes: int = 3
-) -> World:
-    """Update world after hero handles a dragon using multiple distinct heroes.
+        game: world.World, randrange: world.RandRange, hero: str, target: str,
+        *others,
+        _disallowed_heroes: typing.Iterable[str] = ('scroll'),
+        _min_length: int = 3,
+        _min_heroes: int = 3
+) -> world.World:
+    """Update game after hero handles a dragon using multiple distinct heroes.
 
     Additional required heroes are specified within variable-length others."""
     # Simple prerequisites for attempting to defeat the dragon
-    if world.dungeon.dragon < min_length:
-        raise DrollError("Enemy {} only comes at length {}"
-                         .format(target, min_length))
-    if not defeated_monsters(world.dungeon):
-        raise DrollError("Enemy {} only comes after all others defeated."
-                         .format(target))
-    if len(others) != min_heroes - 1:
-        raise DrollError("A total of {} heroes must be specified."
-                         .format(min_heroes))
+    if game.dungeon.dragon < _min_length:
+        raise error.DrollError("Enemy {} only comes at length {}"
+                               .format(target, _min_length))
+    if not world.defeated_monsters(game.dungeon):
+        raise error.DrollError("Enemy {} only comes after all others defeated."
+                               .format(target))
+    if len(others) != _min_heroes - 1:
+        raise error.DrollError("A total of {} heroes must be specified."
+                               .format(_min_heroes))
 
     # Confirm required number of distinct heroes available
-    party = __decrement_hero(world.party, hero)
+    party = __decrement_hero(game.party, hero)
     distinct_heroes = {hero}
     for other in others:
         party = __decrement_hero(party, other)
         distinct_heroes.add(other)
-    if len(distinct_heroes) != min_heroes:
-        raise DrollError("The {} heroes must all be distinct")
-    if distinct_heroes & set(disallowed_heroes):
-        raise DrollError("Heroes {} cannot defeat {}"
-                         .format(disallowed_heroes, target))
+    if len(distinct_heroes) != _min_heroes:
+        raise error.DrollError("The {} heroes must all be distinct")
+    if distinct_heroes & set(_disallowed_heroes):
+        raise error.DrollError("Heroes {} cannot defeat {}"
+                               .format(_disallowed_heroes, target))
 
     # Attempt was successful, so update experience and treasure
-    return draw_treasure(world, randrange)._replace(
-        experience=world.experience + 1,
+    return world.draw_treasure(game, randrange)._replace(
+        experience=game.experience + 1,
         party=party,
-        dungeon=__eliminate_targets(world.dungeon, target)
+        dungeon=__eliminate_targets(game.dungeon, target)
     )
 
 
 def bait_dragon(
-        world: World, randrange: RandRange, noun: str,
+        game: world.World, randrange: world.RandRange, noun: str,
         target: typing.Optional[str] = None,
         *,
-        enemies: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze')
-) -> World:
+        _enemies: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze')
+) -> world.World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target
     target = 'dragon' if target is None else target
     if target != 'dragon':
-        raise DrollError('Cannot {} a {}'.format(noun, target))
-    world = replace_treasure(world, noun)
+        raise error.DrollError('Cannot {} a {}'.format(noun, target))
+    game = world.replace_treasure(game, noun)
 
     # Compute how many new dragons will be produced and remove sources
     new_targets = 0
-    dungeon = world.dungeon
-    for enemy in enemies:
-        new_targets += getattr(world.dungeon, enemy)
+    dungeon = game.dungeon
+    for enemy in _enemies:
+        new_targets += getattr(game.dungeon, enemy)
         dungeon = dungeon._replace(**{enemy: 0})
     if not new_targets:
-        raise DrollError("At least one of {} required for '{}'"
-                         .format(enemies, noun))
+        raise error.DrollError("At least one of {} required for '{}'"
+                               .format(_enemies, noun))
 
     # Increment the number of targets (i.e. dragons)
-    return world._replace(
+    return game._replace(
         dungeon=dungeon._replace(
             **{target: getattr(dungeon, target) + new_targets})
     )
 
 
 def ring(
-        world: World, randrange: RandRange, noun: str,
+        game: world.World, randrange: world.RandRange, noun: str,
         target: typing.Optional[str] = None,
-) -> World:
+) -> world.World:
     """Use a ring of invisibility to sneak past a dragon."""
     target = 'dragon' if target is None else target
     if target != 'dragon':
-        raise DrollError('Cannot {} a {}'.format(noun, target))
-    return apply_ring(world=world, noun=noun)
+        raise error.DrollError('Cannot {} a {}'.format(noun, target))
+    return world.apply_ring(world=game, noun=noun)
 
 
 def portal(
-        world: World, randrange: RandRange, noun: str,
+        game: world.World, randrange: world.RandRange, noun: str,
         target: typing.Optional[str] = None,
-) -> World:
+) -> world.World:
     """Use a town portal towards retiring to town."""
     if target is not None:
-        raise DrollError('No targets accepted for {}'.format(noun))
-    return retire(apply_portal(world=world, noun=noun))
+        raise error.DrollError('No targets accepted for {}'.format(noun))
+    return world.retire(world.apply_portal(world=game, noun=noun))
 
 
 def elixir(
-        world: World, randrange: RandRange, noun: str, target: str
-) -> World:
+        game: world.World, randrange: world.RandRange, noun: str, target: str
+) -> world.World:
     """Add one hero die of any requested type."""
-    return replace_treasure(world, noun)._replace(
-        party=__increment_hero(world.party, target)
+    return world.replace_treasure(game, noun)._replace(
+        party=__increment_hero(game.party, target)
     )
