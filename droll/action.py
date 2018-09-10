@@ -203,7 +203,6 @@ def bait_dragon(
     )
 
 
-# TODO Do not move to the next dungeon-- simply defeat the dragon
 def ring(
         world: World, randrange: RandRange, noun: str,
         target: typing.Optional[str] = None,
