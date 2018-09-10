@@ -127,7 +127,6 @@ class Shell(cmd.Cmd):
         with ShellManager():
             no_arguments(line)
             self._world = world.new_delve(self._world, self._randrange)
-            self._world = world.next_dungeon(self._world, self._randrange)
 
 
 class ShellManager:
