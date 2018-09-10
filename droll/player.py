@@ -5,12 +5,9 @@
 
 import collections
 
-from .action import (
-    defeat_all, defeat_dragon, defeat_one, portal,
-    open_all, open_one, quaff, reroll, bait_dragon, elixir, ring
-)
-from .error import DrollError
-from .world import Dungeon, Party, RandRange, World, replace_treasure
+from . import action
+from . import error
+from . import world
 
 Player = collections.namedtuple('Player', (
     'bait',
@@ -22,17 +19,15 @@ Player = collections.namedtuple('Player', (
 ))
 
 
-# TODO Implicitly map portals into retire operations
-# TODO Implicitly map rings into next_dungeon operations
 def apply(
         player: Player,
-        world: World,
-        randrange: RandRange,
+        game: world.World,
+        randrange: world.RandRange,
         noun: str,
         target: str = None,
         *additional
-) -> World:
-    """Apply noun to target within world, returning a new version.
+) -> world.World:
+    """Apply noun to target within game, returning a new version.
 
     Processes hero-like artifacts (i.e. not rings/portals/scales).
     Varargs 'additional' permits passing more required information.
@@ -46,16 +41,16 @@ def apply(
     if noun in {'bait', 'elixir', 'ring', 'portal'}:
         try:
             action = getattr(player, noun)
-            return action(world, randrange, noun, target, *additional)
+            return action(game, randrange, noun, target, *additional)
         except AttributeError as cause:
-            raise DrollError(str(cause)) from cause
+            raise error.DrollError(str(cause)) from cause
 
     # Many treasures behave exactly like party members, so
     # convert into party members prior to action invocation.
-    prior_treasure = world.treasure
-    world = world._replace(
-        party=world.party._replace(**{
-            hero: getattr(world.party, hero) + getattr(prior_treasure, artifact)
+    prior_treasure = game.treasure
+    game = game._replace(
+        party=game.party._replace(**{
+            hero: getattr(game.party, hero) + getattr(prior_treasure, artifact)
             for hero, artifact in player.artifacts._asdict().items()
             if artifact is not None
         })
@@ -64,31 +59,31 @@ def apply(
     # Apply a hero (possibly phantom per above) to some collection of targets.
     try:
         action = getattr(getattr(player.party, noun), target)
-        world = action(world, randrange, noun, target, *additional)
+        game = action(game, randrange, noun, target, *additional)
     except AttributeError as cause:
-        raise DrollError(str(cause)) from cause
+        raise error.DrollError(str(cause)) from cause
 
     # Undo the prior transformation by subtracting prior_treasure.
-    world = world._replace(
-        party=world.party._replace(**{
-            hero: getattr(world.party, hero) - getattr(prior_treasure, artifact)
+    game = game._replace(
+        party=game.party._replace(**{
+            hero: getattr(game.party, hero) - getattr(prior_treasure, artifact)
             for hero, artifact in player.artifacts._asdict().items()
             if artifact is not None
         })
     )
 
     # Consume treasure equivalent to any hero which has gone negative.
-    for hero, quantity in world.party._asdict().items():
+    for hero, quantity in game.party._asdict().items():
         if quantity >= 0:
             continue
         for _ in range(-min(0, quantity)):
-            world = replace_treasure(world, getattr(player.artifacts, hero))
-        world = world._replace(party=world.party._replace(**{hero: 0}))
+            game = world.replace_treasure(game, getattr(player.artifacts, hero))
+        game = game._replace(party=game.party._replace(**{hero: 0}))
 
-    return world
+    return game
 
 
-def partify(token: str, artifacts: Party):
+def partify(token: str, artifacts: world.Party):
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None
@@ -99,11 +94,11 @@ def partify(token: str, artifacts: Party):
 
 
 DEFAULT = Player(
-    bait=bait_dragon,
-    elixir=elixir,
-    portal=portal,
-    ring=ring,
-    artifacts=Party(
+    bait=action.bait_dragon,
+    elixir=action.elixir,
+    portal=action.portal,
+    ring=action.ring,
+    artifacts=world.Party(
         fighter='sword',
         cleric='talisman',
         mage='sceptre',
@@ -111,56 +106,56 @@ DEFAULT = Player(
         champion=None,
         scroll='scroll',
     ),
-    party=Party(
-        fighter=Dungeon(
-            goblin=defeat_all,
-            skeleton=defeat_one,
-            ooze=defeat_one,
-            chest=open_one,
-            potion=quaff,
-            dragon=defeat_dragon,
+    party=world.Party(
+        fighter=world.Dungeon(
+            goblin=action.defeat_all,
+            skeleton=action.defeat_one,
+            ooze=action.defeat_one,
+            chest=action.open_one,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
         ),
-        cleric=Dungeon(
-            goblin=defeat_one,
-            skeleton=defeat_all,
-            ooze=defeat_one,
-            chest=open_one,
-            potion=quaff,
-            dragon=defeat_dragon,
+        cleric=world.Dungeon(
+            goblin=action.defeat_one,
+            skeleton=action.defeat_all,
+            ooze=action.defeat_one,
+            chest=action.open_one,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
         ),
-        mage=Dungeon(
-            goblin=defeat_one,
-            skeleton=defeat_one,
-            ooze=defeat_all,
-            chest=open_one,
-            potion=quaff,
-            dragon=defeat_dragon,
+        mage=world.Dungeon(
+            goblin=action.defeat_one,
+            skeleton=action.defeat_one,
+            ooze=action.defeat_all,
+            chest=action.open_one,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
         ),
-        thief=Dungeon(
-            goblin=defeat_one,
-            skeleton=defeat_one,
-            ooze=defeat_one,
-            chest=open_all,
-            potion=quaff,
-            dragon=defeat_dragon,
+        thief=world.Dungeon(
+            goblin=action.defeat_one,
+            skeleton=action.defeat_one,
+            ooze=action.defeat_one,
+            chest=action.open_all,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
         ),
-        champion=Dungeon(
-            goblin=defeat_all,
-            skeleton=defeat_all,
-            ooze=defeat_all,
-            chest=open_all,
-            potion=quaff,
-            dragon=defeat_dragon,
+        champion=world.Dungeon(
+            goblin=action.defeat_all,
+            skeleton=action.defeat_all,
+            ooze=action.defeat_all,
+            chest=action.open_all,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
         ),
         # Technically scrolls could re-roll potions,
         # but doing so would be a really peculiar choice.
-        scroll=Dungeon(
-            goblin=reroll,
-            skeleton=reroll,
-            ooze=reroll,
-            chest=reroll,
-            potion=quaff,
-            dragon=defeat_dragon,
+        scroll=world.Dungeon(
+            goblin=action.reroll,
+            skeleton=action.reroll,
+            ooze=action.reroll,
+            chest=action.reroll,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
         ),
     ),
 )
