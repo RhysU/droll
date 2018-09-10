@@ -14,7 +14,6 @@ from . import world
 
 # TODO Accept constructor flag causing pdb on unexpected exception
 # TODO Suggest descend() after a dungeon is completed
-# TODO Tab complete heros/monsters only when sensible
 # TODO Tab complete only monsters left in the current dungeon
 # TODO Exit after all delves exhausted
 # TODO Emit score after end of the game
@@ -22,18 +21,7 @@ from . import world
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
 # TODO Permit one-dungeon of undo
-# TODO Permit saving world state to file
-# TODO Permit loading world state from file
-# TODO Do not descend on new_delve to permit rerolling
 # TODO Permit multiple players within a single shell?
-
-
-# Trailing space causes tab completion to insert token separators
-_NOUNS = list(i + ' ' for i in sorted(itertools.chain(
-    world.Dungeon._fields,
-    world.Party._fields,
-    world.Treasure._fields,
-)))
 
 
 class Shell(cmd.Cmd):
@@ -85,10 +73,21 @@ class Shell(cmd.Cmd):
 
     def completenames(self, text, *ignored):
         return (super(Shell, self).completenames(text, *ignored) +
-                [i for i in _NOUNS if i.startswith(text)])
+                self.completedefault(text, *ignored))
 
-    def completedefault(self, text, line, begidx, endidx):
-        return [i for i in _NOUNS if i.startswith(text)]
+    # Trailing space causes tab completion to insert token separators
+    def completedefault(self, text, *ignored):
+        """Complete based upon currently available dungeon/party/treasures."""
+        result = []
+        for source in (self._world.dungeon,
+                       self._world.party,
+                       self._world.treasure):
+            if source is not None:
+                for key, value in source._asdict().items():
+                    if value and key.startswith(text):
+                        result.append(key + ' ')
+        result.sort()
+        return result
 
     ####################
     # ACTIONS BELOW HERE
