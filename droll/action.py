@@ -217,10 +217,17 @@ def portal(
         game: world.World, randrange: world.RandRange, noun: str,
         target: typing.Optional[str] = None,
 ) -> world.World:
-    """Use a town portal towards retiring to town."""
+    """Use a town portal towards retiring to town.
+
+    Automatically starts a new delve, if possible."""
     if target is not None:
         raise error.DrollError('No targets accepted for {}'.format(noun))
-    return world.retire(world.apply_portal(world=game, noun=noun))
+    game = world.retire(world.apply_portal(world=game, noun=noun))
+    try:
+        game = world.next_delve(world=game, randrange=randrange)
+    except error.DrollError:
+        pass
+    return game
 
 
 def elixir(
