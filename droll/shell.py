@@ -14,14 +14,14 @@ from . import world
 
 # TODO Accept constructor flag causing pdb on unexpected exception
 # TODO Suggest descend() after a dungeon is completed
-# TODO Tab complete only monsters left in the current dungeon
 # TODO Exit after all delves exhausted
 # TODO Emit score after end of the game
 # TODO Context-dependent help, in that only feasible options suggested
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
+# TODO Context-dependent help, scroll/elixir any heroes in later arguments
 # TODO Permit one-dungeon of undo
-# TODO Permit multiple players within a single shell?
+# TODO Exit after all delves completed
 
 
 class Shell(cmd.Cmd):
