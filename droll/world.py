@@ -193,14 +193,14 @@ def retire(world: World) -> World:
             world = apply_ring(world)
         except DrollError:
             try:
-                world = __throw_if_no_town_portal(world)
+                world = apply_portal(world)
             except DrollError:
                 raise DrollError("Dragon remains but neither a ring of"
                                  " invisibility nor a town portal in hand.")
     else:
         # Player has not defeated neither monsters nor possibly a dragon.
         try:
-            world = __throw_if_no_town_portal(world)
+            world = apply_portal(world)
         except DrollError:
             raise DrollError('Monsters remain but no town portal in hand.')
 
@@ -267,10 +267,11 @@ def apply_ring(world: World, *, noun: str = 'ring') -> World:
     return world._replace(dungeon=world.dungeon._replace(dragon=0))
 
 
-# TODO Confirm blocking in some fashion
-def __throw_if_no_town_portal(
-        world: World
-) -> World:
+def apply_portal(world: World, *, noun: str = 'portal') -> World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
-    return replace_treasure(world, 'portal')
+    if defeated_dungeon(world.dungeon):
+        raise DrollError('No need to apply {} when dungeon clear'.format(noun))
+    return replace_treasure(world, 'portal')._replace(
+        dungeon=Dungeon(*([0] * len(Dungeon._fields)))
+    )
