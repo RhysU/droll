@@ -8,8 +8,8 @@ import typing
 
 from .error import DrollError
 from .world import (Dungeon, RandRange, Party, World,
-                    defeated_monsters, defeated_dungeon, draw_treasure,
-                    next_dungeon, replace_treasure, roll_dungeon)
+                    defeated_monsters, defeated_dungeon, blocking_dragon,
+                    draw_treasure, next_dungeon, replace_treasure, roll_dungeon)
 
 
 def defeat_one(
@@ -213,9 +213,7 @@ def ring(
     if target != 'dragon':
         raise DrollError('Cannot {} a {}'.format(noun, target))
 
-    dragon_present = (defeated_monsters(world.dungeon) and
-                      not defeated_dungeon(world.dungeon))
-    if not dragon_present:
+    if not blocking_dragon(world.dungeon):
         raise DrollError('A dragon must be present to use a {}'.format(noun))
 
     # next_dungeon performs the replace_treasure(...) call

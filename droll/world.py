@@ -34,6 +34,11 @@ def defeated_dungeon(dungeon: Dungeon) -> bool:
                                  dungeon.dragon < 3)
 
 
+def blocking_dragon(dungeon: Dungeon) -> bool:
+    """Is a dragon blocking progress to the next level?"""
+    return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
+
+
 # random.Random.randrange or random.randrange are accepted for randomness.
 # Note, too, that a deterministic function may be provided for testing.
 RandRange = typing.Callable[[int, int], int]
