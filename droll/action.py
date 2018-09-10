@@ -8,8 +8,8 @@ import typing
 
 from .error import DrollError
 from .world import (Dungeon, RandRange, Party, World,
-                    defeated_monsters, blocking_dragon, apply_ring,
-                    draw_treasure, next_dungeon, replace_treasure, roll_dungeon)
+                    defeated_monsters, apply_ring, apply_portal, retire,
+                    draw_treasure, replace_treasure, roll_dungeon)
 
 
 def defeat_one(
@@ -212,6 +212,16 @@ def ring(
     if target != 'dragon':
         raise DrollError('Cannot {} a {}'.format(noun, target))
     return apply_ring(world=world, noun=noun)
+
+
+def portal(
+        world: World, randrange: RandRange, noun: str,
+        target: typing.Optional[str] = None,
+) -> World:
+    """Use a town portal towards retiring to town."""
+    if target is not None:
+        raise DrollError('No targets accepted for {}'.format(noun))
+    return retire(apply_portal(world=world, noun=noun))
 
 
 def elixir(

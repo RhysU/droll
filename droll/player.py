@@ -6,7 +6,7 @@
 import collections
 
 from .action import (
-    defeat_all, defeat_dragon, defeat_one,
+    defeat_all, defeat_dragon, defeat_one, portal,
     open_all, open_one, quaff, reroll, bait_dragon, elixir, ring
 )
 from .error import DrollError
@@ -15,6 +15,7 @@ from .world import Dungeon, Party, RandRange, World, replace_treasure
 Player = collections.namedtuple('Player', (
     'bait',
     'elixir',
+    'portal',
     'ring',
     'artifacts',
     'party',
@@ -42,7 +43,7 @@ def apply(
     additional = tuple(partify(i, player.artifacts) for i in additional)
 
     # One-off handling of some treasures, with error wrapping to aid usability
-    if noun in {'bait', 'elixir', 'ring'}:
+    if noun in {'bait', 'elixir', 'ring', 'portal'}:
         try:
             action = getattr(player, noun)
             return action(world, randrange, noun, target, *additional)
@@ -100,6 +101,7 @@ def partify(token: str, artifacts: Party):
 DEFAULT = Player(
     bait=bait_dragon,
     elixir=elixir,
+    portal=portal,
     ring=ring,
     artifacts=Party(
         fighter='sword',
