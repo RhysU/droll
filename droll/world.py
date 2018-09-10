@@ -150,19 +150,15 @@ def next_dungeon(
 
     If necessary, a ring of invisibility will be used to sneak past a dragon.
     Adheres to the specified number of dice available in the game."""
-    # Apologies for the following convoluted mess...  See the unit tests.
-    if defeated_dungeon(world.dungeon):
-        # Player has defeated the dungeon thus no special handling required.
-        pass
-    elif defeated_monsters(world.dungeon):
-        # Player has defeated the dungeon but a dragon remains.
+    if not defeated_monsters(world.dungeon):
+        raise DrollError('Must defeat enemies to proceed to next dungeon.')
+
+    if blocking_dragon(world.dungeon):
         try:
             world = apply_ring(world)
         except DrollError:
             raise DrollError("Dragon remains but a ring of"
                              " invisibility is not in hand.")
-    else:
-        raise DrollError('Must defeat enemies to proceed to next dungeon.')
 
     # Success above, so update the world in anticipation of the next dungeon
     next_depth = (world.depth if world.depth else 0) + 1
