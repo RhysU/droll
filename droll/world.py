@@ -157,7 +157,7 @@ def next_dungeon(
     elif defeated_monsters(world.dungeon):
         # Player has defeated the dungeon but a dragon remains.
         try:
-            world = __throw_if_no_ring_of_invisibility(world)
+            world = apply_ring(world)
         except DrollError:
             raise DrollError("Dragon remains but a ring of"
                              " invisibility is not in hand.")
@@ -190,7 +190,7 @@ def retire(world: World) -> World:
         # Player has defeated the dungeon but a dragon remains.
         # First attempt to use a ring then a portal (because portals are +2)
         try:
-            world = __throw_if_no_ring_of_invisibility(world)
+            world = apply_ring(world)
         except DrollError:
             try:
                 world = __throw_if_no_town_portal(world)
@@ -259,13 +259,18 @@ def replace_treasure(world: World, item: str) -> World:
     )
 
 
-def __throw_if_no_ring_of_invisibility(world: World) -> World:
+def apply_ring(world: World, *, noun: str = 'ring') -> World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
-    world = replace_treasure(world, 'ring')
+    if not blocking_dragon(world.dungeon):
+        raise DrollError('A dragon must be present to use a {}'.format(noun))
+    world = replace_treasure(world, noun)
     return world._replace(dungeon=world.dungeon._replace(dragon=0))
 
 
-def __throw_if_no_town_portal(world: World) -> World:
+# TODO Confirm blocking in some fashion
+def __throw_if_no_town_portal(
+        world: World
+) -> World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     return replace_treasure(world, 'portal')

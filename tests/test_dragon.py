@@ -123,4 +123,3 @@ def test_ring(game, randrange):
     pass1 = player.apply(player.DEFAULT, attempt, randrange,
                          'ring', 'dragon')
     assert pass1.dungeon.dragon == 0
-    assert pass1.depth == 1
