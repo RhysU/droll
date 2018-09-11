@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """A REPL permitting playing a game via a tab-completion shell."""
 import cmd
-import itertools
 import random
 import typing
 
@@ -12,6 +11,8 @@ from . import error
 from . import player
 from . import world
 
+
+# TODO "(droll  0) fighter" input is fatal
 # TODO Accept constructor flag causing pdb on unexpected exception
 # TODO Suggest descend() after a dungeon is completed
 # TODO Exit after all delves exhausted
@@ -19,7 +20,6 @@ from . import world
 # TODO Context-dependent help, in that only feasible options suggested
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
-# TODO Context-dependent help, scroll/elixir any heroes in later arguments
 # TODO Permit one-dungeon of undo
 # TODO Exit after all delves completed
 
@@ -75,19 +75,37 @@ class Shell(cmd.Cmd):
         return (super(Shell, self).completenames(text, line, begidx, endidx) +
                 self.completedefault(text, line, begidx, endidx))
 
-    # Trailing space causes tab completion to insert token separators
     def completedefault(self, text, line, begidx, endidx):
-        """Complete based upon currently available dungeon/party/treasures."""
-        result = []
-        for source in (self._world.dungeon,
-                       self._world.party,
-                       self._world.treasure):
-            if source is not None:
-                for key, value in source._asdict().items():
-                    if value and key.startswith(text):
-                        result.append(key + ' ')
-        result.sort()
-        return result
+        """Complete loosely based upon available heroes/treasures/dungeon."""
+        # Which zero-indexed position contains this whitespace-delimited token?
+        previous = parse(line[:begidx])
+        position = len(previous)
+
+        # Early tokens dominated by items/dice that can be applied/attacked.
+        # Later tokens contain mixtures of present and requested items.
+        # Attempts to specialize much beyond this quickly go awry.
+        # Trailing space causes tab completion to insert token separators.
+        results = []
+        if position == 0:
+            for source in (self._world.party, self._world.treasure):
+                if source is not None:
+                    for key, value in source._asdict().items():
+                        if value and key.startswith(text):
+                            results.append(key + ' ')
+        elif position == 1:
+            for source in (self._world.party, self._world.dungeon):
+                if source is not None:
+                    for key, value in source._asdict().items():
+                        if value and key.startswith(text):
+                            results.append(key + ' ')
+        else:
+            for source in (world.Party, world.Dungeon):
+                for key in source._fields:
+                    if key.startswith(text):
+                        results.append(key + ' ')
+        results.sort()
+
+        return results
 
     ####################
     # ACTIONS BELOW HERE
