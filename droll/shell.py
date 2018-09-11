@@ -71,12 +71,12 @@ class Shell(cmd.Cmd):
         """Empty line causes no action to occur."""
         pass
 
-    def completenames(self, text, *ignored):
-        return (super(Shell, self).completenames(text, *ignored) +
-                self.completedefault(text, *ignored))
+    def completenames(self, text, line, begidx, endidx):
+        return (super(Shell, self).completenames(text, line, begidx, endidx) +
+                self.completedefault(text, line, begidx, endidx))
 
     # Trailing space causes tab completion to insert token separators
-    def completedefault(self, text, *ignored):
+    def completedefault(self, text, line, begidx, endidx):
         """Complete based upon currently available dungeon/party/treasures."""
         result = []
         for source in (self._world.dungeon,
