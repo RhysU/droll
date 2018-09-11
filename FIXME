@@ -1,0 +1,39 @@
+Evidently a bud in the talisman handling below as 'talisman ooze' produces off-by-one.
+Bizarrely, 'talisman skeleton' looks correct.  Turn into a unit test and debug.
+
+$ droll --seed 4
+
+(delve=1, ability=True, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), treasure=())
+(droll  0) descend
+
+(delve=1, depth=1, ability=True, dungeon=(goblin=1), party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), treasure=())
+(droll  0) fighter goblin 
+
+(delve=1, depth=1, ability=True, dungeon=(), party=(cleric=2, mage=1, thief=2, scroll=1), treasure=())
+(droll  0) descend
+
+(delve=1, depth=2, ability=True, dungeon=(goblin=2), party=(cleric=2, mage=1, thief=2, scroll=1), treasure=())
+(droll  0) cleric goblin 
+
+(delve=1, depth=2, ability=True, dungeon=(goblin=1), party=(cleric=1, mage=1, thief=2, scroll=1), treasure=())
+(droll  0) mage goblin 
+
+(delve=1, depth=2, ability=True, dungeon=(), party=(cleric=1, thief=2, scroll=1), treasure=())
+(droll  0) descend
+
+(delve=1, depth=3, ability=True, dungeon=(ooze=1, chest=1, potion=1), party=(cleric=1, thief=2, scroll=1), treasure=())
+(droll  0) thief ooze 
+
+(delve=1, depth=3, ability=True, dungeon=(chest=1, potion=1), party=(cleric=1, thief=1, scroll=1), treasure=())
+(droll  0) thief chest 
+
+(delve=1, depth=3, ability=True, dungeon=(potion=1), party=(cleric=1, scroll=1), treasure=(talisman=1))
+(droll  1) descend
+
+(delve=1, depth=4, ability=True, dungeon=(skeleton=1, ooze=1, potion=2), party=(cleric=1, scroll=1), treasure=(talisman=1))
+(droll  1) talisman ooze 
+
+(delve=1, depth=4, ability=True, dungeon=(skeleton=1, potion=2), party=(scroll=1), treasure=(talisman=1))
+(droll  1) talisman skeleton 
+
+(delve=1, depth=4, ability=True, dungeon=(potion=2), party=(scroll=1), treasure=())
