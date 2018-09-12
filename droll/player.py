@@ -52,7 +52,8 @@ def apply(
     game = game._replace(
         party=game.party._replace(**{
             hero: getattr(game.party, hero) + getattr(prior_treasure, artifact)
-            for hero, artifact in player.artifacts._asdict().items()
+            for hero, artifact in zip(player.artifacts._fields,
+                                      player.artifacts)
             if artifact is not None
         })
     )
@@ -68,13 +69,14 @@ def apply(
     game = game._replace(
         party=game.party._replace(**{
             hero: getattr(game.party, hero) - getattr(prior_treasure, artifact)
-            for hero, artifact in player.artifacts._asdict().items()
+            for hero, artifact in zip(player.artifacts._fields,
+                                      player.artifacts)
             if artifact is not None
         })
     )
 
     # Consume treasure equivalent to any hero which has gone negative.
-    for hero, quantity in game.party._asdict().items():
+    for hero, quantity in zip(game.party._fields, game.party):
         if quantity >= 0:
             continue
         for _ in range(-min(0, quantity)):
@@ -88,7 +90,7 @@ def partify(token: str, artifacts: world.Party):
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None
-    for party, artifact in artifacts._asdict().items():
+    for party, artifact in zip(artifacts._fields, artifacts):
         if token == artifact:
             return party
     return token
