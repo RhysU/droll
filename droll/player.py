@@ -103,26 +103,30 @@ def complete(
         text: str,
         position: int,
 ) -> typing.Iterable[str]:
-    """List possible completions for text with position among tokens."""
-    results = []
-
+    """Possible completions for text with position among (partial) tokens."""
     if position == 0:
-        for source in (game.party, game.treasure):
-            if source is not None:
-                for key, value in zip(source._fields, source):
-                    if value and key.startswith(text):
-                        results.append(key)
+        results = (
+            key
+            for source in (game.party, game.treasure)
+            if source is not None
+            for key, value in zip(source._fields, source)
+            if value and key.startswith(text)
+        )
     elif position == 1:
-        for source in (game.party, game.dungeon):
-            if source is not None:
-                for key, value in zip(source._fields, source):
-                    if value and key.startswith(text):
-                        results.append(key)
+        results = (
+            key
+            for source in (game.party, game.dungeon)
+            if source is not None
+            for key, value in zip(source._fields, source)
+            if value and key.startswith(text)
+        )
     else:
-        for source in (world.Party, world.Dungeon):
-            for key in source._fields:
-                if key.startswith(text):
-                    results.append(key)
+        results = (
+            key
+            for source in (world.Party, world.Dungeon)
+            for key in source._fields
+            if key.startswith(text)
+        )
 
     return sorted(results)
 
