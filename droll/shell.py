@@ -25,9 +25,9 @@ from . import world
 class Shell(cmd.Cmd):
     """"REPL permitting playing a game via tab-completion shell."""
 
-    ##################
-    # SETUP BELOW HERE
-    ##################
+    ######################
+    # LIFECYCLE BELOW HERE
+    ######################
 
     def __init__(self, *, player=player.DEFAULT, randrange=None):
         super(Shell, self).__init__()
@@ -69,27 +69,6 @@ class Shell(cmd.Cmd):
         """Empty line causes no action to occur."""
         pass
 
-    def completenames(self, text, line, begidx, endidx):
-        return (super(Shell, self).completenames(text, line, begidx, endidx) +
-                self.completedefault(text, line, begidx, endidx))
-
-    def completedefault(self, text, line, begidx, endidx):
-        """Complete loosely based upon available heroes/treasures/dungeon."""
-        # Break line into tokens until and starting from present text
-        head = parse(line[:begidx])
-        tail = parse(line[begidx:])
-
-        # Bulk of processing elsewhere to simplify unit testing, and because
-        # many exceptions silently suppress tab completion in readline.
-        raw = player.complete(game=self._world,
-                              tokens=head + tail,
-                              text=text,
-                              position=len(head))
-
-        # Trailing space causes tab completion to insert token separators.
-        return [x + ' ' for x in raw]
-
-
     ####################
     # ACTIONS BELOW HERE
     ####################
@@ -128,16 +107,67 @@ class Shell(cmd.Cmd):
             no_arguments(line)
             self._world = world.next_delve(self._world, self._randrange)
 
+    #######################
+    # COMPLETION BELOW HERE
+    #######################
+
+    def completenames(self, text, line, begidx, endidx):
+        """Complete possible command names based upon context."""
+        # Are any dungeon dice still active?  Distinct from defeating level!
+        dungeon_dice = sum(self._world.dungeon) if self._world.dungeon else 0
+
+        # TODO Confirm no trivial retreat prior to entering dungeon
+        # Which world actions might be taken successfully given game state?
+        possible = []
+        if self._world.ability and dungeon_dice:
+            possible.append('ability')
+        with ShellManager(verbose=False):
+            world.next_dungeon(self._world, dummy_randrange)
+            possible.append('descend')
+        with ShellManager(verbose=False):
+            world.retire(self._world)
+            possible.append('retire')
+        with ShellManager(verbose=False):
+            world.next_delve(self._world, dummy_randrange)
+            possible.append('retreat')
+
+        # TODO No completedefault if only dragon < 3 remains
+        # Filter to prefix matches and add any hero-related possibilities
+        results = [x for x in possible if x.startswith(text)]
+        if dungeon_dice:
+            results += self.completedefault(text, line, begidx, endidx)
+        return results
+
+    def completedefault(self, text, line, begidx, endidx):
+        """Complete loosely based upon available heroes/treasures/dungeon."""
+        # Break line into tokens until and starting from present text
+        head = parse(line[:begidx])
+        tail = parse(line[begidx:])
+
+        # Bulk of processing elsewhere to simplify unit testing, and because
+        # many exceptions silently suppress tab completion in readline.
+        raw = player.complete(game=self._world,
+                              tokens=head + tail,
+                              text=text,
+                              position=len(head))
+
+        # Trailing space causes tab completion to insert token separators.
+        return [x + ' ' for x in raw]
+
 
 class ShellManager:
-    """Print DrollErrors while propagating other exceptions."""
+    """Print DrollErrors (if verbose) while propagating other exceptions."""
+
+    def __init__(self, verbose=True):
+        self._verbose = verbose
 
     def __enter__(self):
         pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if isinstance(exc_val, error.DrollError):
-            print(exc_val)
+            if self._verbose:
+                print(exc_val)
             return True
 
 
@@ -150,3 +180,8 @@ def no_arguments(line):
     """Raise DrollError if line is non-empty."""
     if line:
         raise error.DrollError('Command accepts no arguments.')
+
+
+def dummy_randrange(start, stop=None):
+    """Non-random psuedorandom generator so that completion is stateless."""
+    return start
