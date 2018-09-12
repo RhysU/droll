@@ -60,7 +60,10 @@ def apply(
 
     # Apply a hero (possibly phantom per above) to some collection of targets.
     try:
-        action = getattr(getattr(player.party, noun), target)
+        action = getattr(player.party, noun)
+        if target is None:
+            raise error.DrollError('"{}" requires some target'.format(noun))
+        action = getattr(action, target)
         game = action(game, randrange, noun, target, *additional)
     except AttributeError as cause:
         raise error.DrollError(str(cause)) from cause

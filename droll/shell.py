@@ -12,8 +12,6 @@ from . import player
 from . import world
 
 
-# TODO "(droll  0) fighter" input is fatal
-# TODO Accept constructor flag causing pdb on unexpected exception
 # TODO Suggest descend() after a dungeon is completed
 # TODO Exit after all delves exhausted
 # TODO Emit score after end of the game
