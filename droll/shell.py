@@ -12,6 +12,7 @@ from . import player
 from . import world
 
 
+# TODO Scrolls cannot be used to defeat dragons
 # TODO Do not permit retreat when player should sensibly retire
 # TODO Exit after all delves exhausted
 # TODO Emit score after end of the game
