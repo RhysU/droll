@@ -77,35 +77,20 @@ class Shell(cmd.Cmd):
 
     def completedefault(self, text, line, begidx, endidx):
         """Complete loosely based upon available heroes/treasures/dungeon."""
-        # Which zero-indexed position contains this whitespace-delimited token?
-        previous = parse(line[:begidx])
-        position = len(previous)
+        # Break line into tokens until and starting from present text
+        head = parse(line[:begidx])
+        tail = parse(line[begidx:])
 
-        # Early tokens dominated by items/dice that can be applied/attacked.
-        # Later tokens contain mixtures of present and requested items.
-        # Attempts to specialize much beyond this quickly go awry.
+        # Bulk of processing elsewhere to simplify unit testing, and because
+        # many exceptions silently suppress tab completion in readline.
+        raw = player.complete(game=self._world,
+                              tokens=head + tail,
+                              text=text,
+                              position=len(head))
+
         # Trailing space causes tab completion to insert token separators.
-        results = []
-        if position == 0:
-            for source in (self._world.party, self._world.treasure):
-                if source is not None:
-                    for key, value in source._asdict().items():
-                        if value and key.startswith(text):
-                            results.append(key + ' ')
-        elif position == 1:
-            for source in (self._world.party, self._world.dungeon):
-                if source is not None:
-                    for key, value in source._asdict().items():
-                        if value and key.startswith(text):
-                            results.append(key + ' ')
-        else:
-            for source in (world.Party, world.Dungeon):
-                for key in source._fields:
-                    if key.startswith(text):
-                        results.append(key + ' ')
-        results.sort()
+        return [x + ' ' for x in raw]
 
-        return results
 
     ####################
     # ACTIONS BELOW HERE

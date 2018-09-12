@@ -4,6 +4,7 @@
 """Functionality associated with player action mechanics."""
 
 import collections
+import typing
 
 from . import action
 from . import error
@@ -91,6 +92,39 @@ def partify(token: str, artifacts: world.Party):
         if token == artifact:
             return party
     return token
+
+
+# Early tokens dominated by items/dice that can be applied/attacked.
+# Later tokens contain mixtures of present and requested items.
+# Attempts to specialize much beyond this seem to quickly go awry.
+def complete(
+        game: world.World,
+        tokens: typing.Sequence[str],
+        text: str,
+        position: int,
+) -> typing.Iterable[str]:
+    """List possible completions for text with position among tokens."""
+    results = []
+
+    if position == 0:
+        for source in (game.party, game.treasure):
+            if source is not None:
+                for key, value in zip(source._fields, source):
+                    if value and key.startswith(text):
+                        results.append(key)
+    elif position == 1:
+        for source in (game.party, game.dungeon):
+            if source is not None:
+                for key, value in zip(source._fields, source):
+                    if value and key.startswith(text):
+                        results.append(key)
+    else:
+        for source in (world.Party, world.Dungeon):
+            for key in source._fields:
+                if key.startswith(text):
+                    results.append(key)
+
+    return sorted(results)
 
 
 DEFAULT = Player(
