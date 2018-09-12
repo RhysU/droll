@@ -12,7 +12,6 @@ from . import player
 from . import world
 
 
-# TODO Suggest descend() after a dungeon is completed
 # TODO Exit after all delves exhausted
 # TODO Emit score after end of the game
 # TODO Context-dependent help, in that only feasible options suggested
