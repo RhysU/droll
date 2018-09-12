@@ -130,3 +130,34 @@ def test_scroll_reroll(game):
         potion=2,
         dragon=2,
     )
+
+
+def test_complete0(game):
+    """Complete available party and treasure in the zeroth position."""
+    assert ['fighter'] == player.complete(game, ('fig',), 'fig', 0)
+    game = game._replace(party=game.party._replace(fighter=0))
+    assert [] == player.complete(game, ('fig',), 'fig', 0)  # party
+    assert [] == player.complete(game, ('gob',), 'gob', 0)  # dungeon
+    assert [] == player.complete(game, ('bai',), 'bai', 0)  # treasure
+    game = game._replace(treasure=game.treasure._replace(bait=1))
+    assert ['bait'] == player.complete(game, ('bai',), 'bai', 0)  # treasure
+
+
+def test_complete1(game):
+    """Complete available party and monsters in the first position."""
+    assert ['goblin'] == player.complete(game, ('fig', 'gob'), 'gob', 1)
+    assert ['fighter'] == player.complete(game, ('fig', 'fig'), 'fig', 1)  # party
+    game = game._replace(dungeon=game.dungeon._replace(goblin=0))
+    assert [] == player.complete(game, ('fig', 'gob'), 'gob', 1)  # dungeon
+    game = game._replace(party=game.party._replace(fighter=0))
+    assert [] == player.complete(game, ('fig', 'fig'), 'fig', 1)  # dungeon
+    game = game._replace(treasure=game.treasure._replace(bait=1))
+    assert [] == player.complete(game, ('fig', 'bai'), 'fig', 1)  # treasure
+
+
+def test_complete2(game):
+    """Complete all party and dungeon in the second position."""
+    game = game._replace(party=game.party._replace(fighter=0))
+    game = __remove_monsters(game)
+    assert ['fighter'] == player.complete(game, ('fig', 'x', 'fig'), 'fig', 2)
+    assert ['goblin'] == player.complete(game, ('fig', 'x', 'gob'), 'gob', 2)
