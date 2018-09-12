@@ -175,7 +175,7 @@ def retire(world: World) -> World:
     """Retire to the tavern after completing the present dungeon.
 
     If monsters or a dragon remains, either ring of invisibility or
-    a town portal will be used if available."""
+    a town portal will be used when available."""
     if world.depth == 0:
         raise DrollError("Descend at least once prior to retiring.")
 
@@ -200,6 +200,17 @@ def retire(world: World) -> World:
     return world._replace(
         depth=0,
         experience=world.experience + world.depth,
+        dungeon=None,
+    )
+
+
+def retreat(world: World) -> World:
+    """Retreat to the tavern without completing the present dungeon."""
+    if world.depth == 0:
+        raise DrollError("Descend at least once prior to retreating.")
+
+    return world._replace(
+        depth=0,
         dungeon=None,
     )
 

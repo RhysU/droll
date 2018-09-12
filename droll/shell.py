@@ -105,6 +105,7 @@ class Shell(cmd.Cmd):
         Automatically starts a new delve, if possible."""
         with ShellManager():
             no_arguments(line)
+            self._world = world.retreat(self._world)
             self._world = world.next_delve(self._world, self._randrange)
 
     #######################
@@ -116,7 +117,6 @@ class Shell(cmd.Cmd):
         # Are any dungeon dice still active?  Distinct from defeating level!
         dungeon_dice = sum(self._world.dungeon) if self._world.dungeon else 0
 
-        # TODO Confirm no trivial retreat prior to entering dungeon
         # Which world actions might be taken successfully given game state?
         possible = []
         if self._world.ability and dungeon_dice:
@@ -128,7 +128,7 @@ class Shell(cmd.Cmd):
             world.retire(self._world)
             possible.append('retire')
         with ShellManager(verbose=False):
-            world.next_delve(self._world, dummy_randrange)
+            world.retreat(self._world)
             possible.append('retreat')
 
         # TODO No completedefault if only dragon < 3 remains
