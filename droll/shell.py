@@ -12,13 +12,13 @@ from . import player
 from . import world
 
 
+# TODO Do not permit retreat when player should sensibly retire
 # TODO Exit after all delves exhausted
 # TODO Emit score after end of the game
 # TODO Context-dependent help, in that only feasible options suggested
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
 # TODO Permit one-dungeon of undo
-# TODO Exit after all delves completed
 
 
 class Shell(cmd.Cmd):
