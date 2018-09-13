@@ -12,11 +12,9 @@ from . import player
 from . import world
 
 
-# TODO Scrolls cannot be used to defeat dragons
 # TODO Context-dependent help, in that only feasible options suggested
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
-# TODO Permit one-dungeon of undo
 
 
 class Shell(cmd.Cmd):
