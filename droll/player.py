@@ -102,6 +102,7 @@ def partify(token: str, artifacts: world.Party):
 # Early tokens dominated by items/dice that can be applied/attacked.
 # Later tokens contain mixtures of present and requested items.
 # Attempts to specialize much beyond this seem to quickly go awry.
+# One notable special case is 'elixir' as any party die follows.
 def complete(
         game: world.World,
         tokens: typing.Sequence[str],
@@ -116,6 +117,12 @@ def complete(
             if source is not None
             for key, value in zip(source._fields, source)
             if value and key.startswith(text)
+        )
+    elif position == 1 and tokens[0] == 'elixir':
+        results = (
+            key
+            for key in world.Party._fields
+            if key.startswith(text)
         )
     elif position == 1:
         results = (

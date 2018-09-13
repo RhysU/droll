@@ -145,6 +145,7 @@ def test_complete0(game):
 
 def test_complete1(game):
     """Complete available party and dungeon in the first position."""
+    # Vanilla first position stuff
     assert ['goblin'] == player.complete(game, ('fig', 'gob'), 'gob', 1)
     assert ['fighter'] == player.complete(game, ('fig', 'fig'), 'fig', 1)  # party
     game = game._replace(dungeon=game.dungeon._replace(goblin=0))
@@ -153,6 +154,12 @@ def test_complete1(game):
     assert [] == player.complete(game, ('fig', 'fig'), 'fig', 1)  # dungeon
     game = game._replace(treasure=game.treasure._replace(bait=1))
     assert [] == player.complete(game, ('fig', 'bai'), 'fig', 1)  # treasure
+
+    # Special case associated with 'elixir'
+    game = game._replace(party=world.Party(*([0] * len(game.party))))
+    game = game._replace(treasure=world.Treasure(*([0] * len(game.treasure))))
+    assert list(sorted(world.Party._fields)) == (
+        player.complete(game, ('elixir', ''), '', 1))
 
 
 def test_complete2(game):
