@@ -12,8 +12,6 @@ from . import player
 from . import world
 
 
-# TODO Context-dependent help, suggested whenever empty input received
-# TODO Context-dependent help, after hitting an empty line
 # TODO Populate all help topics
 
 
@@ -64,7 +62,7 @@ class Shell(cmd.Cmd):
 
     def emptyline(self):
         """Empty line causes no action to occur."""
-        pass
+        return self.onecmd('help')
 
     ####################
     # ACTIONS BELOW HERE
@@ -164,7 +162,7 @@ class Shell(cmd.Cmd):
     # HELP BELOW HERE
     #################
 
-    doc_header = "Currently feasible commands (type help <topic>):"
+    doc_header = "Feasible commands (help <command>):"
 
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
