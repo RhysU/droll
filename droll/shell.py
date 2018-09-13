@@ -6,14 +6,15 @@ import cmd
 import random
 import typing
 
+from . import action
 from . import brief
 from . import error
 from . import player
 from . import world
 
 
-# TODO Populate all help topics
 # TODO Populate intro
+# TODO action.portal interacts poorly with above  _next_delve_or_exit(...).
 
 
 class Shell(cmd.Cmd):
@@ -165,6 +166,14 @@ class Shell(cmd.Cmd):
     #################
 
     doc_header = "Feasible commands (help <command>):"
+    doc_hero_template = ("Attack monsters, quaff potions, and open chests"
+                         " with a {} like so:")
+    doc_hero_example = """
+        champion skeleton            # Attack skeleton(s)
+        thief chest                  # Open chest(s)
+        fighter potion mage thief    # Drink 2 potions obtaining mage, thief
+        mage dragon champion cleric  # Attack dragon with party of 3
+    """
 
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
@@ -174,6 +183,57 @@ class Shell(cmd.Cmd):
         return (['do_' + x for x in names] +
                 ['help_' + x for x in names
                  if not getattr(self, 'do_' + x, None)])
+
+    def help_bait(self):
+        print(action.bait_dragon.__doc__)
+
+    def help_champion(self):
+        print(self.doc_hero_template.format('champion'))
+        print(self.doc_hero_example)
+
+    def help_cleric(self):
+        print(self.doc_hero_template.format('cleric'))
+        print(self.doc_hero_example)
+
+    def help_elixir(self):
+        print(action.elixir.__doc__)
+
+    def help_fighter(self):
+        print(self.doc_hero_template.format('fighter'))
+        print(self.doc_hero_example)
+
+    def help_mage(self):
+        print(self.doc_hero_template.format('mage'))
+        print(self.doc_hero_example)
+
+    def help_portal(self):
+        print(action.portal.__doc__)
+
+    def help_ring(self):
+        print(action.ring.__doc__)
+
+    def help_sceptre(self):
+        print("""Sceptres behave identically to a mage.""")
+
+    def help_scroll(self):
+        print("Scrolls may quaff potions and reroll dungeon dice like so:")
+        print("""
+            scroll potion mage thief    # Drink 2 potions obtaining mage, thief
+            scroll skeleton goblin      # Re-roll all skeletons and goblins
+        """)
+
+    def help_sword(self):
+        print("""Swords behave identically to a fighter.""")
+
+    def help_talisman(self):
+        print("""Talismans behave identically to a cleric.""")
+
+    def help_thief(self):
+        print(self.doc_hero_template.format('thief'))
+        print(self.doc_hero_example)
+
+    def help_tools(self):
+        print("""Tools behave identically to a thief.""")
 
 
 class ShellManager:
