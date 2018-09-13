@@ -12,9 +12,10 @@ from . import player
 from . import world
 
 
-# TODO Context-dependent help, in that only feasible options suggested
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
+# TODO Entering a lone '?' is breaking something in cmd.Cmd guts
+# TODO Populate all help topics
 
 
 class Shell(cmd.Cmd):
@@ -159,6 +160,19 @@ class Shell(cmd.Cmd):
 
         # Trailing space causes tab completion to insert token separators.
         return [x + ' ' for x in raw]
+
+    #################
+    # HELP BELOW HERE
+    #################
+
+    doc_header = "Currently feasible commands (type help <topic>):"
+
+    # Overrides superclass behavior relying purely on do_XXX(...) methods
+    def get_names(self):
+        """Compute potential help topics from contextual completions."""
+        return ['do_' + x
+                for x in self.completenames(text='', line='',
+                                            begidx=0, endidx=0)]
 
 
 class ShellManager:
