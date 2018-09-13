@@ -81,14 +81,15 @@ class Shell(cmd.Cmd):
                 self._player, self._world, self._randrange, *parse(line))
 
     def do_descend(self, line):
-        """Descend to the next dungeon (in contrast to retiring)."""
+        """Descend to the next depth (in contrast to retiring/retreating)."""
         with ShellManager():
             no_arguments(line)
             self._world = world.next_dungeon(self._world, self._randrange)
 
     def do_retire(self, line):
-        """Retire from the dungeon after successfully completing a dungeon.
+        """Retire to the tavern after successfully clearing a dungeon depth..
 
+        Automatically uses a 'ring' or 'portal' treasure if so required.
         Automatically starts a new delve or ends game, as suitable."""
         with ShellManager():
             no_arguments(line)
