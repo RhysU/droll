@@ -208,6 +208,8 @@ def retreat(world: World) -> World:
     """Retreat to the tavern without completing the present dungeon."""
     if world.depth == 0:
         raise DrollError("Descend at least once prior to retreating.")
+    if defeated_dungeon(world.dungeon):
+        raise DrollError("Why retreat when you could instead retire?")
 
     return world._replace(
         depth=0,
