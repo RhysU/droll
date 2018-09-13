@@ -14,7 +14,6 @@ from . import world
 
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
-# TODO Entering a lone '?' is breaking something in cmd.Cmd guts
 # TODO Populate all help topics
 
 
@@ -167,12 +166,14 @@ class Shell(cmd.Cmd):
 
     doc_header = "Currently feasible commands (type help <topic>):"
 
-    # Overrides superclass behavior relying purely on do_XXX(...) methods
+    # Overrides superclass behavior relying purely on do_XXX(...) methods.
+    # Also, lies that help_XXX(...) present for completedefault(...) methods.
     def get_names(self):
         """Compute potential help topics from contextual completions."""
-        return ['do_' + x
-                for x in self.completenames(text='', line='',
-                                            begidx=0, endidx=0)]
+        names = self.completenames(text='', line='', begidx=0, endidx=0)
+        return (['do_' + x for x in names] +
+                ['help_' + x for x in names
+                 if not getattr(self, 'do_' + x, None)])
 
 
 class ShellManager:
