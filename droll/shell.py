@@ -13,6 +13,7 @@ from . import world
 
 
 # TODO Populate all help topics
+# TODO Populate intro
 
 
 class Shell(cmd.Cmd):
