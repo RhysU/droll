@@ -110,37 +110,37 @@ def complete(
         position: int,
 ) -> typing.Iterable[str]:
     """Possible completions for text with position among (partial) tokens."""
+    # First compute candidate completions independent of observed text
     if position == 0:
-        results = (
+        candidates = (
             key
             for source in (game.party, game.treasure)
             if source is not None
             for key, value in zip(source._fields, source)
-            if value and key.startswith(text)
+            if value
         )
     elif position == 1 and tokens[0] == 'elixir':
-        results = (
+        candidates = (
             key
             for key in world.Party._fields
-            if key.startswith(text)
         )
     elif position == 1:
-        results = (
+        candidates = (
             key
             for source in (game.party, game.dungeon)
             if source is not None
             for key, value in zip(source._fields, source)
-            if value and key.startswith(text)
+            if value
         )
     else:
-        results = (
+        candidates = (
             key
             for source in (world.Party, world.Dungeon)
             for key in source._fields
-            if key.startswith(text)
         )
 
-    return results
+    # Then filter to retain only those matching requested text prefix
+    return (key for key in candidates if key.startswith(text))
 
 
 DEFAULT = Player(

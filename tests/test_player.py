@@ -132,41 +132,45 @@ def test_scroll_reroll(game):
     )
 
 
+# Shorthand for testing completions given that method returns unsorted generator
+def complete(*args):
+    return list(sorted(player.complete(*args)))
+
+
 def test_complete0(game):
     """Complete available party and treasure in the zeroth position."""
-    assert ['fighter'] == player.complete(game, ('fig',), 'fig', 0)
+    assert ['fighter'] == complete(game, ('fig',), 'fig', 0)
     game = game._replace(party=game.party._replace(fighter=0))
-    assert [] == player.complete(game, ('fig',), 'fig', 0)  # party
-    assert [] == player.complete(game, ('gob',), 'gob', 0)  # dungeon
-    assert [] == player.complete(game, ('bai',), 'bai', 0)  # treasure
+    assert [] == complete(game, ('fig',), 'fig', 0)  # party
+    assert [] == complete(game, ('gob',), 'gob', 0)  # dungeon
+    assert [] == complete(game, ('bai',), 'bai', 0)  # treasure
     game = game._replace(treasure=game.treasure._replace(bait=1))
-    assert ['bait'] == player.complete(game, ('bai',), 'bai', 0)  # treasure
+    assert ['bait'] == complete(game, ('bai',), 'bai', 0)  # treasure
 
 
 def test_complete1(game):
     """Complete available party and dungeon in the first position."""
     # Vanilla first position stuff
-    assert ['goblin'] == player.complete(game, ('fig', 'gob'), 'gob', 1)
-    assert ['fighter'] == player.complete(game, ('fig', 'fig'), 'fig', 1)  # party
+    assert ['goblin'] == complete(game, ('fig', 'gob'), 'gob', 1)
+    assert ['fighter'] == complete(game, ('fig', 'fig'), 'fig', 1)  # party
     game = game._replace(dungeon=game.dungeon._replace(goblin=0))
-    assert [] == player.complete(game, ('fig', 'gob'), 'gob', 1)  # dungeon
+    assert [] == complete(game, ('fig', 'gob'), 'gob', 1)  # dungeon
     game = game._replace(party=game.party._replace(fighter=0))
-    assert [] == player.complete(game, ('fig', 'fig'), 'fig', 1)  # dungeon
+    assert [] == complete(game, ('fig', 'fig'), 'fig', 1)  # dungeon
     game = game._replace(treasure=game.treasure._replace(bait=1))
-    assert [] == player.complete(game, ('fig', 'bai'), 'fig', 1)  # treasure
+    assert [] == complete(game, ('fig', 'bai'), 'fig', 1)  # treasure
 
     # Special case associated with 'elixir'
     game = game._replace(party=world.Party(*([0] * len(game.party))))
     game = game._replace(treasure=world.Treasure(*([0] * len(game.treasure))))
     assert list(sorted(world.Party._fields)) == (
-        player.complete(game, ('elixir', ''), '', 1))
+        complete(game, ('elixir', ''), '', 1))
 
 
 def test_complete2(game):
     """Complete all party and dungeon in the second position."""
     game = game._replace(party=game.party._replace(fighter=0))
     game = __remove_monsters(game)
-    assert ['fighter'] == player.complete(game, ('X', 'Y', 'fig'), 'fig', 2)
-    assert ['goblin'] == player.complete(game, ('X', 'Y', 'gob'), 'gob', 2)
-    assert ['champion', 'chest'] == player.complete(game,
-                                                    ('X', 'Y', 'ch'), 'ch', 2)
+    assert ['fighter'] == complete(game, ('X', 'Y', 'fig'), 'fig', 2)
+    assert ['goblin'] == complete(game, ('X', 'Y', 'gob'), 'gob', 2)
+    assert ['champion', 'chest'] == complete(game, ('X', 'Y', 'ch'), 'ch', 2)
