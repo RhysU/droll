@@ -135,12 +135,12 @@ class Shell(cmd.Cmd):
         with ShellManager(verbose=False):
             world.retreat(self._world)
             possible.append('retreat')
-
-        # TODO No completedefault if only dragon < 3 remains
-        # Filter to prefix matches and add any hero-related possibilities
         results = [x for x in possible if x.startswith(text)]
-        if dungeon_dice:
+
+        # Add any hero-related possibilities
+        if not world.exhausted_dungeon(self._world.dungeon):
             results += self.completedefault(text, line, begidx, endidx)
+
         return results
 
     def completedefault(self, text, line, begidx, endidx):

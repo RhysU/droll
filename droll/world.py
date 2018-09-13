@@ -39,6 +39,14 @@ def blocking_dragon(dungeon: Dungeon) -> bool:
     return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
 
 
+def exhausted_dungeon(dungeon: Dungeon) -> bool:
+    """Has the player exhausted all possible actions for this dungeon?
+
+    In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
+    return (dungeon is None) or ((0 == sum(dungeon) - dungeon.dragon) and
+                                 not blocking_dragon(dungeon))
+
+
 # random.Random.randrange or random.randrange are accepted for randomness.
 # Note, too, that a deterministic function may be provided for testing.
 RandRange = typing.Callable[[int, int], int]
