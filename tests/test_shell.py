@@ -64,62 +64,62 @@ def test_summary_command():
 def test_simple():
     """Runs the following scenario:
 
-    (delve=1, ability=True, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), treasure=())
+    (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ability=True, treasure=())
     (droll  0) descend
 
-    (delve=1, depth=1, ability=True, dungeon=(goblin=1), party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), treasure=())
+    (delve=1, depth=1, dungeon=(goblin=1), party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ability=True, treasure=())
     (droll  0) cleric goblin
 
-    (delve=1, depth=1, ability=True, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=2, scroll=1), treasure=())
+    (delve=1, depth=1, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=2, scroll=1), ability=True, treasure=())
     (droll  0) descend
 
-    (delve=1, depth=2, ability=True, dungeon=(goblin=2), party=(fighter=1, cleric=1, mage=1, thief=2, scroll=1), treasure=())
+    (delve=1, depth=2, dungeon=(goblin=2), party=(fighter=1, cleric=1, mage=1, thief=2, scroll=1), ability=True, treasure=())
     (droll  0) fighter goblin
 
-    (delve=1, depth=2, ability=True, dungeon=(), party=(cleric=1, mage=1, thief=2, scroll=1), treasure=())
+    (delve=1, depth=2, dungeon=(), party=(cleric=1, mage=1, thief=2, scroll=1), ability=True, treasure=())
     (droll  0) descend
 
-    (delve=1, depth=3, ability=True, dungeon=(ooze=1, chest=1, potion=1), party=(cleric=1, mage=1, thief=2, scroll=1), treasure=())
+    (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), party=(cleric=1, mage=1, thief=2, scroll=1), ability=True, treasure=())
     (droll  0) thief ooze
 
-    (delve=1, depth=3, ability=True, dungeon=(chest=1, potion=1), party=(cleric=1, mage=1, thief=1, scroll=1), treasure=())
+    (delve=1, depth=3, dungeon=(chest=1, potion=1), party=(cleric=1, mage=1, thief=1, scroll=1), ability=True, treasure=())
     (droll  0) thief chest
 
-    (delve=1, depth=3, ability=True, dungeon=(potion=1), party=(cleric=1, mage=1, scroll=1), treasure=(talisman=1))
+    (delve=1, depth=3, dungeon=(potion=1), party=(cleric=1, mage=1, scroll=1), ability=True, treasure=(talisman=1))
     (droll  1) scroll potion
     Require exactly 1 to revive
 
-    (delve=1, depth=3, ability=True, dungeon=(potion=1), party=(cleric=1, mage=1, scroll=1), treasure=(talisman=1))
+    (delve=1, depth=3, dungeon=(potion=1), party=(cleric=1, mage=1, scroll=1), ability=True, treasure=(talisman=1))
     (droll  1) scroll potion champion
 
-    (delve=1, depth=3, ability=True, dungeon=(), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1))
+    (delve=1, depth=3, dungeon=(), party=(cleric=1, mage=1, champion=1), ability=True, treasure=(talisman=1))
     (droll  1) descend
 
-    (delve=1, depth=4, ability=True, dungeon=(skeleton=1, ooze=1, potion=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1))
+    (delve=1, depth=4, dungeon=(skeleton=1, ooze=1, potion=2), party=(cleric=1, mage=1, champion=1), ability=True, treasure=(talisman=1))
     (droll  1) cleric skeleton
 
-    (delve=1, depth=4, ability=True, dungeon=(ooze=1, potion=2), party=(mage=1, champion=1), treasure=(talisman=1))
+    (delve=1, depth=4, dungeon=(ooze=1, potion=2), party=(mage=1, champion=1), ability=True, treasure=(talisman=1))
     (droll  1) mage ooze
 
-    (delve=1, depth=4, ability=True, dungeon=(potion=2), party=(champion=1), treasure=(talisman=1))
+    (delve=1, depth=4, dungeon=(potion=2), party=(champion=1), ability=True, treasure=(talisman=1))
     (droll  1) champion potion champion fighter
 
-    (delve=1, depth=4, ability=True, dungeon=(), party=(fighter=1, champion=1), treasure=(talisman=1))
+    (delve=1, depth=4, dungeon=(), party=(fighter=1, champion=1), ability=True, treasure=(talisman=1))
     (droll  1) descend
 
-    (delve=1, depth=5, ability=True, dungeon=(goblin=1, skeleton=2, ooze=2), party=(fighter=1, champion=1), treasure=(talisman=1))
+    (delve=1, depth=5, dungeon=(goblin=1, skeleton=2, ooze=2), party=(fighter=1, champion=1), ability=True, treasure=(talisman=1))
     (droll  1) champion ooze
 
-    (delve=1, depth=5, ability=True, dungeon=(goblin=1, skeleton=2), party=(fighter=1), treasure=(talisman=1))
+    (delve=1, depth=5, dungeon=(goblin=1, skeleton=2), party=(fighter=1), ability=True, treasure=(talisman=1))
     (droll  1) talisman skeleton
 
-    (delve=1, depth=5, ability=True, dungeon=(goblin=1), party=(fighter=1), treasure=())
+    (delve=1, depth=5, dungeon=(goblin=1), party=(fighter=1), ability=True, treasure=())
     (droll  0) fighter goblin
 
-    (delve=1, depth=5, ability=True, dungeon=(), party=(), treasure=())
+    (delve=1, depth=5, dungeon=(), party=(), ability=True, treasure=())
     (droll  0) retire
 
-    (delve=2, experience=5, ability=True, party=(fighter=1, cleric=2, mage=3, scroll=1), treasure=())
+    (delve=2, experience=5, party=(fighter=1, cleric=2, mage=3, scroll=1), ability=True, treasure=())
     (droll  5) EOF
     """
     # Drive the game according to the script in the above docstring.

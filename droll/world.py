@@ -111,9 +111,9 @@ World = collections.namedtuple('World', (
     'delve',
     'depth',
     'experience',
-    'ability',
     'dungeon',
     'party',
+    'ability',
     'treasure',
     'reserve',
 ))
