@@ -119,7 +119,8 @@ class Shell(cmd.Cmd):
 
     def completenames(self, text, line, begidx, endidx):
         """Complete possible command names based upon context."""
-        # Are any dungeon dice still active?  Distinct from defeating level!
+        # Are any dungeon dice still active?  Distinct from defeating dungeon!
+        # Distinct from exhausting dungeon-- could convert potions to dragon!
         dungeon_dice = sum(self._world.dungeon) if self._world.dungeon else 0
 
         # Which world actions might be taken successfully given game state?
