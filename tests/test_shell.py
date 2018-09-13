@@ -24,8 +24,6 @@ def test_EOF():
     assert s.lastcmd == ''
 
 
-# TODO Unit test completion
-
 # Strategy for testing, further below, will turn docstrings into assertions
 def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     """Parse input like the following into (summary, command) tuples:
