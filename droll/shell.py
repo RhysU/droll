@@ -14,8 +14,6 @@ from . import world
 
 # TODO Scrolls cannot be used to defeat dragons
 # TODO Do not permit retreat when player should sensibly retire
-# TODO Exit after all delves exhausted
-# TODO Emit score after end of the game
 # TODO Context-dependent help, in that only feasible options suggested
 # TODO Context-dependent help, suggested whenever empty input received
 # TODO Context-dependent help, after hitting an empty line
@@ -49,11 +47,13 @@ class Shell(cmd.Cmd):
         self.postcmd(stop=False, line='')
 
     def postcmd(self, stop, line):
-        """Print game state after each commmand."""
+        """Print game state after each commmand and final details on exit."""
+        self._update_prompt()
         print()
         if line != 'EOF':
             print(self.summary())
-        self._update_prompt()
+            if stop:
+                print(self.prompt)
         return stop
 
     def _update_prompt(self):
@@ -93,20 +93,28 @@ class Shell(cmd.Cmd):
     def do_retire(self, line):
         """Retire from the dungeon after successfully completing a dungeon.
 
-        Automatically starts a new delve, if possible."""
+        Automatically starts a new delve or ends game, as suitable."""
         with ShellManager():
             no_arguments(line)
             self._world = world.retire(self._world)
-            self._world = world.next_delve(self._world, self._randrange)
+            return self._next_delve_or_exit()
 
     def do_retreat(self, line):
         """Retreat from the dungeon at any time (e.g. after being defeated).
 
-        Automatically starts a new delve, if possible."""
+        Automatically starts a new delve or ends game, as suitable."""
         with ShellManager():
             no_arguments(line)
             self._world = world.retreat(self._world)
+            return self._next_delve_or_exit()
+
+    def _next_delve_or_exit(self) -> bool:
+        """Either start next delve or exit the game, printing final score."""
+        try:
             self._world = world.next_delve(self._world, self._randrange)
+            return False
+        except error.DrollError:
+            return True
 
     #######################
     # COMPLETION BELOW HERE
