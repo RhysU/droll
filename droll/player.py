@@ -140,7 +140,7 @@ def complete(
             if key.startswith(text)
         )
 
-    return sorted(results)
+    return results
 
 
 DEFAULT = Player(
