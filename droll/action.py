@@ -224,6 +224,7 @@ def portal(
         raise error.DrollError('No targets accepted for {}'.format(noun))
     game = world.retire(world.apply_portal(world=game, noun=noun))
     try:
+        # FIXME transformer must be plumbed in from player
         game = world.next_delve(world=game, randrange=randrange)
     except error.DrollError:
         pass
