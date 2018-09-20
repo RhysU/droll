@@ -148,7 +148,7 @@ def next_delve(
         depth=0,
         ability=True,
         dungeon=None,
-        party=roll_party(dice=_party_dice, randrange=randrange),
+        party=transformer(roll_party(dice=_party_dice, randrange=randrange)),
     )
 
 
