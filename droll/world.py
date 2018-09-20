@@ -136,7 +136,7 @@ def new_game() -> World:
 def next_delve(
         world: World,
         randrange: RandRange,
-        transformer: typing.Callable[[Party], Party] = lambda x: x,
+        transformer: typing.Callable[[Party], Party],
         *,
         _party_dice=7
 ) -> World:
