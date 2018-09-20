@@ -73,13 +73,14 @@ class Shell(cmd.Cmd):
     def do_ability(self, line):
         """Invoke the player's ability."""
         with ShellManager():
-            raise error.DrollError("NotYetImplemented")
+            self._world = player.apply(self._player, self._world,
+                                       self._randrange, 'ability', *parse(line))
 
     def default(self, line):
         """Apply some named hero or treasure to some collection of nouns."""
         with ShellManager():
-            self._world = player.apply(
-                self._player, self._world, self._randrange, *parse(line))
+            self._world = player.apply(self._player, self._world,
+                                       self._randrange, *parse(line))
 
     def do_descend(self, line):
         """Descend to the next depth (in contrast to retiring/retreating)."""

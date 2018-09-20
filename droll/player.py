@@ -11,6 +11,7 @@ from . import error
 from . import world
 
 Player = collections.namedtuple('Player', (
+    'ability',
     'bait',
     'elixir',
     'portal',
@@ -20,11 +21,16 @@ Player = collections.namedtuple('Player', (
 ))
 
 # Rules governing a default player lacking any special abilities.
+# Effectively, this data is one large, dense dispatch table.
+# Other players will generally be defined in terms of this one.
 DEFAULT = Player(
+    # Behavior of special commands?
+    ability=action.nop_ability,
     bait=action.bait_dragon,
     elixir=action.elixir,
     portal=action.portal,
     ring=action.ring,
+    # How do artifacts map to heroes?
     artifacts=world.Party(
         fighter='sword',
         cleric='talisman',
@@ -33,6 +39,7 @@ DEFAULT = Player(
         champion=None,
         scroll='scroll',
     ),
+    # What effect does each hero have on each enemy?
     party=world.Party(
         fighter=world.Dungeon(
             goblin=action.defeat_all,
@@ -107,7 +114,7 @@ def apply(
     additional = tuple(partify(i, player.artifacts) for i in additional)
 
     # One-off handling of some treasures, with error wrapping to aid usability
-    if noun in {'bait', 'elixir', 'ring', 'portal'}:
+    if noun in {'ability', 'bait', 'elixir', 'ring', 'portal'}:
         try:
             action = getattr(player, noun)
             return action(game, randrange, noun, target, *additional)

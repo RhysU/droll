@@ -237,3 +237,19 @@ def elixir(
     return world.replace_treasure(game, noun)._replace(
         party=__increment_hero(game.party, target)
     )
+
+
+def __consume_ability(game: world.World):
+    if not game.ability:
+        raise error.DrollError("Ability not available for use.")
+    return game._replace(ability=False)
+
+
+def nop_ability(
+        game: world.World, randrange: world.RandRange, noun: str,
+        target: typing.Optional[str] = None,
+) -> world.World:
+    """No ability available though its consumption is tracked"""
+    if target is not None:
+        raise error.DrollError('No targets accepted for {}'.format(noun))
+    return __consume_ability(game)
