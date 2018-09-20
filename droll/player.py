@@ -19,6 +19,74 @@ Player = collections.namedtuple('Player', (
     'party',
 ))
 
+# Rules governing a default player lacking any special abilities.
+DEFAULT = Player(
+    bait=action.bait_dragon,
+    elixir=action.elixir,
+    portal=action.portal,
+    ring=action.ring,
+    artifacts=world.Party(
+        fighter='sword',
+        cleric='talisman',
+        mage='sceptre',
+        thief='tools',
+        champion=None,
+        scroll='scroll',
+    ),
+    party=world.Party(
+        fighter=world.Dungeon(
+            goblin=action.defeat_all,
+            skeleton=action.defeat_one,
+            ooze=action.defeat_one,
+            chest=action.open_one,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
+        ),
+        cleric=world.Dungeon(
+            goblin=action.defeat_one,
+            skeleton=action.defeat_all,
+            ooze=action.defeat_one,
+            chest=action.open_one,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
+        ),
+        mage=world.Dungeon(
+            goblin=action.defeat_one,
+            skeleton=action.defeat_one,
+            ooze=action.defeat_all,
+            chest=action.open_one,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
+        ),
+        thief=world.Dungeon(
+            goblin=action.defeat_one,
+            skeleton=action.defeat_one,
+            ooze=action.defeat_one,
+            chest=action.open_all,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
+        ),
+        champion=world.Dungeon(
+            goblin=action.defeat_all,
+            skeleton=action.defeat_all,
+            ooze=action.defeat_all,
+            chest=action.open_all,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
+        ),
+        # Technically scrolls could re-roll potions,
+        # but doing so would be a really peculiar choice.
+        scroll=world.Dungeon(
+            goblin=action.reroll,
+            skeleton=action.reroll,
+            ooze=action.reroll,
+            chest=action.reroll,
+            potion=action.quaff,
+            dragon=action.defeat_dragon,
+        ),
+    ),
+)
+
 
 def apply(
         player: Player,
@@ -141,71 +209,3 @@ def complete(
 
     # Then filter to retain only those matching requested text prefix
     return (key for key in candidates if key.startswith(text))
-
-
-DEFAULT = Player(
-    bait=action.bait_dragon,
-    elixir=action.elixir,
-    portal=action.portal,
-    ring=action.ring,
-    artifacts=world.Party(
-        fighter='sword',
-        cleric='talisman',
-        mage='sceptre',
-        thief='tools',
-        champion=None,
-        scroll='scroll',
-    ),
-    party=world.Party(
-        fighter=world.Dungeon(
-            goblin=action.defeat_all,
-            skeleton=action.defeat_one,
-            ooze=action.defeat_one,
-            chest=action.open_one,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
-        ),
-        cleric=world.Dungeon(
-            goblin=action.defeat_one,
-            skeleton=action.defeat_all,
-            ooze=action.defeat_one,
-            chest=action.open_one,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
-        ),
-        mage=world.Dungeon(
-            goblin=action.defeat_one,
-            skeleton=action.defeat_one,
-            ooze=action.defeat_all,
-            chest=action.open_one,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
-        ),
-        thief=world.Dungeon(
-            goblin=action.defeat_one,
-            skeleton=action.defeat_one,
-            ooze=action.defeat_one,
-            chest=action.open_all,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
-        ),
-        champion=world.Dungeon(
-            goblin=action.defeat_all,
-            skeleton=action.defeat_all,
-            ooze=action.defeat_all,
-            chest=action.open_all,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
-        ),
-        # Technically scrolls could re-roll potions,
-        # but doing so would be a really peculiar choice.
-        scroll=world.Dungeon(
-            goblin=action.reroll,
-            skeleton=action.reroll,
-            ooze=action.reroll,
-            chest=action.reroll,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
-        ),
-    ),
-)
