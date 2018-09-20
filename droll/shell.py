@@ -38,7 +38,7 @@ class Shell(cmd.Cmd):
     def preloop(self):
         """Prepare a new game and start the first delve."""
         w = world.new_game()
-        w = world.next_delve(w, self._randrange, self._player.transformer)
+        w = world.next_delve(w, self._randrange)
         self._world = w
         # Causes printing of initial world state
         self.postcmd(stop=False, line='')
@@ -111,7 +111,7 @@ class Shell(cmd.Cmd):
         """Either start next delve or exit the game, printing final score."""
         try:
             self._world = world.next_delve(
-                self._world, self._randrange, self._player.transformer)
+                self._world, self._randrange)
             return False
         except error.DrollError:
             return True

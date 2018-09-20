@@ -25,7 +25,7 @@ def test_game_initial():
 
 def test_delve_initial(state):
     game = droll.world.new_game()
-    game = droll.world.next_delve(game, state.randrange, lambda x: x)
+    game = droll.world.next_delve(game, state.randrange)
     assert 0 == game.depth
     assert game.ability is True
     assert 7 == sum(game.party)
@@ -33,7 +33,7 @@ def test_delve_initial(state):
 
 def test_dungeon_initial(state):
     game = droll.world.new_game()
-    game = droll.world.next_delve(game, state.randrange, lambda x: x)
+    game = droll.world.next_delve(game, state.randrange)
     game = droll.world.next_dungeon(game, state.randrange)
     assert 1 == game.depth
     assert 1 == sum(game.dungeon)
@@ -58,7 +58,7 @@ def test_replace_treasure():
 
 def test_retire_simple(state):
     pre = droll.world.new_game()
-    pre = droll.world.next_delve(pre, state.randrange, lambda x: x)
+    pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
         dungeon=droll.world.Dungeon(
@@ -76,7 +76,7 @@ def test_retire_simple(state):
 
 def test_retire_monsters(state):
     pre = droll.world.new_game()
-    pre = droll.world.next_delve(pre, state.randrange, lambda x: x)
+    pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
         dungeon=droll.world.Dungeon(
@@ -107,7 +107,7 @@ def test_retire_monsters(state):
 
 def test_retire_dragon(state):
     pre = droll.world.new_game()
-    pre = droll.world.next_delve(pre, state.randrange, lambda x: x)
+    pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
         dungeon=droll.world.Dungeon(
@@ -148,7 +148,7 @@ def test_retire_dragon(state):
 
 def test_next_dungeon_simple(state):
     pre = droll.world.new_game()
-    pre = droll.world.next_delve(pre, state.randrange, lambda x: x)
+    pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
         dungeon=droll.world.Dungeon(
@@ -165,7 +165,7 @@ def test_next_dungeon_simple(state):
 
 def test_next_dungeon_monsters(state):
     pre = droll.world.new_game()
-    pre = droll.world.next_delve(pre, state.randrange, lambda x: x)
+    pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
         dungeon=droll.world.Dungeon(
@@ -195,7 +195,7 @@ def test_next_dungeon_monsters(state):
 
 def test_next_dungeon_dragon(state):
     pre = droll.world.new_game()
-    pre = droll.world.next_delve(pre, state.randrange, lambda x: x)
+    pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
         dungeon=droll.world.Dungeon(
