@@ -11,6 +11,10 @@ import typing
 
 from .error import DrollError
 
+# TODO Explicitly model roll_party using randrange
+# TODO Explicitly model roll_dungeon using randrange?
+# TODO Explicitly model roll_treasure using randrange?
+
 Dungeon = collections.namedtuple('Dungeon', (
     'goblin',
     'skeleton',
