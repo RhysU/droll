@@ -134,10 +134,13 @@ def new_game() -> World:
 
 
 def next_delve(
-        world: World, randrange: RandRange, *,
+        world: World,
+        randrange: RandRange,
+        transformer: typing.Callable[[Party], Party] = lambda x: x,
+        *,
         _party_dice=7
 ) -> World:
-    """Establish a new delve within an existing game."""
+    """Establish new delve within a game, optionally transforming the party."""
     if world.delve >= 3:
         raise DrollError("At most three delves are permitted.")
     return world._replace(

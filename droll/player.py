@@ -16,6 +16,7 @@ Player = collections.namedtuple('Player', (
     'elixir',
     'portal',
     'ring',
+    'transformer',
     'artifacts',
     'party',
 ))
@@ -30,6 +31,8 @@ DEFAULT = Player(
     elixir=action.elixir,
     portal=action.portal,
     ring=action.ring,
+    # Behavior at specific lifecycle events
+    transformer=lambda x: x,
     # How do artifacts map to heroes?
     artifacts=world.Party(
         fighter='sword',
