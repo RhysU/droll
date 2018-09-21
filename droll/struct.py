@@ -12,3 +12,12 @@ Dungeon = collections.namedtuple('Dungeon', (
     'potion',
     'dragon',
 ))
+
+Party = collections.namedtuple('Party', (
+    'fighter',
+    'cleric',
+    'mage',
+    'thief',
+    'champion',
+    'scroll',
+))

@@ -10,7 +10,7 @@ import itertools
 import typing
 
 # TODO Less namespace pollution by importing package only
-from .struct import Dungeon
+from .struct import Dungeon, Party
 from .error import DrollError
 
 # TODO Explicitly model roll_party using randrange
@@ -67,16 +67,6 @@ def roll_dungeon(dice: int, randrange: RandRange) -> Dungeon:
     On Dungeon N one should account for the number of extant dragons."""
     assert dice >= 1, "At least one dice required (requested {})".format(dice)
     return Dungeon(*_roll(dice, 0, len(Dungeon._fields), randrange))
-
-
-Party = collections.namedtuple('Party', (
-    'fighter',
-    'cleric',
-    'mage',
-    'thief',
-    'champion',
-    'scroll',
-))
 
 
 def roll_party(dice: int, randrange: RandRange) -> Party:
