@@ -21,3 +21,33 @@ Party = collections.namedtuple('Party', (
     'champion',
     'scroll',
 ))
+
+_RESERVE = collections.OrderedDict((
+    ('sword', 3),
+    ('talisman', 3),
+    ('sceptre', 3),
+    ('tools', 3),
+    ('scroll', 3),
+    ('elixir', 3),
+    ('bait', 4),
+    ('portal', 4),
+    ('ring', 4),
+    ('scale', 6),
+))
+
+Treasure = collections.namedtuple('Treasure', _RESERVE.keys())
+
+RESERVE_INITIAL = Treasure(*_RESERVE.values())
+
+TREASURE_INITIAL = Treasure(*([0] * len(_RESERVE)))
+
+World = collections.namedtuple('World', (
+    'delve',
+    'depth',
+    'experience',
+    'dungeon',
+    'party',
+    'ability',
+    'treasure',
+    'reserve',
+))

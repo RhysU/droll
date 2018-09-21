@@ -3,15 +3,16 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with game state and world mechanics."""
 
-import collections
 import copy
 import functools
 import itertools
 import typing
 
-# TODO Less namespace pollution by importing package only
-from .struct import Dungeon, Party
 from .error import DrollError
+# TODO Less namespace pollution by importing package only
+from .struct import Dungeon, Party, Treasure, World
+from .struct import RESERVE_INITIAL, TREASURE_INITIAL
+
 
 # TODO Explicitly model roll_party using randrange
 # TODO Explicitly model roll_dungeon using randrange?
@@ -72,37 +73,6 @@ def roll_dungeon(dice: int, randrange: RandRange) -> Dungeon:
 def roll_party(dice: int, randrange: RandRange) -> Party:
     """Roll a new Party using given number of dice."""
     return Party(*_roll(dice, 0, len(Party._fields), randrange))
-
-
-_RESERVE = collections.OrderedDict((
-    ('sword', 3),
-    ('talisman', 3),
-    ('sceptre', 3),
-    ('tools', 3),
-    ('scroll', 3),
-    ('elixir', 3),
-    ('bait', 4),
-    ('portal', 4),
-    ('ring', 4),
-    ('scale', 6),
-))
-
-Treasure = collections.namedtuple('Treasure', _RESERVE.keys())
-
-RESERVE_INITIAL = Treasure(*_RESERVE.values())
-
-TREASURE_INITIAL = Treasure(*([0] * len(_RESERVE)))
-
-World = collections.namedtuple('World', (
-    'delve',
-    'depth',
-    'experience',
-    'dungeon',
-    'party',
-    'ability',
-    'treasure',
-    'reserve',
-))
 
 
 def new_game() -> World:
