@@ -3,28 +3,17 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
 
-import collections
 import typing
 
 from . import action
 from . import error
+from . import struct
 from . import world
-
-Player = collections.namedtuple('Player', (
-    'ability',
-    'bait',
-    'elixir',
-    'portal',
-    'ring',
-    'transformer',
-    'artifacts',
-    'party',
-))
 
 # Rules governing a default player lacking any special abilities.
 # Effectively, this data is one large, dense dispatch table.
 # Other players will generally be defined in terms of this one.
-DEFAULT = Player(
+DEFAULT = struct.Player(
     # Behavior of special commands?
     ability=action.nop_ability,
     bait=action.bait_dragon,
@@ -99,7 +88,7 @@ DEFAULT = Player(
 
 
 def apply(
-        player: Player,
+        player: struct.Player,
         game: world.World,
         randrange: world.RandRange,
         noun: str,

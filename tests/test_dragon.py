@@ -9,6 +9,7 @@ import pytest
 
 import droll.error as error
 import droll.player as player
+import droll.struct as struct
 import droll.world as world
 
 

@@ -22,6 +22,17 @@ Party = collections.namedtuple('Party', (
     'scroll',
 ))
 
+Player = collections.namedtuple('Player', (
+    'ability',
+    'bait',
+    'elixir',
+    'portal',
+    'ring',
+    'transformer',
+    'artifacts',
+    'party',
+))
+
 _RESERVE = collections.OrderedDict((
     ('sword', 3),
     ('talisman', 3),
