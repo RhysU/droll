@@ -23,7 +23,7 @@ DEFAULT = struct.Player(
     # Behavior at specific lifecycle events
     transformer=lambda x: x,
     # How do artifacts map to heroes?
-    artifacts=world.Party(
+    artifacts=struct.Party(
         fighter='sword',
         cleric='talisman',
         mage='sceptre',
@@ -32,8 +32,8 @@ DEFAULT = struct.Player(
         scroll='scroll',
     ),
     # What effect does each hero have on each enemy?
-    party=world.Party(
-        fighter=world.Dungeon(
+    party=struct.Party(
+        fighter=struct.Dungeon(
             goblin=action.defeat_all,
             skeleton=action.defeat_one,
             ooze=action.defeat_one,
@@ -41,7 +41,7 @@ DEFAULT = struct.Player(
             potion=action.quaff,
             dragon=action.defeat_dragon,
         ),
-        cleric=world.Dungeon(
+        cleric=struct.Dungeon(
             goblin=action.defeat_one,
             skeleton=action.defeat_all,
             ooze=action.defeat_one,
@@ -49,7 +49,7 @@ DEFAULT = struct.Player(
             potion=action.quaff,
             dragon=action.defeat_dragon,
         ),
-        mage=world.Dungeon(
+        mage=struct.Dungeon(
             goblin=action.defeat_one,
             skeleton=action.defeat_one,
             ooze=action.defeat_all,
@@ -57,7 +57,7 @@ DEFAULT = struct.Player(
             potion=action.quaff,
             dragon=action.defeat_dragon,
         ),
-        thief=world.Dungeon(
+        thief=struct.Dungeon(
             goblin=action.defeat_one,
             skeleton=action.defeat_one,
             ooze=action.defeat_one,
@@ -65,7 +65,7 @@ DEFAULT = struct.Player(
             potion=action.quaff,
             dragon=action.defeat_dragon,
         ),
-        champion=world.Dungeon(
+        champion=struct.Dungeon(
             goblin=action.defeat_all,
             skeleton=action.defeat_all,
             ooze=action.defeat_all,
@@ -75,7 +75,7 @@ DEFAULT = struct.Player(
         ),
         # Technically scrolls could re-roll potions,
         # but doing so would be a really peculiar choice.
-        scroll=world.Dungeon(
+        scroll=struct.Dungeon(
             goblin=action.reroll,
             skeleton=action.reroll,
             ooze=action.reroll,
@@ -89,12 +89,12 @@ DEFAULT = struct.Player(
 
 def apply(
         player: struct.Player,
-        game: world.World,
-        randrange: world.RandRange,
+        game: struct.World,
+        randrange: struct.RandRange,
         noun: str,
         target: str = None,
         *additional
-) -> world.World:
+) -> struct.World:
     """Apply noun to target within game, returning a new version.
 
     Processes hero-like artifacts (i.e. not rings/portals/scales).
@@ -156,7 +156,7 @@ def apply(
     return game
 
 
-def partify(token: str, artifacts: world.Party):
+def partify(token: str, artifacts: struct.Party):
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None
@@ -171,7 +171,7 @@ def partify(token: str, artifacts: world.Party):
 # Attempts to specialize much beyond this seem to quickly go awry.
 # One notable special case is 'elixir' as any party die follows.
 def complete(
-        game: world.World,
+        game: struct.World,
         tokens: typing.Sequence[str],
         text: str,
         position: int,
@@ -189,7 +189,7 @@ def complete(
     elif position == 1 and tokens[0] == 'elixir':
         candidates = (
             key
-            for key in world.Party._fields
+            for key in struct.Party._fields
         )
     elif position == 1:
         candidates = (
@@ -202,7 +202,7 @@ def complete(
     else:
         candidates = (
             key
-            for source in (world.Party, world.Dungeon)
+            for source in (struct.Party, struct.Dungeon)
             for key in source._fields
         )
 

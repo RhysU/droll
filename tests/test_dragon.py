@@ -16,7 +16,7 @@ import droll.world as world
 @pytest.fixture(name='game')
 def _game():
     return world.new_game()._replace(
-        dungeon=world.Dungeon(
+        dungeon=struct.Dungeon(
             goblin=0,
             skeleton=0,
             ooze=0,
@@ -24,7 +24,7 @@ def _game():
             potion=2,
             dragon=3,
         ),
-        party=world.Party(*([2] * len(world.Party._fields))),
+        party=struct.Party(*([2] * len(struct.Party._fields))),
     )
 
 

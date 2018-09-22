@@ -9,14 +9,15 @@ import pytest
 
 import droll.error as error
 import droll.player as player
+import droll.struct as struct
 import droll.world as world
 
 
 @pytest.fixture(name='game')
 def _game():
     return world.new_game()._replace(
-        dungeon=world.Dungeon(*([2] * len(world.Dungeon._fields))),
-        party=world.Party(*([0] * len(world.Party._fields))),
+        dungeon=struct.Dungeon(*([2] * len(struct.Dungeon._fields))),
+        party=struct.Party(*([0] * len(struct.Party._fields))),
     )
 
 

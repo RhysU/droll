@@ -7,12 +7,13 @@ import operator
 import typing
 
 from . import error
+from . import struct
 from . import world
 
 
 def defeat_one(
-        game: world.World, randrange: world.RandRange, hero: str, target: str
-) -> world.World:
+        game: struct.World, randrange: struct.RandRange, hero: str, target: str
+) -> struct.World:
     """Update game after hero handles exactly one target."""
     return game._replace(
         party=__decrement_hero(game.party, hero),
@@ -20,18 +21,18 @@ def defeat_one(
     )
 
 
-def __decrement_hero(party: world.Party, hero: str) -> world.Party:
+def __decrement_hero(party: struct.Party, hero: str) -> struct.Party:
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
         raise error.DrollError("Require at least one hero {}".format(hero))
     return party._replace(**{hero: prior_heroes - 1})
 
 
-def __increment_hero(party: world.Party, hero: str) -> world.Party:
+def __increment_hero(party: struct.Party, hero: str) -> struct.Party:
     return party._replace(**{hero: getattr(party, hero) + 1})
 
 
-def __decrement_target(dungeon: world.Dungeon, target: str) -> world.Dungeon:
+def __decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise ValueError("Require at least one target {}".format(target))
@@ -39,8 +40,8 @@ def __decrement_target(dungeon: world.Dungeon, target: str) -> world.Dungeon:
 
 
 def defeat_all(
-        game: world.World, randrange: world.RandRange, hero: str, target: str
-) -> world.World:
+        game: struct.World, randrange: struct.RandRange, hero: str, target: str
+) -> struct.World:
     """Update game after hero handles all of one type of target."""
     return game._replace(
         party=__decrement_hero(game.party, hero),
@@ -48,7 +49,7 @@ def defeat_all(
     )
 
 
-def __eliminate_targets(dungeon: world.Dungeon, target: str) -> world.Dungeon:
+def __eliminate_targets(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise error.DrollError("Require at least one target {}".format(target))
@@ -56,9 +57,9 @@ def __eliminate_targets(dungeon: world.Dungeon, target: str) -> world.Dungeon:
 
 
 def open_one(
-        game: world.World, randrange: world.RandRange, hero: str, target: str,
+        game: struct.World, randrange: struct.RandRange, hero: str, target: str,
         *, _after_monsters=True
-) -> world.World:
+) -> struct.World:
     """Update game after hero opens exactly one chest."""
     if _after_monsters and not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Monsters must be defeated before opening.")
@@ -69,9 +70,9 @@ def open_one(
 
 
 def open_all(
-        game: world.World, randrange: world.RandRange, hero: str, target: str,
+        game: struct.World, randrange: struct.RandRange, hero: str, target: str,
         *, _after_monsters=True
-) -> world.World:
+) -> struct.World:
     """Update game after hero opens all chests."""
     if _after_monsters and not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Monsters must be defeated before opening.")
@@ -87,9 +88,9 @@ def open_all(
 
 
 def quaff(
-        game: world.World, randrange: world.RandRange, hero: str, target: str,
+        game: struct.World, randrange: struct.RandRange, hero: str, target: str,
         *revivable, _after_monsters=True
-) -> world.World:
+) -> struct.World:
     """Update game after hero quaffs all available potions.
 
     Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
@@ -110,8 +111,8 @@ def quaff(
 
 
 def reroll(
-        game: world.World, randrange: world.RandRange, hero: str, *targets
-) -> world.World:
+        game: struct.World, randrange: struct.RandRange, hero: str, *targets
+) -> struct.World:
     """Update game after hero rerolls some number of targets."""
     if not targets:
         raise error.DrollError('At least one target must be re-rolled.')
@@ -127,17 +128,17 @@ def reroll(
     increased = world.roll_dungeon(dice=len(targets), randrange=randrange)
     return game._replace(
         party=__decrement_hero(game.party, hero),
-        dungeon=world.Dungeon(*tuple(map(operator.add, reduced, increased)))
+        dungeon=struct.Dungeon(*tuple(map(operator.add, reduced, increased)))
     )
 
 
 def defeat_dragon(
-        game: world.World, randrange: world.RandRange, hero: str, target: str,
+        game: struct.World, randrange: struct.RandRange, hero: str, target: str,
         *others,
         _disallowed_heroes: typing.Iterable[str] = ('scroll'),
         _min_length: int = 3,
         _min_heroes: int = 3
-) -> world.World:
+) -> struct.World:
     """Update game after hero handles a dragon using multiple distinct heroes.
 
     Additional required heroes are specified within variable-length others."""
@@ -173,11 +174,11 @@ def defeat_dragon(
 
 
 def bait_dragon(
-        game: world.World, randrange: world.RandRange, noun: str,
+        game: struct.World, randrange: struct.RandRange, noun: str,
         target: typing.Optional[str] = None,
         *,
         _enemies: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze')
-) -> world.World:
+) -> struct.World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target
     target = 'dragon' if target is None else target
@@ -203,9 +204,9 @@ def bait_dragon(
 
 
 def ring(
-        game: world.World, randrange: world.RandRange, noun: str,
+        game: struct.World, randrange: struct.RandRange, noun: str,
         target: typing.Optional[str] = None,
-) -> world.World:
+) -> struct.World:
     """Use a ring of invisibility to sneak past a dragon."""
     target = 'dragon' if target is None else target
     if target != 'dragon':
@@ -214,9 +215,9 @@ def ring(
 
 
 def portal(
-        game: world.World, randrange: world.RandRange, noun: str,
+        game: struct.World, randrange: struct.RandRange, noun: str,
         target: typing.Optional[str] = None,
-) -> world.World:
+) -> struct.World:
     """Use a town portal towards retiring to town.
 
     Automatically starts a new delve, if possible."""
@@ -232,24 +233,24 @@ def portal(
 
 
 def elixir(
-        game: world.World, randrange: world.RandRange, noun: str, target: str
-) -> world.World:
+        game: struct.World, randrange: struct.RandRange, noun: str, target: str
+) -> struct.World:
     """Add one hero die of any requested type."""
     return world.replace_treasure(game, noun)._replace(
         party=__increment_hero(game.party, target)
     )
 
 
-def __consume_ability(game: world.World):
+def __consume_ability(game: struct.World):
     if not game.ability:
         raise error.DrollError("Ability not available for use.")
     return game._replace(ability=False)
 
 
 def nop_ability(
-        game: world.World, randrange: world.RandRange, noun: str,
+        game: struct.World, randrange: struct.RandRange, noun: str,
         target: typing.Optional[str] = None,
-) -> world.World:
+) -> struct.World:
     """No ability available though its consumption is tracked"""
     if target is not None:
         raise error.DrollError('No targets accepted for {}'.format(noun))

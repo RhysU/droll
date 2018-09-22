@@ -9,18 +9,19 @@ import pytest
 
 import droll.error as error
 import droll.player as player
+import droll.struct as struct
 import droll.world as world
 
 
 @pytest.fixture(name='game')
 def _game():
     return world.new_game()._replace(
-        dungeon=world.Dungeon(*([2] * len(world.Dungeon._fields))),
-        party=world.Party(*([2] * len(world.Party._fields))),
+        dungeon=struct.Dungeon(*([2] * len(struct.Dungeon._fields))),
+        party=struct.Party(*([2] * len(struct.Party._fields))),
     )
 
 
-def __remove_monsters(game: world.World) -> world.World:
+def __remove_monsters(game: struct.World) -> struct.World:
     return game._replace(
         dungeon=game.dungeon._replace(goblin=0, skeleton=0, ooze=0)
     )
@@ -122,7 +123,7 @@ def test_scroll_reroll(game):
     game = player.apply(player.DEFAULT, game, canned_sequence,
                         'scroll', 'chest', 'ooze', 'chest')
     assert game.party.scroll == 1
-    assert game.dungeon == world.Dungeon(
+    assert game.dungeon == struct.Dungeon(
         goblin=3,
         skeleton=3,
         ooze=2,
@@ -161,9 +162,9 @@ def test_complete1(game):
     assert [] == complete(game, ('fig', 'bai'), 'fig', 1)  # treasure
 
     # Special case associated with 'elixir'
-    game = game._replace(party=world.Party(*([0] * len(game.party))))
-    game = game._replace(treasure=world.Treasure(*([0] * len(game.treasure))))
-    assert list(sorted(world.Party._fields)) == (
+    game = game._replace(party=struct.Party(*([0] * len(game.party))))
+    game = game._replace(treasure=struct.Treasure(*([0] * len(game.treasure))))
+    assert list(sorted(struct.Party._fields)) == (
         complete(game, ('elixir', ''), '', 1))
 
 

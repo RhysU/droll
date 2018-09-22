@@ -8,6 +8,7 @@ import random
 import pytest
 
 import droll.error
+import droll.struct
 import droll.world
 
 
@@ -61,7 +62,7 @@ def test_retire_simple(state):
     pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
-        dungeon=droll.world.Dungeon(
+        dungeon=droll.struct.Dungeon(
             goblin=0,
             skeleton=0,
             ooze=0,
@@ -79,7 +80,7 @@ def test_retire_monsters(state):
     pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
-        dungeon=droll.world.Dungeon(
+        dungeon=droll.struct.Dungeon(
             goblin=0,
             skeleton=1,
             ooze=0,
@@ -110,7 +111,7 @@ def test_retire_dragon(state):
     pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
-        dungeon=droll.world.Dungeon(
+        dungeon=droll.struct.Dungeon(
             goblin=0,
             skeleton=0,
             ooze=0,
@@ -151,7 +152,7 @@ def test_next_dungeon_simple(state):
     pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
-        dungeon=droll.world.Dungeon(
+        dungeon=droll.struct.Dungeon(
             goblin=0,
             skeleton=0,
             ooze=0,
@@ -168,7 +169,7 @@ def test_next_dungeon_monsters(state):
     pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
-        dungeon=droll.world.Dungeon(
+        dungeon=droll.struct.Dungeon(
             goblin=0,
             skeleton=1,
             ooze=0,
@@ -198,7 +199,7 @@ def test_next_dungeon_dragon(state):
     pre = droll.world.next_delve(pre, state.randrange)
     pre = pre._replace(
         depth=3,
-        dungeon=droll.world.Dungeon(
+        dungeon=droll.struct.Dungeon(
             goblin=0,
             skeleton=0,
             ooze=0,
@@ -233,14 +234,14 @@ def test_next_dungeon_dragon(state):
 
 
 def test_score():
-    world = droll.world.World(
+    world = droll.struct.World(
         delve=3,
         depth=1,
         experience=15,
         ability=None,
         dungeon=None,
         party=None,
-        treasure=droll.world.Treasure(
+        treasure=droll.struct.Treasure(
             sword=0,
             talisman=0,
             sceptre=0,

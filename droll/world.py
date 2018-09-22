@@ -9,33 +9,28 @@ import itertools
 import typing
 
 from . import error
-from .struct import Dungeon, Party, Treasure, World
-from .struct import RESERVE_INITIAL, TREASURE_INITIAL
+from . import struct
 
 
-# TODO Explicitly model roll_party using randrange
-# TODO Explicitly model roll_dungeon using randrange?
-# TODO Explicitly model roll_treasure using randrange?
-
-def defeated_monsters(dungeon: Dungeon) -> bool:
+def defeated_monsters(dungeon: struct.Dungeon) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""
     return (dungeon is None) or 0 == (dungeon.goblin +
                                       dungeon.skeleton +
                                       dungeon.ooze)
 
 
-def defeated_dungeon(dungeon: Dungeon) -> bool:
+def defeated_dungeon(dungeon: struct.Dungeon) -> bool:
     """Are all monsters and any dragon on this dungeon defected?"""
     return (dungeon is None) or (defeated_monsters(dungeon) and
                                  dungeon.dragon < 3)
 
 
-def blocking_dragon(dungeon: Dungeon) -> bool:
+def blocking_dragon(dungeon: struct.Dungeon) -> bool:
     """Is a dragon blocking progress to the next level?"""
     return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
 
 
-def exhausted_dungeon(dungeon: Dungeon) -> bool:
+def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
     """Has the player exhausted all possible actions for this dungeon?
 
     In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
@@ -43,16 +38,11 @@ def exhausted_dungeon(dungeon: Dungeon) -> bool:
                                  not blocking_dragon(dungeon))
 
 
-# random.Random.randrange or random.randrange are accepted for randomness.
-# Note, too, that a deterministic function may be provided for testing.
-RandRange = typing.Callable[[int, int], int]
-
-
 def _roll(
         dice: int,
         start: int,
         stop: int,
-        randrange: RandRange
+        randrange: struct.RandRange
 ) -> typing.List[int]:
     assert dice >= 0, "At least one die must be requested"
     result = [0] * (stop - start)
@@ -61,34 +51,37 @@ def _roll(
     return result
 
 
-def roll_dungeon(dice: int, randrange: RandRange) -> Dungeon:
+def roll_dungeon(dice: int, randrange: struct.RandRange) -> struct.Dungeon:
     """Roll a new Dungeon using given number of dice.
 
     On Dungeon N one should account for the number of extant dragons."""
     assert dice >= 1, "At least one dice required (requested {})".format(dice)
-    return Dungeon(*_roll(dice, 0, len(Dungeon._fields), randrange))
+    return struct.Dungeon(
+        *_roll(dice, 0, len(struct.Dungeon._fields), randrange))
 
 
-def roll_party(dice: int, randrange: RandRange) -> Party:
+def roll_party(dice: int, randrange: struct.RandRange) -> struct.Party:
     """Roll a new Party using given number of dice."""
-    return Party(*_roll(dice, 0, len(Party._fields), randrange))
+    return struct.Party(*_roll(dice, 0, len(struct.Party._fields), randrange))
 
 
-def new_game() -> World:
+def new_game() -> struct.World:
     """Establish a new game independent of a delve/dungeon."""
-    return World(
+    return struct.World(
         delve=0,
         depth=None,
         experience=0,
         ability=None,
         dungeon=None,
         party=None,
-        treasure=copy.deepcopy(TREASURE_INITIAL),
-        reserve=copy.deepcopy(RESERVE_INITIAL),
+        treasure=copy.deepcopy(struct.TREASURE_INITIAL),
+        reserve=copy.deepcopy(struct.RESERVE_INITIAL),
     )
 
 
-def next_delve(world: World, randrange: RandRange, *, _party_dice=7) -> World:
+def next_delve(
+        world: struct.World, randrange: struct.RandRange, *, _party_dice=7
+) -> struct.World:
     """Establish new delve within a game, optionally transforming the party."""
     if world.delve >= 3:
         raise error.DrollError("At most three delves are permitted.")
@@ -102,10 +95,10 @@ def next_delve(world: World, randrange: RandRange, *, _party_dice=7) -> World:
 
 
 def next_dungeon(
-        world: World, randrange: RandRange, *,
+        world: struct.World, randrange: struct.RandRange, *,
         _max_depth=10,
         _dungeon_dice=7
-) -> World:
+) -> struct.World:
     """Move one dungeon deeper in the dungeon, retaining any partial dragons.
 
     If necessary, a ring of invisibility will be used to sneak past a dragon.
@@ -131,7 +124,7 @@ def next_dungeon(
     return world._replace(depth=next_depth, dungeon=dungeon)
 
 
-def retire(world: World) -> World:
+def retire(world: struct.World) -> struct.World:
     """Retire to the tavern after completing the present dungeon.
 
     If monsters or a dragon remains, either ring of invisibility or
@@ -164,7 +157,7 @@ def retire(world: World) -> World:
     )
 
 
-def retreat(world: World) -> World:
+def retreat(world: struct.World) -> struct.World:
     """Retreat to the tavern without completing the present dungeon."""
     if world.depth == 0:
         raise error.DrollError("Descend at least once prior to retreating.")
@@ -177,7 +170,7 @@ def retreat(world: World) -> World:
     )
 
 
-def score(world: World) -> int:
+def score(world: struct.World) -> int:
     """Compute the present score for the game, including all treasure."""
     return (
             world.experience +
@@ -188,18 +181,20 @@ def score(world: World) -> int:
 
 
 # There are likely much, much faster implementations.
-def _draw(reserve: Treasure, randrange: RandRange) -> str:
+def _draw(reserve: struct.Treasure, randrange: struct.RandRange) -> str:
     seq = functools.reduce(
         itertools.chain,
         (itertools.repeat(t, reserve[i])
-         for i, t in enumerate(Treasure._fields)),
+         for i, t in enumerate(struct.Treasure._fields)),
         [])
     seq = tuple(seq)
     assert len(seq) > 1, "Presently no items remaining in the reserve"
     return seq[randrange(0, len(seq))]
 
 
-def draw_treasure(world: World, randrange: RandRange) -> World:
+def draw_treasure(
+        world: struct.World, randrange: struct.RandRange
+) -> struct.World:
     """Draw a single item from the reserve into the player's treasures."""
     drawn = _draw(reserve=world.reserve, randrange=randrange)
     treasure = world.treasure._replace(
@@ -210,7 +205,7 @@ def draw_treasure(world: World, randrange: RandRange) -> World:
     return world._replace(treasure=treasure, reserve=reserve)
 
 
-def replace_treasure(world: World, item: str) -> World:
+def replace_treasure(world: struct.World, item: str) -> struct.World:
     """Replace a single item from the player's treasures into the reserve."""
     prior_count = getattr(world.treasure, item)
     if not prior_count:
@@ -223,7 +218,7 @@ def replace_treasure(world: World, item: str) -> World:
     )
 
 
-def apply_ring(world: World, *, noun: str = 'ring') -> World:
+def apply_ring(world: struct.World, *, noun: str = 'ring') -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     if not blocking_dragon(world.dungeon):
         raise error.DrollError('A dragon must be present to use a {}'
@@ -232,12 +227,12 @@ def apply_ring(world: World, *, noun: str = 'ring') -> World:
     return world._replace(dungeon=world.dungeon._replace(dragon=0))
 
 
-def apply_portal(world: World, *, noun: str = 'portal') -> World:
+def apply_portal(world: struct.World, *, noun: str = 'portal') -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):
         raise error.DrollError('No need to apply {} when dungeon clear'
                                .format(noun))
     return replace_treasure(world, 'portal')._replace(
-        dungeon=Dungeon(*([0] * len(Dungeon._fields)))
+        dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields)))
     )
