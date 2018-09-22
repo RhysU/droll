@@ -8,8 +8,7 @@ import functools
 import itertools
 import typing
 
-from .error import DrollError
-# TODO Less namespace pollution by importing package only
+from . import error
 from .struct import Dungeon, Party, Treasure, World
 from .struct import RESERVE_INITIAL, TREASURE_INITIAL
 
@@ -92,7 +91,7 @@ def new_game() -> World:
 def next_delve(world: World, randrange: RandRange, *, _party_dice=7) -> World:
     """Establish new delve within a game, optionally transforming the party."""
     if world.delve >= 3:
-        raise DrollError("At most three delves are permitted.")
+        raise error.DrollError("At most three delves are permitted.")
     return world._replace(
         delve=(world.delve if world.delve else 0) + 1,
         depth=0,
@@ -112,19 +111,19 @@ def next_dungeon(
     If necessary, a ring of invisibility will be used to sneak past a dragon.
     Adheres to the specified number of dice available in the game."""
     if not defeated_monsters(world.dungeon):
-        raise DrollError('Must defeat enemies to proceed to next dungeon.')
+        raise error.DrollError('Must defeat enemies to proceed to next dungeon.')
 
     if not defeated_dungeon(world.dungeon):
         try:
             world = apply_ring(world)
-        except DrollError:
-            raise DrollError("Dragon remains but a ring of"
-                             " invisibility is not in hand.")
+        except error.DrollError:
+            raise error.DrollError("Dragon remains but a ring of"
+                                   " invisibility is not in hand.")
 
     # Success above, so update the world in anticipation of the next dungeon
     next_depth = (world.depth if world.depth else 0) + 1
     if next_depth > _max_depth:
-        raise DrollError("The maximum depth is {}".format(_max_depth))
+        raise error.DrollError("The maximum depth is {}".format(_max_depth))
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
     dungeon = roll_dungeon(dice=min(_dungeon_dice - prior_dragons, next_depth),
                            randrange=randrange)
@@ -138,23 +137,23 @@ def retire(world: World) -> World:
     If monsters or a dragon remains, either ring of invisibility or
     a town portal will be used when available."""
     if world.depth == 0:
-        raise DrollError("Descend at least once prior to retiring.")
+        raise error.DrollError("Descend at least once prior to retiring.")
 
     if not defeated_monsters(world.dungeon):
         try:
             world = apply_portal(world)
-        except DrollError:
-            raise DrollError('Monsters remain but no town portal in hand.')
+        except error.DrollError:
+            raise error.DrollError('Monsters remain but no portal in hand.')
     elif blocking_dragon(world.dungeon):
         # First attempt to use a ring then a portal (because portals are +2)
         try:
             world = apply_ring(world)
-        except DrollError:
+        except error.DrollError:
             try:
                 world = apply_portal(world)
-            except DrollError:
-                raise DrollError("Dragon remains but neither a ring of"
-                                 " invisibility nor a town portal in hand.")
+            except error.DrollError:
+                raise error.DrollError("Dragon remains but neither a ring of"
+                                       " invisibility nor a portal in hand.")
 
     # TODO Upgrade hero's ability after hitting 5 experience points
     # Success above, so update the world in anticipation of the next delve
@@ -168,9 +167,9 @@ def retire(world: World) -> World:
 def retreat(world: World) -> World:
     """Retreat to the tavern without completing the present dungeon."""
     if world.depth == 0:
-        raise DrollError("Descend at least once prior to retreating.")
+        raise error.DrollError("Descend at least once prior to retreating.")
     if defeated_dungeon(world.dungeon):
-        raise DrollError("Why retreat when you could instead retire?")
+        raise error.DrollError("Why retreat when you could instead retire?")
 
     return world._replace(
         depth=0,
@@ -215,7 +214,7 @@ def replace_treasure(world: World, item: str) -> World:
     """Replace a single item from the player's treasures into the reserve."""
     prior_count = getattr(world.treasure, item)
     if not prior_count:
-        raise DrollError("'{}' not in player's treasure".format(item))
+        raise error.DrollError("'{}' not in player's treasure".format(item))
     return world._replace(
         treasure=world.treasure._replace(
             **{item: prior_count - 1}),
@@ -227,7 +226,8 @@ def replace_treasure(world: World, item: str) -> World:
 def apply_ring(world: World, *, noun: str = 'ring') -> World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     if not blocking_dragon(world.dungeon):
-        raise DrollError('A dragon must be present to use a {}'.format(noun))
+        raise error.DrollError('A dragon must be present to use a {}'
+                               .format(noun))
     world = replace_treasure(world, noun)
     return world._replace(dungeon=world.dungeon._replace(dragon=0))
 
@@ -236,7 +236,8 @@ def apply_portal(world: World, *, noun: str = 'portal') -> World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):
-        raise DrollError('No need to apply {} when dungeon clear'.format(noun))
+        raise error.DrollError('No need to apply {} when dungeon clear'
+                               .format(noun))
     return replace_treasure(world, 'portal')._replace(
         dungeon=Dungeon(*([0] * len(Dungeon._fields)))
     )
