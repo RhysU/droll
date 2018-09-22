@@ -7,9 +7,9 @@ import random
 import typing
 
 from . import action
-from . import brief
 from . import error
 from . import player
+from . import struct
 from . import world
 
 
@@ -33,7 +33,7 @@ class Shell(cmd.Cmd):
 
     def summary(self) -> str:
         """Brief, string description of the present game state."""
-        return '(None)' if self._world is None else brief(self._world)
+        return '(None)' if self._world is None else struct.brief(self._world)
 
     def preloop(self):
         """Prepare a new game and start the first delve."""

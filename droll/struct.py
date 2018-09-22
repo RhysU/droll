@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Type definitions, generally of the struct-like variety."""
 import collections
+import typing
 
 Dungeon = collections.namedtuple('Dungeon', (
     'goblin',
@@ -62,3 +63,16 @@ World = collections.namedtuple('World', (
     'treasure',
     'reserve',
 ))
+
+
+def brief(o: typing.Any, *, omitted: typing.Set[str] = {'reserve'}) -> str:
+    """A __str__(...) variant suppressing False fields within namedtuples."""
+    fields = getattr(o, '_fields', None)
+    if fields is None:
+        return str(o)
+
+    keyvalues = []
+    for field, value in zip(fields, o):
+        if value and field not in omitted:
+            keyvalues.append('{}={}'.format(field, brief(value)))
+    return '({})'.format(', '.join(keyvalues))
