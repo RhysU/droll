@@ -6,8 +6,8 @@
 import copy
 import functools
 import itertools
-import typing
 
+from . import dice
 from . import error
 from . import struct
 
@@ -38,33 +38,6 @@ def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
                                  not blocking_dragon(dungeon))
 
 
-def _roll(
-        dice: int,
-        start: int,
-        stop: int,
-        randrange: struct.RandRange
-) -> typing.List[int]:
-    assert dice >= 0, "At least one die must be requested"
-    result = [0] * (stop - start)
-    for _ in range(dice):
-        result[randrange(start, stop)] += 1
-    return result
-
-
-def roll_dungeon(dice: int, randrange: struct.RandRange) -> struct.Dungeon:
-    """Roll a new Dungeon using given number of dice.
-
-    On Dungeon N one should account for the number of extant dragons."""
-    assert dice >= 1, "At least one dice required (requested {})".format(dice)
-    return struct.Dungeon(
-        *_roll(dice, 0, len(struct.Dungeon._fields), randrange))
-
-
-def roll_party(dice: int, randrange: struct.RandRange) -> struct.Party:
-    """Roll a new Party using given number of dice."""
-    return struct.Party(*_roll(dice, 0, len(struct.Party._fields), randrange))
-
-
 def new_game() -> struct.World:
     """Establish a new game independent of a delve/dungeon."""
     return struct.World(
@@ -80,7 +53,7 @@ def new_game() -> struct.World:
 
 
 def next_delve(
-        world: struct.World, randrange: struct.RandRange, *, _party_dice=7
+        world: struct.World, randrange: dice.RandRange, *, _party_dice=7
 ) -> struct.World:
     """Establish new delve within a game, optionally transforming the party."""
     if world.delve >= 3:
@@ -90,12 +63,12 @@ def next_delve(
         depth=0,
         ability=True,
         dungeon=None,
-        party=roll_party(dice=_party_dice, randrange=randrange),
+        party=dice.roll_party(dice=_party_dice, randrange=randrange),
     )
 
 
 def next_dungeon(
-        world: struct.World, randrange: struct.RandRange, *,
+        world: struct.World, randrange: dice.RandRange, *,
         _max_depth=10,
         _dungeon_dice=7
 ) -> struct.World:
@@ -118,8 +91,9 @@ def next_dungeon(
     if next_depth > _max_depth:
         raise error.DrollError("The maximum depth is {}".format(_max_depth))
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
-    dungeon = roll_dungeon(dice=min(_dungeon_dice - prior_dragons, next_depth),
-                           randrange=randrange)
+    dungeon = dice.roll_dungeon(dice=min(_dungeon_dice - prior_dragons,
+                                         next_depth),
+                                randrange=randrange)
     dungeon = dungeon._replace(dragon=dungeon.dragon + prior_dragons)
     return world._replace(depth=next_depth, dungeon=dungeon)
 
@@ -180,8 +154,8 @@ def score(world: struct.World) -> int:
     )
 
 
-# There are likely much, much faster implementations.
-def _draw(reserve: struct.Treasure, randrange: struct.RandRange) -> str:
+# There are definitely much, much better implementations.
+def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
     seq = functools.reduce(
         itertools.chain,
         (itertools.repeat(t, reserve[i])
@@ -193,7 +167,7 @@ def _draw(reserve: struct.Treasure, randrange: struct.RandRange) -> str:
 
 
 def draw_treasure(
-        world: struct.World, randrange: struct.RandRange
+        world: struct.World, randrange: dice.RandRange
 ) -> struct.World:
     """Draw a single item from the reserve into the player's treasures."""
     drawn = _draw(reserve=world.reserve, randrange=randrange)

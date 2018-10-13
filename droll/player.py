@@ -6,6 +6,7 @@
 import typing
 
 from . import action
+from . import dice
 from . import error
 from . import struct
 from . import world
@@ -90,7 +91,7 @@ DEFAULT = struct.Player(
 def apply(
         player: struct.Player,
         game: struct.World,
-        randrange: struct.RandRange,
+        randrange: dice.RandRange,
         noun: str,
         target: str = None,
         *additional

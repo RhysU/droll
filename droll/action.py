@@ -6,13 +6,14 @@
 import operator
 import typing
 
+from . import dice
 from . import error
 from . import struct
 from . import world
 
 
 def defeat_one(
-        game: struct.World, randrange: struct.RandRange, hero: str, target: str
+        game: struct.World, randrange: dice.RandRange, hero: str, target: str
 ) -> struct.World:
     """Update game after hero handles exactly one target."""
     return game._replace(
@@ -40,7 +41,7 @@ def __decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
 
 
 def defeat_all(
-        game: struct.World, randrange: struct.RandRange, hero: str, target: str
+        game: struct.World, randrange: dice.RandRange, hero: str, target: str
 ) -> struct.World:
     """Update game after hero handles all of one type of target."""
     return game._replace(
@@ -57,7 +58,7 @@ def __eliminate_targets(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
 
 
 def open_one(
-        game: struct.World, randrange: struct.RandRange, hero: str, target: str,
+        game: struct.World, randrange: dice.RandRange, hero: str, target: str,
         *, _after_monsters=True
 ) -> struct.World:
     """Update game after hero opens exactly one chest."""
@@ -70,7 +71,7 @@ def open_one(
 
 
 def open_all(
-        game: struct.World, randrange: struct.RandRange, hero: str, target: str,
+        game: struct.World, randrange: dice.RandRange, hero: str, target: str,
         *, _after_monsters=True
 ) -> struct.World:
     """Update game after hero opens all chests."""
@@ -88,7 +89,7 @@ def open_all(
 
 
 def quaff(
-        game: struct.World, randrange: struct.RandRange, hero: str, target: str,
+        game: struct.World, randrange: dice.RandRange, hero: str, target: str,
         *revivable, _after_monsters=True
 ) -> struct.World:
     """Update game after hero quaffs all available potions.
@@ -111,7 +112,7 @@ def quaff(
 
 
 def reroll(
-        game: struct.World, randrange: struct.RandRange, hero: str, *targets
+        game: struct.World, randrange: dice.RandRange, hero: str, *targets
 ) -> struct.World:
     """Update game after hero rerolls some number of targets."""
     if not targets:
@@ -125,7 +126,7 @@ def reroll(
         reduced = __decrement_target(reduced, target)
 
     # Re-roll the necessary number of dice then add to anything left fixed
-    increased = world.roll_dungeon(dice=len(targets), randrange=randrange)
+    increased = dice.roll_dungeon(dice=len(targets), randrange=randrange)
     return game._replace(
         party=__decrement_hero(game.party, hero),
         dungeon=struct.Dungeon(*tuple(map(operator.add, reduced, increased)))
@@ -133,7 +134,7 @@ def reroll(
 
 
 def defeat_dragon(
-        game: struct.World, randrange: struct.RandRange, hero: str, target: str,
+        game: struct.World, randrange: dice.RandRange, hero: str, target: str,
         *others,
         _disallowed_heroes: typing.Iterable[str] = ('scroll'),
         _min_length: int = 3,
@@ -174,7 +175,7 @@ def defeat_dragon(
 
 
 def bait_dragon(
-        game: struct.World, randrange: struct.RandRange, noun: str,
+        game: struct.World, randrange: dice.RandRange, noun: str,
         target: typing.Optional[str] = None,
         *,
         _enemies: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze')
@@ -204,7 +205,7 @@ def bait_dragon(
 
 
 def ring(
-        game: struct.World, randrange: struct.RandRange, noun: str,
+        game: struct.World, randrange: dice.RandRange, noun: str,
         target: typing.Optional[str] = None,
 ) -> struct.World:
     """Use a ring of invisibility to sneak past a dragon."""
@@ -215,7 +216,7 @@ def ring(
 
 
 def portal(
-        game: struct.World, randrange: struct.RandRange, noun: str,
+        game: struct.World, randrange: dice.RandRange, noun: str,
         target: typing.Optional[str] = None,
 ) -> struct.World:
     """Use a town portal towards retiring to town.
@@ -233,7 +234,7 @@ def portal(
 
 
 def elixir(
-        game: struct.World, randrange: struct.RandRange, noun: str, target: str
+        game: struct.World, randrange: dice.RandRange, noun: str, target: str
 ) -> struct.World:
     """Add one hero die of any requested type."""
     return world.replace_treasure(game, noun)._replace(
@@ -248,7 +249,7 @@ def __consume_ability(game: struct.World):
 
 
 def nop_ability(
-        game: struct.World, randrange: struct.RandRange, noun: str,
+        game: struct.World, randrange: dice.RandRange, noun: str,
         target: typing.Optional[str] = None,
 ) -> struct.World:
     """No ability available though its consumption is tracked"""
