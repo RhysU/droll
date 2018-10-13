@@ -74,7 +74,8 @@ class Shell(cmd.Cmd):
         """Invoke the player's ability."""
         with ShellManager():
             self._world = player.apply(self._player, self._world,
-                                       self._randrange, 'ability', *parse(line))
+                                       self._randrange, 'ability',
+                                       *parse(line))
 
     def default(self, line):
         """Apply some named hero or treasure to some collection of nouns."""

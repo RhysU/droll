@@ -151,7 +151,8 @@ def apply(
         if quantity >= 0:
             continue
         for _ in range(-min(0, quantity)):
-            game = world.replace_treasure(game, getattr(player.artifacts, hero))
+            game = world.replace_treasure(game,
+                                          getattr(player.artifacts, hero))
         game = game._replace(party=game.party._replace(**{hero: 0}))
 
     return game

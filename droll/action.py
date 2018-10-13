@@ -50,7 +50,9 @@ def defeat_all(
     )
 
 
-def __eliminate_targets(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
+def __eliminate_targets(
+        dungeon: struct.Dungeon, target: str
+) -> struct.Dungeon:
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise error.DrollError("Require at least one target {}".format(target))

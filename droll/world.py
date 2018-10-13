@@ -77,7 +77,7 @@ def next_dungeon(
     If necessary, a ring of invisibility will be used to sneak past a dragon.
     Adheres to the specified number of dice available in the game."""
     if not defeated_monsters(world.dungeon):
-        raise error.DrollError('Must defeat enemies to proceed to next dungeon.')
+        raise error.DrollError('Must defeat foes to proceed to next dungeon.')
 
     if not defeated_dungeon(world.dungeon):
         try:
