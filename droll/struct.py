@@ -5,10 +5,6 @@
 import collections
 import typing
 
-# TODO Explicitly model roll_party using randrange
-# TODO Explicitly model roll_dungeon using randrange?
-# TODO Explicitly model roll_treasure using randrange?
-RandRange = typing.Callable[[int, int], int]
 
 Dungeon = collections.namedtuple('Dungeon', (
     'goblin',
@@ -27,6 +23,14 @@ Party = collections.namedtuple('Party', (
     'champion',
     'scroll',
 ))
+
+RandRange = typing.Callable[[int, int], int]
+
+# TODO Plumb custom rolling logic through Player just below
+Roll = collections.namedtuple('Roll', [
+    'dungeon',  # typing.Callable[[int, RandRange], Dungeon]
+    'party',    # typing.Callable[[int, RandRange], Party]
+])
 
 Player = collections.namedtuple('Player', (
     'ability',
