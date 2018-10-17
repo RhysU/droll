@@ -8,6 +8,8 @@ import typing
 from . import struct
 
 RandRange = typing.Callable[[int, int], int]
+RollDungeon = typing.Callable[[int, RandRange], struct.Dungeon]
+RollParty = typing.Callable[[int, RandRange], struct.Party]
 
 
 def _roll(
@@ -26,6 +28,7 @@ def _roll(
 def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
     """Roll a new Dungeon using given number of dice.
 
+    Any implementation must follow type signature of RollDungeon.
     On Dungeon N one should account for the number of extant dragons."""
     assert dice >= 1, "At least one dice required (requested {})".format(dice)
     return struct.Dungeon(
@@ -33,5 +36,7 @@ def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
 
 
 def roll_party(dice: int, randrange: RandRange) -> struct.Party:
-    """Roll a new Party using given number of dice."""
+    """Roll a new Party using given number of dice.
+
+    Any implementation must follow type signature of RollParty."""
     return struct.Party(*_roll(dice, 0, len(struct.Party._fields), randrange))
