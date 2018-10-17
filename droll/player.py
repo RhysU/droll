@@ -21,8 +21,11 @@ DEFAULT = struct.Player(
     elixir=action.elixir,
     portal=action.portal,
     ring=action.ring,
-    # Behavior at specific lifecycle events
-    # TODO Plumb in roll
+    # Behavior at specific lifecycle events?
+    roll=struct.Roll(
+        dungeon=dice.roll_dungeon,
+        party=dice.roll_party,
+    ),
     # How do artifacts map to heroes?
     artifacts=struct.Party(
         fighter='sword',

@@ -24,7 +24,6 @@ Party = collections.namedtuple('Party', (
     'scroll',
 ))
 
-# TODO Plumb custom rolling logic through Player just below
 Roll = collections.namedtuple('Roll', [
     'dungeon',
     'party',
@@ -36,6 +35,7 @@ Player = collections.namedtuple('Player', (
     'elixir',
     'portal',
     'ring',
+    'roll',
     'artifacts',
     'party',
 ))

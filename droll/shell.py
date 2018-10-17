@@ -38,7 +38,9 @@ class Shell(cmd.Cmd):
     def preloop(self):
         """Prepare a new game and start the first delve."""
         w = world.new_game()
-        w = world.next_delve(w, self._randrange)
+        w = world.next_delve(w,
+                             self._player.roll.party,
+                             self._randrange)
         self._world = w
         # Causes printing of initial world state
         self.postcmd(stop=False, line='')
@@ -87,7 +89,9 @@ class Shell(cmd.Cmd):
         """Descend to the next depth (in contrast to retiring/retreating)."""
         with ShellManager():
             no_arguments(line)
-            self._world = world.next_dungeon(self._world, self._randrange)
+            self._world = world.next_dungeon(self._world,
+                                             self._player.roll.dungeon,
+                                             self._randrange)
 
     def do_retire(self, line):
         """Retire to the tavern after successfully clearing a dungeon depth..
@@ -111,8 +115,9 @@ class Shell(cmd.Cmd):
     def _next_delve_or_exit(self) -> bool:
         """Either start next delve or exit the game, printing final score."""
         try:
-            self._world = world.next_delve(
-                self._world, self._randrange)
+            self._world = world.next_delve(self._world,
+                                           self._player.roll.party,
+                                           self._randrange)
             return False
         except error.DrollError:
             return True
@@ -132,7 +137,9 @@ class Shell(cmd.Cmd):
         if self._world.ability and dungeon_dice:
             possible.append('ability')
         with ShellManager(verbose=False):
-            world.next_dungeon(self._world, dummy_randrange)
+            world.next_dungeon(self._world,
+                               self._player.roll.dungeon,
+                               dummy_randrange)
             possible.append('descend')
         with ShellManager(verbose=False):
             world.retire(self._world)

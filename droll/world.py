@@ -53,9 +53,15 @@ def new_game() -> struct.World:
 
 
 def next_delve(
-        world: struct.World, randrange: dice.RandRange, *, _party_dice=7
+        world: struct.World,
+        roll_party: dice.RollParty,
+        randrange: dice.RandRange,
+        *,
+        _party_dice: int = 7
 ) -> struct.World:
-    """Establish new delve within a game, optionally transforming the party."""
+    """Establish new delve within a game, optionally transforming the party.
+
+    Argument roll_party can be dice.roll_party but other choices okay."""
     if world.delve >= 3:
         raise error.DrollError("At most three delves are permitted.")
     return world._replace(
@@ -63,18 +69,22 @@ def next_delve(
         depth=0,
         ability=True,
         dungeon=None,
-        party=dice.roll_party(dice=_party_dice, randrange=randrange),
+        party=roll_party(_party_dice, randrange),
     )
 
 
 def next_dungeon(
-        world: struct.World, randrange: dice.RandRange, *,
-        _max_depth=10,
-        _dungeon_dice=7
+        world: struct.World,
+        roll_dungeon: dice.RollDungeon,
+        randrange: dice.RandRange,
+        *,
+        _max_depth: int = 10,
+        _dungeon_dice: int = 7
 ) -> struct.World:
     """Move one dungeon deeper in the dungeon, retaining any partial dragons.
 
     If necessary, a ring of invisibility will be used to sneak past a dragon.
+    Argument roll_dungeon can be dice.roll_dungeon but other choices okay
     Adheres to the specified number of dice available in the game."""
     if not defeated_monsters(world.dungeon):
         raise error.DrollError('Must defeat foes to proceed to next dungeon.')
@@ -91,9 +101,8 @@ def next_dungeon(
     if next_depth > _max_depth:
         raise error.DrollError("The maximum depth is {}".format(_max_depth))
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
-    dungeon = dice.roll_dungeon(dice=min(_dungeon_dice - prior_dragons,
-                                         next_depth),
-                                randrange=randrange)
+    dungeon = roll_dungeon(min(_dungeon_dice - prior_dragons, next_depth),
+                           randrange)
     dungeon = dungeon._replace(dragon=dungeon.dragon + prior_dragons)
     return world._replace(depth=next_depth, dungeon=dungeon)
 
