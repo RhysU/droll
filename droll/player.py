@@ -22,7 +22,7 @@ DEFAULT = struct.Player(
     portal=action.portal,
     ring=action.ring,
     # Behavior at specific lifecycle events
-    transformer=lambda x: x,
+    # TODO Plumb in roll
     # How do artifacts map to heroes?
     artifacts=struct.Party(
         fighter='sword',

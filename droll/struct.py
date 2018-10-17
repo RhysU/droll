@@ -38,7 +38,6 @@ Player = collections.namedtuple('Player', (
     'elixir',
     'portal',
     'ring',
-    'transformer',
     'artifacts',
     'party',
 ))
