@@ -14,7 +14,7 @@ def _roll(
         dice: int,
         start: int,
         stop: int,
-        randrange: struct.RandRange
+        randrange: RandRange
 ) -> typing.List[int]:
     assert dice >= 0, "At least one die must be requested"
     result = [0] * (stop - start)
@@ -23,7 +23,7 @@ def _roll(
     return result
 
 
-def roll_dungeon(dice: int, randrange: struct.RandRange) -> struct.Dungeon:
+def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
     """Roll a new Dungeon using given number of dice.
 
     On Dungeon N one should account for the number of extant dragons."""
@@ -32,6 +32,6 @@ def roll_dungeon(dice: int, randrange: struct.RandRange) -> struct.Dungeon:
         *_roll(dice, 0, len(struct.Dungeon._fields), randrange))
 
 
-def roll_party(dice: int, randrange: struct.RandRange) -> struct.Party:
+def roll_party(dice: int, randrange: RandRange) -> struct.Party:
     """Roll a new Party using given number of dice."""
     return struct.Party(*_roll(dice, 0, len(struct.Party._fields), randrange))

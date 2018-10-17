@@ -24,12 +24,10 @@ Party = collections.namedtuple('Party', (
     'scroll',
 ))
 
-RandRange = typing.Callable[[int, int], int]
-
 # TODO Plumb custom rolling logic through Player just below
 Roll = collections.namedtuple('Roll', [
-    'dungeon',  # typing.Callable[[int, RandRange], Dungeon]
-    'party',    # typing.Callable[[int, RandRange], Party]
+    'dungeon',
+    'party',
 ])
 
 Player = collections.namedtuple('Player', (
