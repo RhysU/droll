@@ -6,17 +6,20 @@ import argparse
 import random
 import sys
 
+from .heroes import KNOWN
 from .shell import Shell
 
 
 def main(args=None):
     parser = argparse.ArgumentParser(prog='droll', description=__doc__)
+    parser.add_argument('hero', choices=KNOWN.keys(),
+                        help='Select the hero for this game.')
     parser.add_argument('--seed', metavar='N', type=int, nargs=1, default=None,
-                        help='an integer to seed random number generation')
+                        help='An integer to seed random number generation.')
     arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
     randrange = random.Random(*randseed).randrange
-    s = Shell(randrange=randrange)
+    s = Shell(randrange=randrange, player=KNOWN.get(arguments.hero))
     s.cmdloop()
 
 

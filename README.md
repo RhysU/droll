@@ -27,7 +27,7 @@ will catch onto in the space of 20 minutes.
 ## What does it look like?
 
 ```
-$ python -m droll --seed 4
+$ droll Default --seed 4
 (delve=1, depth=1, ability=True, dungeon=(goblin=1), party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), treasure=())
 (droll  0) cleric goblin
 
