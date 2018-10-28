@@ -15,6 +15,7 @@ from . import world
 # Effectively, this data is one large, dense dispatch table.
 # Other players will generally be defined in terms of this one.
 DEFAULT = struct.Player(
+    name='Default',
     # Behavior of special commands?
     ability=action.nop_ability,
     bait=action.bait_dragon,
