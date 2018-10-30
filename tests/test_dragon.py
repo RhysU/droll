@@ -34,7 +34,7 @@ def _randrange():
 
 
 def test_successful(game, randrange):
-    game = player.apply(player.DEFAULT, game, randrange,
+    game = player.apply(player.Default, game, randrange,
                         'fighter', 'dragon', 'cleric', 'mage')
     assert game.party.fighter == 1
     assert game.party.cleric == 1
@@ -47,7 +47,7 @@ def test_successful(game, randrange):
 def test_treasure_slot1(game, randrange):
     game = game._replace(treasure=game.treasure._replace(sword=7))
     game = game._replace(party=game.party._replace(fighter=0))
-    game = player.apply(player.DEFAULT, game, randrange,  # Notice sword!
+    game = player.apply(player.Default, game, randrange,  # Notice sword!
                         'fighter', 'dragon', 'cleric', 'mage')
     assert game.treasure.sword == 6
     assert game.party.fighter == 0
@@ -61,7 +61,7 @@ def test_treasure_slot1(game, randrange):
 def test_treasure_slot3(game, randrange):
     game = game._replace(treasure=game.treasure._replace(talisman=7))
     game = game._replace(party=game.party._replace(cleric=0))
-    game = player.apply(player.DEFAULT, game, randrange,  # Notice talisman!
+    game = player.apply(player.Default, game, randrange,  # Notice talisman!
                         'fighter', 'dragon', 'cleric', 'mage')
     assert game.treasure.talisman == 6
     assert game.party.fighter == 1
@@ -75,7 +75,7 @@ def test_treasure_slot3(game, randrange):
 def test_treasure_slot2(game, randrange):
     game = game._replace(treasure=game.treasure._replace(sceptre=7))
     game = game._replace(party=game.party._replace(mage=0))
-    game = player.apply(player.DEFAULT, game, randrange,  # Notice talisman!
+    game = player.apply(player.Default, game, randrange,  # Notice talisman!
                         'fighter', 'dragon', 'cleric', 'mage')
     assert game.treasure.sceptre == 6
     assert game.party.fighter == 1
@@ -91,36 +91,36 @@ def test_monsters_remain(game, randrange):
         dungeon=game.dungeon._replace(goblin=1)
     )
     with pytest.raises(error.DrollError):
-        player.apply(player.DEFAULT, game, randrange,
+        player.apply(player.Default, game, randrange,
                      'fighter', 'dragon', 'cleric', 'mage')
 
 
 def test_too_few_specified(game, randrange):
     with pytest.raises(error.DrollError):
-        player.apply(player.DEFAULT, game, randrange,
+        player.apply(player.Default, game, randrange,
                      'fighter', 'dragon', 'cleric')
 
     with pytest.raises(error.DrollError):
-        player.apply(player.DEFAULT, game, randrange,
+        player.apply(player.Default, game, randrange,
                      'fighter', 'dragon')
 
 
 def test_not_enough_distinct(game, randrange):
     with pytest.raises(error.DrollError):
-        player.apply(player.DEFAULT, game, randrange,
+        player.apply(player.Default, game, randrange,
                      'fighter', 'dragon', 'mage', 'mage')
 
 
 def test_ring(game, randrange):
     with pytest.raises(error.DrollError):  # No ring
-        player.apply(player.DEFAULT, game, randrange,
+        player.apply(player.Default, game, randrange,
                      'ring', 'dragon')
 
     with pytest.raises(error.DrollError):  # No ring and implied dragon
-        player.apply(player.DEFAULT, game, randrange,
+        player.apply(player.Default, game, randrange,
                      'ring')
 
     attempt = game._replace(treasure=game.treasure._replace(ring=1))
-    pass1 = player.apply(player.DEFAULT, attempt, randrange,
+    pass1 = player.apply(player.Default, attempt, randrange,
                          'ring', 'dragon')
     assert pass1.dungeon.dragon == 0

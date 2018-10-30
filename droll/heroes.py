@@ -4,7 +4,11 @@
 """Hero definitions."""
 import collections
 
+from . import action
+from . import dice
 from . import player
+from . import struct
+
 
 # TODO Implement the following initial characters
 # TODO Implement promotion after 5 experience points
@@ -17,6 +21,24 @@ from . import player
 # Minstrel -> Bard
 # Half-goblin -> Chieftan
 
+
+def knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
+    """Roll a new Party, changing all Scrolls into Champions."""
+    default = dice.roll_party(dice=count, randrange=randrange)
+    return default._replace(
+        scroll=0,
+        champion=default.champion + default.scroll
+    )
+
+
+Knight = player.Default._replace(
+    ability=action.bait_dragon,
+    roll=player.Default.roll._replace(
+        party=knight_roll_party,
+    )
+)
+
 KNOWN = collections.OrderedDict([
-    ('Default', player.DEFAULT),
+    ('Default', player.Default),
+    ('Knight', Knight),
 ])

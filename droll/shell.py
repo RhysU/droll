@@ -25,7 +25,7 @@ class Shell(cmd.Cmd):
     # LIFECYCLE BELOW HERE
     ######################
 
-    def __init__(self, *, player=player.DEFAULT, randrange=None):
+    def __init__(self, *, player=player.Default, randrange=None):
         super(Shell, self).__init__()
         self._player = player
         self._randrange = (random.Random().randrange

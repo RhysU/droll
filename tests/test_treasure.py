@@ -28,17 +28,17 @@ def _randrange():
 
 def test_elixir(game, randrange):
     game = game._replace(treasure=game.treasure._replace(elixir=1))
-    game = player.apply(player.DEFAULT, game, randrange, 'elixir', 'cleric')
+    game = player.apply(player.Default, game, randrange, 'elixir', 'cleric')
     assert game.party.cleric == 1
     assert game.treasure.elixir == 0
 
     with pytest.raises(error.DrollError):
-        player.apply(player.DEFAULT, game, randrange, 'elixir', 'mage')
+        player.apply(player.Default, game, randrange, 'elixir', 'mage')
 
 
 def test_bait(game, randrange):
     game = game._replace(treasure=game.treasure._replace(bait=2))
-    game = player.apply(player.DEFAULT, game, randrange, 'bait', 'dragon')
+    game = player.apply(player.Default, game, randrange, 'bait', 'dragon')
     assert game.treasure.bait == 1
     assert game.dungeon.goblin == 0
     assert game.dungeon.skeleton == 0
@@ -46,25 +46,25 @@ def test_bait(game, randrange):
     assert game.dungeon.dragon == 8
 
     with pytest.raises(error.DrollError):
-        player.apply(player.DEFAULT, game, randrange, 'bait')
+        player.apply(player.Default, game, randrange, 'bait')
 
 
 # Should behave identically to test_fighter inside test_player.py,
 def helper_sword(identifier, game):
     """Test sword when referred to via identifier (e.g. 'sword', 'fighter'."""
     game = game._replace(treasure=game.treasure._replace(sword=2))
-    game = player.apply(player.DEFAULT, game, None, identifier, 'goblin')
+    game = player.apply(player.Default, game, None, identifier, 'goblin')
     assert game.treasure.sword == 1
     assert game.party.fighter == 0
     assert game.dungeon.goblin == 0
 
-    game = player.apply(player.DEFAULT, game, None, identifier, 'ooze')
+    game = player.apply(player.Default, game, None, identifier, 'ooze')
     assert game.treasure.sword == 0
     assert game.party.fighter == 0
     assert game.dungeon.ooze == 1
 
     with pytest.raises(error.DrollError):
-        player.apply(player.DEFAULT, game, None, identifier, 'ooze')
+        player.apply(player.Default, game, None, identifier, 'ooze')
 
 
 def test_sword_via_fighter(game):

@@ -14,7 +14,7 @@ from . import world
 # Rules governing a default player lacking any special abilities.
 # Effectively, this data is one large, dense dispatch table.
 # Other players will generally be defined in terms of this one.
-DEFAULT = struct.Player(
+Default = struct.Player(
     # Behavior of special commands?
     ability=action.nop_ability,
     bait=action.bait_dragon,
