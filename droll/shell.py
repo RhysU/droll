@@ -4,6 +4,7 @@
 """A REPL permitting playing a game via a tab-completion shell."""
 import cmd
 import random
+import textwrap
 import typing
 
 from . import action
@@ -193,6 +194,11 @@ class Shell(cmd.Cmd):
         return (['do_' + x for x in names] +
                 ['help_' + x for x in names
                  if not getattr(self, 'do_' + x, None)])
+
+    def help_ability(self):
+        print(self.do_ability.__doc__)
+        print()
+        print(textwrap.indent(self._player.ability.__doc__, '    '))
 
     def help_bait(self):
         print(action.bait_dragon.__doc__)

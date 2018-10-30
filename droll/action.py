@@ -253,7 +253,7 @@ def nop_ability(
         game: struct.World, randrange: dice.RandRange, noun: str,
         target: typing.Optional[str] = None,
 ) -> struct.World:
-    """No ability available though its consumption is tracked"""
+    """No special ability available (though its consumption is tracked)"""
     if target is not None:
         raise error.DrollError('No targets accepted for {}'.format(noun))
     return __consume_ability(game)
