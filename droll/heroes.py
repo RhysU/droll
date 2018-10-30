@@ -31,6 +31,7 @@ def knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
     )
 
 
+# TODO Increment bait treasure prior to calling bait_dragon
 Knight = player.Default._replace(
     ability=action.bait_dragon,
     roll=player.Default.roll._replace(
