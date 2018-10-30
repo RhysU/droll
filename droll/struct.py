@@ -30,7 +30,6 @@ Roll = collections.namedtuple('Roll', [
 ])
 
 Player = collections.namedtuple('Player', (
-    'name',
     'ability',
     'bait',
     'elixir',
