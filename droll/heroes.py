@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions."""
 import collections
+import functools
 
 from . import action
 from . import dice
@@ -31,9 +32,13 @@ def knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
     )
 
 
-# TODO Increment bait treasure prior to calling bait_dragon
+@functools.wraps(action.bait_dragon)
+def knight_bait_dragon(*args, **kwargs):
+    return action.bait_dragon(*args, _require_treasure=False, **kwargs)
+
+
 Knight = player.Default._replace(
-    ability=action.bait_dragon,
+    ability=knight_bait_dragon,
     roll=player.Default.roll._replace(
         party=knight_roll_party,
     )

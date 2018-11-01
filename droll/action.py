@@ -180,14 +180,16 @@ def bait_dragon(
         game: struct.World, randrange: dice.RandRange, noun: str,
         target: typing.Optional[str] = None,
         *,
-        _enemies: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze')
+        _enemies: typing.Sequence[str] = ('goblin', 'skeleton', 'ooze'),
+        _require_treasure: bool = True
 ) -> struct.World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target
     target = 'dragon' if target is None else target
     if target != 'dragon':
         raise error.DrollError('Cannot {} a {}'.format(noun, target))
-    game = world.replace_treasure(game, noun)
+    if _require_treasure:
+        game = world.replace_treasure(game, noun)
 
     # Compute how many new dragons will be produced and remove sources
     new_targets = 0
