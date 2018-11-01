@@ -140,7 +140,7 @@ def defeat_dragon(
         *others,
         _disallowed_heroes: typing.Iterable[str] = ('scroll'),
         _min_length: int = 3,
-        _min_heroes: int = 3
+        _distinct_heroes: int = 3
 ) -> struct.World:
     """Update game after hero handles a dragon using multiple distinct heroes.
 
@@ -152,9 +152,9 @@ def defeat_dragon(
     if not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Enemy {} only comes after all others defeated."
                                .format(target))
-    if len(others) != _min_heroes - 1:
+    if len(others) != _distinct_heroes - 1:
         raise error.DrollError("A total of {} heroes must be specified."
-                               .format(_min_heroes))
+                               .format(_distinct_heroes))
 
     # Confirm required number of distinct heroes available
     party = __decrement_hero(game.party, hero)
@@ -162,7 +162,7 @@ def defeat_dragon(
     for other in others:
         party = __decrement_hero(party, other)
         distinct_heroes.add(other)
-    if len(distinct_heroes) != _min_heroes:
+    if len(distinct_heroes) != _distinct_heroes:
         raise error.DrollError("The {} heroes must all be distinct")
     if distinct_heroes & set(_disallowed_heroes):
         raise error.DrollError("Heroes {} cannot defeat {}"
