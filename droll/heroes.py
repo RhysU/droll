@@ -45,6 +45,9 @@ Knight = player.Default._replace(
     )
 )
 
+# TODO Minimum of two instead of three to defeat the dragon
+DragonSlayer = Knight
+
 KNOWN = collections.OrderedDict([
     ('Default', player.Default),
     ('Knight', Knight),
