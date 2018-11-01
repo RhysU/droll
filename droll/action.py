@@ -246,7 +246,7 @@ def elixir(
     )
 
 
-def __consume_ability(game: struct.World):
+def consume_ability(game: struct.World):
     if not game.ability:
         raise error.DrollError("Ability not available for use.")
     return game._replace(ability=False)
@@ -259,4 +259,4 @@ def nop_ability(
     """No special ability available (though its consumption is tracked)"""
     if target is not None:
         raise error.DrollError('No targets accepted for {}'.format(noun))
-    return __consume_ability(game)
+    return consume_ability(game)

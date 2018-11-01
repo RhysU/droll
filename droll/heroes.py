@@ -34,7 +34,8 @@ def knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
 
 @functools.wraps(action.bait_dragon)
 def knight_bait_dragon(*args, **kwargs):
-    return action.bait_dragon(*args, _require_treasure=False, **kwargs)
+    return action.consume_ability(
+        action.bait_dragon(*args, _require_treasure=False, **kwargs))
 
 
 Knight = player.Default._replace(
