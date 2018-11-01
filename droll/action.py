@@ -194,9 +194,10 @@ def bait_dragon(
     # Compute how many new dragons will be produced and remove sources
     new_targets = 0
     dungeon = game.dungeon
-    for enemy in _enemies:
-        new_targets += getattr(game.dungeon, enemy)
-        dungeon = dungeon._replace(**{enemy: 0})
+    if dungeon is not None:
+        for enemy in _enemies:
+            new_targets += getattr(game.dungeon, enemy)
+            dungeon = dungeon._replace(**{enemy: 0})
     if not new_targets:
         raise error.DrollError("At least one of {} required for '{}'"
                                .format(_enemies, noun))
