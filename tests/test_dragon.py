@@ -105,6 +105,12 @@ def test_too_few_specified(game, randrange):
                      'fighter', 'dragon')
 
 
+def test_too_many_specified(game, randrange):
+    with pytest.raises(error.DrollError):
+        player.apply(player.Default, game, randrange,
+                     'fighter', 'dragon', 'cleric', 'mage', 'thief')
+
+
 def test_not_enough_distinct(game, randrange):
     with pytest.raises(error.DrollError):
         player.apply(player.Default, game, randrange,
