@@ -8,6 +8,7 @@ import random
 import pytest
 
 import droll.error as error
+import droll.heroes as heroes
 import droll.player as player
 import droll.struct as struct
 import droll.world as world
@@ -104,11 +105,21 @@ def test_too_few_specified(game, randrange):
         player.apply(player.Default, game, randrange,
                      'fighter', 'dragon')
 
+    # Dragon Slayer requires only two
+    with pytest.raises(error.DrollError):
+        player.apply(heroes.DragonSlayer, game, randrange,
+                     'fighter', 'dragon')
+
 
 def test_too_many_specified(game, randrange):
     with pytest.raises(error.DrollError):
         player.apply(player.Default, game, randrange,
                      'fighter', 'dragon', 'cleric', 'mage', 'thief')
+
+    # Dragon Slayer requires only two
+    with pytest.raises(error.DrollError):
+        player.apply(heroes.DragonSlayer, game, randrange,
+                     'fighter', 'dragon', 'cleric', 'mage')
 
 
 def test_not_enough_distinct(game, randrange):
