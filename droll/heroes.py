@@ -15,7 +15,6 @@ from . import struct
 # TODO Implement promotion after 5 experience points
 # Spellsword -> Battlemage
 # Crusader -> Paladin
-# Knight -> Dragon Slayer
 # Mercenary -> Commander
 # Enchantress -> Beguiler
 # Occultist -> Necromancer
