@@ -45,8 +45,43 @@ Knight = player.Default._replace(
     )
 )
 
-# TODO Minimum of two instead of three to defeat the dragon
-DragonSlayer = Knight
+
+@functools.wraps(action.defeat_dragon_heroes)
+def dragonslayer_defeat_dragon_heroes(*args, **kwargs):
+    return action.defeat_dragon_heroes(*args, **kwargs, _distinct_heroes=2)
+
+
+@functools.wraps(action.defeat_dragon)
+def dragonslayer_defeat_dragon(*args, **kwargs):
+    return action.defeat_dragon(
+        *args,
+        **kwargs,
+        _defeat_dragon_heroes=dragonslayer_defeat_dragon_heroes)
+
+
+DragonSlayer = Knight._replace(
+    party=Knight.party._replace(
+        fighter=Knight.party.fighter._replace(
+            dragon=dragonslayer_defeat_dragon,
+        ),
+        cleric=Knight.party.cleric._replace(
+            dragon=dragonslayer_defeat_dragon,
+        ),
+        mage=Knight.party.mage._replace(
+            dragon=dragonslayer_defeat_dragon,
+        ),
+        thief=Knight.party.thief._replace(
+            dragon=dragonslayer_defeat_dragon,
+        ),
+        champion=Knight.party.champion._replace(
+            dragon=dragonslayer_defeat_dragon,
+        ),
+        scroll=Knight.party.scroll._replace(
+            dragon=dragonslayer_defeat_dragon,
+        ),
+    )
+
+)
 
 KNOWN = collections.OrderedDict([
     ('Default', player.Default),
