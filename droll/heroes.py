@@ -7,8 +7,8 @@ import functools
 
 from . import action
 from . import dice
-from . import player
 from . import struct
+from .player import Default
 
 
 # TODO Implement the following initial characters
@@ -48,45 +48,46 @@ def dragonslayer_defeat_dragon(*args, **kwargs):
         **kwargs,
         _defeat_dragon_heroes=dragonslayer_defeat_dragon_heroes)
 
+
 # Defined in terms of Default, not Knight, to permit advance(...) closure
-DragonSlayer = player.Default._replace(
+DragonSlayer = Default._replace(
     ability=knight_bait_dragon,
     advance=(lambda _: DragonSlayer),  # Cannot advance further
-    roll=player.Default.roll._replace(
+    roll=Default.roll._replace(
         party=knight_roll_party,
     ),
-    party=player.Default.party._replace(
-        fighter=player.Default.party.fighter._replace(
+    party=Default.party._replace(
+        fighter=Default.party.fighter._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        cleric=player.Default.party.cleric._replace(
+        cleric=Default.party.cleric._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        mage=player.Default.party.mage._replace(
+        mage=Default.party.mage._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        thief=player.Default.party.thief._replace(
+        thief=Default.party.thief._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        champion=player.Default.party.champion._replace(
+        champion=Default.party.champion._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        scroll=player.Default.party.scroll._replace(
+        scroll=Default.party.scroll._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
     )
 )
 
 # Defined after DragonSlayer to permit advance(...) closure
-Knight = player.Default._replace(
+Knight = Default._replace(
     ability=knight_bait_dragon,
     advance=(lambda world: Knight if world.experience < 5 else DragonSlayer),
-    roll=player.Default.roll._replace(
+    roll=Default.roll._replace(
         party=knight_roll_party,
     )
 )
 
 KNOWN = collections.OrderedDict([
-    ('Default', player.Default),
+    ('Default', Default),
     ('Knight', Knight),
 ])
