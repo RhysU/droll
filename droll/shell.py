@@ -59,6 +59,16 @@ class Shell(cmd.Cmd):
         score = world.score(self._world) if self._world else 0
         self.prompt = '(droll {:-2d}) '.format(score)
 
+    def _next_delve_or_exit(self) -> bool:
+        """Either start next delve or exit the game, printing final score."""
+        try:
+            self._world = world.next_delve(self._world,
+                                           self._player.roll.party,
+                                           self._randrange)
+            return False
+        except error.DrollError:
+            return True
+
     def do_EOF(self, line):
         """End-of-file causes shell exit."""
         return True
@@ -110,16 +120,6 @@ class Shell(cmd.Cmd):
             no_arguments(line)
             self._world = world.retreat(self._world)
             return self._next_delve_or_exit()
-
-    def _next_delve_or_exit(self) -> bool:
-        """Either start next delve or exit the game, printing final score."""
-        try:
-            self._world = world.next_delve(self._world,
-                                           self._player.roll.party,
-                                           self._randrange)
-            return False
-        except error.DrollError:
-            return True
 
     #######################
     # COMPLETION BELOW HERE
