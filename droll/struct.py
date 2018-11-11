@@ -31,6 +31,7 @@ Roll = collections.namedtuple('Roll', [
 
 Player = collections.namedtuple('Player', (
     'ability',
+    'advance',
     'bait',
     'elixir',
     'portal',

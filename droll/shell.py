@@ -62,9 +62,12 @@ class Shell(cmd.Cmd):
     def _next_delve_or_exit(self) -> bool:
         """Either start next delve or exit the game, printing final score."""
         try:
+            # Record any world updates
             self._world = world.next_delve(self._world,
                                            self._player.roll.party,
                                            self._randrange)
+            # Permit the player to advance to higher abilities
+            self._player = self._player.advance(self._world)
             return False
         except error.DrollError:
             return True

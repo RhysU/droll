@@ -17,6 +17,9 @@ from . import world
 Default = struct.Player(
     # Behavior of special commands?
     ability=action.nop_ability,
+    # Advance maps struct.World -> struct.Player, permitting promotion.
+    # However, the Default player is not promotable.
+    advance=(lambda _: Default),
     bait=action.bait_dragon,
     elixir=action.elixir,
     portal=action.portal,

@@ -12,7 +12,6 @@ from . import struct
 
 
 # TODO Implement the following initial characters
-# TODO Implement promotion after 5 experience points
 # Spellsword -> Battlemage
 # Crusader -> Paladin
 # Mercenary -> Commander
@@ -37,14 +36,6 @@ def knight_bait_dragon(*args, **kwargs):
         action.bait_dragon(*args, _require_treasure=False, **kwargs))
 
 
-Knight = player.Default._replace(
-    ability=knight_bait_dragon,
-    roll=player.Default.roll._replace(
-        party=knight_roll_party,
-    )
-)
-
-
 @functools.wraps(action.defeat_dragon_heroes)
 def dragonslayer_defeat_dragon_heroes(*args, **kwargs):
     return action.defeat_dragon_heroes(*args, **kwargs, _distinct_heroes=2)
@@ -57,29 +48,42 @@ def dragonslayer_defeat_dragon(*args, **kwargs):
         **kwargs,
         _defeat_dragon_heroes=dragonslayer_defeat_dragon_heroes)
 
-
-DragonSlayer = Knight._replace(
-    party=Knight.party._replace(
-        fighter=Knight.party.fighter._replace(
+# Defined in terms of Default, not Knight, to permit advance(...) closure
+DragonSlayer = player.Default._replace(
+    ability=knight_bait_dragon,
+    advance=(lambda _: DragonSlayer),  # Cannot advance further
+    roll=player.Default.roll._replace(
+        party=knight_roll_party,
+    ),
+    party=player.Default.party._replace(
+        fighter=player.Default.party.fighter._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        cleric=Knight.party.cleric._replace(
+        cleric=player.Default.party.cleric._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        mage=Knight.party.mage._replace(
+        mage=player.Default.party.mage._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        thief=Knight.party.thief._replace(
+        thief=player.Default.party.thief._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        champion=Knight.party.champion._replace(
+        champion=player.Default.party.champion._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
-        scroll=Knight.party.scroll._replace(
+        scroll=player.Default.party.scroll._replace(
             dragon=dragonslayer_defeat_dragon,
         ),
     )
+)
 
+# Defined after DragonSlayer to permit advance(...) closure
+Knight = player.Default._replace(
+    ability=knight_bait_dragon,
+    advance=(lambda world: Knight if world.experience < 5 else DragonSlayer),
+    roll=player.Default.roll._replace(
+        party=knight_roll_party,
+    )
 )
 
 KNOWN = collections.OrderedDict([
