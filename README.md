@@ -10,9 +10,9 @@ and then come back here.
 
 ## What is implemented?
 
-Not much more than default player semantics and treasures (i.e. no abilities, no
-special rules like fighters/mages equivalent, no promotion after experience
-level 5).
+Default player semantics (i.e. no special abilities).  Special semantics for
+the Knight with advancement to DragonSlayer after 5 experience points.  Other
+characters remain to be done.
 
 ## Why implement it?
 
