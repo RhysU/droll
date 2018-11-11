@@ -38,11 +38,9 @@ class Shell(cmd.Cmd):
 
     def preloop(self):
         """Prepare a new game and start the first delve."""
-        w = world.new_game()
-        w = world.next_delve(w,
-                             self._player.roll.party,
-                             self._randrange)
-        self._world = w
+        self._world = world.new_game()
+        if self._next_delve_or_exit():
+            raise RuntimeError('Unexpected True during preloop()')
         # Causes printing of initial world state
         self.postcmd(stop=False, line='')
 
