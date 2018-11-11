@@ -15,7 +15,7 @@ from . import world
 
 
 # TODO Populate intro
-# TODO action.portal interacts poorly with above  _next_delve_or_exit(...).
+# TODO action.portal interacts poorly with _next_delve_or_exit(...).
 
 
 class Shell(cmd.Cmd):

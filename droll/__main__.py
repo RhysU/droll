@@ -23,7 +23,5 @@ def main(args=None):
     s.cmdloop()
 
 
-# TODO Permit specifying different players
-# TODO Picking up the random seed could be much simpler
 if __name__ == '__main__':
     main(sys.argv[1:])

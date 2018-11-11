@@ -131,8 +131,8 @@ def retire(world: struct.World) -> struct.World:
                 raise error.DrollError("Dragon remains but neither a ring of"
                                        " invisibility nor a portal in hand.")
 
-    # TODO Upgrade hero's ability after hitting 5 experience points
     # Success above, so update the world in anticipation of the next delve
+    # Upgrading a hero's ability after 5 experience points is done elsewhere.
     return world._replace(
         depth=0,
         experience=world.experience + world.depth,

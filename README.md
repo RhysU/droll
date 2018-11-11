@@ -12,7 +12,7 @@ and then come back here.
 
 Default player semantics (i.e. no special abilities).  Special semantics for
 the Knight with advancement to DragonSlayer after 5 experience points.  Other
-characters remain to be done.
+characters remain to be done.  Known shortcomings are flagged with TODOs.
 
 ## Why implement it?
 
@@ -22,66 +22,129 @@ the score is very straightforward, and (c) there's some probabilistic behavior
 in both the basic die mechanics as well as the expected value of the treasure.
 
 Also, I was curious how much code was required to capture a game that children
-will catch onto in the space of 20 minutes.
+will catch onto in the space of 20 minutes.  And, I wanted to stick to
+collections.namedtuple and free functions instead of OOPing all-the-things.
 
 ## What does it look like?
 
 ```
-$ droll Default --seed 4
-(delve=1, depth=1, ability=True, dungeon=(goblin=1), party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), treasure=())
-(droll  0) cleric goblin
+$ droll --seed 7 Knight
 
-(delve=1, depth=1, ability=True, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=2, scroll=1), treasure=())
+(delve=1, party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
+(droll  0) help
+
+Feasible commands (help <command>):
+===================================
+descend
+
+
+(delve=1, party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
 (droll  0) descend
 
-(delve=1, depth=2, ability=True, dungeon=(goblin=2), party=(fighter=1, cleric=1, mage=1, thief=2, scroll=1), treasure=())
+(delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
+(droll  0) help
+
+Feasible commands (help <command>):
+===================================
+ability  champion   cleric   fighter   mage   retreat  thief
+
+
+(delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
+(droll  0) help fighter
+Attack monsters, quaff potions, and open chests with a fighter like so:
+
+        champion skeleton            # Attack skeleton(s)
+        thief chest                  # Open chest(s)
+        fighter potion mage thief    # Drink 2 potions obtaining mage, thief
+        mage dragon champion cleric  # Attack dragon with party of 3
+
+
+(delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
 (droll  0) fighter goblin
 
-(delve=1, depth=2, ability=True, dungeon=(), party=(cleric=1, mage=1, thief=2, scroll=1), treasure=())
+(delve=1, depth=1, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
 (droll  0) descend
 
-(delve=1, depth=3, ability=True, dungeon=(ooze=1, chest=1, potion=1), party=(cleric=1, mage=1, thief=2, scroll=1), treasure=())
-(droll  0) thief ooze
+(delve=1, depth=2, dungeon=(ooze=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
+(droll  0) mage ooze
 
-(delve=1, depth=3, ability=True, dungeon=(chest=1, potion=1), party=(cleric=1, mage=1, thief=1, scroll=1), treasure=())
+(delve=1, depth=2, dungeon=(potion=1), party=(fighter=1, cleric=1, thief=1, champion=2), ability=True, treasure=())
+(droll  0) champion potion mage
+
+(delve=1, depth=2, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
+(droll  0) descend
+
+(delve=1, depth=3, dungeon=(goblin=1, skeleton=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
+(droll  0) help ability
+Invoke the player's ability.
+
+    Convert all monster faces into dragon dice.
+
+(delve=1, depth=3, dungeon=(goblin=1, skeleton=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
+(droll  0) ability
+
+(delve=1, depth=3, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
+(droll  0) help
+
+Feasible commands (help <command>):
+===================================
+champion   cleric   descend  fighter   mage   retire  thief
+
+
+(delve=1, depth=3, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
+(droll  0) descend
+
+(delve=1, depth=4, dungeon=(goblin=2, chest=2, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
+(droll  0) fighter goblin
+
+(delve=1, depth=4, dungeon=(chest=2, dragon=2), party=(cleric=1, mage=1, thief=1, champion=1), treasure=())
 (droll  0) thief chest
 
-(delve=1, depth=3, ability=True, dungeon=(potion=1), party=(cleric=1, mage=1, scroll=1), treasure=(talisman=1))
-(droll  1) scroll potion
-Require exactly 1 to revive
+(delve=1, depth=4, dungeon=(dragon=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1, elixir=1))
+(droll  2) descend
 
-(delve=1, depth=3, ability=True, dungeon=(potion=1), party=(cleric=1, mage=1, scroll=1), treasure=(talisman=1))
-(droll  1) scroll potion champion
+(delve=1, depth=5, dungeon=(goblin=2, chest=1, potion=2, dragon=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1, elixir=1))
+(droll  2) champion goblin
 
-(delve=1, depth=3, ability=True, dungeon=(), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1))
-(droll  1) descend
+(delve=1, depth=5, dungeon=(chest=1, potion=2, dragon=2), party=(cleric=1, mage=1), treasure=(talisman=1, elixir=1))
+(droll  2) mage potion champion thief
 
-(delve=1, depth=4, ability=True, dungeon=(skeleton=1, ooze=1, potion=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1))
-(droll  1) cleric skeleton
+(delve=1, depth=5, dungeon=(chest=1, dragon=2), party=(cleric=1, thief=1, champion=1), treasure=(talisman=1, elixir=1))
+(droll  2) thief chest
 
-(delve=1, depth=4, ability=True, dungeon=(ooze=1, potion=2), party=(mage=1, champion=1), treasure=(talisman=1))
-(droll  1) mage ooze
+(delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
+(droll  3) help retreat
+Retreat from the dungeon at any time (e.g. after being defeated).
 
-(delve=1, depth=4, ability=True, dungeon=(potion=2), party=(champion=1), treasure=(talisman=1))
-(droll  1) champion potion champion fighter
+        Automatically starts a new delve or ends game, as suitable.
 
-(delve=1, depth=4, ability=True, dungeon=(), party=(fighter=1, champion=1), treasure=(talisman=1))
-(droll  1) descend
+(delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
+(droll  3) retreat
+Why retreat when you could instead retire?
 
-(delve=1, depth=5, ability=True, dungeon=(goblin=1, skeleton=2, ooze=2), party=(fighter=1, champion=1), treasure=(talisman=1))
-(droll  1) champion ooze
+(delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
+(droll  3) retire
 
-(delve=1, depth=5, ability=True, dungeon=(goblin=1, skeleton=2), party=(fighter=1), treasure=(talisman=1))
-(droll  1) talisman skeleton
+(delve=2, experience=5, party=(fighter=1, cleric=1, champion=5), ability=True, treasure=(talisman=1, sceptre=1, elixir=1))
+(droll  8) descend
 
-(delve=1, depth=5, ability=True, dungeon=(goblin=1), party=(fighter=1), treasure=())
-(droll  0) fighter goblin
+(delve=2, depth=1, experience=5, dungeon=(chest=1), party=(fighter=1, cleric=1, champion=5), ability=True, treasure=(talisman=1, sceptre=1, elixir=1))
+(droll  8) champion chest
 
-(delve=1, depth=5, ability=True, dungeon=(), party=(), treasure=())
-(droll  0) retire
+(delve=2, depth=1, experience=5, dungeon=(), party=(fighter=1, cleric=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
+(droll  9) descend
 
-(delve=2, depth=1, experience=5, ability=True, dungeon=(ooze=1), party=(fighter=1, cleric=2, mage=3, scroll=1), treasure=())
-(droll  5) ^D
+(delve=2, depth=2, experience=5, dungeon=(goblin=1, skeleton=1), party=(fighter=1, cleric=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
+(droll  9) talisman goblin
+
+(delve=2, depth=2, experience=5, dungeon=(skeleton=1), party=(fighter=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
+(droll  9) sceptre skeleton
+
+(delve=2, depth=2, experience=5, dungeon=(), party=(fighter=1, champion=4), ability=True, treasure=(talisman=2, elixir=1))
+(droll  8) elixir mage
+
+(delve=2, depth=2, experience=5, dungeon=(), party=(fighter=1, mage=1, champion=4), ability=True, treasure=(talisman=2))
+(droll  7) ^D
 ```
 
 ## Testing
