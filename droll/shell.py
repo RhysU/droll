@@ -15,7 +15,6 @@ from . import world
 
 
 # TODO Populate intro
-# TODO action.portal interacts poorly with _next_delve_or_exit(...).
 
 
 class Shell(cmd.Cmd):
@@ -222,12 +221,6 @@ class Shell(cmd.Cmd):
     def help_mage(self):
         print(self.doc_hero_template.format('mage'))
         print(self.doc_hero_example)
-
-    def help_portal(self):
-        print(action.portal.__doc__)
-
-    def help_ring(self):
-        print(action.ring.__doc__)
 
     def help_sceptre(self):
         print("""Sceptres behave identically to a mage.""")

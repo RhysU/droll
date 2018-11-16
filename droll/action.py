@@ -217,34 +217,6 @@ def bait_dragon(
     )
 
 
-def ring(
-        game: struct.World, randrange: dice.RandRange, noun: str,
-        target: typing.Optional[str] = None,
-) -> struct.World:
-    """Use a ring of invisibility to sneak past a dragon."""
-    target = 'dragon' if target is None else target
-    if target != 'dragon':
-        raise error.DrollError('Cannot {} a {}'.format(noun, target))
-    return world.apply_ring(world=game, noun=noun)
-
-
-def portal(
-        game: struct.World, randrange: dice.RandRange, noun: str,
-        target: typing.Optional[str] = None,
-) -> struct.World:
-    """Use a town portal towards retiring to town.
-
-    Automatically starts a new delve, if possible."""
-    if target is not None:
-        raise error.DrollError('No targets accepted for {}'.format(noun))
-    game = world.retire(world.apply_portal(world=game, noun=noun))
-    try:
-        game = world.next_delve(world=game, randrange=randrange)
-    except error.DrollError:
-        pass
-    return game
-
-
 def elixir(
         game: struct.World, randrange: dice.RandRange, noun: str, target: str
 ) -> struct.World:

@@ -22,8 +22,6 @@ Default = struct.Player(
     advance=(lambda _: Default),
     bait=action.bait_dragon,
     elixir=action.elixir,
-    portal=action.portal,
-    ring=action.ring,
     # Behavior at specific lifecycle events?
     roll=struct.Roll(
         dungeon=dice.roll_dungeon,
@@ -113,7 +111,11 @@ def apply(
     additional = tuple(partify(i, player.artifacts) for i in additional)
 
     # One-off handling of some treasures, with error wrapping to aid usability
-    if noun in {'ability', 'bait', 'elixir', 'ring', 'portal'}:
+    if noun == 'portal':
+        raise error.DrollError('To use a portal, directly "retire".')
+    if noun == 'ring':
+        raise error.DrollError('To use a ring, directly "descend" or "retire".')
+    if noun in {'ability', 'bait', 'elixir'}:
         try:
             action = getattr(player, noun)
             return action(game, randrange, noun, target, *additional)

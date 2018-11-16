@@ -126,18 +126,3 @@ def test_not_enough_distinct(game, randrange):
     with pytest.raises(error.DrollError):
         player.apply(player.Default, game, randrange,
                      'fighter', 'dragon', 'mage', 'mage')
-
-
-def test_ring(game, randrange):
-    with pytest.raises(error.DrollError):  # No ring
-        player.apply(player.Default, game, randrange,
-                     'ring', 'dragon')
-
-    with pytest.raises(error.DrollError):  # No ring and implied dragon
-        player.apply(player.Default, game, randrange,
-                     'ring')
-
-    attempt = game._replace(treasure=game.treasure._replace(ring=1))
-    pass1 = player.apply(player.Default, attempt, randrange,
-                         'ring', 'dragon')
-    assert pass1.dungeon.dragon == 0
