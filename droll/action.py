@@ -151,15 +151,15 @@ def defeat_dragon(
         *others,
         _defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
         _disallowed_heroes: typing.Sequence[str] = ('scroll'),
-        _min_length: int = 3
+        _min_dragon_length: int = 3
 ) -> struct.World:
     """Update game after hero handles a dragon using multiple distinct heroes.
 
     Additional required heroes are specified within variable-length others."""
     # Simple prerequisites for attempting to defeat the dragon
-    if game.dungeon.dragon < _min_length:
+    if game.dungeon.dragon < _min_dragon_length:
         raise error.DrollError("Enemy {} only comes at length {}"
-                               .format(target, _min_length))
+                               .format(target, _min_dragon_length))
     if not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Enemy {} only comes after all others defeated."
                                .format(target))
