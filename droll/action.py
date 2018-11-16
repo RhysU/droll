@@ -136,7 +136,10 @@ def reroll(
 
 
 def defeat_dragon_heroes(*heroes, _distinct_heroes: int = 3) -> bool:
-    """Have sufficiently many distinct heroes been provided to slay dragon?"""
+    """Have sufficiently many distinct heroes been provided to slay dragon?
+
+    Specifically, in the case when all heroes must be distinct.
+    """
     if len(heroes) != _distinct_heroes:
         raise error.DrollError("Exactly {} heroes must be specified."
                                .format(_distinct_heroes))
@@ -144,6 +147,18 @@ def defeat_dragon_heroes(*heroes, _distinct_heroes: int = 3) -> bool:
         raise error.DrollError("The {} heroes must all be distinct",
                                _distinct_heroes)
     return True
+
+
+def defeat_dragon_heroes_interchangeable(
+        *heroes,
+        _interchangeable: typing.Set[str],
+        _distinct_heroes: int = 3
+) -> bool:
+    """Have sufficiently many distinct heroes been provided to slay dragon?
+
+    Specifically, in the case when 'A may be used as B and B may be used as A.
+    """
+    pass  # FIXME
 
 
 def defeat_dragon(
