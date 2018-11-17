@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
 
+import collections
 import operator
 import typing
 
@@ -160,16 +161,37 @@ def defeat_dragon_heroes_interchangeable(
         *heroes,
         _interchangeable: typing.Set[str],
         _disallowed_heroes: typing.Sequence[str] = ('scroll',),
-        _distinct_heroes: int = 3
+        _required_heroes: int = 3
 ) -> bool:
-    """Have sufficiently many distinct heroes been provided to slay dragon?
+    """Have sufficiently many heroes been provided to slay dragon?
 
-    Specifically, in the case when 'A may be used as B and B may be used as A.
+    Specifically, in the case when 'A may be used as B and B may be used as A'.
     """
     if {*heroes} & {*_disallowed_heroes}:
         raise error.DrollError("Heroes {} cannot defeat a dragon"
                                .format(_disallowed_heroes))
-    raise NotImplementedError()  # FIXME
+    if len(heroes) != _required_heroes:
+        raise error.DrollError("Exactly {} heroes must be specified."
+                               .format(_required_heroes))
+
+    # Count all heroes, accumulating all _interchangable into just one hero
+    counter = collections.Counter(*heroes)
+    interchangeable = list(sorted(_interchangeable))
+    while len(interchangeable) > 1:
+        counter[interchangeable[0]] += counter.pop(interchangeable.pop(), 0)
+
+    # Permit no more than number of distinct interchangeable heroes.
+    # For example, 'fighter fighter mage' is only two distinct types
+    # even when fighters and mages are interchangeable.
+    counter[interchangeable[0]] = min(counter[interchangeable[0]],
+                                      len(_interchangeable))
+
+    # Sum the number of distinct heroes observed after these coercions.
+    distinct_heroes = sum(v for k, v in counter.items())
+    if distinct_heroes != _required_heroes:
+        raise error.DrollError("Heroes {} not sufficiently distinct", heroes)
+
+    return True
 
 
 def defeat_dragon(
