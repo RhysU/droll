@@ -165,7 +165,7 @@ def defeat_dragon(
         game: struct.World, randrange: dice.RandRange, hero: str, target: str,
         *others,
         _defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
-        _disallowed_heroes: typing.Sequence[str] = ('scroll'),
+        _disallowed_heroes: typing.Sequence[str] = ('scroll', ),
         _min_dragon_length: int = 3
 ) -> struct.World:
     """Update game after hero handles a dragon using multiple distinct heroes.

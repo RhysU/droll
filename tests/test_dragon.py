@@ -122,6 +122,17 @@ def test_too_many_specified(game, randrange):
                      'fighter', 'dragon', 'cleric', 'mage')
 
 
+def test_one_scroll(game, randrange):
+    with pytest.raises(error.DrollError):
+        player.apply(player.Default, game, randrange,
+                     'fighter', 'dragon', 'cleric', 'scroll')
+
+    # Dragon Slayer requires only two
+    with pytest.raises(error.DrollError):
+        player.apply(heroes.DragonSlayer, game, randrange,
+                     'fighter', 'dragon', 'scroll')
+
+
 def test_not_enough_distinct(game, randrange):
     with pytest.raises(error.DrollError):
         player.apply(player.Default, game, randrange,
