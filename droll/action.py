@@ -135,11 +135,18 @@ def reroll(
     )
 
 
-def defeat_dragon_heroes(*heroes, _distinct_heroes: int = 3) -> bool:
+def defeat_dragon_heroes(
+        *heroes,
+        _disallowed_heroes: typing.Sequence[str] = ('scroll',),
+        _distinct_heroes: int = 3
+) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
 
     Specifically, in the case when all heroes must be distinct.
     """
+    if {*heroes} & {*_disallowed_heroes}:
+        raise error.DrollError("Heroes {} cannot defeat a dragon"
+                               .format(_disallowed_heroes))
     if len(heroes) != _distinct_heroes:
         raise error.DrollError("Exactly {} heroes must be specified."
                                .format(_distinct_heroes))
@@ -152,20 +159,23 @@ def defeat_dragon_heroes(*heroes, _distinct_heroes: int = 3) -> bool:
 def defeat_dragon_heroes_interchangeable(
         *heroes,
         _interchangeable: typing.Set[str],
+        _disallowed_heroes: typing.Sequence[str] = ('scroll',),
         _distinct_heroes: int = 3
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
 
     Specifically, in the case when 'A may be used as B and B may be used as A.
     """
-    pass  # FIXME
+    if {*heroes} & {*_disallowed_heroes}:
+        raise error.DrollError("Heroes {} cannot defeat a dragon"
+                               .format(_disallowed_heroes))
+    raise NotImplementedError()  # FIXME
 
 
 def defeat_dragon(
         game: struct.World, randrange: dice.RandRange, hero: str, target: str,
         *others,
         _defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
-        _disallowed_heroes: typing.Sequence[str] = ('scroll', ),
         _min_dragon_length: int = 3
 ) -> struct.World:
     """Update game after hero handles a dragon using multiple distinct heroes.
@@ -178,9 +188,6 @@ def defeat_dragon(
     if not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Enemy {} only comes after all others defeated."
                                .format(target))
-    if (hero in _disallowed_heroes) or ({*others} & {*_disallowed_heroes}):
-        raise error.DrollError("Heroes {} cannot defeat {}"
-                               .format(_disallowed_heroes, target))
 
     # Confirm required number of distinct heroes available
     party = __decrement_hero(game.party, hero)
