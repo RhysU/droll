@@ -7,6 +7,7 @@ import random
 
 import pytest
 
+import droll.action as action
 import droll.error as error
 import droll.heroes as heroes
 import droll.player as player
@@ -137,3 +138,32 @@ def test_not_enough_distinct(game, randrange):
     with pytest.raises(error.DrollError):
         player.apply(player.Default, game, randrange,
                      'fighter', 'dragon', 'mage', 'mage')
+
+
+# More directly test some hero-vs-dragon logic as it is more complicated.
+def test_defeat_dragon_heroes_interchangeable():
+    # Less interesting successful cases first
+    assert action.defeat_dragon_heroes_interchangeable(
+        'cleric', 'thief', 'mage',
+        _interchangeable={'fighter'})
+    assert action.defeat_dragon_heroes_interchangeable(
+        'cleric', 'thief', 'fighter',
+        _interchangeable={'fighter'})
+
+    # Less interesting failure cases next
+    with pytest.raises(error.DrollError):
+        assert action.defeat_dragon_heroes_interchangeable(
+            'cleric', 'thief',
+            _interchangeable={'fighter'})
+    with pytest.raises(error.DrollError):
+        assert action.defeat_dragon_heroes_interchangeable(
+            'cleric', 'fighter',
+            _interchangeable={'fighter'})
+    with pytest.raises(error.DrollError):
+        assert action.defeat_dragon_heroes_interchangeable(
+            'cleric', 'thief', 'champion', 'mage',
+            _interchangeable={'fighter'})
+    with pytest.raises(error.DrollError):
+        assert action.defeat_dragon_heroes_interchangeable(
+            'cleric', 'thief', 'champion', 'fighter',
+            _interchangeable={'fighter'})

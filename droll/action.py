@@ -175,8 +175,9 @@ def defeat_dragon_heroes_interchangeable(
                                .format(_required_heroes))
 
     # Count all heroes, accumulating all _interchangable into just one hero
-    counter = collections.Counter(*heroes)
+    counter = collections.Counter(heroes)
     interchangeable = list(sorted(_interchangeable))
+    assert len(interchangeable) > 0, 'At least one interchangeable required'
     while len(interchangeable) > 1:
         counter[interchangeable[0]] += counter.pop(interchangeable.pop(), 0)
 
