@@ -167,3 +167,9 @@ def test_defeat_dragon_heroes_interchangeable():
         assert action.defeat_dragon_heroes_interchangeable(
             'cleric', 'thief', 'champion', 'fighter',
             _interchangeable={'fighter'})
+
+    # More interesting successful cases
+    # TODO
+
+    # More interesting failure cases last
+    # TODO
