@@ -99,7 +99,7 @@ def spellsword_ability(
     """Spellsword usable as a fighter or a mage, adding one hero to party."""
     if target is None:
         target = next(sorted(_acceptable_targets))
-    if target not in _acceptable_targets
+    if target not in _acceptable_targets:
         raise error.DrollError('Target {} not one of {}'
                                .format(target, _acceptable_targets))
     return action.consume_ability(game._replace(
