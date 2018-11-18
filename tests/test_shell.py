@@ -6,7 +6,8 @@
 import random
 import typing
 
-from droll.heroes import Default, Knight, Spellsword
+from droll.heroes import Knight, Spellsword
+from droll.player import Default
 from droll.shell import Shell
 
 
