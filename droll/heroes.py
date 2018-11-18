@@ -96,9 +96,11 @@ def spellsword_ability(
         *,
         _acceptable_targets: typing.Set[str] = {'fighter', 'mage'}
 ) -> struct.World:
-    """Spellsword usable as a fighter or a mage, adding one hero to party."""
+    """Spellsword usable as a fighter or a mage, adding one hero to party.
+
+    Optionally, specify 'fighter' or 'mage' to select which to choose."""
     if target is None:
-        target = next(sorted(_acceptable_targets))
+        target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
         raise error.DrollError('Target {} not one of {}'
                                .format(target, _acceptable_targets))
