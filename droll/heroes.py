@@ -143,14 +143,16 @@ Battlemage = Default._replace(
     advance=(lambda _: Battlemage),  # Cannot advance further
     party=Default.party._replace(
         fighter=Default.party.fighter._replace(
-            ooze=Default.party.mage.ooze,  # Fighters used as mages
+            # Fighters usable as mages implies fighter.ooze as if a mage
+            ooze=Default.party.mage.ooze,
             dragon=spellsword_defeat_dragon,
         ),
         cleric=Default.party.cleric._replace(
             dragon=spellsword_defeat_dragon,
         ),
         mage=Default.party.mage._replace(
-            skeleton=Default.party.fighter.skeleton,  # Mages used as fighters
+            # Mages usable as fighters implies mage.skeleton as if a fighter
+            skeleton=Default.party.fighter.skeleton,
             dragon=spellsword_defeat_dragon,
         ),
         thief=Default.party.thief._replace(
@@ -165,7 +167,15 @@ Battlemage = Default._replace(
     )
 )
 
+# Defined after Battlemage to permit advance(...) closure
+Spellsword = Default._replace(
+    ability=spellsword_ability,
+    advance=(lambda world: Spellsword if world.experience < 5 else Battlemage),
+    party=Battlemage.party,
+)
+
 KNOWN = collections.OrderedDict([
     ('Default', Default),
     ('Knight', Knight),
+    ('Spellsword', Spellsword),
 ])

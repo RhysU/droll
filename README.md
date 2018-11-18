@@ -10,9 +10,10 @@ and then come back here.
 
 ## What is implemented?
 
-Default player semantics (i.e. no special abilities).  Special semantics for
-the Knight with advancement to DragonSlayer after 5 experience points.  Other
-characters remain to be done.  Known shortcomings are flagged with TODOs.
+Default player semantics (i.e. no special abilities).  Special semantics for the
+Knight with advancement to DragonSlayer after 5 experience points.  Also,
+semantics for Spellsword with advancement to Battlemage.  Other characters
+remain to be done.  Known shortcomings are flagged with TODOs.
 
 ## Why implement it?
 
