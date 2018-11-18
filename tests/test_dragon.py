@@ -123,6 +123,12 @@ def test_too_many_specified(game, randrange):
                      'fighter', 'dragon', 'cleric', 'mage')
 
 
+def test_only_heroes_accepted(game, randrange):
+    with pytest.raises(error.DrollError):
+        player.apply(player.Default, game, randrange,
+                     'fighter', 'dragon', 'cleric', 'foo')
+
+
 def test_one_scroll(game, randrange):
     with pytest.raises(error.DrollError):
         player.apply(player.Default, game, randrange,
@@ -138,9 +144,6 @@ def test_not_enough_distinct(game, randrange):
     with pytest.raises(error.DrollError):
         player.apply(player.Default, game, randrange,
                      'fighter', 'dragon', 'mage', 'mage')
-
-
-# TODO Test that non-hero names are not accepted
 
 
 # More directly test some hero-vs-dragon logic as it is more complicated.
