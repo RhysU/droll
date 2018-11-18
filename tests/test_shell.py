@@ -273,7 +273,7 @@ def test_knight():
 
 
 def test_spellsword():
-    """Runs the following scenario involving unique Spellsword details:
+    """Runs the following scenario involving unique Spellsword/Battlemage details:
 
     (delve=1, party=(cleric=1, mage=3, thief=1, champion=1, scroll=1), ability=True, treasure=())
     (droll  0) ability fighter
@@ -306,10 +306,37 @@ def test_spellsword():
     (droll  0) thief chest
 
     (delve=1, depth=4, dungeon=(dragon=3), party=(mage=2, champion=2), treasure=(elixir=1, scale=1))
-    (droll  2) mage dragon mage champion
+    (droll  2) champion dragon mage mage
 
     (delve=1, depth=4, experience=1, dungeon=(), party=(champion=1), treasure=(elixir=1, bait=1, scale=1))
-    (droll  4) EOF
+    (droll  4) retire
+
+    (delve=2, experience=5, party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) descend
+
+    (delve=2, depth=1, experience=5, dungeon=(skeleton=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) cleric skeleton
+
+    (delve=2, depth=1, experience=5, dungeon=(), party=(fighter=1, thief=1, champion=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) descend
+
+    (delve=2, depth=2, experience=5, dungeon=(skeleton=2), party=(fighter=1, thief=1, champion=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) champion skeleton
+
+    (delve=2, depth=2, experience=5, dungeon=(), party=(fighter=1, thief=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) descend
+
+    (delve=2, depth=3, experience=5, dungeon=(potion=2, dragon=1), party=(fighter=1, thief=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) scroll potion fighter mage
+
+    (delve=2, depth=3, experience=5, dungeon=(dragon=1), party=(fighter=2, mage=1, thief=1, scroll=2), ability=True, treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) descend
+
+    (delve=2, depth=4, experience=5, dungeon=(skeleton=1, ooze=1, potion=1, dragon=2), party=(fighter=2, mage=1, thief=1, scroll=2), ability=True, treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) ability
+
+    (delve=2, depth=4, experience=5, dungeon=(), party=(fighter=2, mage=1, thief=1, scroll=2), treasure=(elixir=1, bait=1, scale=1))
+    (droll  8) EOF
     """
     # Drive the game according to the script in the above docstring.
     s = Shell(randrange=random.Random(17).randrange, player=Spellsword)
