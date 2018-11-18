@@ -140,6 +140,9 @@ def test_not_enough_distinct(game, randrange):
                      'fighter', 'dragon', 'mage', 'mage')
 
 
+# TODO Test that non-hero names are not accepted
+
+
 # More directly test some hero-vs-dragon logic as it is more complicated.
 def test_defeat_dragon_heroes_interchangeable():
     # Less interesting successful cases first
