@@ -6,8 +6,8 @@
 import random
 import typing
 
+from droll.heroes import Default, Knight, Spellsword
 from droll.shell import Shell
-from droll.heroes import Default, Knight
 
 
 def test_initial():
@@ -266,6 +266,55 @@ def test_knight():
     s = Shell(randrange=random.Random(4).randrange, player=Knight)
     s.preloop()
     parsed = parse_summary_command(test_knight.__doc__)
+    for index, (expected_summary, following_command) in enumerate(parsed):
+        assert expected_summary == s.summary(), (
+            "Summary mismatch at {}".format(index))
+        s.onecmd(following_command)
+
+
+def test_spellsword():
+    """Runs the following scenario involving unique Spellsword details:
+
+    (delve=1, party=(cleric=1, mage=3, thief=1, champion=1, scroll=1), ability=True, treasure=())
+    (droll  0) ability fighter
+
+    (delve=1, party=(fighter=1, cleric=1, mage=3, thief=1, champion=1, scroll=1), treasure=())
+    (droll  0) descend
+
+    (delve=1, depth=1, dungeon=(dragon=1), party=(fighter=1, cleric=1, mage=3, thief=1, champion=1, scroll=1), treasure=())
+    (droll  0) descend
+
+    (delve=1, depth=2, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, mage=3, thief=1, champion=1, scroll=1), treasure=())
+    (droll  0) scroll potion champion
+
+    (delve=1, depth=2, dungeon=(dragon=2), party=(fighter=1, cleric=1, mage=3, thief=1, champion=2), treasure=())
+    (droll  0) descend
+
+    (delve=1, depth=3, dungeon=(goblin=2, ooze=1, dragon=2), party=(fighter=1, cleric=1, mage=3, thief=1, champion=2), treasure=())
+    (droll  0) mage goblin
+
+    (delve=1, depth=3, dungeon=(ooze=1, dragon=2), party=(fighter=1, cleric=1, mage=2, thief=1, champion=2), treasure=())
+    (droll  0) fighter ooze
+
+    (delve=1, depth=3, dungeon=(dragon=2), party=(cleric=1, mage=2, thief=1, champion=2), treasure=())
+    (droll  0) descend
+
+    (delve=1, depth=4, dungeon=(skeleton=1, chest=2, dragon=3), party=(cleric=1, mage=2, thief=1, champion=2), treasure=())
+    (droll  0) cleric skeleton
+
+    (delve=1, depth=4, dungeon=(chest=2, dragon=3), party=(mage=2, thief=1, champion=2), treasure=())
+    (droll  0) thief chest
+
+    (delve=1, depth=4, dungeon=(dragon=3), party=(mage=2, champion=2), treasure=(elixir=1, scale=1))
+    (droll  2) mage dragon mage champion
+
+    (delve=1, depth=4, experience=1, dungeon=(), party=(champion=1), treasure=(elixir=1, bait=1, scale=1))
+    (droll  4) EOF
+    """
+    # Drive the game according to the script in the above docstring.
+    s = Shell(randrange=random.Random(17).randrange, player=Spellsword)
+    s.preloop()
+    parsed = parse_summary_command(test_spellsword.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
         assert expected_summary == s.summary(), (
             "Summary mismatch at {}".format(index))
