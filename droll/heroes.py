@@ -153,8 +153,8 @@ Battlemage = Default._replace(
             dragon=spellsword_defeat_dragon,
         ),
         mage=Default.party.mage._replace(
-            # Mages usable as fighters implies mage.skeleton as if a fighter
-            skeleton=Default.party.fighter.skeleton,
+            # Mages usable as fighters implies mage.goblin as if a fighter
+            goblin=Default.party.fighter.goblin,
             dragon=spellsword_defeat_dragon,
         ),
         thief=Default.party.thief._replace(
