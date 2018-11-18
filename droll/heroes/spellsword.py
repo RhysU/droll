@@ -53,7 +53,7 @@ def battlemage_ability(
         *,
         _acceptable_targets: typing.Set[str] = {'fighter', 'mage'}
 ) -> struct.World:
-    """Discard all monsters, chests, potions, and dice in the dragon's lair.."""
+    """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:
         raise error.DrollError('No targets accepted for {}'.format(noun))
     return action.consume_ability(game._replace(
