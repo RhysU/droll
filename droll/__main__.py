@@ -3,23 +3,31 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Command-line version of droll."""
 import argparse
+import collections
 import random
 import sys
 
-from .heroes import KNOWN
+from .heroes import Knight, Spellsword
+from .player import Default
 from .shell import Shell
+
+AVAILABLE_HEROES = collections.OrderedDict([
+    ('Default', Default),
+    ('Knight', Knight),
+    ('Spellsword', Spellsword),
+])
 
 
 def main(args=None):
     parser = argparse.ArgumentParser(prog='droll', description=__doc__)
-    parser.add_argument('hero', choices=KNOWN.keys(),
+    parser.add_argument('hero', choices=AVAILABLE_HEROES.keys(),
                         help='Select the hero for this game.')
     parser.add_argument('--seed', metavar='N', type=int, nargs=1, default=None,
                         help='An integer to seed random number generation.')
     arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
     randrange = random.Random(*randseed).randrange
-    s = Shell(randrange=randrange, player=KNOWN.get(arguments.hero))
+    s = Shell(randrange=randrange, player=AVAILABLE_HEROES.get(arguments.hero))
     s.cmdloop()
 
 
