@@ -107,6 +107,20 @@ def spellsword_ability(
     ))
 
 
+def battlemage_ability(
+        game: struct.World, randrange: dice.RandRange, noun: str,
+        target: typing.Optional[str] = None,
+        *,
+        _acceptable_targets: typing.Set[str] = {'fighter', 'mage'}
+) -> struct.World:
+    """Discard all monsters, chests, potions, and dice in the dragon's lair.."""
+    if target is not None:
+        raise error.DrollError('No targets accepted for {}'.format(noun))
+    return action.consume_ability(game._replace(
+        dungeon=game.dungeon._replace([0] * len(struct.Dungeon._fields))
+    ))
+
+
 KNOWN = collections.OrderedDict([
     ('Default', Default),
     ('Knight', Knight),
