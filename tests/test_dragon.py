@@ -152,24 +152,53 @@ def test_defeat_dragon_heroes_interchangeable():
 
     # Less interesting failure cases next
     with pytest.raises(error.DrollError):
-        assert action.defeat_dragon_heroes_interchangeable(
+        action.defeat_dragon_heroes_interchangeable(
             'cleric', 'thief',
             _interchangeable={'fighter'})
     with pytest.raises(error.DrollError):
-        assert action.defeat_dragon_heroes_interchangeable(
+        action.defeat_dragon_heroes_interchangeable(
             'cleric', 'fighter',
             _interchangeable={'fighter'})
     with pytest.raises(error.DrollError):
-        assert action.defeat_dragon_heroes_interchangeable(
+        action.defeat_dragon_heroes_interchangeable(
             'cleric', 'thief', 'champion', 'mage',
             _interchangeable={'fighter'})
     with pytest.raises(error.DrollError):
-        assert action.defeat_dragon_heroes_interchangeable(
+        action.defeat_dragon_heroes_interchangeable(
             'cleric', 'thief', 'champion', 'fighter',
             _interchangeable={'fighter'})
 
+    # More than two could be interchangeable, but does not appear in the game.
+    # Therefore, only two interchangeable case is checked below.
+
     # More interesting successful cases
-    # TODO
+    assert action.defeat_dragon_heroes_interchangeable(
+        'cleric', 'thief', 'mage',
+        _interchangeable={'mage', 'fighter'})
+    assert action.defeat_dragon_heroes_interchangeable(
+        'cleric', 'fighter', 'mage',
+        _interchangeable={'mage', 'fighter'})
+    assert action.defeat_dragon_heroes_interchangeable(
+        'cleric', 'fighter', 'fighter',
+        _interchangeable={'mage', 'fighter'})
+    assert action.defeat_dragon_heroes_interchangeable(
+        'cleric', 'mage', 'mage',
+        _interchangeable={'mage', 'fighter'})
 
     # More interesting failure cases last
-    # TODO
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            'mage', 'mage', 'mage',
+            _interchangeable={'mage', 'fighter'})
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            'fighter', 'fighter', 'fighter',
+            _interchangeable={'mage', 'fighter'})
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            'fighter', 'mage', 'mage',
+            _interchangeable={'mage', 'fighter'})
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            'mage', 'fighter', 'fighter',
+            _interchangeable={'mage', 'fighter'})
