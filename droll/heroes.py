@@ -14,7 +14,6 @@ from .player import Default
 
 
 # TODO Implement the following initial characters
-# Spellsword -> Battlemage
 # Crusader -> Paladin
 # Mercenary -> Commander
 # Enchantress -> Beguiler
@@ -135,7 +134,7 @@ def battlemage_ability(
     if target is not None:
         raise error.DrollError('No targets accepted for {}'.format(noun))
     return action.consume_ability(game._replace(
-        dungeon=game.dungeon._replace([0] * len(struct.Dungeon._fields))
+        dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields))),
     ))
 
 
