@@ -107,6 +107,22 @@ def spellsword_ability(
     ))
 
 
+@functools.wraps(action.defeat_dragon)
+def spellsword_defeat_dragon(*args, **kwargs):
+    return action.defeat_dragon(
+        *args,
+        **kwargs,
+        _defeat_dragon_heroes=spellsword_defeat_dragon_heroes)
+
+
+@functools.wraps(action.defeat_dragon_heroes_interchangeable)
+def spellsword_defeat_dragon_heroes(*args, **kwargs):
+    return action.defeat_dragon_heroes_interchangeable(
+        *args,
+        **kwargs,
+        _interchangeable={'fighter', 'mage'})
+
+
 def battlemage_ability(
         game: struct.World, randrange: dice.RandRange, noun: str,
         target: typing.Optional[str] = None,
@@ -120,6 +136,34 @@ def battlemage_ability(
         dungeon=game.dungeon._replace([0] * len(struct.Dungeon._fields))
     ))
 
+
+# Defined in terms of Default, not Spellsword, to permit advance(...) closure
+Battlemage = Default._replace(
+    ability=battlemage_ability,
+    advance=(lambda _: Battlemage),  # Cannot advance further
+    party=Default.party._replace(
+        fighter=Default.party.fighter._replace(
+            ooze=Default.party.mage.ooze,  # Fighters used as mages
+            dragon=spellsword_defeat_dragon,
+        ),
+        cleric=Default.party.cleric._replace(
+            dragon=spellsword_defeat_dragon,
+        ),
+        mage=Default.party.mage._replace(
+            skeleton=Default.party.fighter.skeleton,  # Mages used as fighters
+            dragon=spellsword_defeat_dragon,
+        ),
+        thief=Default.party.thief._replace(
+            dragon=spellsword_defeat_dragon,
+        ),
+        champion=Default.party.champion._replace(
+            dragon=spellsword_defeat_dragon,
+        ),
+        scroll=Default.party.scroll._replace(
+            dragon=spellsword_defeat_dragon,
+        ),
+    )
+)
 
 KNOWN = collections.OrderedDict([
     ('Default', Default),
