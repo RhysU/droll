@@ -51,6 +51,36 @@ def defeat_all(
     )
 
 
+def defeat_all_plus_additional(
+        game: struct.World, randrange: dice.RandRange, hero: str, target: str,
+        *additional
+) -> struct.World:
+    """Update game after hero handles all of one target type plus one more."""
+    # First, defeat all of the specified target
+    after_target = defeat_all(game=game,
+                              randrange=randrange,
+                              hero=hero,
+                              target=target)
+
+    # Second, determine if additional should not have been supplied
+    if world.defeated_monsters(after_target):
+        if additional:
+            raise error.DrollError("Additional {} given but no monsters left"
+                                   .format(additional))
+        return after_target
+
+    # Third, confirm at most one additional provided
+    if len(additional) > 1:
+        raise error.DrollError("At most one additional allowed, but {} given"
+                               .format(additional))
+
+    # Last, attempt to defeat the additional
+    return defeat_one(game=after_target,
+                      randrange=randrange,
+                      hero=hero,
+                      target=additional[0])
+
+
 def __eliminate_targets(
         dungeon: struct.Dungeon, target: str
 ) -> struct.Dungeon:
