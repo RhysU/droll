@@ -70,8 +70,8 @@ def defeat_all_plus_additional(
         return after_target
 
     # Third, confirm at most one additional provided
-    if len(additional) > 1:
-        raise error.DrollError("At most one additional allowed, but {} given"
+    if len(additional) != 1:
+        raise error.DrollError("One additional target allowed, but {} provided"
                                .format(additional))
 
     # Last, attempt to defeat the additional
