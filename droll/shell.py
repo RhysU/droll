@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """A REPL permitting playing a game via a tab-completion shell."""
 import cmd
+import collections
 import textwrap
 import typing
 from random import Random
@@ -13,9 +14,15 @@ from . import player
 from . import struct
 from . import world
 
+# Details necessary to implement an undo list just below in Shell
+Undo = collections.namedtuple('Undo', (
+    'player',
+    'randhash',
+    'world',
+))
 
-# TODO Populate intro
 
+# TODO Populate intro for Shell
 
 class Shell(cmd.Cmd):
     """"REPL permitting playing a game via tab-completion shell."""
@@ -33,6 +40,7 @@ class Shell(cmd.Cmd):
         self._player = player
         self._random = Random() if random is None else random
         self._world = None
+        self._undo = None
 
     def summary(self) -> str:
         """Brief, string description of the present game state."""
@@ -47,13 +55,34 @@ class Shell(cmd.Cmd):
         self.postcmd(stop=False, line='')
 
     def postcmd(self, stop, line):
-        """Print game state after each commmand and final details on exit."""
+        """Print game state after each commmand and final details on exit.
+
+        Also, performs undo tracking where undo can't force re-roll/re-draw."""
         self._update_prompt()
         print()
         if line != 'EOF':
             print(self.summary())
             if stop:
                 print(self.prompt)
+
+        # After each command, preserve undo candidates that disallow cheating.
+        # These are the candidates where, e.g., no dice have been rolled.
+        current = Undo(player=self._player,
+                       randhash=hash(self._random.getstate()),
+                       world=self._world)
+        if not self._undo:
+            # History starts now
+            self._undo = [current]
+        elif self._undo[-1] == current:
+            # Trivial change not worth recording
+            pass
+        elif self._undo[-1].randhash == current.randhash:
+            # Significant change but no change in self._random getstate
+            self._undo.append(current)
+        else:
+            # Significant change and change to getstate, purge old details
+            self._undo = [current]
+
         return stop
 
     def _update_prompt(self):
