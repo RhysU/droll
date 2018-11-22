@@ -6,7 +6,7 @@
 import random
 import typing
 
-from droll.heroes import Knight, Spellsword
+from droll.heroes import Knight, Minstrel, Spellsword
 from droll.player import Default
 from droll.shell import Shell
 
@@ -341,6 +341,154 @@ def test_spellsword():
     """
     # Drive the game according to the script in the above docstring.
     s = Shell(randrange=random.Random(17).randrange, player=Spellsword)
+    s.preloop()
+    parsed = parse_summary_command(test_spellsword.__doc__)
+    for index, (expected_summary, following_command) in enumerate(parsed):
+        assert expected_summary == s.summary(), (
+            "Summary mismatch at {}".format(index))
+        s.onecmd(following_command)
+
+
+def test_minstrel():
+    """Runs the following scenario involving unique Minstrel/Bard details:
+
+    (delve=1, party=(fighter=1, cleric=1, mage=2, thief=1, scroll=2), ability=True, treasure=())
+    (Minstrel  0) descend
+
+    (delve=1, depth=1, dungeon=(goblin=1), party=(fighter=1, cleric=1, mage=2, thief=1, scroll=2), ability=True, treasure=())
+    (Minstrel  0) mage goblin
+
+    (delve=1, depth=1, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, scroll=2), ability=True, treasure=())
+    (Minstrel  0) descend
+
+    (delve=1, depth=2, dungeon=(ooze=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, scroll=2), ability=True, treasure=())
+    (Minstrel  0) thief ooze
+
+    (delve=1, depth=2, dungeon=(potion=1), party=(fighter=1, cleric=1, mage=1, scroll=2), ability=True, treasure=())
+    (Minstrel  0) scroll potion thief
+
+    (delve=1, depth=2, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, scroll=1), ability=True, treasure=())
+    (Minstrel  0) descend
+
+    (delve=1, depth=3, dungeon=(ooze=3), party=(fighter=1, cleric=1, mage=1, thief=1, scroll=1), ability=True, treasure=())
+    (Minstrel  0) thief ooze
+
+    (delve=1, depth=3, dungeon=(), party=(fighter=1, cleric=1, mage=1, scroll=1), ability=True, treasure=())
+    (Minstrel  0) descend
+
+    (delve=1, depth=4, dungeon=(skeleton=3, chest=1), party=(fighter=1, cleric=1, mage=1, scroll=1), ability=True, treasure=())
+    (Minstrel  0) cleric skeleton
+
+    (delve=1, depth=4, dungeon=(chest=1), party=(fighter=1, mage=1, scroll=1), ability=True, treasure=())
+    (Minstrel  0) descend
+
+    (delve=1, depth=5, dungeon=(goblin=1, chest=1, potion=1, dragon=2), party=(fighter=1, mage=1, scroll=1), ability=True, treasure=())
+    (Minstrel  0) fighter goblin
+
+    (delve=1, depth=5, dungeon=(chest=1, potion=1, dragon=2), party=(mage=1, scroll=1), ability=True, treasure=())
+    (Minstrel  0) mage chest
+
+    (delve=1, depth=5, dungeon=(potion=1, dragon=2), party=(scroll=1), ability=True, treasure=(talisman=1))
+    (Minstrel  1) scroll potion champion
+
+    (delve=1, depth=5, dungeon=(dragon=2), party=(champion=1), ability=True, treasure=(talisman=1))
+    (Minstrel  1) ability
+
+    (delve=1, depth=5, dungeon=(), party=(champion=1), treasure=(talisman=1))
+    (Minstrel  1) retire
+
+    (delve=2, experience=5, party=(fighter=1, thief=3, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) descend
+
+    (delve=2, depth=1, experience=5, dungeon=(ooze=1), party=(fighter=1, thief=3, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) thief ooze
+
+    (delve=2, depth=1, experience=5, dungeon=(), party=(fighter=1, thief=2, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) descend
+
+    (delve=2, depth=2, experience=5, dungeon=(goblin=1, dragon=1), party=(fighter=1, thief=2, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) thief goblin
+
+    (delve=2, depth=2, experience=5, dungeon=(dragon=1), party=(fighter=1, thief=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) descend
+
+    (delve=2, depth=3, experience=5, dungeon=(skeleton=1, ooze=1, chest=1, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) champion skeleton ooze
+
+    (delve=2, depth=3, experience=5, dungeon=(chest=1, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) descend
+
+    (delve=2, depth=4, experience=5, dungeon=(ooze=1, potion=2, dragon=2), party=(fighter=1, thief=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) thief ooze
+
+    (delve=2, depth=4, experience=5, dungeon=(potion=2, dragon=2), party=(fighter=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+    (Bard  6) scroll potion mage cleric
+
+    (delve=2, depth=4, experience=5, dungeon=(dragon=2), party=(fighter=1, cleric=1, mage=1, champion=1, scroll=1), ability=True, treasure=(talisman=1))
+    (Bard  6) descend
+
+    (delve=2, depth=5, experience=5, dungeon=(goblin=1, skeleton=2, potion=1, dragon=3), party=(fighter=1, cleric=1, mage=1, champion=1, scroll=1), ability=True, treasure=(talisman=1))
+    (Bard  6) scroll goblin skeleton skeleton
+
+    (delve=2, depth=5, experience=5, dungeon=(ooze=1, chest=1, potion=1, dragon=4), party=(fighter=1, cleric=1, mage=1, champion=1), ability=True, treasure=(talisman=1))
+    (Bard  6) mage ooze
+
+    (delve=2, depth=5, experience=5, dungeon=(chest=1, potion=1, dragon=4), party=(fighter=1, cleric=1, champion=1), ability=True, treasure=(talisman=1))
+    (Bard  6) fighter chest
+
+    (delve=2, depth=5, experience=5, dungeon=(potion=1, dragon=4), party=(cleric=1, champion=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard  7) ability
+
+    (delve=2, depth=5, experience=5, dungeon=(potion=1), party=(cleric=1, champion=1), treasure=(sword=1, talisman=1))
+    (Bard  7) retire
+
+    (delve=3, experience=10, party=(fighter=1, cleric=2, thief=1, champion=1, scroll=2), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) descend
+
+    (delve=3, depth=1, experience=10, dungeon=(ooze=1), party=(fighter=1, cleric=2, thief=1, champion=1, scroll=2), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) cleric ooze
+
+    (delve=3, depth=1, experience=10, dungeon=(), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=2), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) descend
+
+    (delve=3, depth=2, experience=10, dungeon=(goblin=1, potion=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=2), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) fighter goblin
+
+    (delve=3, depth=2, experience=10, dungeon=(potion=1), party=(cleric=1, thief=1, champion=1, scroll=2), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) scroll potion fighter
+
+    (delve=3, depth=2, experience=10, dungeon=(), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) descend
+
+    (delve=3, depth=3, experience=10, dungeon=(goblin=1, skeleton=1, dragon=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) cleric goblin
+
+    (delve=3, depth=3, experience=10, dungeon=(skeleton=1, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) champion skeleton
+
+    (delve=3, depth=3, experience=10, dungeon=(dragon=1), party=(fighter=1, thief=1, scroll=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) descend
+
+    (delve=3, depth=4, experience=10, dungeon=(skeleton=1, ooze=1, chest=1, potion=1, dragon=1), party=(fighter=1, thief=1, scroll=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) fighter skeleton
+
+    (delve=3, depth=4, experience=10, dungeon=(ooze=1, chest=1, potion=1, dragon=1), party=(thief=1, scroll=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) thief ooze
+
+    (delve=3, depth=4, experience=10, dungeon=(chest=1, potion=1, dragon=1), party=(scroll=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) scroll potion thief
+
+    (delve=3, depth=4, experience=10, dungeon=(chest=1, dragon=1), party=(thief=1), ability=True, treasure=(sword=1, talisman=1))
+    (Bard 12) thief chest
+
+    (delve=3, depth=4, experience=10, dungeon=(dragon=1), party=(), ability=True, treasure=(sword=1, talisman=1, ring=1))
+    (Bard 13) ability
+
+    (delve=3, depth=4, experience=10, dungeon=(), party=(), treasure=(sword=1, talisman=1, ring=1))
+    (Bard 13) EOF
+    """
+    # Drive the game according to the script in the above docstring.
+    s = Shell(randrange=random.Random(27).randrange, player=Minstrel)
     s.preloop()
     parsed = parse_summary_command(test_spellsword.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
