@@ -14,13 +14,6 @@ from . import player
 from . import struct
 from . import world
 
-# Details necessary to implement an undo list just below in Shell
-Undo = collections.namedtuple('Undo', (
-    'player',
-    'randhash',
-    'world',
-))
-
 
 # TODO Populate intro for Shell
 
@@ -37,6 +30,7 @@ class Shell(cmd.Cmd):
             random: Random = None
     ) -> None:
         super(Shell, self).__init__()
+        # Review postcmd(...) and do_undo(...) when modifying instance state!
         self._player = player
         self._random = Random() if random is None else random
         self._world = None
@@ -84,6 +78,19 @@ class Shell(cmd.Cmd):
             self._undo = [current]
 
         return stop
+
+    def do_undo(self, line):
+        """Undo prior commands, only permitted if nothing rolled/drawn."""
+        with ShellManager():
+            # self._random not mutated-- by precondition it did not change
+            # within the tracked undo history per postcmd(...) processing.
+            if self._undo:
+                prior = self._undo.pop()
+                self._player = prior.player
+                self._world = prior.world
+            else:
+                raise error.DrollError("Cannot undo any prior command(s).")
+        return False
 
     def _update_prompt(self):
         """Compute a prompt including the current score."""
@@ -276,6 +283,14 @@ class Shell(cmd.Cmd):
 
     def help_tools(self):
         print("""Tools behave identically to a thief.""")
+
+
+# Details necessary to implement undo tracking in Shell
+Undo = collections.namedtuple('Undo', (
+    'player',
+    'randhash',
+    'world',
+))
 
 
 class ShellManager:
