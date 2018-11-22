@@ -12,6 +12,10 @@ import droll.player as player
 import droll.struct as struct
 import droll.world as world
 
+# TODO Following case is bizarre:
+# (delve=2, depth=4, experience=5, dungeon=(goblin=1, skeleton=1, chest=1, potion=1), party=(cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=(talisman=1, bait=1))
+# (droll  7) champion goblin skeleton 
+# Require at least one hero champion
 
 @pytest.fixture(name='game')
 def _game():
