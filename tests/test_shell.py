@@ -125,7 +125,7 @@ def test_simple():
     (Default  5) EOF
     """
     # Drive the game according to the script in the above docstring.
-    s = Shell(randrange=random.Random(4).randrange, player=Default)
+    s = Shell(random=random.Random(4), player=Default)
     s.preloop()
     parsed = parse_summary_command(test_simple.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
@@ -264,7 +264,7 @@ def test_knight():
     (DragonSlayer 23) EOF
     """
     # Drive the game according to the script in the above docstring.
-    s = Shell(randrange=random.Random(4).randrange, player=Knight)
+    s = Shell(random=random.Random(4), player=Knight)
     s.preloop()
     parsed = parse_summary_command(test_knight.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
@@ -340,7 +340,7 @@ def test_spellsword():
     (Battlemage  8) EOF
     """
     # Drive the game according to the script in the above docstring.
-    s = Shell(randrange=random.Random(17).randrange, player=Spellsword)
+    s = Shell(random=random.Random(17), player=Spellsword)
     s.preloop()
     parsed = parse_summary_command(test_spellsword.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
@@ -488,7 +488,7 @@ def test_minstrel():
     (Bard 13) EOF
     """
     # Drive the game according to the script in the above docstring.
-    s = Shell(randrange=random.Random(27).randrange, player=Minstrel)
+    s = Shell(random=random.Random(27), player=Minstrel)
     s.preloop()
     parsed = parse_summary_command(test_spellsword.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):

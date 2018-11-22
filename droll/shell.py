@@ -3,9 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """A REPL permitting playing a game via a tab-completion shell."""
 import cmd
-import random
 import textwrap
 import typing
+from random import Random
 
 from . import action
 from . import error
@@ -24,11 +24,14 @@ class Shell(cmd.Cmd):
     # LIFECYCLE BELOW HERE
     ######################
 
-    def __init__(self, *, player=player.Default, randrange=None):
+    def __init__(
+            self,
+            player: struct.Player = player.Default,
+            random: Random = None
+    ) -> None:
         super(Shell, self).__init__()
         self._player = player
-        self._randrange = (random.Random().randrange
-                           if randrange is None else randrange)
+        self._random = Random() if random is None else random
         self._world = None
 
     def summary(self) -> str:
@@ -64,7 +67,7 @@ class Shell(cmd.Cmd):
             # Record any world updates
             self._world = world.next_delve(self._world,
                                            self._player.roll.party,
-                                           self._randrange)
+                                           self._random.randrange)
             # Permit the player to advance to higher abilities
             self._player = self._player.advance(self._world)
             return False
@@ -87,14 +90,14 @@ class Shell(cmd.Cmd):
         """Invoke the player's ability."""
         with ShellManager():
             self._world = player.apply(self._player, self._world,
-                                       self._randrange, 'ability',
+                                       self._random.randrange, 'ability',
                                        *parse(line))
 
     def default(self, line):
         """Apply some named hero or treasure to some collection of nouns."""
         with ShellManager():
             self._world = player.apply(self._player, self._world,
-                                       self._randrange, *parse(line))
+                                       self._random.randrange, *parse(line))
 
     def do_descend(self, line):
         """Descend to the next depth (in contrast to retiring/retreating)."""
@@ -102,7 +105,7 @@ class Shell(cmd.Cmd):
             no_arguments(line)
             self._world = world.next_dungeon(self._world,
                                              self._player.roll.dungeon,
-                                             self._randrange)
+                                             self._random.randrange)
 
     def do_retire(self, line):
         """Retire to the tavern after successfully clearing a dungeon depth..

@@ -27,8 +27,10 @@ def main(args=None):
                         help='An integer to seed random number generation.')
     arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
-    randrange = random.Random(*randseed).randrange
-    s = Shell(randrange=randrange, player=AVAILABLE_HEROES.get(arguments.hero))
+    s = Shell(
+        player=AVAILABLE_HEROES.get(arguments.hero),
+        random=random.Random(*randseed),
+    )
     s.cmdloop()
 
 
