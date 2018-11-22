@@ -23,9 +23,9 @@ def minstrel_ability(
     if target is not 'dragon':
         raise error.DrollError('Can only discard {} dice'
                                .format(target))
-    return game._replace(
+    return action.consume_ability(game._replace(
         dungeon=action.__eliminate_targets(game.dungeon, target)
-    )
+    ))
 
 
 @functools.wraps(action.defeat_dragon)
