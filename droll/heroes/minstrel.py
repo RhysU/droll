@@ -72,6 +72,7 @@ _Minstrel_Party = Default.party._replace(
 
 # Defined in terms of Default, not Minstrel, to permit advance(...) closure
 Bard = Default._replace(
+    name='Bard',
     ability=minstrel_ability,
     advance=(lambda _: Bard),  # Cannot advance further
     party=_Minstrel_Party._replace(
@@ -86,6 +87,7 @@ Bard = Default._replace(
 
 # Defined after Bard to permit advance(...) closure
 Minstrel = Default._replace(
+    name='Minstrel',
     ability=minstrel_ability,
     advance=(lambda world: Minstrel if world.experience < 5 else Bard),
     party=_Minstrel_Party,

@@ -63,6 +63,7 @@ def battlemage_ability(
 
 # Defined in terms of Default, not Spellsword, to permit advance(...) closure
 Battlemage = Default._replace(
+    name='Battlemage',
     ability=battlemage_ability,
     advance=(lambda _: Battlemage),  # Cannot advance further
     party=Default.party._replace(
@@ -93,6 +94,7 @@ Battlemage = Default._replace(
 
 # Defined after Battlemage to permit advance(...) closure
 Spellsword = Default._replace(
+    name='Spellsword',
     ability=spellsword_ability,
     advance=(lambda world: Spellsword if world.experience < 5 else Battlemage),
     party=Battlemage.party,

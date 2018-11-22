@@ -40,6 +40,7 @@ def dragonslayer_defeat_dragon(*args, **kwargs):
 
 # Defined in terms of Default, not Knight, to permit advance(...) closure
 DragonSlayer = Default._replace(
+    name='DragonSlayer',
     ability=knight_bait_dragon,
     advance=(lambda _: DragonSlayer),  # Cannot advance further
     roll=Default.roll._replace(
@@ -69,6 +70,7 @@ DragonSlayer = Default._replace(
 
 # Defined after DragonSlayer to permit advance(...) closure
 Knight = Default._replace(
+    name='Knight',
     ability=knight_bait_dragon,
     advance=(lambda world: Knight if world.experience < 5 else DragonSlayer),
     roll=Default.roll._replace(
