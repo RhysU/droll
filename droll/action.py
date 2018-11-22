@@ -63,7 +63,7 @@ def defeat_all_plus_additional(
                               target=target)
 
     # Second, determine if additional should not have been supplied
-    if world.defeated_monsters(after_target):
+    if world.defeated_monsters(after_target.dungeon):
         if additional:
             raise error.DrollError("Additional {} given but no monsters left"
                                    .format(additional))
