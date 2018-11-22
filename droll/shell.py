@@ -33,8 +33,8 @@ class Shell(cmd.Cmd):
         # Review postcmd(...) and do_undo(...) when modifying instance state!
         self._player = player
         self._random = Random() if random is None else random
-        self._world = None
         self._undo = None
+        self._world = None
 
     def summary(self) -> str:
         """Brief, string description of the present game state."""
@@ -42,60 +42,12 @@ class Shell(cmd.Cmd):
 
     def preloop(self):
         """Prepare a new game and start the first delve."""
+        self._undo = []
         self._world = world.new_game()
         if self._next_delve_or_exit():
             raise RuntimeError('Unexpected True during preloop()')
         # Causes printing of initial world state
         self.postcmd(stop=False, line='')
-
-    def postcmd(self, stop, line):
-        """Print game state after each commmand and final details on exit.
-
-        Also, performs undo tracking where undo can't force re-roll/re-draw."""
-        self._update_prompt()
-        print()
-        if line != 'EOF':
-            print(self.summary())
-            if stop:
-                print(self.prompt)
-
-        # After each command, preserve undo candidates that disallow cheating.
-        # These are the candidates where, e.g., no dice have been rolled.
-        current = Undo(player=self._player,
-                       randhash=hash(self._random.getstate()),
-                       world=self._world)
-        if not self._undo:
-            # History starts now
-            self._undo = [current]
-        elif self._undo[-1] == current:
-            # Trivial change not worth recording
-            pass
-        elif self._undo[-1].randhash == current.randhash:
-            # Significant change but no change in self._random getstate
-            self._undo.append(current)
-        else:
-            # Significant change and change to getstate, purge old details
-            self._undo = [current]
-
-        return stop
-
-    def do_undo(self, line):
-        """Undo prior commands, only permitted if nothing rolled/drawn."""
-        with ShellManager():
-            # self._random not mutated-- by precondition it did not change
-            # within the tracked undo history per postcmd(...) processing.
-            if self._undo:
-                prior = self._undo.pop()
-                self._player = prior.player
-                self._world = prior.world
-            else:
-                raise error.DrollError("Cannot undo any prior command(s).")
-        return False
-
-    def _update_prompt(self):
-        """Compute a prompt including the current score."""
-        score = world.score(self._world) if self._world else 0
-        self.prompt = '({} {:-2d}) '.format(self._player.name, score)
 
     def _next_delve_or_exit(self) -> bool:
         """Either start next delve or exit the game, printing final score."""
@@ -109,6 +61,65 @@ class Shell(cmd.Cmd):
             return False
         except error.DrollError:
             return True
+
+    def postcmd(self, stop, line):
+        """Print game state after each commmand and final details on exit."""
+        self._update_prompt()
+        print()
+        if line != 'EOF':
+            print(self.summary())
+            if stop:
+                print(self.prompt)
+        return stop
+
+    def _update_prompt(self):
+        """Compute a prompt including the current score."""
+        score = world.score(self._world) if self._world else 0
+        self.prompt = '({} {:-2d}) '.format(self._player.name, score)
+
+    def onecmd(self, line):
+        """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
+        # Preserve all observable state prior to processing the command
+        self._undo.append(Undo(tokens=parse(line),
+                               player=self._player,
+                               randhash=self._randhash(),
+                               world=self._world))
+
+        # Process the current command by delegating to superclass
+        result = super(Shell, self).onecmd(line)
+
+        # After each command, retain undo candidates that disallow cheating.
+        # These are the candidates where, e.g., no dice have been rolled.
+        # Beware that do_undo(...), below, mutates self._undo.
+        if not self._undo:
+            pass                # No prior undo against which to compare
+        elif self._undo[-1].randhash != self._randhash():
+            self._undo.clear()  # Change in random state purges history
+        elif (self._undo[-1].player == self._player and
+              self._undo[-1].world == self._world):
+            self._undo.pop()    # Ignore non-changing state (e.g. 'help')
+        else:
+            pass                # Change retained for a later 'undo'
+
+        return result
+
+    def do_undo(self, line):
+        """Undo prior commands.  Only permitted when nothing rolled/drawn."""
+        with ShellManager():
+            # self._random not mutated-- by precondition it did not change
+            # within the tracked undo history per postcmd(...) processing.
+            if len(self._undo) > 1:
+                self._undo.pop()             # 'undo' was itself on undo list...
+                previous = self._undo.pop()  # ...hence two pops to previous.
+                self._player = previous.player
+                self._world = previous.world
+            else:
+                raise error.DrollError("Cannot undo any prior command(s).")
+        return False
+
+    def _randhash(self) -> int:
+        """Obtain a hash representing the current Random state."""
+        return hash(self._random.getstate())
 
     def do_EOF(self, line):
         """End-of-file causes shell exit."""
@@ -287,6 +298,7 @@ class Shell(cmd.Cmd):
 
 # Details necessary to implement undo tracking in Shell
 Undo = collections.namedtuple('Undo', (
+    'tokens',
     'player',
     'randhash',
     'world',
