@@ -74,8 +74,10 @@ def defeat_all_plus_additional(
         raise error.DrollError("One additional target allowed, but {} provided"
                                .format(additional))
 
-    # Last, attempt to defeat the additional
-    return defeat_one(game=after_target,
+    # Last, attempt to defeat the additional monster using the same hero
+    return defeat_one(game=after_target._replace(
+                        party=__increment_hero(game.party, hero)
+                      ),
                       randrange=randrange,
                       hero=hero,
                       target=additional[0])
