@@ -7,13 +7,14 @@ import collections
 import random
 import sys
 
-from .heroes import Knight, Spellsword
+from .heroes import Knight, Minstrel, Spellsword
 from .player import Default
 from .shell import Shell
 
 AVAILABLE_HEROES = collections.OrderedDict([
     ('Default', Default),
     ('Knight', Knight),
+    ('Minstrel', Minstrel),
     ('Spellsword', Spellsword),
 ])
 

@@ -4,4 +4,5 @@
 """All known hero definitions."""
 
 from .knight import Knight, DragonSlayer
+from .minstrel import Minstrel, Bard
 from .spellsword import Spellsword, Battlemage
