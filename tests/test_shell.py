@@ -67,62 +67,62 @@ def test_simple():
     """Runs the following scenario:
 
     (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ability=True, treasure=())
-    (droll  0) descend
+    (Default  0) descend
 
     (delve=1, depth=1, dungeon=(goblin=1), party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ability=True, treasure=())
-    (droll  0) cleric goblin
+    (Default  0) cleric goblin
 
     (delve=1, depth=1, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=2, scroll=1), ability=True, treasure=())
-    (droll  0) descend
+    (Default  0) descend
 
     (delve=1, depth=2, dungeon=(goblin=2), party=(fighter=1, cleric=1, mage=1, thief=2, scroll=1), ability=True, treasure=())
-    (droll  0) fighter goblin
+    (Default  0) fighter goblin
 
     (delve=1, depth=2, dungeon=(), party=(cleric=1, mage=1, thief=2, scroll=1), ability=True, treasure=())
-    (droll  0) descend
+    (Default  0) descend
 
     (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), party=(cleric=1, mage=1, thief=2, scroll=1), ability=True, treasure=())
-    (droll  0) thief ooze
+    (Default  0) thief ooze
 
     (delve=1, depth=3, dungeon=(chest=1, potion=1), party=(cleric=1, mage=1, thief=1, scroll=1), ability=True, treasure=())
-    (droll  0) thief chest
+    (Default  0) thief chest
 
     (delve=1, depth=3, dungeon=(potion=1), party=(cleric=1, mage=1, scroll=1), ability=True, treasure=(talisman=1))
-    (droll  1) scroll potion
+    (Default  1) scroll potion
     Require exactly 1 to revive
 
     (delve=1, depth=3, dungeon=(potion=1), party=(cleric=1, mage=1, scroll=1), ability=True, treasure=(talisman=1))
-    (droll  1) scroll potion champion
+    (Default  1) scroll potion champion
 
     (delve=1, depth=3, dungeon=(), party=(cleric=1, mage=1, champion=1), ability=True, treasure=(talisman=1))
-    (droll  1) descend
+    (Default  1) descend
 
     (delve=1, depth=4, dungeon=(skeleton=1, ooze=1, potion=2), party=(cleric=1, mage=1, champion=1), ability=True, treasure=(talisman=1))
-    (droll  1) cleric skeleton
+    (Default  1) cleric skeleton
 
     (delve=1, depth=4, dungeon=(ooze=1, potion=2), party=(mage=1, champion=1), ability=True, treasure=(talisman=1))
-    (droll  1) mage ooze
+    (Default  1) mage ooze
 
     (delve=1, depth=4, dungeon=(potion=2), party=(champion=1), ability=True, treasure=(talisman=1))
-    (droll  1) champion potion champion fighter
+    (Default  1) champion potion champion fighter
 
     (delve=1, depth=4, dungeon=(), party=(fighter=1, champion=1), ability=True, treasure=(talisman=1))
-    (droll  1) descend
+    (Default  1) descend
 
     (delve=1, depth=5, dungeon=(goblin=1, skeleton=2, ooze=2), party=(fighter=1, champion=1), ability=True, treasure=(talisman=1))
-    (droll  1) champion ooze
+    (Default  1) champion ooze
 
     (delve=1, depth=5, dungeon=(goblin=1, skeleton=2), party=(fighter=1), ability=True, treasure=(talisman=1))
-    (droll  1) talisman skeleton
+    (Default  1) talisman skeleton
 
     (delve=1, depth=5, dungeon=(goblin=1), party=(fighter=1), ability=True, treasure=())
-    (droll  0) fighter goblin
+    (Default  0) fighter goblin
 
     (delve=1, depth=5, dungeon=(), party=(), ability=True, treasure=())
-    (droll  0) retire
+    (Default  0) retire
 
     (delve=2, experience=5, party=(fighter=1, cleric=2, mage=3, scroll=1), ability=True, treasure=())
-    (droll  5) EOF
+    (Default  5) EOF
     """
     # Drive the game according to the script in the above docstring.
     s = Shell(randrange=random.Random(4).randrange, player=Default)
@@ -138,130 +138,130 @@ def test_knight():
     """Runs the following scenario involving unique Knight/Dragonslayer details:
 
     (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, champion=1), ability=True, treasure=())
-    (droll  0) descend
+    (Knight  0) descend
 
     (delve=1, depth=1, dungeon=(goblin=1), party=(fighter=1, cleric=2, mage=1, thief=2, champion=1), ability=True, treasure=())
-    (droll  0) cleric goblin
+    (Knight  0) cleric goblin
 
     (delve=1, depth=1, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=2, champion=1), ability=True, treasure=())
-    (droll  0) descend
+    (Knight  0) descend
 
     (delve=1, depth=2, dungeon=(goblin=2), party=(fighter=1, cleric=1, mage=1, thief=2, champion=1), ability=True, treasure=())
-    (droll  0) fighter goblin
+    (Knight  0) fighter goblin
 
     (delve=1, depth=2, dungeon=(), party=(cleric=1, mage=1, thief=2, champion=1), ability=True, treasure=())
-    (droll  0) descend
+    (Knight  0) descend
 
     (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), party=(cleric=1, mage=1, thief=2, champion=1), ability=True, treasure=())
-    (droll  0) thief ooze
+    (Knight  0) thief ooze
 
     (delve=1, depth=3, dungeon=(chest=1, potion=1), party=(cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
-    (droll  0) thief chest
+    (Knight  0) thief chest
 
     (delve=1, depth=3, dungeon=(potion=1), party=(cleric=1, mage=1, champion=1), ability=True, treasure=(talisman=1))
-    (droll  1) descend
+    (Knight  1) descend
 
     (delve=1, depth=4, dungeon=(skeleton=1, ooze=1, potion=2), party=(cleric=1, mage=1, champion=1), ability=True, treasure=(talisman=1))
-    (droll  1) ability
+    (Knight  1) ability
 
     (delve=1, depth=4, dungeon=(potion=2, dragon=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1))
-    (droll  1) mage potion mage fighter
+    (Knight  1) mage potion mage fighter
 
     (delve=1, depth=4, dungeon=(dragon=2), party=(fighter=1, cleric=1, mage=1, champion=1), treasure=(talisman=1))
-    (droll  1) descend
+    (Knight  1) descend
 
     (delve=1, depth=5, dungeon=(goblin=1, skeleton=2, ooze=2, dragon=2), party=(fighter=1, cleric=1, mage=1, champion=1), treasure=(talisman=1))
-    (droll  1) cleric skeleton
+    (Knight  1) cleric skeleton
 
     (delve=1, depth=5, dungeon=(goblin=1, ooze=2, dragon=2), party=(fighter=1, mage=1, champion=1), treasure=(talisman=1))
-    (droll  1) mage ooze
+    (Knight  1) mage ooze
 
     (delve=1, depth=5, dungeon=(goblin=1, dragon=2), party=(fighter=1, champion=1), treasure=(talisman=1))
-    (droll  1) fighter goblin
+    (Knight  1) fighter goblin
 
     (delve=1, depth=5, dungeon=(dragon=2), party=(champion=1), treasure=(talisman=1))
-    (droll  1) retire
+    (Knight  1) retire
 
     (delve=2, experience=5, party=(fighter=1, cleric=2, mage=3, champion=1), ability=True, treasure=(talisman=1))
-    (droll  6) descend
+    (DragonSlayer  6) descend
 
     (delve=2, depth=1, experience=5, dungeon=(ooze=1), party=(fighter=1, cleric=2, mage=3, champion=1), ability=True, treasure=(talisman=1))
-    (droll  6) mage ooze
+    (DragonSlayer  6) mage ooze
 
     (delve=2, depth=1, experience=5, dungeon=(), party=(fighter=1, cleric=2, mage=2, champion=1), ability=True, treasure=(talisman=1))
-    (droll  6) descend
+    (DragonSlayer  6) descend
 
     (delve=2, depth=2, experience=5, dungeon=(dragon=2), party=(fighter=1, cleric=2, mage=2, champion=1), ability=True, treasure=(talisman=1))
-    (droll  6) descend
+    (DragonSlayer  6) descend
 
     (delve=2, depth=3, experience=5, dungeon=(goblin=1, ooze=1, potion=1, dragon=2), party=(fighter=1, cleric=2, mage=2, champion=1), ability=True, treasure=(talisman=1))
-    (droll  6) ability
+    (DragonSlayer  6) ability
 
     (delve=2, depth=3, experience=5, dungeon=(potion=1, dragon=4), party=(fighter=1, cleric=2, mage=2, champion=1), treasure=(talisman=1))
-    (droll  6) mage potion thief
+    (DragonSlayer  6) mage potion thief
 
     (delve=2, depth=3, experience=5, dungeon=(dragon=4), party=(fighter=1, cleric=2, mage=1, thief=1, champion=1), treasure=(talisman=1))
-    (droll  6) cleric dragon thief
+    (DragonSlayer  6) cleric dragon thief
 
     (delve=2, depth=3, experience=6, dungeon=(), party=(fighter=1, cleric=1, mage=1, champion=1), treasure=(talisman=1, portal=1))
-    (droll  9) descend
+    (DragonSlayer  9) descend
 
     (delve=2, depth=4, experience=6, dungeon=(skeleton=1, chest=1, potion=1, dragon=1), party=(fighter=1, cleric=1, mage=1, champion=1), treasure=(talisman=1, portal=1))
-    (droll  9) fighter skeleton
+    (DragonSlayer  9) fighter skeleton
 
     (delve=2, depth=4, experience=6, dungeon=(chest=1, potion=1, dragon=1), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1, portal=1))
-    (droll  9) mage chest
+    (DragonSlayer  9) mage chest
 
     (delve=2, depth=4, experience=6, dungeon=(potion=1, dragon=1), party=(cleric=1, champion=1), treasure=(talisman=1, scroll=1, portal=1))
-    (droll 10) descend
+    (DragonSlayer 10) descend
 
     (delve=2, depth=5, experience=6, dungeon=(goblin=1, skeleton=1, ooze=1, chest=1, potion=1, dragon=1), party=(cleric=1, champion=1), treasure=(talisman=1, scroll=1, portal=1))
-    (droll 10) cleric goblin
+    (DragonSlayer 10) cleric goblin
 
     (delve=2, depth=5, experience=6, dungeon=(skeleton=1, ooze=1, chest=1, potion=1, dragon=1), party=(champion=1), treasure=(talisman=1, scroll=1, portal=1))
-    (droll 10) champion skeleton
+    (DragonSlayer 10) champion skeleton
 
     (delve=2, depth=5, experience=6, dungeon=(ooze=1, chest=1, potion=1, dragon=1), party=(), treasure=(talisman=1, scroll=1, portal=1))
-    (droll 10) talisman ooze
+    (DragonSlayer 10) talisman ooze
 
     (delve=2, depth=5, experience=6, dungeon=(chest=1, potion=1, dragon=1), party=(), treasure=(scroll=1, portal=1))
-    (droll  9) retire
+    (DragonSlayer  9) retire
 
     (delve=3, experience=11, party=(fighter=1, mage=3, champion=3), ability=True, treasure=(scroll=1, portal=1))
-    (droll 14) descend
+    (DragonSlayer 14) descend
 
     (delve=3, depth=1, experience=11, dungeon=(skeleton=1), party=(fighter=1, mage=3, champion=3), ability=True, treasure=(scroll=1, portal=1))
-    (droll 14) mage skeleton
+    (DragonSlayer 14) mage skeleton
 
     (delve=3, depth=1, experience=11, dungeon=(), party=(fighter=1, mage=2, champion=3), ability=True, treasure=(scroll=1, portal=1))
-    (droll 14) descend
+    (DragonSlayer 14) descend
 
     (delve=3, depth=2, experience=11, dungeon=(chest=2), party=(fighter=1, mage=2, champion=3), ability=True, treasure=(scroll=1, portal=1))
-    (droll 14) champion chest
+    (DragonSlayer 14) champion chest
 
     (delve=3, depth=2, experience=11, dungeon=(), party=(fighter=1, mage=2, champion=2), ability=True, treasure=(scroll=1, bait=1, portal=1, scale=1))
-    (droll 16) descend
+    (DragonSlayer 16) descend
 
     (delve=3, depth=3, experience=11, dungeon=(skeleton=2, chest=1), party=(fighter=1, mage=2, champion=2), ability=True, treasure=(scroll=1, bait=1, portal=1, scale=1))
-    (droll 16) champion skeleton
+    (DragonSlayer 16) champion skeleton
 
     (delve=3, depth=3, experience=11, dungeon=(chest=1), party=(fighter=1, mage=2, champion=1), ability=True, treasure=(scroll=1, bait=1, portal=1, scale=1))
-    (droll 16) mage chest
+    (DragonSlayer 16) mage chest
 
     (delve=3, depth=3, experience=11, dungeon=(), party=(fighter=1, mage=1, champion=1), ability=True, treasure=(scroll=1, bait=2, portal=1, scale=1))
-    (droll 17) descend
+    (DragonSlayer 17) descend
 
     (delve=3, depth=4, experience=11, dungeon=(goblin=3, ooze=1), party=(fighter=1, mage=1, champion=1), ability=True, treasure=(scroll=1, bait=2, portal=1, scale=1))
-    (droll 17) ability
+    (DragonSlayer 17) ability
 
     (delve=3, depth=4, experience=11, dungeon=(dragon=4), party=(fighter=1, mage=1, champion=1), treasure=(scroll=1, bait=2, portal=1, scale=1))
-    (droll 17) mage dragon fighter
+    (DragonSlayer 17) mage dragon fighter
 
     (delve=3, depth=4, experience=12, dungeon=(), party=(champion=1), treasure=(scroll=1, elixir=1, bait=2, portal=1, scale=1))
-    (droll 19) retire
+    (DragonSlayer 19) retire
 
     (delve=3, experience=16, party=(champion=1), treasure=(scroll=1, elixir=1, bait=2, portal=1, scale=1))
-    (droll 23) EOF
+    (DragonSlayer 23) EOF
     """
     # Drive the game according to the script in the above docstring.
     s = Shell(randrange=random.Random(4).randrange, player=Knight)
@@ -277,67 +277,67 @@ def test_spellsword():
     """Runs the following scenario involving unique Spellsword/Battlemage details:
 
     (delve=1, party=(cleric=1, mage=3, thief=1, champion=1, scroll=1), ability=True, treasure=())
-    (droll  0) ability fighter
+    (Spellsword  0) ability fighter
 
     (delve=1, party=(fighter=1, cleric=1, mage=3, thief=1, champion=1, scroll=1), treasure=())
-    (droll  0) descend
+    (Spellsword  0) descend
 
     (delve=1, depth=1, dungeon=(dragon=1), party=(fighter=1, cleric=1, mage=3, thief=1, champion=1, scroll=1), treasure=())
-    (droll  0) descend
+    (Spellsword  0) descend
 
     (delve=1, depth=2, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, mage=3, thief=1, champion=1, scroll=1), treasure=())
-    (droll  0) scroll potion champion
+    (Spellsword  0) scroll potion champion
 
     (delve=1, depth=2, dungeon=(dragon=2), party=(fighter=1, cleric=1, mage=3, thief=1, champion=2), treasure=())
-    (droll  0) descend
+    (Spellsword  0) descend
 
     (delve=1, depth=3, dungeon=(goblin=2, ooze=1, dragon=2), party=(fighter=1, cleric=1, mage=3, thief=1, champion=2), treasure=())
-    (droll  0) mage goblin
+    (Spellsword  0) mage goblin
 
     (delve=1, depth=3, dungeon=(ooze=1, dragon=2), party=(fighter=1, cleric=1, mage=2, thief=1, champion=2), treasure=())
-    (droll  0) fighter ooze
+    (Spellsword  0) fighter ooze
 
     (delve=1, depth=3, dungeon=(dragon=2), party=(cleric=1, mage=2, thief=1, champion=2), treasure=())
-    (droll  0) descend
+    (Spellsword  0) descend
 
     (delve=1, depth=4, dungeon=(skeleton=1, chest=2, dragon=3), party=(cleric=1, mage=2, thief=1, champion=2), treasure=())
-    (droll  0) cleric skeleton
+    (Spellsword  0) cleric skeleton
 
     (delve=1, depth=4, dungeon=(chest=2, dragon=3), party=(mage=2, thief=1, champion=2), treasure=())
-    (droll  0) thief chest
+    (Spellsword  0) thief chest
 
     (delve=1, depth=4, dungeon=(dragon=3), party=(mage=2, champion=2), treasure=(elixir=1, scale=1))
-    (droll  2) champion dragon mage mage
+    (Spellsword  2) champion dragon mage mage
 
     (delve=1, depth=4, experience=1, dungeon=(), party=(champion=1), treasure=(elixir=1, bait=1, scale=1))
-    (droll  4) retire
+    (Spellsword  4) retire
 
     (delve=2, experience=5, party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) descend
+    (Battlemage  8) descend
 
     (delve=2, depth=1, experience=5, dungeon=(skeleton=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) cleric skeleton
+    (Battlemage  8) cleric skeleton
 
     (delve=2, depth=1, experience=5, dungeon=(), party=(fighter=1, thief=1, champion=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) descend
+    (Battlemage  8) descend
 
     (delve=2, depth=2, experience=5, dungeon=(skeleton=2), party=(fighter=1, thief=1, champion=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) champion skeleton
+    (Battlemage  8) champion skeleton
 
     (delve=2, depth=2, experience=5, dungeon=(), party=(fighter=1, thief=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) descend
+    (Battlemage  8) descend
 
     (delve=2, depth=3, experience=5, dungeon=(potion=2, dragon=1), party=(fighter=1, thief=1, scroll=3), ability=True, treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) scroll potion fighter mage
+    (Battlemage  8) scroll potion fighter mage
 
     (delve=2, depth=3, experience=5, dungeon=(dragon=1), party=(fighter=2, mage=1, thief=1, scroll=2), ability=True, treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) descend
+    (Battlemage  8) descend
 
     (delve=2, depth=4, experience=5, dungeon=(skeleton=1, ooze=1, potion=1, dragon=2), party=(fighter=2, mage=1, thief=1, scroll=2), ability=True, treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) ability
+    (Battlemage  8) ability
 
     (delve=2, depth=4, experience=5, dungeon=(), party=(fighter=2, mage=1, thief=1, scroll=2), treasure=(elixir=1, bait=1, scale=1))
-    (droll  8) EOF
+    (Battlemage  8) EOF
     """
     # Drive the game according to the script in the above docstring.
     s = Shell(randrange=random.Random(17).randrange, player=Spellsword)

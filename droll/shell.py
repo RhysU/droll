@@ -56,7 +56,7 @@ class Shell(cmd.Cmd):
     def _update_prompt(self):
         """Compute a prompt including the current score."""
         score = world.score(self._world) if self._world else 0
-        self.prompt = '(droll {:-2d}) '.format(score)
+        self.prompt = '({} {:-2d}) '.format(self._player.name, score)
 
     def _next_delve_or_exit(self) -> bool:
         """Either start next delve or exit the game, printing final score."""

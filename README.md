@@ -32,7 +32,7 @@ collections.namedtuple and free functions instead of OOPing all-the-things.
 $ droll --seed 7 Knight
 
 (delve=1, party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(droll  0) help
+(Knight  0) help
 
 Feasible commands (help <command>):
 ===================================
@@ -40,10 +40,10 @@ descend
 
 
 (delve=1, party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(droll  0) descend
+(Knight  0) descend
 
 (delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(droll  0) help
+(Knight  0) help
 
 Feasible commands (help <command>):
 ===================================
@@ -51,7 +51,7 @@ ability  champion   cleric   fighter   mage   retreat  thief
 
 
 (delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(droll  0) help fighter
+(Knight  0) help fighter
 Attack monsters, quaff potions, and open chests with a fighter like so:
 
         champion skeleton            # Attack skeleton(s)
@@ -61,31 +61,31 @@ Attack monsters, quaff potions, and open chests with a fighter like so:
 
 
 (delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(droll  0) fighter goblin
+(Knight  0) fighter goblin
 
 (delve=1, depth=1, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(droll  0) descend
+(Knight  0) descend
 
 (delve=1, depth=2, dungeon=(ooze=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(droll  0) mage ooze
+(Knight  0) mage ooze
 
 (delve=1, depth=2, dungeon=(potion=1), party=(fighter=1, cleric=1, thief=1, champion=2), ability=True, treasure=())
-(droll  0) champion potion mage
+(Knight  0) champion potion mage
 
 (delve=1, depth=2, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
-(droll  0) descend
+(Knight  0) descend
 
 (delve=1, depth=3, dungeon=(goblin=1, skeleton=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
-(droll  0) help ability
+(Knight  0) help ability
 Invoke the player's ability.
 
     Convert all monster faces into dragon dice.
 
 (delve=1, depth=3, dungeon=(goblin=1, skeleton=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
-(droll  0) ability
+(Knight  0) ability
 
 (delve=1, depth=3, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
-(droll  0) help
+(Knight  0) help
 
 Feasible commands (help <command>):
 ===================================
@@ -93,59 +93,59 @@ champion   cleric   descend  fighter   mage   retire  thief
 
 
 (delve=1, depth=3, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
-(droll  0) descend
+(Knight  0) descend
 
 (delve=1, depth=4, dungeon=(goblin=2, chest=2, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
-(droll  0) fighter goblin
+(Knight  0) fighter goblin
 
 (delve=1, depth=4, dungeon=(chest=2, dragon=2), party=(cleric=1, mage=1, thief=1, champion=1), treasure=())
-(droll  0) thief chest
+(Knight  0) thief chest
 
 (delve=1, depth=4, dungeon=(dragon=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1, elixir=1))
-(droll  2) descend
+(Knight  2) descend
 
 (delve=1, depth=5, dungeon=(goblin=2, chest=1, potion=2, dragon=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1, elixir=1))
-(droll  2) champion goblin
+(Knight  2) champion goblin
 
 (delve=1, depth=5, dungeon=(chest=1, potion=2, dragon=2), party=(cleric=1, mage=1), treasure=(talisman=1, elixir=1))
-(droll  2) mage potion champion thief
+(Knight  2) mage potion champion thief
 
 (delve=1, depth=5, dungeon=(chest=1, dragon=2), party=(cleric=1, thief=1, champion=1), treasure=(talisman=1, elixir=1))
-(droll  2) thief chest
+(Knight  2) thief chest
 
 (delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
-(droll  3) help retreat
+(Knight  3) help retreat
 Retreat from the dungeon at any time (e.g. after being defeated).
 
         Automatically starts a new delve or ends game, as suitable.
 
 (delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
-(droll  3) retreat
+(Knight  3) retreat
 Why retreat when you could instead retire?
 
 (delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
-(droll  3) retire
+(Knight  3) retire
 
 (delve=2, experience=5, party=(fighter=1, cleric=1, champion=5), ability=True, treasure=(talisman=1, sceptre=1, elixir=1))
-(droll  8) descend
+(DragonSlayer  8) descend
 
 (delve=2, depth=1, experience=5, dungeon=(chest=1), party=(fighter=1, cleric=1, champion=5), ability=True, treasure=(talisman=1, sceptre=1, elixir=1))
-(droll  8) champion chest
+(DragonSlayer  8) champion chest
 
 (delve=2, depth=1, experience=5, dungeon=(), party=(fighter=1, cleric=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
-(droll  9) descend
+(DragonSlayer  9) descend
 
 (delve=2, depth=2, experience=5, dungeon=(goblin=1, skeleton=1), party=(fighter=1, cleric=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
-(droll  9) talisman goblin
+(DragonSlayer  9) talisman goblin
 
 (delve=2, depth=2, experience=5, dungeon=(skeleton=1), party=(fighter=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
-(droll  9) sceptre skeleton
+(DragonSlayer  9) sceptre skeleton
 
 (delve=2, depth=2, experience=5, dungeon=(), party=(fighter=1, champion=4), ability=True, treasure=(talisman=2, elixir=1))
-(droll  8) elixir mage
+(DragonSlayer  8) elixir mage
 
 (delve=2, depth=2, experience=5, dungeon=(), party=(fighter=1, mage=1, champion=4), ability=True, treasure=(talisman=2))
-(droll  7) ^D
+(DragonSlayer  7) ^D
 ```
 
 ## Testing
