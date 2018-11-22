@@ -12,23 +12,40 @@ and then come back here.
 
 Default player semantics (i.e. no special abilities).  Special semantics for the
 Knight with advancement to DragonSlayer after 5 experience points.  Also,
-semantics for Spellsword with advancement to Battlemage.  Other characters
-remain to be done.  Known shortcomings are flagged with TODOs.
+semantics for Spellsword with advancement to Battlemage.  Likewise, Minstrel
+with advancement to Bard.  Other characters remain to be done.  Known
+shortcomings are flagged with TODOs.  Tab-completion is present in the shell,
+which greatly speeds up playing.
 
 ## Why implement it?
 
-It seemed like a fun thing to hack on.  Possibly a fun problem to throw into
-reinforcement learning algorithms as (a) the strategy isn't too complicated, (b)
-the score is very straightforward, and (c) there's some probabilistic behavior
-in both the basic die mechanics as well as the expected value of the treasure.
+It seemed like a fun thing to hack on.  Also, I was curious how much code was
+required to capture a game that children will catch onto in the space of 20
+minutes.
 
-Also, I was curious how much code was required to capture a game that children
-will catch onto in the space of 20 minutes.  And, I wanted to stick to
-collections.namedtuple and free functions instead of OOPing all-the-things.
+This game seems like a fun problem to throw into reinforcement learning
+algorithms as (a) the strategy isn't too complicated, (b) the score is very
+straightforward, and (c) there's probabilistic behavior in both the basic die
+mechanics as well as the expected value of the treasure.  That said, I've not
+yet tried such a thing.
 
 ## What does it look like?
 
 ```
+$ droll --help
+usage: droll [-h] [--seed N] {Default,Knight,Minstrel,Spellsword}
+
+Command-line version of droll.
+
+positional arguments:
+  {Default,Knight,Minstrel,Spellsword}
+                        Select the hero for this game.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --seed N              An integer to seed random number generation.
+
+
 $ droll --seed 7 Knight
 
 (delve=1, party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
