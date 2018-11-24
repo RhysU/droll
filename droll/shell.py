@@ -81,8 +81,7 @@ class Shell(cmd.Cmd):
     def onecmd(self, line):
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
         # Preserve all observable state prior to processing the command
-        self._undo.append(Undo(tokens=parse(line),
-                               player=self._player,
+        self._undo.append(Undo(player=self._player,
                                randhash=self._randhash(),
                                world=self._world))
 
@@ -299,7 +298,6 @@ class Shell(cmd.Cmd):
 
 # Details necessary to implement undo tracking in Shell
 Undo = collections.namedtuple('Undo', (
-    'tokens',
     'player',
     'randhash',
     'world',
