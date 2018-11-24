@@ -14,9 +14,17 @@ from . import player
 from . import struct
 from . import world
 
-
 # TODO Populate intro for Shell
 # TODO Include 'undo' in help, when appropriate
+
+
+# Details necessary to implement undo tracking in Shell
+Undo = collections.namedtuple('Undo', (
+    'player',
+    'randhash',
+    'world',
+))
+
 
 class Shell(cmd.Cmd):
     """"REPL permitting playing a game via tab-completion shell."""
@@ -80,46 +88,44 @@ class Shell(cmd.Cmd):
 
     def onecmd(self, line):
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
-        # Preserve all observable state prior to processing the command
-        self._undo.append(Undo(player=self._player,
-                               randhash=self._randhash(),
-                               world=self._world))
-
-        # Process the current command by delegating to superclass
+        # Track observable state before and after command processing.
+        # Beware that do_undo(...), implemented below, mutates self._undo.
+        self._undo.append(self._compute_undo())
         result = super(Shell, self).onecmd(line)
+        after = self._compute_undo()
 
-        # After each command, retain undo candidates that disallow cheating.
-        # These are the candidates where, e.g., no dice have been rolled.
-        # Beware that do_undo(...), below, mutates self._undo.
+        # Retain only undo candidates that disallow cheating.
+        # Okay would be 'Oh! I should have used a fighter on the goblin!'
+        # Not okay would be undoing a 'descend' to roll a different dungeon.
         if not self._undo:
-            pass                # No prior undo against which to compare
-        elif self._undo[-1].randhash != self._randhash():
+            pass  # No prior undo against which to compare
+        elif after.randhash != self._undo[-1].randhash:
             self._undo.clear()  # Change in random state purges history
-        elif (self._undo[-1].player == self._player and
-              self._undo[-1].world == self._world):
-            self._undo.pop()    # Ignore non-changing state (e.g. 'help')
+        elif after == self._undo[-1]:
+            self._undo.pop()  # Ignore non-changing state (e.g. 'help')
         else:
-            pass                # Change retained for a later 'undo'
+            pass  # Change retained for possible later 'undo'
 
         return result
+
+    def _compute_undo(self) -> Undo:
+        """Produce an Undo instance comprising all current Shell state."""
+        return Undo(player=self._player,
+                    randhash=hash(self._random.getstate()),
+                    world=self._world)
 
     def do_undo(self, line):
         """Undo prior commands.  Only permitted when nothing rolled/drawn."""
         with ShellManager():
-            # self._random not mutated-- by precondition it did not change
-            # within the tracked undo history per postcmd(...) processing.
+            # self._random not mutated-- by onecmd(...) it did not change.
             if len(self._undo) > 1:
-                self._undo.pop()             # 'undo' was itself on undo list...
+                self._undo.pop()  # 'undo' was itself on undo list...
                 previous = self._undo.pop()  # ...hence two pops to previous.
                 self._player = previous.player
                 self._world = previous.world
             else:
                 raise error.DrollError("Cannot undo any prior command(s).")
         return False
-
-    def _randhash(self) -> int:
-        """Obtain a hash representing the current Random state."""
-        return hash(self._random.getstate())
 
     def do_EOF(self, line):
         """End-of-file causes shell exit."""
@@ -294,14 +300,6 @@ class Shell(cmd.Cmd):
 
     def help_tools(self):
         print("""Tools behave identically to a thief.""")
-
-
-# Details necessary to implement undo tracking in Shell
-Undo = collections.namedtuple('Undo', (
-    'player',
-    'randhash',
-    'world',
-))
 
 
 class ShellManager:
