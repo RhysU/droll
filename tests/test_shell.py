@@ -134,6 +134,53 @@ def test_simple():
         s.onecmd(following_command)
 
 
+def test_undo():
+    """Based upon test_simple(...), verify undo behaving as expected."""
+    s = Shell(random=random.Random(4), player=Default)
+    s.preloop()
+
+    # (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
+    s.onecmd("undo")  # NOP
+    s.onecmd("descend")
+
+    # (delve=1, depth=1, dungeon=(goblin=1),
+    #  party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
+    assert s._world.dungeon.goblin == 1
+    s.onecmd("undo")  # NOP
+    s.onecmd("fighter goblin")
+    s.onecmd("undo")
+    s.onecmd("cleric goblin")
+    s.onecmd("undo")
+    s.onecmd("undo")  # NOP
+    s.onecmd("mage goblin")
+    s.onecmd("descend")
+
+    # (delve=1, depth=2, dungeon=(goblin=2), ...)
+    assert s._world.dungeon.goblin == 2
+    s.onecmd("undo")  # NOP
+    s.onecmd("thief goblin")
+    s.onecmd("fighter goblin")
+    s.onecmd("undo")
+    s.onecmd("undo")
+    s.onecmd("fighter goblin")
+    s.onecmd("descend")
+
+    # (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), ...)
+    assert s._world.dungeon.ooze == 1
+    assert s._world.dungeon.chest == 1
+    assert s._world.dungeon.potion == 1
+    s.onecmd("undo")  # NOP
+    s.onecmd("cleric ooze")
+    s.onecmd("undo")
+    s.onecmd("cleric ooze")
+    s.onecmd("thief chest")
+    s.onecmd("undo")  # NOP
+    s.onecmd("scroll potion champion")
+    s.onecmd("undo")
+    s.onecmd("scroll potion thief")
+    s.onecmd("descend")
+
+
 def test_knight():
     """Runs the following scenario involving unique Knight/Dragonslayer details:
 

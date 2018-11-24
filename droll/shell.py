@@ -16,6 +16,7 @@ from . import world
 
 
 # TODO Populate intro for Shell
+# TODO Include 'undo' in help, when appropriate
 
 class Shell(cmd.Cmd):
     """"REPL permitting playing a game via tab-completion shell."""
