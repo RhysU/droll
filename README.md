@@ -15,7 +15,8 @@ Knight with advancement to DragonSlayer after 5 experience points.  Also,
 semantics for Spellsword with advancement to Battlemage.  Likewise, Minstrel
 with advancement to Bard.  Other characters remain to be done.  Known
 shortcomings are flagged with TODOs.  Tab-completion is present in the shell,
-which greatly speeds up playing.
+which greatly speeds up playing.  Deterministic actions can be undone using
+the 'undo' command.
 
 ## Why implement it?
 
