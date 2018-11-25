@@ -15,6 +15,7 @@ from . import struct
 from . import world
 
 # TODO Populate intro for Shell
+# TODO Improve test coverage for 'undo'
 # TODO Include 'undo' in help, when appropriate
 
 
