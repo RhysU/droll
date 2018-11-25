@@ -118,6 +118,7 @@ class Shell(cmd.Cmd):
     def do_undo(self, line):
         """Undo prior commands.  Only permitted when nothing rolled/drawn."""
         with ShellManager():
+            no_arguments(line)
             # self._random not mutated-- by onecmd(...) it did not change.
             if len(self._undo) > 1:
                 self._undo.pop()  # 'undo' was itself on undo list...
