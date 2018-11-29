@@ -16,7 +16,6 @@ from . import world
 
 # TODO Populate intro for Shell
 # TODO Improve test coverage for 'undo'
-# TODO Include 'undo' in help, when appropriate
 
 
 # Details necessary to implement undo tracking in Shell
@@ -207,7 +206,7 @@ class Shell(cmd.Cmd):
             possible.append('retreat')
         except error.DrollError:
             pass
-        if self._undo:
+        if len(self._undo) > 1:
             possible.append('undo')
 
         results = [x for x in possible if x.startswith(text)]
