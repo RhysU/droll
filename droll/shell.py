@@ -15,7 +15,6 @@ from . import struct
 from . import world
 
 # TODO Populate intro for Shell
-# TODO Improve test coverage for 'undo'
 
 
 # Details necessary to implement undo tracking in Shell
@@ -86,7 +85,7 @@ class Shell(cmd.Cmd):
         score = world.score(self._world) if self._world else 0
         self.prompt = '({} {:-2d}) '.format(self._player.name, score)
 
-    def onecmd(self, line):
+    def onecmd(self, line, *, _raises=False):
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
         # Track observable state before and after command processing.
         # Beware that do_undo(...), implemented below, mutates self._undo.
@@ -95,6 +94,8 @@ class Shell(cmd.Cmd):
             result = False
             result = super(Shell, self).onecmd(line)
         except error.DrollError as e:
+            if _raises:
+                raise
             print(*e.args)
         after = self._compute_undo()
 

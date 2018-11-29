@@ -6,6 +6,9 @@
 import random
 import typing
 
+import pytest
+
+from droll.error import DrollError
 from droll.heroes import Knight, Minstrel, Spellsword
 from droll.player import Default
 from droll.shell import Shell
@@ -137,48 +140,58 @@ def test_simple():
 def test_undo():
     """Based upon test_simple(...), verify undo behaving as expected."""
     s = Shell(random=random.Random(4), player=Default)
+
+    # Supplies a private flag so that DrollErrors percolate to this level
+    def onecmd(line):
+        s.onecmd(line, _raises=True)
+
     s.preloop()
 
     # (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
-    s.onecmd("undo")  # NOP
-    s.onecmd("descend")
+    with pytest.raises(DrollError):
+        onecmd("undo")
+    onecmd("descend")
 
     # (delve=1, depth=1, dungeon=(goblin=1),
     #  party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
-    assert s._world.dungeon.goblin == 1
-    s.onecmd("undo")  # NOP
-    s.onecmd("fighter goblin")
-    s.onecmd("undo")
-    s.onecmd("cleric goblin")
-    s.onecmd("undo")
-    s.onecmd("undo")  # NOP
-    s.onecmd("mage goblin")
-    s.onecmd("descend")
+    with pytest.raises(DrollError):
+        onecmd("undo")
+    onecmd("fighter goblin")
+    onecmd("undo")
+    onecmd("cleric goblin")
+    onecmd("undo")
+    with pytest.raises(DrollError):
+        onecmd("undo")
+    onecmd("mage goblin")
+    onecmd("descend")
 
     # (delve=1, depth=2, dungeon=(goblin=2), ...)
     assert s._world.dungeon.goblin == 2
-    s.onecmd("undo")  # NOP
-    s.onecmd("thief goblin")
-    s.onecmd("fighter goblin")
-    s.onecmd("undo")
-    s.onecmd("undo")
-    s.onecmd("fighter goblin")
-    s.onecmd("descend")
+    with pytest.raises(DrollError):
+        onecmd("undo")
+    onecmd("thief goblin")
+    onecmd("fighter goblin")
+    onecmd("undo")
+    onecmd("undo")
+    onecmd("fighter goblin")
+    onecmd("descend")
 
     # (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), ...)
     assert s._world.dungeon.ooze == 1
     assert s._world.dungeon.chest == 1
     assert s._world.dungeon.potion == 1
-    s.onecmd("undo")  # NOP
-    s.onecmd("cleric ooze")
-    s.onecmd("undo")
-    s.onecmd("cleric ooze")
-    s.onecmd("thief chest")
-    s.onecmd("undo")  # NOP
-    s.onecmd("scroll potion champion")
-    s.onecmd("undo")
-    s.onecmd("scroll potion thief")
-    s.onecmd("descend")
+    with pytest.raises(DrollError):
+        onecmd("undo")
+    onecmd("cleric ooze")
+    onecmd("undo")
+    onecmd("cleric ooze")
+    onecmd("thief chest")
+    with pytest.raises(DrollError):
+        onecmd("undo")
+    onecmd("scroll potion champion")
+    onecmd("undo")
+    onecmd("scroll potion thief")
+    onecmd("descend")
 
 
 def test_knight():
