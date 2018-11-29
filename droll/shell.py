@@ -202,6 +202,8 @@ class Shell(cmd.Cmd):
         with ShellManager(verbose=False):
             world.retreat(self._world)
             possible.append('retreat')
+        if self._undo:
+            possible.append('undo')
         results = [x for x in possible if x.startswith(text)]
 
         # Add any hero-related possibilities
