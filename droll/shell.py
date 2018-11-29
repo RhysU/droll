@@ -92,7 +92,11 @@ class Shell(cmd.Cmd):
         # Track observable state before and after command processing.
         # Beware that do_undo(...), implemented below, mutates self._undo.
         self._undo.append(self._compute_undo())
-        result = super(Shell, self).onecmd(line)
+        try:
+            result = False
+            result = super(Shell, self).onecmd(line)
+        except error.DrollError as e:
+            print(*e.args)
         after = self._compute_undo()
 
         # Retain only undo candidates that disallow cheating.
@@ -117,16 +121,16 @@ class Shell(cmd.Cmd):
 
     def do_undo(self, line):
         """Undo prior commands.  Only permitted when nothing rolled/drawn."""
-        with ShellManager():
-            no_arguments(line)
-            # self._random not mutated-- by onecmd(...) it did not change.
-            if len(self._undo) > 1:
-                self._undo.pop()  # 'undo' was itself on undo list...
-                previous = self._undo.pop()  # ...hence two pops to previous.
-                self._player = previous.player
-                self._world = previous.world
-            else:
-                raise error.DrollError("Cannot undo any prior command(s).")
+        no_arguments(line)
+        # self._random not mutated-- by onecmd(...) it did not change.
+        if len(self._undo) > 1:
+            self._undo.pop()  # 'undo' was itself on undo list...
+            previous = self._undo.pop()  # ...hence two pops to previous.
+            self._player = previous.player
+            self._world = previous.world
+        else:
+            raise error.DrollError("Cannot undo any prior command(s).")
+
         return False
 
     def do_EOF(self, line):
@@ -143,43 +147,38 @@ class Shell(cmd.Cmd):
 
     def do_ability(self, line):
         """Invoke the player's ability."""
-        with ShellManager():
-            self._world = player.apply(self._player, self._world,
-                                       self._random.randrange, 'ability',
-                                       *parse(line))
+        self._world = player.apply(self._player, self._world,
+                                   self._random.randrange, 'ability',
+                                   *parse(line))
 
     def default(self, line):
         """Apply some named hero or treasure to some collection of nouns."""
-        with ShellManager():
-            self._world = player.apply(self._player, self._world,
-                                       self._random.randrange, *parse(line))
+        self._world = player.apply(self._player, self._world,
+                                   self._random.randrange, *parse(line))
 
     def do_descend(self, line):
         """Descend to the next depth (in contrast to retiring/retreating)."""
-        with ShellManager():
-            no_arguments(line)
-            self._world = world.next_dungeon(self._world,
-                                             self._player.roll.dungeon,
-                                             self._random.randrange)
+        no_arguments(line)
+        self._world = world.next_dungeon(self._world,
+                                         self._player.roll.dungeon,
+                                         self._random.randrange)
 
     def do_retire(self, line):
         """Retire to the tavern after successfully clearing a dungeon depth..
 
         Automatically uses a 'ring' or 'portal' treasure if so required.
         Automatically starts a new delve or ends game, as suitable."""
-        with ShellManager():
-            no_arguments(line)
-            self._world = world.retire(self._world)
-            return self._next_delve_or_exit()
+        no_arguments(line)
+        self._world = world.retire(self._world)
+        return self._next_delve_or_exit()
 
     def do_retreat(self, line):
         """Retreat from the dungeon at any time (e.g. after being defeated).
 
         Automatically starts a new delve or ends game, as suitable."""
-        with ShellManager():
-            no_arguments(line)
-            self._world = world.retreat(self._world)
-            return self._next_delve_or_exit()
+        no_arguments(line)
+        self._world = world.retreat(self._world)
+        return self._next_delve_or_exit()
 
     #######################
     # COMPLETION BELOW HERE
@@ -191,19 +190,26 @@ class Shell(cmd.Cmd):
         possible = []
         if self._world.ability:
             possible.append('ability')
-        with ShellManager(verbose=False):
+        try:
             world.next_dungeon(self._world,
                                self._player.roll.dungeon,
                                dummy_randrange)
             possible.append('descend')
-        with ShellManager(verbose=False):
+        except error.DrollError:
+            pass
+        try:
             world.retire(self._world)
             possible.append('retire')
-        with ShellManager(verbose=False):
+        except error.DrollError:
+            pass
+        try:
             world.retreat(self._world)
             possible.append('retreat')
+        except error.DrollError:
+            pass
         if self._undo:
             possible.append('undo')
+
         results = [x for x in possible if x.startswith(text)]
 
         # Add any hero-related possibilities
@@ -300,22 +306,6 @@ class Shell(cmd.Cmd):
 
     def help_tools(self):
         print("""Tools behave identically to a thief.""")
-
-
-class ShellManager:
-    """Print DrollErrors (if verbose) while propagating other exceptions."""
-
-    def __init__(self, verbose=True):
-        self._verbose = verbose
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if isinstance(exc_val, error.DrollError):
-            if self._verbose:
-                print(exc_val)
-            return True
 
 
 def parse(line: str) -> typing.Tuple[str]:
