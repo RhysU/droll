@@ -193,7 +193,7 @@ class Shell(cmd.Cmd):
 
         # Which world actions might be taken successfully given game state?
         possible = []
-        if self._world.ability and dungeon_dice:
+        if self._world.ability:
             possible.append('ability')
         with ShellManager(verbose=False):
             world.next_dungeon(self._world,
