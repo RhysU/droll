@@ -19,14 +19,14 @@ def _state():
 
 
 def test_game_initial():
-    game = droll.world.new_game()
+    game = droll.world.new_world()
     assert 0 == game.experience
     assert 0 == sum(game.treasure)
     assert (6 * 3) + (4 * 3) + 6 == sum(game.reserve)
 
 
 def test_delve_initial(state):
-    game = droll.world.new_game()
+    game = droll.world.new_world()
     game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
     assert 0 == game.depth
     assert game.ability is True
@@ -34,7 +34,7 @@ def test_delve_initial(state):
 
 
 def test_dungeon_initial(state):
-    game = droll.world.new_game()
+    game = droll.world.new_world()
     game = droll.world.next_delve(game, droll.dice.roll_party,
                                   state.randrange)
     game = droll.world.next_dungeon(game, droll.dice.roll_dungeon,
@@ -44,7 +44,7 @@ def test_dungeon_initial(state):
 
 
 def test_draw_treasure(state):
-    pre = droll.world.new_game()
+    pre = droll.world.new_world()
     post = droll.world.draw_treasure(pre, state.randrange)
     assert sum(pre.treasure) == 0
     assert sum(post.treasure) == 1
@@ -52,7 +52,7 @@ def test_draw_treasure(state):
 
 
 def test_replace_treasure():
-    pre = droll.world.new_game()
+    pre = droll.world.new_world()
     pre = pre._replace(treasure=pre.treasure._replace(elixir=1))
     post = droll.world.replace_treasure(pre, 'elixir')
     assert sum(pre.treasure) == 1
@@ -61,7 +61,7 @@ def test_replace_treasure():
 
 
 def test_retire_simple(state):
-    pre = droll.world.new_game()
+    pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
     pre = pre._replace(
         depth=3,
@@ -79,7 +79,7 @@ def test_retire_simple(state):
 
 
 def test_retire_monsters(state):
-    pre = droll.world.new_game()
+    pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
     pre = pre._replace(
         depth=3,
@@ -110,7 +110,7 @@ def test_retire_monsters(state):
 
 
 def test_retire_dragon(state):
-    pre = droll.world.new_game()
+    pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
     pre = pre._replace(
         depth=3,
@@ -151,7 +151,7 @@ def test_retire_dragon(state):
 
 
 def test_next_dungeon_simple(state):
-    pre = droll.world.new_game()
+    pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
     pre = pre._replace(
         depth=3,
@@ -169,7 +169,7 @@ def test_next_dungeon_simple(state):
 
 
 def test_next_dungeon_monsters(state):
-    pre = droll.world.new_game()
+    pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
     pre = pre._replace(
         depth=3,
@@ -199,7 +199,7 @@ def test_next_dungeon_monsters(state):
 
 
 def test_next_dungeon_dragon(state):
-    pre = droll.world.new_game()
+    pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
     pre = pre._replace(
         depth=3,

@@ -17,7 +17,7 @@ import droll.world as world
 
 @pytest.fixture(name='game')
 def _game():
-    return world.new_game()._replace(
+    return world.new_world()._replace(
         dungeon=struct.Dungeon(
             goblin=0,
             skeleton=0,

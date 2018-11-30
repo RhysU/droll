@@ -51,7 +51,7 @@ class Shell(cmd.Cmd):
     def preloop(self):
         """Prepare a new game and start the first delve."""
         self._undo = []
-        self._world = world.new_game()
+        self._world = world.new_world()
         if self._next_delve_or_exit():
             raise RuntimeError('Unexpected True during preloop()')
         # Causes printing of initial world state

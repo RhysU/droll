@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Functionality associated with game state and world mechanics."""
+"""Functionality associated with world state and world mechanics."""
 
 import copy
 import functools
@@ -38,8 +38,8 @@ def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
                                  not blocking_dragon(dungeon))
 
 
-def new_game() -> struct.World:
-    """Establish a new game independent of a delve/dungeon."""
+def new_world() -> struct.World:
+    """Establish a new world independent of a delve/dungeon."""
     return struct.World(
         delve=0,
         depth=None,
@@ -59,7 +59,7 @@ def next_delve(
         *,
         _party_dice: int = 7
 ) -> struct.World:
-    """Establish new delve within a game, optionally transforming the party.
+    """Establish new delve within a world, optionally transforming the party.
 
     Argument roll_party can be dice.roll_party but other choices okay."""
     if world.delve >= 3:
@@ -85,7 +85,7 @@ def next_dungeon(
 
     If necessary, a ring of invisibility will be used to sneak past a dragon.
     Argument roll_dungeon can be dice.roll_dungeon but other choices okay
-    Adheres to the specified number of dice available in the game."""
+    Adheres to the specified number of dice available in the world."""
     if not defeated_monsters(world.dungeon):
         raise error.DrollError('Must defeat foes to proceed to next dungeon.')
 
@@ -154,7 +154,7 @@ def retreat(world: struct.World) -> struct.World:
 
 
 def score(world: struct.World) -> int:
-    """Compute the present score for the game, including all treasure."""
+    """Compute the present score for the world, including all treasure."""
     return (
             world.experience +
             sum(world.treasure) +  # Each piece of treasure is +1 point
