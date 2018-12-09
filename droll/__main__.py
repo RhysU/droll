@@ -7,6 +7,7 @@ import collections
 import random
 import sys
 
+from .shell import Game
 from .heroes import Knight, Minstrel, Spellsword
 from .player import Default
 from .shell import Shell
@@ -19,7 +20,7 @@ AVAILABLE_HEROES = collections.OrderedDict([
 ])
 
 
-def main(args=None):
+def main(args=None) -> None:
     parser = argparse.ArgumentParser(prog='droll', description=__doc__)
     parser.add_argument('hero', choices=AVAILABLE_HEROES.keys(),
                         help='Select the hero for this game.')
@@ -27,11 +28,10 @@ def main(args=None):
                         help='An integer to seed random number generation.')
     arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
-    s = Shell(
-        player=AVAILABLE_HEROES.get(arguments.hero),
-        random=random.Random(*randseed),
-    )
-    s.cmdloop()
+    g = Game(player=AVAILABLE_HEROES.get(arguments.hero),
+             random=random.Random(*randseed))
+    s = Shell(g)
+    return s.cmdloop()
 
 
 if __name__ == '__main__':

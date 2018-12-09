@@ -13,9 +13,14 @@ from . import struct
 from . import world
 
 
-class GameState(enum.IntEnum):
-    DONE = 0
+class GameState(enum.Enum):
+    """Game should STOP or one can still PLAY?"""
+    STOP = 0
     PLAY = 1
+
+    def __bool__(self):
+        """All non-STOP states coerce to False."""
+        return self.value == self.STOP.value
 
 
 class Game:
@@ -32,6 +37,17 @@ class Game:
         if self._next_delve() != GameState.PLAY:
             raise RuntimeError('Unexpected GameState during constructor()')
 
+    def __eq__(self, other) -> bool:
+        """Is other equivalent to self?"""
+        return (isinstance(other, Game) and
+                self._player == other._player and
+                self._world == other._world and
+                self.randhash() == other.randhash())
+
+    def randhash(self) -> int:
+        """Hash of the current random state."""
+        return hash(self._random.getstate())
+
     def _next_delve(self) -> GameState:
         """Either start next delve or complete this game."""
         try:
@@ -43,7 +59,7 @@ class Game:
             self._player = self._player.advance(self._world)
             return GameState.PLAY
         except error.DrollError:
-            return GameState.DONE
+            return GameState.STOP
 
     def summary(self) -> str:
         """Brief, string description of the world."""
@@ -57,14 +73,14 @@ class Game:
         """A prompt-like string including the player name and score."""
         return '({} {:-2d})'.format(self._player.name, self.score())
 
-    def ability(self, *args: str) -> GameState.PLAY:
+    def ability(self, *args: str) -> GameState:
         """Invoke the player's ability."""
         self._world = player.apply(self._player, self._world,
                                    self._random.randrange, 'ability',
                                    *args)
         return GameState.PLAY
 
-    def apply(self, *args: str) -> GameState.PLAY:
+    def apply(self, *args: str) -> GameState:
         """Apply some named hero or treasure to some collection of nouns."""
         self._world = player.apply(self._player, self._world,
                                    self._random.randrange, *args)

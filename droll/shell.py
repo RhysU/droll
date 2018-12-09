@@ -1,110 +1,63 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""A REPL permitting playing a game via a tab-completion shell."""
+"""A REPL permitting playing a Game via a tab-completion shell."""
 import cmd
-import collections
+import copy
+import functools
 import textwrap
 import typing
-from random import Random
 
 from . import action
-from . import error
-from . import player
-from . import struct
-from . import world
-
-# TODO Populate intro for Shell
-
-
-# Details necessary to implement undo tracking in Shell
-Undo = collections.namedtuple('Undo', (
-    'player',
-    'randhash',
-    'world',
-))
+from .error import DrollError
+from .game import Game, GameState
 
 
 class Shell(cmd.Cmd):
-    """"REPL permitting playing a game via tab-completion shell."""
+    """"REPL permitting playing a Game via tab-completion shell."""
 
-    ######################
-    # LIFECYCLE BELOW HERE
-    ######################
-
-    def __init__(
-            self,
-            player: struct.Player = player.Default,
-            random: Random = None
-    ) -> None:
+    def __init__(self, game: Game) -> None:
         super(Shell, self).__init__()
-        # Review postcmd(...) and do_undo(...) when modifying instance state!
-        self._player = player
-        self._random = Random() if random is None else random
+        assert game is not None
+        self._game = game
         self._undo = None
-        self._world = None
 
-    def summary(self) -> str:
-        """Brief, string description of the present game state."""
-        return '(None)' if self._world is None else struct.brief(self._world)
-
-    def preloop(self):
+    def preloop(self) -> None:
         """Prepare a new game and start the first delve."""
+        assert self._undo is None, "Cannot call preloop(...) multiple times."
         self._undo = []
-        self._world = world.new_world()
-        if self._next_delve_or_exit():
-            raise RuntimeError('Unexpected True during preloop()')
-        # Causes printing of initial world state
-        self.postcmd(stop=False, line='')
+        self.postcmd(stop=False, line='')  # Prints initial world state
 
-    def _next_delve_or_exit(self) -> bool:
-        """Either start next delve or exit the game, printing final score."""
-        try:
-            # Record any world updates
-            self._world = world.next_delve(self._world,
-                                           self._player.roll.party,
-                                           self._random.randrange)
-            # Permit the player to advance to higher abilities
-            self._player = self._player.advance(self._world)
-            return False
-        except error.DrollError:
-            return True
-
-    def postcmd(self, stop, line):
+    def postcmd(self, stop, line) -> bool:
         """Print game state after each commmand and final details on exit."""
-        self._update_prompt()
+        self.prompt = self._game.prompt() + ' '
         print()
         if line != 'EOF':
-            print(self.summary())
+            print(self._game.summary())
             if stop:
                 print(self.prompt)
         return stop
 
-    def _update_prompt(self):
-        """Compute a prompt including the current score."""
-        score = world.score(self._world) if self._world else 0
-        self.prompt = '({} {:-2d}) '.format(self._player.name, score)
-
-    def onecmd(self, line, *, _raises=False):
+    def onecmd(self, line, *, _raises=False) -> GameState:
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
         # Track observable state before and after command processing.
         # Beware that do_undo(...), implemented below, mutates self._undo.
-        self._undo.append(self._compute_undo())
+        self._undo.append(copy.copy(self._game))  # FIXME No early mutation
         try:
-            result = False
+            result = GameState.PLAY
             result = super(Shell, self).onecmd(line)
-        except error.DrollError as e:
+        except DrollError as e:
             if _raises:
                 raise
             print(*e.args)
-        after = self._compute_undo()
+        after = copy.copy(self._game)
 
         # Retain only undo candidates that disallow cheating.
         # Okay would be 'Oh! I should have used a fighter on the goblin!'
         # Not okay would be undoing a 'descend' to roll a different dungeon.
         if not self._undo:
             pass  # No prior undo against which to compare
-        elif after.randhash != self._undo[-1].randhash:
+        elif after.randhash() != self._undo[-1].randhash():
             self._undo.clear()  # Change in random state purges history
         elif after == self._undo[-1]:
             self._undo.pop()  # Ignore non-changing state (e.g. 'help')
@@ -113,31 +66,22 @@ class Shell(cmd.Cmd):
 
         return result
 
-    def _compute_undo(self) -> Undo:
-        """Produce an Undo instance comprising all current Shell state."""
-        return Undo(player=self._player,
-                    randhash=hash(self._random.getstate()),
-                    world=self._world)
-
-    def do_undo(self, line):
+    def do_undo(self, line) -> GameState:
         """Undo prior commands.  Only permitted when nothing rolled/drawn."""
         no_arguments(line)
-        # self._random not mutated-- by onecmd(...) it did not change.
         if len(self._undo) > 1:
             self._undo.pop()  # 'undo' was itself on undo list...
-            previous = self._undo.pop()  # ...hence two pops to previous.
-            self._player = previous.player
-            self._world = previous.world
+            self._game = self._undo.pop()  # ...hence two pops to previous.
         else:
-            raise error.DrollError("Cannot undo any prior command(s).")
+            raise DrollError("Cannot undo any prior command(s).")
 
-        return False
+        return GameState.PLAY
 
-    def do_EOF(self, line):
+    def do_EOF(self, line) -> GameState:
         """End-of-file causes shell exit."""
-        return True
+        return GameState.STOP
 
-    def emptyline(self):
+    def emptyline(self) -> GameState:
         """Empty line causes no action to occur."""
         return self.onecmd('help')
 
@@ -145,93 +89,46 @@ class Shell(cmd.Cmd):
     # ACTIONS BELOW HERE
     ####################
 
-    def do_ability(self, line):
-        """Invoke the player's ability."""
-        self._world = player.apply(self._player, self._world,
-                                   self._random.randrange, 'ability',
-                                   *parse(line))
+    @functools.wraps(Game.ability)
+    def do_ability(self, line) -> GameState:
+        return self._game.ability(*parse(line))
 
-    def default(self, line):
-        """Apply some named hero or treasure to some collection of nouns."""
-        self._world = player.apply(self._player, self._world,
-                                   self._random.randrange, *parse(line))
+    @functools.wraps(Game.apply)
+    def default(self, line) -> GameState:
+        return self._game.apply(*parse(line))
 
-    def do_descend(self, line):
-        """Descend to the next depth (in contrast to retiring/retreating)."""
+    @functools.wraps(Game.descend)
+    def do_descend(self, line) -> GameState:
         no_arguments(line)
-        self._world = world.next_dungeon(self._world,
-                                         self._player.roll.dungeon,
-                                         self._random.randrange)
+        return self._game.descend()
 
-    def do_retire(self, line):
-        """Retire to the tavern after successfully clearing a dungeon depth..
-
-        Automatically uses a 'ring' or 'portal' treasure if so required.
-        Automatically starts a new delve or ends game, as suitable."""
+    @functools.wraps(Game.retire)
+    def do_retire(self, line) -> GameState:
         no_arguments(line)
-        self._world = world.retire(self._world)
-        return self._next_delve_or_exit()
+        return self._game.retire()
 
-    def do_retreat(self, line):
-        """Retreat from the dungeon at any time (e.g. after being defeated).
-
-        Automatically starts a new delve or ends game, as suitable."""
+    @functools.wraps(Game.retreat)
+    def do_retreat(self, line) -> GameState:
         no_arguments(line)
-        self._world = world.retreat(self._world)
-        return self._next_delve_or_exit()
+        return self._game.retreat()
 
     #######################
     # COMPLETION BELOW HERE
     #######################
 
     def completenames(self, text, line, begidx, endidx):
-        """Complete possible command names based upon context."""
-        # Which world actions might be taken successfully given game state?
-        possible = []
-        if self._world.ability:
-            possible.append('ability')
-        try:
-            world.next_dungeon(self._world,
-                               self._player.roll.dungeon,
-                               dummy_randrange)
-            possible.append('descend')
-        except error.DrollError:
-            pass
-        try:
-            world.retire(self._world)
-            possible.append('retire')
-        except error.DrollError:
-            pass
-        try:
-            world.retreat(self._world)
-            possible.append('retreat')
-        except error.DrollError:
-            pass
-        if len(self._undo) > 1:
-            possible.append('undo')
-
-        results = [x for x in possible if x.startswith(text)]
-
-        # Add any hero-related possibilities
-        if not world.exhausted_dungeon(self._world.dungeon):
-            results += self.completedefault(text, line, begidx, endidx)
-
-        return results
+        # Break line into tokens until and starting from present text
+        return self._game.completenames(text=text,
+                                        head=parse(line[:begidx]),
+                                        tail=parse(line[begidx:]))
 
     def completedefault(self, text, line, begidx, endidx):
-        """Complete loosely based upon available heroes/treasures/dungeon."""
         # Break line into tokens until and starting from present text
-        head = parse(line[:begidx])
-        tail = parse(line[begidx:])
+        raw = self._game.completenames(text=text,
+                                       head=parse(line[:begidx]),
+                                       tail=parse(line[begidx:]))
 
-        # Bulk of processing elsewhere to simplify unit testing, and because
-        # many exceptions silently suppress tab completion in readline.
-        raw = player.complete(game=self._world,
-                              tokens=head + tail,
-                              text=text,
-                              position=len(head))
-
-        # Trailing space causes tab completion to insert token separators.
+        # Trailing space causes tab completion to insert token separators
         return [x + ' ' for x in raw]
 
     #################
@@ -247,12 +144,11 @@ class Shell(cmd.Cmd):
         fighter potion mage thief    # Drink 2 potions obtaining mage, thief
         mage dragon champion cleric  # Attack dragon with party of 3
     """
-
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
     def get_names(self):
         """Compute potential help topics from contextual completions."""
-        names = self.completenames(text='', line='', begidx=0, endidx=0)
+        names = self.completenames(text='', head=[], tail=[])
         return (['do_' + x for x in names] +
                 ['help_' + x for x in names
                  if not getattr(self, 'do_' + x, None)])
@@ -316,9 +212,4 @@ def parse(line: str) -> typing.Tuple[str]:
 def no_arguments(line):
     """Raise DrollError if line is non-empty."""
     if line:
-        raise error.DrollError('Command accepts no arguments.')
-
-
-def dummy_randrange(start, stop=None):
-    """Non-random psuedorandom generator so that completion is stateless."""
-    return start
+        raise DrollError('Command accepts no arguments.')

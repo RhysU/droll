@@ -186,7 +186,7 @@ def complete(
         tokens: typing.Sequence[str],
         text: str,
         position: int,
-) -> typing.Iterable[str]:
+) -> typing.Sequence[str]:
     """Possible completions for text with position among (partial) tokens."""
     # First compute candidate completions independent of observed text
     if position == 0:
@@ -218,4 +218,4 @@ def complete(
         )
 
     # Then filter to retain only those matching requested text prefix
-    return (key for key in candidates if key.startswith(text))
+    return [key for key in candidates if key.startswith(text)]
