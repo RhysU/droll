@@ -42,7 +42,7 @@ class Shell(cmd.Cmd):
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
         # Track observable state before and after command processing.
         # Beware that do_undo(...), implemented below, mutates self._undo.
-        self._undo.append(copy.copy(self._game))  # FIXME No early mutation
+        self._undo.append(copy.copy(self._game))
         try:
             result = GameState.PLAY
             result = super(Shell, self).onecmd(line)
