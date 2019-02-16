@@ -143,6 +143,7 @@ class Shell(cmd.Cmd):
         fighter potion mage thief    # Drink 2 potions obtaining mage, thief
         mage dragon champion cleric  # Attack dragon with party of 3
     """
+
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
     def get_names(self):
