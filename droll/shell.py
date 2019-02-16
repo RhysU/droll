@@ -148,7 +148,7 @@ class Shell(cmd.Cmd):
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
     def get_names(self):
         """Compute potential help topics from contextual completions."""
-        names = self.completenames(text='', head=[], tail=[])
+        names = self._game.completenames(text='', head=[], tail=[])
         return (['do_' + x for x in names] +
                 ['help_' + x for x in names
                  if not getattr(self, 'do_' + x, None)])
