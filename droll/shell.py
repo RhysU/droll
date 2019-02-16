@@ -29,7 +29,7 @@ class Shell(cmd.Cmd):
         self.postcmd(stop=False, line='')  # Prints initial world state
 
     def postcmd(self, stop, line) -> bool:
-        """Print game state after each commmand and final details on exit."""
+        """Print game state after each command and final details on exit."""
         self.prompt = self._game.prompt() + ' '
         print()
         if line != 'EOF':
@@ -41,8 +41,7 @@ class Shell(cmd.Cmd):
     def onecmd(self, line, *, _raises=False) -> GameState:
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
         # Track observable state before and after command processing.
-        # Beware that do_undo(...), implemented below, mutates self._undo.
-        self._undo.append(copy.copy(self._game))
+        before = copy.copy(self._game)
         try:
             result = GameState.PLAY
             result = super(Shell, self).onecmd(line)
@@ -50,31 +49,31 @@ class Shell(cmd.Cmd):
             if _raises:
                 raise
             print(*e.args)
-        after = copy.copy(self._game)
+            return result
 
         # Retain only undo candidates that disallow cheating.
         # Okay would be 'Oh! I should have used a fighter on the goblin!'
         # Not okay would be undoing a 'descend' to roll a different dungeon.
-        if not self._undo:
-            pass  # No prior undo against which to compare
-        elif after.randhash() != self._undo[-1].randhash():
-            self._undo.clear()  # Change in random state purges history
-        elif after == self._undo[-1]:
-            self._undo.pop()  # Ignore non-changing state (e.g. 'help')
+        if line == 'undo':
+            pass  # Retaining undo operations would break multiple undos
+        elif self._game == before:
+            pass  # No change in state (e.g. help) so nothing to track
+        elif self._game.randhash() == before.randhash():
+            self._undo.append(before)  # Same random state so undo permitted
         else:
-            pass  # Change retained for possible later 'undo'
+            self._undo.clear()  # Random state mutated so no under permitted
 
         return result
 
     def do_undo(self, line) -> GameState:
         """Undo prior commands.  Only permitted when nothing rolled/drawn."""
         no_arguments(line)
-        if len(self._undo) > 1:
-            self._undo.pop()  # 'undo' was itself on undo list...
-            self._game = self._undo.pop()  # ...hence two pops to previous.
+        if self._undo:
+            # Assertion confirms onecmd(...) processing matches expectations
+            assert self._game.randhash() == self._undo[-1].randhash()
+            self._game = self._undo.pop()
         else:
             raise DrollError("Cannot undo any prior command(s).")
-
         return GameState.PLAY
 
     def do_EOF(self, line) -> GameState:
@@ -184,7 +183,7 @@ class Shell(cmd.Cmd):
         print("""Sceptres behave identically to a mage.""")
 
     def help_scroll(self):
-        print("Scrolls may quaff potions and reroll dungeon dice like so:")
+        print("Scrolls may quaff potions and re-roll dungeon dice like so:")
         print("""
             scroll potion mage thief    # Drink 2 potions obtaining mage, thief
             scroll skeleton goblin      # Re-roll all skeletons and goblins
