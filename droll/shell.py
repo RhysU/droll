@@ -117,12 +117,13 @@ class Shell(cmd.Cmd):
 
     def completedefault(self, text, line, begidx, endidx):
         # Break line into tokens until and starting from present text
-        raw = self._game.completenames(text=text,
-                                       head=parse(line[:begidx]),
-                                       tail=parse(line[begidx:]))
-
+        names = self._game.completenames(text=text,
+                                         head=parse(line[:begidx]),
+                                         tail=parse(line[begidx:]))
+        if self._undo and 'undo'.startswith(text):
+            names.append('undo')
         # Trailing space causes tab completion to insert token separators
-        return [x + ' ' for x in raw]
+        return [x + ' ' for x in names]
 
     def completenames(self, text, line, begidx, endidx):
         return self.completedefault(text, line, begidx, endidx)
@@ -132,6 +133,8 @@ class Shell(cmd.Cmd):
     def get_names(self):
         """Compute potential help topics from contextual completions."""
         names = self._game.completenames(text='', head=[], tail=[])
+        if self._undo:
+            names.append('undo')
         return (['do_' + x for x in names] +
                 ['help_' + x for x in names
                  if not getattr(self, 'do_' + x, None)])
