@@ -127,6 +127,15 @@ class Shell(cmd.Cmd):
     def completenames(self, text, line, begidx, endidx):
         return self.completedefault(text, line, begidx, endidx)
 
+    # Overrides superclass behavior relying purely on do_XXX(...) methods.
+    # Also, lies that help_XXX(...) present for completedefault(...) methods.
+    def get_names(self):
+        """Compute potential help topics from contextual completions."""
+        names = self._game.completenames(text='', head=[], tail=[])
+        return (['do_' + x for x in names] +
+                ['help_' + x for x in names
+                 if not getattr(self, 'do_' + x, None)])
+
     #################
     # HELP BELOW HERE
     #################
@@ -140,15 +149,6 @@ class Shell(cmd.Cmd):
         fighter potion mage thief    # Drink 2 potions obtaining mage, thief
         mage dragon champion cleric  # Attack dragon with party of 3
     """
-
-    # Overrides superclass behavior relying purely on do_XXX(...) methods.
-    # Also, lies that help_XXX(...) present for completedefault(...) methods.
-    def get_names(self):
-        """Compute potential help topics from contextual completions."""
-        names = self._game.completenames(text='', head=[], tail=[])
-        return (['do_' + x for x in names] +
-                ['help_' + x for x in names
-                 if not getattr(self, 'do_' + x, None)])
 
     def help_ability(self):
         print(self.do_ability.__doc__)
