@@ -41,7 +41,7 @@ class Shell(cmd.Cmd):
     def onecmd(self, line, *, _raises=False) -> GameState:
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
         # Track observable state before and after command processing.
-        before = copy.copy(self._game)
+        before = copy.deepcopy(self._game)  # TODO Simplify from deepcopy?
         try:
             result = GameState.PLAY
             result = super(Shell, self).onecmd(line)

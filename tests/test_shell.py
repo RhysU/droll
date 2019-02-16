@@ -133,7 +133,6 @@ def test_simple():
         s.onecmd(following_command)
 
 
-@pytest.mark.skip(reason="Known to be broken at the moment")
 def test_undo():
     """Based upon test_simple(...), verify undo behaving as expected."""
     s = Shell(Game(random=random.Random(4), player=Default))
@@ -147,6 +146,8 @@ def test_undo():
     # (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
     with pytest.raises(DrollError):
         onecmd("undo")
+    with pytest.raises(DrollError):
+        onecmd("undo")
     onecmd("descend")
 
     # (delve=1, depth=1, dungeon=(goblin=1),
@@ -155,6 +156,8 @@ def test_undo():
         onecmd("undo")
     onecmd("fighter goblin")
     onecmd("undo")
+    with pytest.raises(DrollError):
+        onecmd("undo")
     onecmd("cleric goblin")
     onecmd("undo")
     with pytest.raises(DrollError):
@@ -163,7 +166,7 @@ def test_undo():
     onecmd("descend")
 
     # (delve=1, depth=2, dungeon=(goblin=2), ...)
-    assert s._world.dungeon.goblin == 2
+    assert s._game._world.dungeon.goblin == 2
     with pytest.raises(DrollError):
         onecmd("undo")
     onecmd("thief goblin")
@@ -174,9 +177,9 @@ def test_undo():
     onecmd("descend")
 
     # (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), ...)
-    assert s._world.dungeon.ooze == 1
-    assert s._world.dungeon.chest == 1
-    assert s._world.dungeon.potion == 1
+    assert s._game._world.dungeon.ooze == 1
+    assert s._game._world.dungeon.chest == 1
+    assert s._game._world.dungeon.potion == 1
     with pytest.raises(DrollError):
         onecmd("undo")
     onecmd("cleric ooze")
