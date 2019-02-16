@@ -25,6 +25,24 @@ def test_EOF():
     assert s.lastcmd == ''
 
 
+def test_help():
+    """Confirm help invocations do not throw exceptions."""
+    s = Shell(Game())
+    s.help_ability()
+    s.help_bait()
+    s.help_champion()
+    s.help_cleric()
+    s.help_elixir()
+    s.help_fighter()
+    s.help_mage()
+    s.help_sceptre()
+    s.help_scroll()
+    s.help_sword()
+    s.help_talisman()
+    s.help_thief()
+    s.help_tools()
+
+
 # Strategy for testing, further below, will turn docstrings into assertions
 def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     """Parse input like the following into (summary, command) tuples:
