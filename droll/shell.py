@@ -156,7 +156,7 @@ class Shell(cmd.Cmd):
     def help_ability(self):
         print(self.do_ability.__doc__)
         print()
-        print(textwrap.indent(self._player.ability.__doc__, '    '))
+        print(textwrap.indent(self._game._player.ability.__doc__, '    '))
 
     def help_bait(self):
         print(action.bait_dragon.__doc__)
