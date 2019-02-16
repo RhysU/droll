@@ -115,12 +115,6 @@ class Shell(cmd.Cmd):
     # COMPLETION BELOW HERE
     #######################
 
-    def completenames(self, text, line, begidx, endidx):
-        # Break line into tokens until and starting from present text
-        return self._game.completenames(text=text,
-                                        head=parse(line[:begidx]),
-                                        tail=parse(line[begidx:]))
-
     def completedefault(self, text, line, begidx, endidx):
         # Break line into tokens until and starting from present text
         raw = self._game.completenames(text=text,
@@ -129,6 +123,9 @@ class Shell(cmd.Cmd):
 
         # Trailing space causes tab completion to insert token separators
         return [x + ' ' for x in raw]
+
+    def completenames(self, text, line, begidx, endidx):
+        return self.completedefault(text, line, begidx, endidx)
 
     #################
     # HELP BELOW HERE
