@@ -24,6 +24,8 @@ def defeat_one(
 
 
 def __decrement_hero(party: struct.Party, hero: str) -> struct.Party:
+    if party is None:
+        raise error.DrollError('No party currently active')
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
         raise error.DrollError("Require at least one hero {}".format(hero))
@@ -31,10 +33,14 @@ def __decrement_hero(party: struct.Party, hero: str) -> struct.Party:
 
 
 def __increment_hero(party: struct.Party, hero: str) -> struct.Party:
+    if party is None:
+        raise error.DrollError('No party currently active')
     return party._replace(**{hero: getattr(party, hero) + 1})
 
 
 def __decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
+    if dungeon is None:
+        raise error.DrollError('No dungeon currently active')
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise ValueError("Require at least one target {}".format(target))
