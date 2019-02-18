@@ -79,8 +79,8 @@ Default = struct.Player(
             potion=action.quaff,
             dragon=action.defeat_dragon,
         ),
-        # Technically scrolls could re-roll potions,
-        # but doing so would be a really peculiar choice.
+        # Scrolls can re-roll chests and potions though doing so feels odd.
+        # Scrolls can also, less oddly, quaff potions so always assume quaff.
         scroll=struct.Dungeon(
             goblin=action.reroll,
             skeleton=action.reroll,

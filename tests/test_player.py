@@ -120,6 +120,7 @@ def test_scroll_reroll(game):
     def canned_sequence(start, stop):
         return start + sequence.pop(0)
 
+    # Notice scroll causes chests to be re-rolled
     game = player.apply(player.Default, game, canned_sequence,
                         'scroll', 'chest', 'ooze', 'chest')
     assert game.party.scroll == 1
