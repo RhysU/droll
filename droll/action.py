@@ -57,17 +57,17 @@ def defeat_all_plus_additional(
 ) -> struct.World:
     """Update game after hero handles all of one target type plus one more."""
     # First, defeat all of the specified target
-    after_target = defeat_all(game=game,
-                              randrange=randrange,
-                              hero=hero,
-                              target=target)
+    game = defeat_all(game=game,
+                      randrange=randrange,
+                      hero=hero,
+                      target=target)
 
     # Second, determine if additional should not have been supplied
-    if world.defeated_monsters(after_target.dungeon):
+    if world.defeated_monsters(game.dungeon):
         if additional:
             raise error.DrollError("Additional {} given but no monsters left"
                                    .format(additional))
-        return after_target
+        return game
 
     # Third, confirm at most one additional provided
     if len(additional) != 1:
@@ -75,8 +75,8 @@ def defeat_all_plus_additional(
                                .format(additional))
 
     # Last, attempt to defeat the additional monster using the same hero
-    return defeat_one(game=after_target._replace(
-                        party=__increment_hero(after_target.party, hero)
+    return defeat_one(game=game._replace(
+                        party=__increment_hero(game.party, hero)
                       ),
                       randrange=randrange,
                       hero=hero,
