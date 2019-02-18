@@ -76,7 +76,7 @@ def defeat_all_plus_additional(
 
     # Last, attempt to defeat the additional monster using the same hero
     return defeat_one(game=after_target._replace(
-                        party=__increment_hero(game.party, hero)
+                        party=__increment_hero(after_target.party, hero)
                       ),
                       randrange=randrange,
                       hero=hero,
