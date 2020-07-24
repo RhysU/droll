@@ -192,8 +192,8 @@ def defeat_dragon_heroes(
         raise error.DrollError("Exactly {} heroes must be specified."
                                .format(_distinct_heroes))
     if len({*heroes}) != _distinct_heroes:
-        raise error.DrollError("The {} heroes must all be distinct",
-                               _distinct_heroes)
+        raise error.DrollError("The {} heroes must all be distinct."
+                               .format(_distinct_heroes))
     return True
 
 
