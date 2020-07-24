@@ -13,10 +13,12 @@ from ..player import Default
 
 
 def spellsword_ability(
-        game: struct.World, randrange: dice.RandRange, noun: str,
-        target: typing.Optional[str] = None,
-        *,
-        _acceptable_targets: typing.Set[str] = {'fighter', 'mage'}
+    game: struct.World,
+    randrange: dice.RandRange,
+    noun: str,
+    target: typing.Optional[str] = None,
+    *,
+    _acceptable_targets: typing.Set[str] = {"fighter", "mage"}
 ) -> struct.World:
     """Spellsword usable as a fighter or a mage, adding one hero to party.
 
@@ -24,46 +26,49 @@ def spellsword_ability(
     if target is None:
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
-        raise error.DrollError('Target {} not one of {}'
-                               .format(target, _acceptable_targets))
-    return action.consume_ability(game._replace(
-        party=action.__increment_hero(game.party, target)
-    ))
+        raise error.DrollError(
+            "Target {} not one of {}".format(target, _acceptable_targets)
+        )
+    return action.consume_ability(
+        game._replace(party=action.__increment_hero(game.party, target))
+    )
 
 
 @functools.wraps(action.defeat_dragon)
 def spellsword_defeat_dragon(*args, **kwargs):
     return action.defeat_dragon(
-        *args,
-        **kwargs,
-        _defeat_dragon_heroes=spellsword_defeat_dragon_heroes)
+        *args, **kwargs, _defeat_dragon_heroes=spellsword_defeat_dragon_heroes
+    )
 
 
 @functools.wraps(action.defeat_dragon_heroes_interchangeable)
 def spellsword_defeat_dragon_heroes(*args, **kwargs):
     return action.defeat_dragon_heroes_interchangeable(
-        *args,
-        **kwargs,
-        _interchangeable={'fighter', 'mage'})
+        *args, **kwargs, _interchangeable={"fighter", "mage"}
+    )
 
 
 def battlemage_ability(
-        game: struct.World, randrange: dice.RandRange, noun: str,
-        target: typing.Optional[str] = None,
-        *,
-        _acceptable_targets: typing.Set[str] = {'fighter', 'mage'}
+    game: struct.World,
+    randrange: dice.RandRange,
+    noun: str,
+    target: typing.Optional[str] = None,
+    *,
+    _acceptable_targets: typing.Set[str] = {"fighter", "mage"}
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:
-        raise error.DrollError('No targets accepted for {}'.format(noun))
-    return action.consume_ability(game._replace(
-        dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields))),
-    ))
+        raise error.DrollError("No targets accepted for {}".format(noun))
+    return action.consume_ability(
+        game._replace(
+            dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields)))
+        )
+    )
 
 
 # Defined in terms of Default, not Spellsword, to permit advance(...) closure
 Battlemage = Default._replace(
-    name='Battlemage',
+    name="Battlemage",
     ability=battlemage_ability,
     advance=(lambda _: Battlemage),  # Cannot advance further
     party=Default.party._replace(
@@ -72,29 +77,23 @@ Battlemage = Default._replace(
             ooze=Default.party.mage.ooze,
             dragon=spellsword_defeat_dragon,
         ),
-        cleric=Default.party.cleric._replace(
-            dragon=spellsword_defeat_dragon,
-        ),
+        cleric=Default.party.cleric._replace(dragon=spellsword_defeat_dragon),
         mage=Default.party.mage._replace(
             # Mages usable as fighters implies mage.goblin as if a fighter
             goblin=Default.party.fighter.goblin,
             dragon=spellsword_defeat_dragon,
         ),
-        thief=Default.party.thief._replace(
-            dragon=spellsword_defeat_dragon,
-        ),
+        thief=Default.party.thief._replace(dragon=spellsword_defeat_dragon),
         champion=Default.party.champion._replace(
-            dragon=spellsword_defeat_dragon,
+            dragon=spellsword_defeat_dragon
         ),
-        scroll=Default.party.scroll._replace(
-            dragon=spellsword_defeat_dragon,
-        ),
-    )
+        scroll=Default.party.scroll._replace(dragon=spellsword_defeat_dragon),
+    ),
 )
 
 # Defined after Battlemage to permit advance(...) closure
 Spellsword = Default._replace(
-    name='Spellsword',
+    name="Spellsword",
     ability=spellsword_ability,
     advance=(lambda world: Spellsword if world.experience < 5 else Battlemage),
     party=Battlemage.party,

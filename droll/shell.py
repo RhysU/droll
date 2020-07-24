@@ -26,13 +26,13 @@ class Shell(cmd.Cmd):
         """Prepare a new game and start the first delve."""
         assert self._undo is None, "Cannot call preloop(...) multiple times."
         self._undo = []
-        self.postcmd(stop=False, line='')  # Prints initial world state
+        self.postcmd(stop=False, line="")  # Prints initial world state
 
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
-        self.prompt = self._game.prompt() + ' '
+        self.prompt = self._game.prompt() + " "
         print()
-        if line != 'EOF':
+        if line != "EOF":
             print(self._game.summary())
             if stop:
                 print(self.prompt)
@@ -54,7 +54,7 @@ class Shell(cmd.Cmd):
         # Retain only undo candidates that disallow cheating.
         # Okay would be 'Oh! I should have used a fighter on the goblin!'
         # Not okay would be undoing a 'descend' to roll a different dungeon.
-        if line == 'undo':
+        if line == "undo":
             pass  # Retaining undo operations would break multiple undos
         elif self._game == before:
             pass  # No change in state (e.g. help) so nothing to track
@@ -82,7 +82,7 @@ class Shell(cmd.Cmd):
 
     def emptyline(self) -> GameState:
         """Empty line causes no action to occur."""
-        return self.onecmd('help')
+        return self.onecmd("help")
 
     ####################
     # ACTIONS BELOW HERE
@@ -117,13 +117,13 @@ class Shell(cmd.Cmd):
 
     def completedefault(self, text, line, begidx, endidx):
         # Break line into tokens until and starting from present text
-        names = self._game.completenames(text=text,
-                                         head=parse(line[:begidx]),
-                                         tail=parse(line[begidx:]))
-        if self._undo and 'undo'.startswith(text):
-            names.append('undo')
+        names = self._game.completenames(
+            text=text, head=parse(line[:begidx]), tail=parse(line[begidx:])
+        )
+        if self._undo and "undo".startswith(text):
+            names.append("undo")
         # Trailing space causes tab completion to insert token separators
-        return [x + ' ' for x in names]
+        return [x + " " for x in names]
 
     def completenames(self, text, line, begidx, endidx):
         return self.completedefault(text, line, begidx, endidx)
@@ -132,20 +132,21 @@ class Shell(cmd.Cmd):
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
     def get_names(self):
         """Compute potential help topics from contextual completions."""
-        names = self._game.completenames(text='', head=[], tail=[])
+        names = self._game.completenames(text="", head=[], tail=[])
         if self._undo:
-            names.append('undo')
-        return (['do_' + x for x in names] +
-                ['help_' + x for x in names
-                 if not getattr(self, 'do_' + x, None)])
+            names.append("undo")
+        return ["do_" + x for x in names] + [
+            "help_" + x for x in names if not getattr(self, "do_" + x, None)
+        ]
 
     #################
     # HELP BELOW HERE
     #################
 
     doc_header = "Feasible commands (help <command>):"
-    doc_hero_template = ("Attack monsters, quaff potions, and open chests"
-                         " with a {} like so:")
+    doc_hero_template = (
+        "Attack monsters, quaff potions, and open chests" " with a {} like so:"
+    )
     doc_hero_example = """
         champion skeleton            # Attack skeleton(s)
         thief chest                  # Open chest(s)
@@ -156,28 +157,28 @@ class Shell(cmd.Cmd):
     def help_ability(self):
         print(self.do_ability.__doc__)
         print()
-        print(textwrap.indent(self._game._player.ability.__doc__, '    '))
+        print(textwrap.indent(self._game._player.ability.__doc__, "    "))
 
     def help_bait(self):
         print(action.bait_dragon.__doc__)
 
     def help_champion(self):
-        print(self.doc_hero_template.format('champion'))
+        print(self.doc_hero_template.format("champion"))
         print(self.doc_hero_example)
 
     def help_cleric(self):
-        print(self.doc_hero_template.format('cleric'))
+        print(self.doc_hero_template.format("cleric"))
         print(self.doc_hero_example)
 
     def help_elixir(self):
         print(action.elixir.__doc__)
 
     def help_fighter(self):
-        print(self.doc_hero_template.format('fighter'))
+        print(self.doc_hero_template.format("fighter"))
         print(self.doc_hero_example)
 
     def help_mage(self):
-        print(self.doc_hero_template.format('mage'))
+        print(self.doc_hero_template.format("mage"))
         print(self.doc_hero_example)
 
     def help_sceptre(self):
@@ -185,10 +186,12 @@ class Shell(cmd.Cmd):
 
     def help_scroll(self):
         print("Scrolls may quaff potions and re-roll dungeon dice like so:")
-        print("""
+        print(
+            """
             scroll potion mage thief    # Drink 2 potions obtaining mage, thief
             scroll skeleton goblin      # Re-roll all skeletons and goblins
-        """)
+        """
+        )
 
     def help_sword(self):
         print("""Swords behave identically to a fighter.""")
@@ -197,7 +200,7 @@ class Shell(cmd.Cmd):
         print("""Talismans behave identically to a cleric.""")
 
     def help_thief(self):
-        print(self.doc_hero_template.format('thief'))
+        print(self.doc_hero_template.format("thief"))
         print(self.doc_hero_example)
 
     def help_tools(self):
@@ -212,4 +215,4 @@ def parse(line: str) -> typing.Tuple[str]:
 def no_arguments(line):
     """Raise DrollError if line is non-empty."""
     if line:
-        raise DrollError('Command accepts no arguments.')
+        raise DrollError("Command accepts no arguments.")

@@ -19,10 +19,10 @@ def test_EOF():
     """Confirm providing EOF exits cmdloop(...)."""
     s = Shell(Game())
     assert not s.cmdqueue
-    s.cmdqueue.append('EOF')
+    s.cmdqueue.append("EOF")
     s.cmdloop()
-    assert s.prompt == '(Default  0) '
-    assert s.lastcmd == ''
+    assert s.prompt == "(Default  0) "
+    assert s.lastcmd == ""
 
 
 def test_help():
@@ -55,10 +55,10 @@ def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     """
     summaries, commands = [], []
     for line in (x.strip() for x in text.splitlines()):
-        if line.startswith('(delve='):
+        if line.startswith("(delve="):
             summaries.append(line)
-        elif line.startswith('(droll '):
-            command = line[line.index(') ') + 2:]
+        elif line.startswith("(droll "):
+            command = line[line.index(") ") + 2 :]
             commands.append(command)
     return zip(summaries, commands)
 
@@ -146,8 +146,9 @@ def test_simple():
     s.preloop()
     parsed = parse_summary_command(test_simple.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
-        assert expected_summary == s.summary(), (
-            "Summary mismatch at {}".format(index))
+        assert expected_summary == s.summary(), "Summary mismatch at {}".format(
+            index
+        )
         s.onecmd(following_command)
 
 
@@ -346,8 +347,9 @@ def test_knight():
     s.preloop()
     parsed = parse_summary_command(test_knight.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
-        assert expected_summary == s.summary(), (
-            "Summary mismatch at {}".format(index))
+        assert expected_summary == s.summary(), "Summary mismatch at {}".format(
+            index
+        )
         s.onecmd(following_command)
 
 
@@ -422,8 +424,9 @@ def test_spellsword():
     s.preloop()
     parsed = parse_summary_command(test_spellsword.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
-        assert expected_summary == s.summary(), (
-            "Summary mismatch at {}".format(index))
+        assert expected_summary == s.summary(), "Summary mismatch at {}".format(
+            index
+        )
         s.onecmd(following_command)
 
 
@@ -570,6 +573,7 @@ def test_minstrel():
     s.preloop()
     parsed = parse_summary_command(test_spellsword.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
-        assert expected_summary == s.summary(), (
-            "Summary mismatch at {}".format(index))
+        assert expected_summary == s.summary(), "Summary mismatch at {}".format(
+            index
+        )
         s.onecmd(following_command)

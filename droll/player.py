@@ -15,7 +15,7 @@ from . import world
 # Effectively, this data is one large, dense dispatch table.
 # Other players will generally be defined in terms of this one.
 Default = struct.Player(
-    name='Default',
+    name="Default",
     # Behavior of special commands?
     ability=action.nop_ability,
     # Advance maps struct.World -> struct.Player, permitting promotion.
@@ -24,18 +24,15 @@ Default = struct.Player(
     bait=action.bait_dragon,
     elixir=action.elixir,
     # Behavior at specific lifecycle events?
-    roll=struct.Roll(
-        dungeon=dice.roll_dungeon,
-        party=dice.roll_party,
-    ),
+    roll=struct.Roll(dungeon=dice.roll_dungeon, party=dice.roll_party),
     # How do artifacts map to heroes?
     artifacts=struct.Party(
-        fighter='sword',
-        cleric='talisman',
-        mage='sceptre',
-        thief='tools',
+        fighter="sword",
+        cleric="talisman",
+        mage="sceptre",
+        thief="tools",
         champion=None,
-        scroll='scroll',
+        scroll="scroll",
     ),
     # What effect does each hero have on each enemy?
     party=struct.Party(
@@ -94,12 +91,12 @@ Default = struct.Player(
 
 
 def apply(
-        player: struct.Player,
-        game: struct.World,
-        randrange: dice.RandRange,
-        noun: str,
-        target: str = None,
-        *additional
+    player: struct.Player,
+    game: struct.World,
+    randrange: dice.RandRange,
+    noun: str,
+    target: str = None,
+    *additional
 ) -> struct.World:
     """Apply noun to target within game, returning a new version.
 
@@ -112,11 +109,11 @@ def apply(
     additional = tuple(partify(i, player.artifacts) for i in additional)
 
     # One-off handling of some treasures, with error wrapping to aid usability
-    if noun == 'portal':
+    if noun == "portal":
         raise error.DrollError('To use a portal, directly "retire".')
-    if noun == 'ring':
+    if noun == "ring":
         raise error.DrollError('To use a ring, directly "descend" or "retire".')
-    if noun in {'ability', 'bait', 'elixir'}:
+    if noun in {"ability", "bait", "elixir"}:
         try:
             action = getattr(player, noun)
             return action(game, randrange, noun, target, *additional)
@@ -127,12 +124,16 @@ def apply(
     # convert into party members prior to action invocation.
     prior_treasure = game.treasure
     game = game._replace(
-        party=game.party._replace(**{
-            hero: getattr(game.party, hero) + getattr(prior_treasure, artifact)
-            for hero, artifact in zip(player.artifacts._fields,
-                                      player.artifacts)
-            if artifact is not None
-        })
+        party=game.party._replace(
+            **{
+                hero: getattr(game.party, hero)
+                + getattr(prior_treasure, artifact)
+                for hero, artifact in zip(
+                    player.artifacts._fields, player.artifacts
+                )
+                if artifact is not None
+            }
+        )
     )
 
     # Apply a hero (possibly phantom per above) to some collection of targets.
@@ -147,12 +148,16 @@ def apply(
 
     # Undo the prior transformation by subtracting prior_treasure.
     game = game._replace(
-        party=game.party._replace(**{
-            hero: getattr(game.party, hero) - getattr(prior_treasure, artifact)
-            for hero, artifact in zip(player.artifacts._fields,
-                                      player.artifacts)
-            if artifact is not None
-        })
+        party=game.party._replace(
+            **{
+                hero: getattr(game.party, hero)
+                - getattr(prior_treasure, artifact)
+                for hero, artifact in zip(
+                    player.artifacts._fields, player.artifacts
+                )
+                if artifact is not None
+            }
+        )
     )
 
     # Consume treasure equivalent to any hero which has gone negative.
@@ -160,8 +165,7 @@ def apply(
         if quantity >= 0:
             continue
         for _ in range(-min(0, quantity)):
-            game = world.replace_treasure(game,
-                                          getattr(player.artifacts, hero))
+            game = world.replace_treasure(game, getattr(player.artifacts, hero))
         game = game._replace(party=game.party._replace(**{hero: 0}))
 
     return game
@@ -182,10 +186,7 @@ def partify(token: str, artifacts: struct.Party):
 # Attempts to specialize much beyond this seem to quickly go awry.
 # One notable special case is 'elixir' as any party die follows.
 def complete(
-        game: struct.World,
-        tokens: typing.Sequence[str],
-        text: str,
-        position: int,
+    game: struct.World, tokens: typing.Sequence[str], text: str, position: int
 ) -> typing.Sequence[str]:
     """Possible completions for text with position among (partial) tokens."""
     # First compute candidate completions independent of observed text
@@ -197,11 +198,8 @@ def complete(
             for key, value in zip(source._fields, source)
             if value
         )
-    elif position == 1 and tokens[0] == 'elixir':
-        candidates = (
-            key
-            for key in struct.Party._fields
-        )
+    elif position == 1 and tokens[0] == "elixir":
+        candidates = (key for key in struct.Party._fields)
     elif position == 1:
         candidates = (
             key

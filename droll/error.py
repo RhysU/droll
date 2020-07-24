@@ -6,4 +6,5 @@
 
 class DrollError(RuntimeError):
     """Indicates attempts to take impossible actions."""
+
     pass

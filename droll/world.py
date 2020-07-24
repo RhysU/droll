@@ -14,15 +14,16 @@ from . import struct
 
 def defeated_monsters(dungeon: struct.Dungeon) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""
-    return (dungeon is None) or 0 == (dungeon.goblin +
-                                      dungeon.skeleton +
-                                      dungeon.ooze)
+    return (dungeon is None) or 0 == (
+        dungeon.goblin + dungeon.skeleton + dungeon.ooze
+    )
 
 
 def defeated_dungeon(dungeon: struct.Dungeon) -> bool:
     """Are all monsters and any dragon on this dungeon defected?"""
-    return (dungeon is None) or (defeated_monsters(dungeon) and
-                                 dungeon.dragon < 3)
+    return (dungeon is None) or (
+        defeated_monsters(dungeon) and dungeon.dragon < 3
+    )
 
 
 def blocking_dragon(dungeon: struct.Dungeon) -> bool:
@@ -34,8 +35,9 @@ def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
     """Has the player exhausted all possible actions for this dungeon?
 
     In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
-    return (dungeon is None) or ((0 == sum(dungeon) - dungeon.dragon) and
-                                 not blocking_dragon(dungeon))
+    return (dungeon is None) or (
+        (0 == sum(dungeon) - dungeon.dragon) and not blocking_dragon(dungeon)
+    )
 
 
 def new_world() -> struct.World:
@@ -53,11 +55,11 @@ def new_world() -> struct.World:
 
 
 def next_delve(
-        world: struct.World,
-        roll_party: dice.RollParty,
-        randrange: dice.RandRange,
-        *,
-        _party_dice: int = 7
+    world: struct.World,
+    roll_party: dice.RollParty,
+    randrange: dice.RandRange,
+    *,
+    _party_dice: int = 7
 ) -> struct.World:
     """Establish new delve within a world, optionally transforming the party.
 
@@ -74,12 +76,12 @@ def next_delve(
 
 
 def next_dungeon(
-        world: struct.World,
-        roll_dungeon: dice.RollDungeon,
-        randrange: dice.RandRange,
-        *,
-        _max_depth: int = 10,
-        _dungeon_dice: int = 7
+    world: struct.World,
+    roll_dungeon: dice.RollDungeon,
+    randrange: dice.RandRange,
+    *,
+    _max_depth: int = 10,
+    _dungeon_dice: int = 7
 ) -> struct.World:
     """Move one dungeon deeper in the dungeon, retaining any partial dragons.
 
@@ -87,22 +89,24 @@ def next_dungeon(
     Argument roll_dungeon can be dice.roll_dungeon but other choices okay
     Adheres to the specified number of dice available in the world."""
     if not defeated_monsters(world.dungeon):
-        raise error.DrollError('Must defeat foes to proceed to next dungeon.')
+        raise error.DrollError("Must defeat foes to proceed to next dungeon.")
 
     if not defeated_dungeon(world.dungeon):
         try:
             world = apply_ring(world)
         except error.DrollError:
-            raise error.DrollError("Dragon remains but a ring of"
-                                   " invisibility is not in hand.")
+            raise error.DrollError(
+                "Dragon remains but a ring of" " invisibility is not in hand."
+            )
 
     # Success above, so update the world in anticipation of the next dungeon
     next_depth = (world.depth if world.depth else 0) + 1
     if next_depth > _max_depth:
         raise error.DrollError("The maximum depth is {}".format(_max_depth))
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
-    dungeon = roll_dungeon(min(_dungeon_dice - prior_dragons, next_depth),
-                           randrange)
+    dungeon = roll_dungeon(
+        min(_dungeon_dice - prior_dragons, next_depth), randrange
+    )
     dungeon = dungeon._replace(dragon=dungeon.dragon + prior_dragons)
     return world._replace(depth=next_depth, dungeon=dungeon)
 
@@ -119,7 +123,7 @@ def retire(world: struct.World) -> struct.World:
         try:
             world = apply_portal(world)
         except error.DrollError:
-            raise error.DrollError('Monsters remain but no portal in hand.')
+            raise error.DrollError("Monsters remain but no portal in hand.")
     elif blocking_dragon(world.dungeon):
         # First attempt to use a ring then a portal (because portals are +2)
         try:
@@ -128,15 +132,15 @@ def retire(world: struct.World) -> struct.World:
             try:
                 world = apply_portal(world)
             except error.DrollError:
-                raise error.DrollError("Dragon remains but neither a ring of"
-                                       " invisibility nor a portal in hand.")
+                raise error.DrollError(
+                    "Dragon remains but neither a ring of"
+                    " invisibility nor a portal in hand."
+                )
 
     # Success above, so update the world in anticipation of the next delve
     # Upgrading a hero's ability after 5 experience points is done elsewhere.
     return world._replace(
-        depth=0,
-        experience=world.experience + world.depth,
-        dungeon=None,
+        depth=0, experience=world.experience + world.depth, dungeon=None
     )
 
 
@@ -147,19 +151,17 @@ def retreat(world: struct.World) -> struct.World:
     if defeated_dungeon(world.dungeon):
         raise error.DrollError("Why retreat when you could instead retire?")
 
-    return world._replace(
-        depth=0,
-        dungeon=None,
-    )
+    return world._replace(depth=0, dungeon=None)
 
 
 def score(world: struct.World) -> int:
     """Compute the present score for the world, including all treasure."""
     return (
-            world.experience +
-            sum(world.treasure) +  # Each piece of treasure is +1 point
-            world.treasure.portal +  # Portals are each +1 point (2 total)
-            2 * (world.treasure.scale // 2)  # Pairs of scales are +2 points
+        world.experience
+        + sum(world.treasure)
+        + world.treasure.portal  # Each piece of treasure is +1 point
+        + 2  # Portals are each +1 point (2 total)
+        * (world.treasure.scale // 2)  # Pairs of scales are +2 points
     )
 
 
@@ -167,21 +169,25 @@ def score(world: struct.World) -> int:
 def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
     seq = functools.reduce(
         itertools.chain,
-        (itertools.repeat(t, reserve[i])
-         for i, t in enumerate(struct.Treasure._fields)),
-        [])
+        (
+            itertools.repeat(t, reserve[i])
+            for i, t in enumerate(struct.Treasure._fields)
+        ),
+        [],
+    )
     seq = tuple(seq)
     assert len(seq) > 1, "Presently no items remaining in the reserve"
     return seq[randrange(0, len(seq))]
 
 
 def draw_treasure(
-        world: struct.World, randrange: dice.RandRange
+    world: struct.World, randrange: dice.RandRange
 ) -> struct.World:
     """Draw a single item from the reserve into the player's treasures."""
     drawn = _draw(reserve=world.reserve, randrange=randrange)
     treasure = world.treasure._replace(
-        **{drawn: getattr(world.treasure, drawn) + 1})
+        **{drawn: getattr(world.treasure, drawn) + 1}
+    )
     reserve = world.reserve._replace(
         **{drawn: getattr(world.reserve, drawn) - 1}
     )
@@ -194,28 +200,30 @@ def replace_treasure(world: struct.World, item: str) -> struct.World:
     if not prior_count:
         raise error.DrollError("'{}' not in player's treasure".format(item))
     return world._replace(
-        treasure=world.treasure._replace(
-            **{item: prior_count - 1}),
+        treasure=world.treasure._replace(**{item: prior_count - 1}),
         reserve=world.reserve._replace(
-            **{item: getattr(world.reserve, item) + 1})
+            **{item: getattr(world.reserve, item) + 1}
+        ),
     )
 
 
-def apply_ring(world: struct.World, *, noun: str = 'ring') -> struct.World:
+def apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     if not blocking_dragon(world.dungeon):
-        raise error.DrollError('A dragon must be present to use a {}'
-                               .format(noun))
+        raise error.DrollError(
+            "A dragon must be present to use a {}".format(noun)
+        )
     world = replace_treasure(world, noun)
     return world._replace(dungeon=world.dungeon._replace(dragon=0))
 
 
-def apply_portal(world: struct.World, *, noun: str = 'portal') -> struct.World:
+def apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):
-        raise error.DrollError('No need to apply {} when dungeon clear'
-                               .format(noun))
-    return replace_treasure(world, 'portal')._replace(
+        raise error.DrollError(
+            "No need to apply {} when dungeon clear".format(noun)
+        )
+    return replace_treasure(world, "portal")._replace(
         dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields)))
     )

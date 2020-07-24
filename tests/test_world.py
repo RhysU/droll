@@ -13,7 +13,7 @@ import droll.struct
 import droll.world
 
 
-@pytest.fixture(name='state')
+@pytest.fixture(name="state")
 def _state():
     return random.Random(4)
 
@@ -35,10 +35,10 @@ def test_delve_initial(state):
 
 def test_dungeon_initial(state):
     game = droll.world.new_world()
-    game = droll.world.next_delve(game, droll.dice.roll_party,
-                                  state.randrange)
-    game = droll.world.next_dungeon(game, droll.dice.roll_dungeon,
-                                    state.randrange)
+    game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
+    game = droll.world.next_dungeon(
+        game, droll.dice.roll_dungeon, state.randrange
+    )
     assert 1 == game.depth
     assert 1 == sum(game.dungeon)
 
@@ -54,7 +54,7 @@ def test_draw_treasure(state):
 def test_replace_treasure():
     pre = droll.world.new_world()
     pre = pre._replace(treasure=pre.treasure._replace(elixir=1))
-    post = droll.world.replace_treasure(pre, 'elixir')
+    post = droll.world.replace_treasure(pre, "elixir")
     assert sum(pre.treasure) == 1
     assert sum(post.treasure) == 0
     assert sum(post.reserve) - sum(pre.reserve) == 1
@@ -66,12 +66,8 @@ def test_retire_simple(state):
     pre = pre._replace(
         depth=3,
         dungeon=droll.struct.Dungeon(
-            goblin=0,
-            skeleton=0,
-            ooze=0,
-            chest=2,
-            potion=5,
-            dragon=0),
+            goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=0
+        ),
     )
     assert pre.depth > 0
     post = droll.world.retire(pre)
@@ -84,12 +80,8 @@ def test_retire_monsters(state):
     pre = pre._replace(
         depth=3,
         dungeon=droll.struct.Dungeon(
-            goblin=0,
-            skeleton=1,
-            ooze=0,
-            chest=2,
-            potion=5,
-            dragon=0),
+            goblin=0, skeleton=1, ooze=0, chest=2, potion=5, dragon=0
+        ),
     )
     assert pre.depth > 0
 
@@ -115,12 +107,8 @@ def test_retire_dragon(state):
     pre = pre._replace(
         depth=3,
         dungeon=droll.struct.Dungeon(
-            goblin=0,
-            skeleton=0,
-            ooze=0,
-            chest=2,
-            potion=5,
-            dragon=3),
+            goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=3
+        ),
     )
     assert pre.depth > 0
 
@@ -156,15 +144,12 @@ def test_next_dungeon_simple(state):
     pre = pre._replace(
         depth=3,
         dungeon=droll.struct.Dungeon(
-            goblin=0,
-            skeleton=0,
-            ooze=0,
-            chest=2,
-            potion=5,
-            dragon=0),
+            goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=0
+        ),
     )
-    post = droll.world.next_dungeon(pre, droll.dice.roll_dungeon,
-                                    state.randrange)
+    post = droll.world.next_dungeon(
+        pre, droll.dice.roll_dungeon, state.randrange
+    )
     assert post.depth == pre.depth + 1
 
 
@@ -174,12 +159,8 @@ def test_next_dungeon_monsters(state):
     pre = pre._replace(
         depth=3,
         dungeon=droll.struct.Dungeon(
-            goblin=0,
-            skeleton=1,
-            ooze=0,
-            chest=2,
-            potion=5,
-            dragon=1),
+            goblin=0, skeleton=1, ooze=0, chest=2, potion=5, dragon=1
+        ),
     )
     assert pre.depth > 0
 
@@ -204,12 +185,8 @@ def test_next_dungeon_dragon(state):
     pre = pre._replace(
         depth=3,
         dungeon=droll.struct.Dungeon(
-            goblin=0,
-            skeleton=0,
-            ooze=0,
-            chest=2,
-            potion=5,
-            dragon=3),
+            goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=3
+        ),
     )
     assert pre.depth > 0
 
@@ -219,8 +196,9 @@ def test_next_dungeon_dragon(state):
 
     # Ring of invisibility
     pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=0))
-    post1 = droll.world.next_dungeon(pre, droll.dice.roll_dungeon,
-                                     state.randrange)
+    post1 = droll.world.next_dungeon(
+        pre, droll.dice.roll_dungeon, state.randrange
+    )
     assert post1.depth == pre.depth + 1
     assert post1.treasure.ring == 0
     assert post1.treasure.portal == 0
@@ -232,8 +210,9 @@ def test_next_dungeon_dragon(state):
 
     # Both should consume the ring of invisibility
     pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=1))
-    post3 = droll.world.next_dungeon(pre, droll.dice.roll_dungeon,
-                                     state.randrange)
+    post3 = droll.world.next_dungeon(
+        pre, droll.dice.roll_dungeon, state.randrange
+    )
     assert post3.depth == pre.depth + 1
     assert post3.treasure.ring == 0
     assert post3.treasure.portal == 1

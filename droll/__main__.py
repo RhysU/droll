@@ -12,27 +12,40 @@ from .heroes import Knight, Minstrel, Spellsword
 from .player import Default
 from .shell import Shell
 
-AVAILABLE_HEROES = collections.OrderedDict([
-    ('Default', Default),
-    ('Knight', Knight),
-    ('Minstrel', Minstrel),
-    ('Spellsword', Spellsword),
-])
+AVAILABLE_HEROES = collections.OrderedDict(
+    [
+        ("Default", Default),
+        ("Knight", Knight),
+        ("Minstrel", Minstrel),
+        ("Spellsword", Spellsword),
+    ]
+)
 
 
 def main(args=None) -> None:
-    parser = argparse.ArgumentParser(prog='droll', description=__doc__)
-    parser.add_argument('hero', choices=AVAILABLE_HEROES.keys(),
-                        help='Select the hero for this game.')
-    parser.add_argument('--seed', metavar='N', type=int, nargs=1, default=None,
-                        help='An integer to seed random number generation.')
+    parser = argparse.ArgumentParser(prog="droll", description=__doc__)
+    parser.add_argument(
+        "hero",
+        choices=AVAILABLE_HEROES.keys(),
+        help="Select the hero for this game.",
+    )
+    parser.add_argument(
+        "--seed",
+        metavar="N",
+        type=int,
+        nargs=1,
+        default=None,
+        help="An integer to seed random number generation.",
+    )
     arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
-    g = Game(player=AVAILABLE_HEROES.get(arguments.hero),
-             random=random.Random(*randseed))
+    g = Game(
+        player=AVAILABLE_HEROES.get(arguments.hero),
+        random=random.Random(*randseed),
+    )
     s = Shell(g)
     return s.cmdloop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main(sys.argv[1:])

@@ -15,6 +15,7 @@ from . import world
 
 class GameState(enum.Enum):
     """Game should STOP or one can still PLAY?"""
+
     STOP = 0
     PLAY = 1
 
@@ -27,22 +28,22 @@ class Game:
     """Tracks all state associated with a programmatically driven game."""
 
     def __init__(
-            self,
-            player: struct.Player = player.Default,
-            random: Random = None
+        self, player: struct.Player = player.Default, random: Random = None
     ) -> None:
         self._player = player
         self._random = Random() if random is None else copy.copy(random)
         self._world = world.new_world()
         if self._next_delve() != GameState.PLAY:
-            raise RuntimeError('Unexpected GameState during constructor()')
+            raise RuntimeError("Unexpected GameState during constructor()")
 
     def __eq__(self, other) -> bool:
         """Is other equivalent to self?"""
-        return (isinstance(other, Game) and
-                self._player == other._player and
-                self._world == other._world and
-                self.randhash() == other.randhash())
+        return (
+            isinstance(other, Game)
+            and self._player == other._player
+            and self._world == other._world
+            and self.randhash() == other.randhash()
+        )
 
     def randhash(self) -> int:
         """Hash of the current random state."""
@@ -52,9 +53,9 @@ class Game:
         """Either start next delve or complete this game."""
         try:
             # Record any world updates
-            self._world = world.next_delve(self._world,
-                                           self._player.roll.party,
-                                           self._random.randrange)
+            self._world = world.next_delve(
+                self._world, self._player.roll.party, self._random.randrange
+            )
             # Permit the player to advance to higher abilities
             self._player = self._player.advance(self._world)
             return GameState.PLAY
@@ -71,26 +72,27 @@ class Game:
 
     def prompt(self) -> int:
         """A prompt-like string including the player name and score."""
-        return '({} {:-2d})'.format(self._player.name, self.score())
+        return "({} {:-2d})".format(self._player.name, self.score())
 
     def ability(self, *args: str) -> GameState:
         """Invoke the player's ability."""
-        self._world = player.apply(self._player, self._world,
-                                   self._random.randrange, 'ability',
-                                   *args)
+        self._world = player.apply(
+            self._player, self._world, self._random.randrange, "ability", *args
+        )
         return GameState.PLAY
 
     def apply(self, *args: str) -> GameState:
         """Apply some named hero or treasure to some collection of nouns."""
-        self._world = player.apply(self._player, self._world,
-                                   self._random.randrange, *args)
+        self._world = player.apply(
+            self._player, self._world, self._random.randrange, *args
+        )
         return GameState.PLAY
 
     def descend(self) -> GameState:
         """Descend to the next depth (in contrast to retiring/retreating)."""
-        self._world = world.next_dungeon(self._world,
-                                         self._player.roll.dungeon,
-                                         self._random.randrange)
+        self._world = world.next_dungeon(
+            self._world, self._player.roll.dungeon, self._random.randrange
+        )
         return GameState.PLAY
 
     def retire(self) -> GameState:
@@ -109,31 +111,28 @@ class Game:
         return self._next_delve()
 
     def completenames(
-            self,
-            text: str,
-            head: typing.Sequence[str],
-            tail: typing.Sequence[str]
+        self, text: str, head: typing.Sequence[str], tail: typing.Sequence[str]
     ) -> typing.Sequence[str]:
         """Complete possible command names based upon context."""
         # Which world actions might be taken successfully given game state?
         possible = []
         if self._world.ability:
-            possible.append('ability')
+            possible.append("ability")
         try:
-            world.next_dungeon(self._world,
-                               self._player.roll.dungeon,
-                               dummy_randrange)
-            possible.append('descend')
+            world.next_dungeon(
+                self._world, self._player.roll.dungeon, dummy_randrange
+            )
+            possible.append("descend")
         except error.DrollError:
             pass
         try:
             world.retire(self._world)
-            possible.append('retire')
+            possible.append("retire")
         except error.DrollError:
             pass
         try:
             world.retreat(self._world)
-            possible.append('retreat')
+            possible.append("retreat")
         except error.DrollError:
             pass
 
@@ -146,16 +145,12 @@ class Game:
         return results
 
     def completedefault(
-            self,
-            text: str,
-            head: typing.Sequence[str],
-            tail: typing.Sequence[str]
+        self, text: str, head: typing.Sequence[str], tail: typing.Sequence[str]
     ) -> typing.Sequence[str]:
         """Complete loosely based upon available heroes/treasures/dungeon."""
-        return player.complete(game=self._world,
-                               tokens=head + tail,
-                               text=text,
-                               position=len(head))
+        return player.complete(
+            game=self._world, tokens=head + tail, text=text, position=len(head)
+        )
 
 
 def dummy_randrange(start, stop=None):

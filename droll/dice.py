@@ -13,10 +13,7 @@ RollParty = typing.Callable[[int, RandRange], struct.Party]
 
 
 def _roll(
-        dice: int,
-        start: int,
-        stop: int,
-        randrange: RandRange
+    dice: int, start: int, stop: int, randrange: RandRange
 ) -> typing.List[int]:
     assert dice >= 0, "At least one die must be requested"
     result = [0] * (stop - start)
@@ -32,7 +29,8 @@ def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
     On Dungeon N one should account for the number of extant dragons."""
     assert dice >= 1, "At least one dice required (requested {})".format(dice)
     return struct.Dungeon(
-        *_roll(dice, 0, len(struct.Dungeon._fields), randrange))
+        *_roll(dice, 0, len(struct.Dungeon._fields), randrange)
+    )
 
 
 def roll_party(dice: int, randrange: RandRange) -> struct.Party:
