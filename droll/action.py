@@ -25,25 +25,25 @@ def defeat_one(
 
 def __decrement_hero(party: struct.Party, hero: str) -> struct.Party:
     if party is None:
-        raise error.DrollError('No party currently active')
+        raise error.DrollError('No party currently active.')
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
-        raise error.DrollError("Require at least one hero {}".format(hero))
+        raise error.DrollError("Require at least one hero {}.".format(hero))
     return party._replace(**{hero: prior_heroes - 1})
 
 
 def __increment_hero(party: struct.Party, hero: str) -> struct.Party:
     if party is None:
-        raise error.DrollError('No party currently active')
+        raise error.DrollError('No party currently active.')
     return party._replace(**{hero: getattr(party, hero) + 1})
 
 
 def __decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     if dungeon is None:
-        raise error.DrollError('No dungeon currently active')
+        raise error.DrollError('No dungeon currently active.')
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise ValueError("Require at least one target {}".format(target))
+        raise ValueError("Require at least one target {}.".format(target))
     return dungeon._replace(**{target: prior_targets - 1})
 
 
@@ -71,13 +71,13 @@ def defeat_all_plus_additional(
     # Second, determine if additional should not have been supplied
     if world.defeated_monsters(game.dungeon):
         if additional:
-            raise error.DrollError("Additional {} given but no monsters left"
+            raise error.DrollError("Additional {} given but no monsters left."
                                    .format(additional))
         return game
 
     # Third, confirm at most one additional provided
     if len(additional) != 1:
-        raise error.DrollError("One additional target allowed, but {} provided"
+        raise error.DrollError("One additional target okay but {} provided."
                                .format(additional))
 
     # Last, attempt to defeat the additional monster using the same hero
@@ -93,10 +93,10 @@ def __eliminate_targets(
         dungeon: struct.Dungeon, target: str
 ) -> struct.Dungeon:
     if dungeon is None:
-        raise error.DrollError('No dungeon currently active')
+        raise error.DrollError('No dungeon currently active.')
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise error.DrollError("Require at least one target {}".format(target))
+        raise error.DrollError("Require at least one target {}.".format(target))
     return dungeon._replace(**{target: 0})
 
 
@@ -122,7 +122,7 @@ def open_all(
         raise error.DrollError("Monsters must be defeated before opening.")
     howmany = getattr(game.dungeon, target)
     if not howmany:
-        raise error.DrollError("At least 1 {} required".format(target))
+        raise error.DrollError("At least 1 {} required.".format(target))
     for _ in range(howmany):
         game = world.draw_treasure(game, randrange)
     return game._replace(
@@ -140,9 +140,9 @@ def quaff(
     Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
     howmany = getattr(game.dungeon, target)
     if not howmany:
-        raise error.DrollError("At least 1 {} required".format(target))
+        raise error.DrollError("At least 1 {} required.".format(target))
     if len(revivable) != howmany:
-        raise error.DrollError("Require exactly {} to revive".format(howmany))
+        raise error.DrollError("Require exactly {} to revive.".format(howmany))
     if _after_monsters and not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Monsters must be defeated before quaffing.")
     party = __decrement_hero(game.party, hero)
@@ -157,7 +157,7 @@ def quaff(
 def reroll(
         game: struct.World, randrange: dice.RandRange, hero: str, *targets
 ) -> struct.World:
-    """Update game after hero rerolls some number of targets."""
+    """Update game after hero re-rolls some number of targets."""
     if not targets:
         raise error.DrollError('At least one target must be re-rolled.')
 
@@ -165,7 +165,7 @@ def reroll(
     reduced = game.dungeon
     for target in targets:
         if target in {'potion', 'dragon'}:
-            raise error.DrollError("{} cannot be rerolled".format(target))
+            raise error.DrollError("{} cannot be re-rolled".format(target))
         reduced = __decrement_target(reduced, target)
 
     # Re-roll the necessary number of dice then add to anything left fixed
@@ -186,7 +186,7 @@ def defeat_dragon_heroes(
     Specifically, in the case when all heroes must be distinct.
     """
     if {*heroes} & {*_disallowed_heroes}:
-        raise error.DrollError("Heroes {} cannot defeat a dragon"
+        raise error.DrollError("Heroes {} cannot defeat a dragon."
                                .format(_disallowed_heroes))
     if len(heroes) != _distinct_heroes:
         raise error.DrollError("Exactly {} heroes must be specified."
@@ -208,7 +208,7 @@ def defeat_dragon_heroes_interchangeable(
     Specifically, in the case when 'A may be used as B and B may be used as A'.
     """
     if {*heroes} & {*_disallowed_heroes}:
-        raise error.DrollError("Heroes {} cannot defeat a dragon"
+        raise error.DrollError("Heroes {} cannot defeat a dragon."
                                .format(_disallowed_heroes))
     if len(heroes) != _required_heroes:
         raise error.DrollError("Exactly {} heroes must be specified."
@@ -217,7 +217,7 @@ def defeat_dragon_heroes_interchangeable(
     # Count all heroes, accumulating all _interchangable into just one hero
     counter = collections.Counter(heroes)
     interchangeable = list(sorted(_interchangeable))
-    assert len(interchangeable) > 0, 'At least one interchangeable required'
+    assert len(interchangeable) > 0, 'At least one interchangeable required.'
     while len(interchangeable) > 1:
         counter[interchangeable[0]] += counter.pop(interchangeable.pop(), 0)
 
@@ -230,7 +230,7 @@ def defeat_dragon_heroes_interchangeable(
     # Sum the number of distinct heroes observed after these coercions.
     distinct_heroes = sum(v for k, v in counter.items())
     if distinct_heroes != _required_heroes:
-        raise error.DrollError("Heroes {} not sufficiently distinct", heroes)
+        raise error.DrollError("Heroes {} not sufficiently distinct.", heroes)
 
     return True
 
@@ -246,7 +246,7 @@ def defeat_dragon(
     Additional required heroes are specified within variable-length others."""
     # Simple prerequisites for attempting to defeat the dragon
     if game.dungeon.dragon < _min_dragon_length:
-        raise error.DrollError("Enemy {} only comes at length {}"
+        raise error.DrollError("Enemy {} only comes at length {}."
                                .format(target, _min_dragon_length))
     if not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Enemy {} only comes after all others defeated."
@@ -280,7 +280,7 @@ def bait_dragon(
     # Confirm well-formed request optionally containing a target
     target = 'dragon' if target is None else target
     if target != 'dragon':
-        raise error.DrollError('Cannot {} a {}'.format(noun, target))
+        raise error.DrollError('Cannot {} a {}.'.format(noun, target))
     if _require_treasure:
         game = world.replace_treasure(game, noun)
 
@@ -292,7 +292,7 @@ def bait_dragon(
             new_targets += getattr(game.dungeon, enemy)
             dungeon = dungeon._replace(**{enemy: 0})
     if not new_targets:
-        raise error.DrollError("At least one of {} required for '{}'"
+        raise error.DrollError("At least one of {} required for '{}'."
                                .format(_enemies, noun))
 
     # Increment the number of targets (i.e. dragons)
@@ -323,5 +323,5 @@ def nop_ability(
 ) -> struct.World:
     """No special ability available (though its consumption is tracked)"""
     if target is not None:
-        raise error.DrollError('No targets accepted for {}'.format(noun))
+        raise error.DrollError('No targets accepted for {}.'.format(noun))
     return consume_ability(game)
