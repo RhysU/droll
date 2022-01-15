@@ -1,5 +1,7 @@
 Droll
 =====
+[![Build Status](https://travis-ci.com/RhysU/droll.svg?branch=master)](https://travis-ci.com/github/RhysU/droll)
+
 ## What is it?
 
 Droll is an implementation of some of the game mechanics underneath [Dungeon
