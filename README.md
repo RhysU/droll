@@ -1,6 +1,6 @@
 Droll
 =====
-[![Build Status](https://travis-ci.com/RhysU/droll.svg?branch=master)](https://travis-ci.com/github/RhysU/droll)
+[![CircleCI](https://circleci.com/gh/RhysU/droll/tree/master.svg?style=svg)](https://circleci.com/gh/RhysU/droll/tree/master)
 
 ## What is it?
 
