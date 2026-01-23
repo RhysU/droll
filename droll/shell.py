@@ -197,6 +197,9 @@ class Shell(cmd.Cmd):
         """
         )
 
+    def help_scale(self):
+        print("""Scales are treasures that score 2 points per pair.""")
+
     def help_sword(self):
         print("""Swords behave identically to a fighter.""")
 
