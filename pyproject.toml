@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "droll"
+version = "0.1"
+authors = [
+    {name = "Rhys Ulerich"},
+]
+description = "Implementation of game mechanics for Dungeon Roll"
+readme = "README.md"
+requires-python = ">=3.5"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "flake8",
+    "Sphinx",
+]
+test = [
+    "pytest",
+]
+
+[project.scripts]
+droll = "droll.__main__:main"
+
+[tool.setuptools]
+packages = ["droll"]
+
+[tool.setuptools.package-data]
+"*" = ["*"]

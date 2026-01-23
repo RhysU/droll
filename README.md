@@ -168,12 +168,32 @@ Why retreat when you could instead retire?
 (DragonSlayer  7) ^D
 ```
 
-## Testing
+## Installation
 
-You can run unit tests through setup.py with:
+Install the package in development mode with:
 
 ```
-python setup.py test
+pip install -e .
+```
+
+Or install with development dependencies:
+
+```
+pip install -e ".[dev]"
+```
+
+## Testing
+
+Run unit tests with pytest:
+
+```
+pytest
+```
+
+Or using Python's module syntax:
+
+```
+python -m pytest
 ```
 
 ## Documentation
@@ -181,7 +201,7 @@ python setup.py test
 To generate Sphinx documentation, run:
 
 ```
-python setup.py doc
+sphinx-build docs docs/_build
 ```
 
 The generated documentation will be available in `docs/_build`
