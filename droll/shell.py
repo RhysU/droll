@@ -181,6 +181,10 @@ class Shell(cmd.Cmd):
         print(self.doc_hero_template.format("mage"))
         print(self.doc_hero_example)
 
+    def help_ring(self):
+        print("""Rings of invisibility are automatically used when descending or retiring.""")
+        print("""They allow you to sneak past a blocking dragon.""")
+
     def help_sceptre(self):
         print("""Sceptres behave identically to a mage.""")
 

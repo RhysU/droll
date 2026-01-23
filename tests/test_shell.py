@@ -35,6 +35,7 @@ def test_help():
     s.help_elixir()
     s.help_fighter()
     s.help_mage()
+    s.help_ring()
     s.help_sceptre()
     s.help_scroll()
     s.help_sword()
