@@ -23,9 +23,7 @@ jobs:
       version: <<parameters.version>>
     steps:
       - checkout
-      - run: python -m pip install build
-      - run: python -m build
-      - run: python -m pip install dist/droll-*.whl
+      - run: python -m pip install .
       - run: python -m pip install pytest
       - run: python -m pytest tests/
       - run: droll --help
