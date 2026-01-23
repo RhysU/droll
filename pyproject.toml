@@ -36,8 +36,9 @@ test = [
 [project.scripts]
 droll = "droll.__main__:main"
 
-[tool.setuptools]
-packages = ["droll"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["droll*"]
 
 [tool.setuptools.package-data]
 "*" = ["*"]
