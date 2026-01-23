@@ -1,0 +1,43 @@
+# See https://circleci.com/docs/2.0/reusing-config/
+version: 2.1
+
+executors:
+  python-docker:
+    parameters:
+      version:
+        description: "Python version"
+        default: "3.9"
+        type: string
+    docker:
+      - image: cimg/python:<<parameters.version>>
+
+jobs:
+  test:
+    parameters:
+      version:
+        description: "Python version"
+        default: "3.9"
+        type: string
+    executor:
+      name: python-docker
+      version: <<parameters.version>>
+    steps:
+      - checkout
+      - run: python -m pip install build
+      - run: python -m build
+      - run: python -m pip install dist/droll-*.whl
+      - run: python -m pip install pytest
+      - run: python -m pytest tests/
+      - run: droll --help
+
+workflows:
+  matrix-tests:
+    jobs:
+      - test:
+          matrix:
+            parameters:
+              version:
+                - "3.9"
+                - "3.10"
+                - "3.11"
+                - "3.12"
