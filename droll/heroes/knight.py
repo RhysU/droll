@@ -17,7 +17,7 @@ def knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
 
 
 def knight_bait_dragon(*args, **kwargs):
-    """Bait dragon without consuming treasure (uses ability instead)."""
+    """Convert all monster faces into dragon dice."""
     return action.consume_ability(
         action.bait_dragon(*args, _require_treasure=False, **kwargs)
     )
