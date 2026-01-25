@@ -10,7 +10,7 @@ import pytest
 
 from droll.error import DrollError
 from droll.game import Game
-from droll.heroes import Knight, Minstrel, Spellsword
+from droll.heroes import Crusader, Knight, Minstrel, Spellsword
 from droll.player import Default
 from droll.shell import Shell
 
@@ -573,6 +573,119 @@ def test_minstrel():
     s = Shell(Game(random=random.Random(27), player=Minstrel))
     s.preloop()
     parsed = parse_summary_command(test_spellsword.__doc__)
+    for index, (expected_summary, following_command) in enumerate(parsed):
+        assert expected_summary == s.summary(), "Summary mismatch at {}".format(
+            index
+        )
+        s.onecmd(following_command)
+
+def test_crusader():
+    """
+    Runs the following scenario involving unique Crusader/Paladin details:
+
+    (delve=1, party=(cleric=2, mage=3, champion=1, scroll=1), ability=True, treasure=())
+    (Crusader  0) descend
+
+    (delve=1, depth=1, dungeon=(chest=1), party=(cleric=2, mage=3, champion=1, scroll=1), ability=True, treasure=())
+    (Crusader  0) mage chest
+
+    (delve=1, depth=1, dungeon=(), party=(cleric=2, mage=2, champion=1, scroll=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) descend
+
+    (delve=1, depth=2, dungeon=(goblin=1, potion=1), party=(cleric=2, mage=2, champion=1, scroll=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) scroll goblin
+
+    (delve=1, depth=2, dungeon=(potion=1, dragon=1), party=(cleric=2, mage=2, champion=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) descend
+
+    (delve=1, depth=3, dungeon=(ooze=1, potion=1, dragon=2), party=(cleric=2, mage=2, champion=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) mage ooze
+
+    (delve=1, depth=3, dungeon=(potion=1, dragon=2), party=(cleric=2, mage=1, champion=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) mage potion fighter
+
+    (delve=1, depth=3, dungeon=(dragon=2), party=(fighter=1, cleric=2, champion=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) descend
+
+    (delve=1, depth=4, dungeon=(goblin=1, ooze=1, potion=1, dragon=3), party=(fighter=1, cleric=2, champion=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) fighter goblin
+
+    (delve=1, depth=4, dungeon=(ooze=1, potion=1, dragon=3), party=(cleric=2, champion=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) cleric ooze
+
+    (delve=1, depth=4, dungeon=(potion=1, dragon=3), party=(cleric=1, champion=1), ability=True, treasure=(elixir=1))
+    (Crusader  1) elixir cleric
+
+    (delve=1, depth=4, dungeon=(potion=1, dragon=3), party=(cleric=2, champion=1), ability=True, treasure=())
+    (Crusader  0) cleric dragon cleric champion
+
+    (delve=1, depth=4, experience=1, dungeon=(potion=1), party=(), ability=True, treasure=(portal=1))
+    (Crusader  3) ability fighter
+
+    (delve=1, depth=4, experience=1, dungeon=(potion=1), party=(fighter=1), treasure=(portal=1))
+    (Crusader  3) retire
+
+    (delve=2, experience=5, party=(fighter=3, mage=1, thief=1, champion=1, scroll=1), ability=True, treasure=(portal=1))
+    (Paladin  7) descend
+
+    (delve=2, depth=1, experience=5, dungeon=(dragon=1), party=(fighter=3, mage=1, thief=1, champion=1, scroll=1), ability=True, treasure=(portal=1))
+    (Paladin  7) descend
+
+    (delve=2, depth=2, experience=5, dungeon=(goblin=1, ooze=1, dragon=1), party=(fighter=3, mage=1, thief=1, champion=1, scroll=1), ability=True, treasure=(portal=1))
+    (Paladin  7) fighter goblin
+
+    (delve=2, depth=2, experience=5, dungeon=(ooze=1, dragon=1), party=(fighter=2, mage=1, thief=1, champion=1, scroll=1), ability=True, treasure=(portal=1))
+    (Paladin  7) fighter ooze
+
+    (delve=2, depth=2, experience=5, dungeon=(dragon=1), party=(fighter=1, mage=1, thief=1, champion=1, scroll=1), ability=True, treasure=(portal=1))
+    (Paladin  7) descend
+
+    (delve=2, depth=3, experience=5, dungeon=(goblin=1, chest=1, dragon=2), party=(fighter=1, mage=1, thief=1, champion=1, scroll=1), ability=True, treasure=(portal=1))
+    (Paladin  7) mage goblin
+
+    (delve=2, depth=3, experience=5, dungeon=(chest=1, dragon=2), party=(fighter=1, thief=1, champion=1, scroll=1), ability=True, treasure=(portal=1))
+    (Paladin  7) undo
+
+    (delve=2, depth=3, experience=5, dungeon=(goblin=1, chest=1, dragon=2), party=(fighter=1, mage=1, thief=1, champion=1, scroll=1), ability=True, treasure=(portal=1))
+    (Paladin  7) scroll goblin
+
+    (delve=2, depth=3, experience=5, dungeon=(goblin=1, chest=1, dragon=2), party=(fighter=1, mage=1, thief=1, champion=1), ability=True, treasure=(portal=1))
+    (Paladin  7) ability portal
+
+    (delve=2, depth=3, experience=5, dungeon=(), party=(fighter=1, mage=1, thief=1, champion=1), treasure=(elixir=1))
+    (Paladin  6) descend
+
+    (delve=2, depth=4, experience=5, dungeon=(goblin=1, skeleton=1, ooze=2), party=(fighter=1, mage=1, thief=1, champion=1), treasure=(elixir=1))
+    (Paladin  6) mage ooze
+
+    (delve=2, depth=4, experience=5, dungeon=(goblin=1, skeleton=1), party=(fighter=1, thief=1, champion=1), treasure=(elixir=1))
+    (Paladin  6) fighter goblin
+
+    (delve=2, depth=4, experience=5, dungeon=(skeleton=1), party=(thief=1, champion=1), treasure=(elixir=1))
+    (Paladin  6) thief skeleton
+
+    (delve=2, depth=4, experience=5, dungeon=(), party=(champion=1), treasure=(elixir=1))
+    (Paladin  6) retire
+
+    (delve=3, experience=9, party=(fighter=2, cleric=1, mage=2, thief=1, champion=1), ability=True, treasure=(elixir=1))
+    (Paladin 10) descend
+
+    (delve=3, depth=1, experience=9, dungeon=(skeleton=1), party=(fighter=2, cleric=1, mage=2, thief=1, champion=1), ability=True, treasure=(elixir=1))
+    (Paladin 10) fighter skeleton
+
+    (delve=3, depth=1, experience=9, dungeon=(), party=(fighter=1, cleric=1, mage=2, thief=1, champion=1), ability=True, treasure=(elixir=1))
+    (Paladin 10) descend
+
+    (delve=3, depth=2, experience=9, dungeon=(goblin=1, potion=1), party=(fighter=1, cleric=1, mage=2, thief=1, champion=1), ability=True, treasure=(elixir=1))
+    (Paladin 10) ability elixir mage
+
+    (delve=3, depth=2, experience=9, dungeon=(), party=(fighter=1, cleric=1, mage=3, thief=1, champion=1), treasure=())
+    (Paladin  9) EOF
+    """
+    # Drive the game according to the script in the above docstring.
+    s = Shell(Game(random=random.Random(35), player=Crusader))
+    s.preloop()
+    parsed = parse_summary_command(test_crusader.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):
         assert expected_summary == s.summary(), "Summary mismatch at {}".format(
             index
