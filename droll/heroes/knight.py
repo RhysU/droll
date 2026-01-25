@@ -39,7 +39,7 @@ DragonSlayer = Default._replace(
     ability=knight_bait_dragon,
     advance=(lambda _: DragonSlayer),
     roll=Default.roll._replace(party=knight_roll_party),
-    party=action.update_party_dragon(
+    party=struct.update_party_dragon(
         Default.party, _dragonslayer_defeat_dragon
     ),
 )

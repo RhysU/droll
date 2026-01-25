@@ -98,7 +98,7 @@ Paladin = Default._replace(
     name="Paladin",
     ability=paladin_ability,
     advance=(lambda _: Paladin),
-    party=action.update_party_dragon(
+    party=struct.update_party_dragon(
         Default.party, _crusader_defeat_dragon
     )._replace(
         fighter=Default.party.fighter._replace(

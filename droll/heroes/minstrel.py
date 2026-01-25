@@ -37,7 +37,7 @@ _minstrel_defeat_dragon = functools.partial(
 )
 
 # Building block: dragon defeat + mage/thief interchangeability in combat
-_Minstrel_Party = action.update_party_dragon(
+_Minstrel_Party = struct.update_party_dragon(
     Default.party, _minstrel_defeat_dragon
 )._replace(
     mage=Default.party.mage._replace(chest=Default.party.thief.chest),

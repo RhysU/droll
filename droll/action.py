@@ -393,11 +393,3 @@ def nop_ability(
     if target is not None:
         raise error.DrollError("No targets accepted for {}.".format(noun))
     return consume_ability(game)
-
-
-def update_party_dragon(party: struct.Party, dragon_func) -> struct.Party:
-    """Update all heroes in a party to use a custom dragon defeat function."""
-    return struct.Party(*(
-        hero_dungeon._replace(dragon=dragon_func)
-        for hero_dungeon in party
-    ))

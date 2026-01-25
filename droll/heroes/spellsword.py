@@ -67,7 +67,7 @@ Battlemage = Default._replace(
     name="Battlemage",
     ability=battlemage_ability,
     advance=(lambda _: Battlemage),
-    party=action.update_party_dragon(
+    party=struct.update_party_dragon(
         Default.party, _spellsword_defeat_dragon
     )._replace(
         fighter=Default.party.fighter._replace(ooze=Default.party.mage.ooze),

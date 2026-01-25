@@ -66,6 +66,14 @@ World = collections.namedtuple(
 )
 
 
+def update_party_dragon(party: Party, dragon_func) -> Party:
+    """Update all heroes in a party to use a custom dragon defeat function."""
+    return Party(*(
+        hero_dungeon._replace(dragon=dragon_func)
+        for hero_dungeon in party
+    ))
+
+
 def brief(o: typing.Any, *, omitted: typing.Set[str] = {"reserve"}) -> str:
     """A __str__(...) variant suppressing False fields within namedtuples."""
     fields = getattr(o, "_fields", None)
