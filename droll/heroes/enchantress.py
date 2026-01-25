@@ -2,7 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Beguiler advancing to Enchantress."""
-import functools
 import typing
 
 from .. import action
@@ -21,8 +20,8 @@ def enchantress_ability(
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion."""
     dungeon = game.dungeon
-    dungeon = action.__decrement_target(dungeon, target)
-    dungeon = action.__increment_target(dungeon, "potion")
+    dungeon = action._decrement_target(dungeon, target)
+    dungeon = action._increment_target(dungeon, "potion")
     return action.consume_ability(game._replace(dungeon=dungeon))
 
 
@@ -37,49 +36,39 @@ def beguiler_ability(
 
     Requires transforming 2 monsters when 2+ monsters available."""
     dungeon = game.dungeon
-    dungeon = action.__decrement_target(dungeon, target)
+    dungeon = action._decrement_target(dungeon, target)
     if len(extra_targets) > 1:
         raise error.DrollError("At most 2 targets can be transformed.")
     elif len(extra_targets) == 1:
-        dungeon = action.__decrement_target(dungeon, extra_targets[0])
+        dungeon = action._decrement_target(dungeon, extra_targets[0])
     elif not world.defeated_monsters(dungeon):
         assert len(extra_targets) == 0
         raise error.DrollError("Require 2 targets when 2+ available.")
     else:
         pass
-    dungeon = action.__increment_target(dungeon, "potion")
+    dungeon = action._increment_target(dungeon, "potion")
     return action.consume_ability(game._replace(dungeon=dungeon))
 
 
-@functools.wraps(action.defeat_dragon)
-def beguiler_defeat_dragon(*args, **kwargs):
-    return action.defeat_dragon(
-        *args, **kwargs, _defeat_dragon_heroes=beguiler_defeat_dragon_heroes
-    )
+# Scrolls act as wildcards for dragon defeats
+_beguiler_defeat_dragon = action.make_defeat_dragon(
+    action.make_dragon_validator_wildcard({"scroll"})
+)
 
-
-@functools.wraps(action.defeat_dragon_heroes_interchangeable)
-def beguiler_defeat_dragon_heroes(*args, **kwargs):
-    return action.defeat_dragon_heroes_wildcard(
-        *args, **kwargs, _wildcard={"scroll"}
-    )
-
-
-# Defined in terms of Default, not Crusader, to permit advance(...) closure
+# Defined in terms of Default, not Enchantress, to permit advance(...) closure
 Beguiler = Default._replace(
     name="Beguiler",
     ability=beguiler_ability,
-    advance=(lambda _: Beguiler),  # Cannot advance further
+    advance=(lambda _: Beguiler),
     party=Default.party._replace(
-        # Scrolls may be used as any companion so assume "offensive" usage
-        # That is, assumes user wants to defeat enemies not re-roll them
+        # Scrolls act offensively (defeat enemies, not re-roll)
         scroll=struct.Dungeon(
             goblin=action.defeat_all,
             skeleton=action.defeat_all,
             ooze=action.defeat_all,
             chest=action.open_all,
             potion=action.quaff,
-            dragon=beguiler_defeat_dragon,
+            dragon=_beguiler_defeat_dragon,
         ),
     ),
 )
