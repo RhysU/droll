@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """All known hero definitions."""
 
+from .crusader import Crusader, Paladin
 from .knight import Knight, DragonSlayer
 from .minstrel import Minstrel, Bard
 from .spellsword import Spellsword, Battlemage
