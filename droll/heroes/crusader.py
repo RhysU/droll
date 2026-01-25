@@ -21,7 +21,7 @@ def crusader_ability(
     *,
     _acceptable_targets: typing.Set[str] = {"fighter", "cleric"}
 ) -> struct.World:
-    """Holy Strike: Crusader usable as a fighter or a cleric, adding one hero.
+    """Crusader usable as a fighter or a cleric, adding one hero.
 
     Optionally, specify 'fighter' or 'cleric' to select which to choose."""
     if target is None:
@@ -43,10 +43,10 @@ def paladin_ability(
     *revivable,
     _acceptable_targets: typing.Set[str] = {"fighter", "cleric"}
 ) -> struct.World:
-    """Divine Intervention: Use treasure to clear dungeon and revive heroes.
+    """Consume treasure to clear dungeon, open chests, and quaff potions.
 
-    Requires specifying which treasure to consume as the first argument.
-    For each potion in the dungeon, specify one hero to revive."""
+    Specify consumed treasure as first argument.
+    For each potion, add one argument for the hero to review."""
     # Validate that a treasure was specified
     if target is None:
         raise error.DrollError(
