@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Spellsword advancing to Battlemage."""
+import functools
 import typing
 
 from .. import action
@@ -34,8 +35,12 @@ def spellsword_ability(
 
 
 # Fighter/mage are interchangeable for dragon defeats
-_spellsword_defeat_dragon = action.make_defeat_dragon(
-    action.make_dragon_validator_interchangeable({"fighter", "mage"})
+_spellsword_defeat_dragon = functools.partial(
+    action.defeat_dragon,
+    _defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes_interchangeable,
+        _interchangeable={"fighter", "mage"},
+    ),
 )
 
 

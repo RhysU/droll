@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Knight advancing to DragonSlayer."""
+import functools
+
 from .. import action
 from .. import dice
 from .. import struct
@@ -24,8 +26,11 @@ def knight_bait_dragon(*args, **kwargs):
 
 
 # DragonSlayer only needs 2 distinct heroes instead of 3
-_dragonslayer_defeat_dragon = action.make_defeat_dragon(
-    action.make_dragon_validator_fewer(2)
+_dragonslayer_defeat_dragon = functools.partial(
+    action.defeat_dragon,
+    _defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes, _distinct_heroes=2
+    ),
 )
 
 # Defined in terms of Default, not Knight, to permit advance(...) closure

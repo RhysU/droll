@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Beguiler advancing to Enchantress."""
+import functools
 import typing
 
 from .. import action
@@ -51,8 +52,11 @@ def beguiler_ability(
 
 
 # Scrolls act as wildcards for dragon defeats
-_beguiler_defeat_dragon = action.make_defeat_dragon(
-    action.make_dragon_validator_wildcard({"scroll"})
+_beguiler_defeat_dragon = functools.partial(
+    action.defeat_dragon,
+    _defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes_wildcard, _wildcard={"scroll"}
+    ),
 )
 
 # Defined in terms of Default, not Enchantress, to permit advance(...) closure

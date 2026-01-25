@@ -395,52 +395,6 @@ def nop_ability(
     return consume_ability(game)
 
 
-# Factory functions for creating hero-specific dragon defeat variants
-def make_dragon_validator_interchangeable(interchangeable: typing.Set[str]):
-    """Create a dragon hero validator where some heroes are interchangeable."""
-    def validator(*args, **kwargs):
-        return defeat_dragon_heroes_interchangeable(
-            *args, **kwargs, _interchangeable=interchangeable
-        )
-    return validator
-
-
-def make_dragon_validator_wildcard(wildcard: typing.Sequence[str]):
-    """Create a dragon hero validator where some heroes are wildcards."""
-    def validator(*args, **kwargs):
-        return defeat_dragon_heroes_wildcard(
-            *args, **kwargs, _wildcard=wildcard
-        )
-    return validator
-
-
-def make_dragon_validator_fewer(distinct_heroes: int):
-    """Create a dragon hero validator requiring fewer distinct heroes."""
-    def validator(*args, **kwargs):
-        return defeat_dragon_heroes(
-            *args, **kwargs, _distinct_heroes=distinct_heroes
-        )
-    return validator
-
-
-def make_defeat_dragon(heroes_validator):
-    """Create a defeat_dragon function with a custom hero validator."""
-    def variant(
-        game: struct.World,
-        randrange: dice.RandRange,
-        hero: str,
-        target: str,
-        *others,
-        _min_dragon_length: int = 3
-    ) -> struct.World:
-        return defeat_dragon(
-            game, randrange, hero, target, *others,
-            _defeat_dragon_heroes=heroes_validator,
-            _min_dragon_length=_min_dragon_length
-        )
-    return variant
-
-
 def update_party_dragon(party: struct.Party, dragon_func) -> struct.Party:
     """Update all heroes in a party to use a custom dragon defeat function."""
     return struct.Party(*(

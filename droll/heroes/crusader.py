@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Crusader advancing to Paladin."""
+import functools
 import typing
 
 from .. import action
@@ -84,8 +85,12 @@ def paladin_ability(
 
 
 # Fighter/cleric are interchangeable for dragon defeats
-_crusader_defeat_dragon = action.make_defeat_dragon(
-    action.make_dragon_validator_interchangeable({"fighter", "cleric"})
+_crusader_defeat_dragon = functools.partial(
+    action.defeat_dragon,
+    _defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes_interchangeable,
+        _interchangeable={"fighter", "cleric"},
+    ),
 )
 
 # Defined in terms of Default, not Crusader, to permit advance(...) closure

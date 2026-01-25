@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Minstrel advancing to Bard."""
+import functools
 import typing
 
 from .. import action
@@ -27,8 +28,12 @@ def minstrel_ability(
 
 
 # Mage/thief are interchangeable for dragon defeats
-_minstrel_defeat_dragon = action.make_defeat_dragon(
-    action.make_dragon_validator_interchangeable({"mage", "thief"})
+_minstrel_defeat_dragon = functools.partial(
+    action.defeat_dragon,
+    _defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes_interchangeable,
+        _interchangeable={"mage", "thief"},
+    ),
 )
 
 # Building block: dragon defeat + mage/thief interchangeability in combat
