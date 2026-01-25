@@ -12,13 +12,14 @@ learn how to play it, and then come back here.
 
 ## What is implemented?
 
-Default player semantics (i.e. no special abilities).  Special semantics
-for the Crusader with advancement to Paladin after 5 experience points.
-Also, Knight with advancement to DragonSlayer.  Likewise, Minstrel with
-advancement to Bard.  And Spellsword with advancement to Battlemage.  Other
-characters remain to be done.  Known shortcomings are flagged with TODOs.
-Tab-completion is present in the shell, which greatly speeds up playing.
-Deterministic actions can be undone using the 'undo' command.
+Default player semantics (i.e. no special abilities).  Special semantics for
+the Crusader with advancement to Paladin after 5 experience points.  Also,
+Knight with advancement to DragonSlayer.  Likewise, Minstrel with advancement
+to Bard.  Ditto, Enchantress with advancement to Beguiler.  And, Spellsword
+with advancement to Battlemage.  Other characters remain to be done.  Known
+shortcomings are flagged with TODOs.  Tab-completion is present in the shell,
+which greatly speeds up playing.  Deterministic actions can be undone using
+the 'undo' command.
 
 ## Why implement it?
 
@@ -36,7 +37,7 @@ said, I've not yet tried such a thing.
 
 ```
 $ droll --help
-usage: droll [-h] [--seed N] {Default,Crusader,Knight,Minstrel,Spellsword}
+usage: droll [-h] [--seed N] {Default,Crusader,Enchantress,Knight,Minstrel,Spellsword}
 
 Command-line version of droll.
 

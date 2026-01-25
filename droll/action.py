@@ -47,6 +47,13 @@ def __decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     return dungeon._replace(**{target: prior_targets - 1})
 
 
+def __increment_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
+    if dungeon is None:
+        raise error.DrollError("No dungeon currently active.")
+    prior_targets = getattr(dungeon, target, 0)
+    return dungeon._replace(**{target: prior_targets + 1})
+
+
 def defeat_all(
     game: struct.World, randrange: dice.RandRange, hero: str, target: str
 ) -> struct.World:

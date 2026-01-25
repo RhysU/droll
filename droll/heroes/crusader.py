@@ -40,7 +40,7 @@ def paladin_ability(
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
-    *revivable,
+    *revivable: str,
     _acceptable_targets: typing.Set[str] = {"fighter", "cleric"}
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
