@@ -13,9 +13,9 @@ and then come back here.
 ## What is implemented?
 
 Default player semantics (i.e. no special abilities).  Special semantics for the
-Knight with advancement to DragonSlayer after 5 experience points.  Also,
-semantics for Spellsword with advancement to Battlemage.  Likewise, Minstrel
-with advancement to Bard.  Other characters remain to be done.  Known
+Crusader with advancement to Paladin after 5 experience points.  Also, Knight
+with advancement to DragonSlayer.  Likewise, Minstrel with advancement to Bard.
+And Spellsword with advancement to Battlemage.  Other characters remain to be done.  Known
 shortcomings are flagged with TODOs.  Tab-completion is present in the shell,
 which greatly speeds up playing.  Deterministic actions can be undone using
 the 'undo' command.
@@ -36,12 +36,12 @@ yet tried such a thing.
 
 ```
 $ droll --help
-usage: droll [-h] [--seed N] {Default,Knight,Minstrel,Spellsword}
+usage: droll [-h] [--seed N] {Default,Crusader,Knight,Minstrel,Spellsword}
 
 Command-line version of droll.
 
 positional arguments:
-  {Default,Knight,Minstrel,Spellsword}
+  {Default,Crusader,Knight,Minstrel,Spellsword}
                         Select the hero for this game.
 
 optional arguments:
