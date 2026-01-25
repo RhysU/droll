@@ -8,7 +8,7 @@ import random
 import sys
 
 from .shell import Game
-from .heroes import Crusader, Knight, Minstrel, Spellsword
+from .heroes import Crusader, Enchantress, Knight, Minstrel, Spellsword
 from .player import Default
 from .shell import Shell
 
@@ -16,6 +16,7 @@ AVAILABLE_HEROES = collections.OrderedDict(
     [
         ("Default", Default),
         ("Crusader", Crusader),
+        ("Enchantress", Enchantress),
         ("Knight", Knight),
         ("Minstrel", Minstrel),
         ("Spellsword", Spellsword),
