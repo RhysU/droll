@@ -5,32 +5,32 @@ Droll
 ## What is it?
 
 Droll is an implementation of some of the game mechanics underneath [Dungeon
-Roll](https://boardgamegeek.com/boardgame/138788/dungeon-roll), a product of
-[Tasty Minstrel Games](http://playtmg.com/).  This code is in no way affiliated
-with either the game or the publisher.  Go buy their game, learn how to play it,
-and then come back here.
+Roll](https://boardgamegeek.com/boardgame/138788/dungeon-roll), a product
+of [Tasty Minstrel Games](http://playtmg.com/).  This code is in no way
+affiliated with either the game or the publisher.  Go buy their game,
+learn how to play it, and then come back here.
 
 ## What is implemented?
 
-Default player semantics (i.e. no special abilities).  Special semantics for the
-Crusader with advancement to Paladin after 5 experience points.  Also, Knight
-with advancement to DragonSlayer.  Likewise, Minstrel with advancement to Bard.
-And Spellsword with advancement to Battlemage.  Other characters remain to be done.  Known
-shortcomings are flagged with TODOs.  Tab-completion is present in the shell,
-which greatly speeds up playing.  Deterministic actions can be undone using
-the 'undo' command.
+Default player semantics (i.e. no special abilities).  Special semantics
+for the Crusader with advancement to Paladin after 5 experience points.
+Also, Knight with advancement to DragonSlayer.  Likewise, Minstrel with
+advancement to Bard.  And Spellsword with advancement to Battlemage.  Other
+characters remain to be done.  Known shortcomings are flagged with TODOs.
+Tab-completion is present in the shell, which greatly speeds up playing.
+Deterministic actions can be undone using the 'undo' command.
 
 ## Why implement it?
 
-It seemed like a fun thing to hack on.  Also, I was curious how much code was
-required to capture a game that children will catch onto in the space of 20
-minutes.
+It seemed like a fun thing to hack on.  Also, I was curious how much code
+was required to capture a game that children will catch onto in the space
+of 20 minutes.
 
 This game seems like a fun problem to throw into reinforcement learning
-algorithms as (a) the strategy isn't too complicated, (b) the score is very
-straightforward, and (c) there's probabilistic behavior in both the basic die
-mechanics as well as the expected value of the treasure.  That said, I've not
-yet tried such a thing.
+algorithms as (a) the strategy isn't too complicated, (b) the score is
+very straightforward, and (c) there's probabilistic behavior in both the
+basic die mechanics as well as the expected value of the treasure.  That
+said, I've not yet tried such a thing.
 
 ## What does it look like?
 
@@ -187,21 +187,13 @@ pip install -e ".[dev]"
 Run unit tests with pytest:
 
 ```
-pytest
-```
-
-Or using Python's module syntax:
-
-```
 python -m pytest
 ```
 
 ## Documentation
 
-To generate Sphinx documentation, run:
+Generate Sphinx documentation in `docs/_build` by running:
 
 ```
 sphinx-build docs docs/_build
 ```
-
-The generated documentation will be available in `docs/_build`
