@@ -33,7 +33,9 @@ def dragonslayer_defeat_dragon_heroes(*args, **kwargs):
 @functools.wraps(action.defeat_dragon)
 def dragonslayer_defeat_dragon(*args, **kwargs):
     return action.defeat_dragon(
-        *args, **kwargs, _defeat_dragon_heroes=dragonslayer_defeat_dragon_heroes
+        *args,
+        **kwargs,
+        _defeat_dragon_heroes=dragonslayer_defeat_dragon_heroes
     )
 
 
@@ -47,13 +49,17 @@ DragonSlayer = Default._replace(
         fighter=Default.party.fighter._replace(
             dragon=dragonslayer_defeat_dragon
         ),
-        cleric=Default.party.cleric._replace(dragon=dragonslayer_defeat_dragon),
+        cleric=Default.party.cleric._replace(
+            dragon=dragonslayer_defeat_dragon
+        ),
         mage=Default.party.mage._replace(dragon=dragonslayer_defeat_dragon),
         thief=Default.party.thief._replace(dragon=dragonslayer_defeat_dragon),
         champion=Default.party.champion._replace(
             dragon=dragonslayer_defeat_dragon
         ),
-        scroll=Default.party.scroll._replace(dragon=dragonslayer_defeat_dragon),
+        scroll=Default.party.scroll._replace(
+            dragon=dragonslayer_defeat_dragon
+        ),
     ),
 )
 

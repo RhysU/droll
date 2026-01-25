@@ -105,18 +105,20 @@ Paladin = Default._replace(
     advance=(lambda _: Paladin),  # Cannot advance further
     party=Default.party._replace(
         fighter=Default.party.fighter._replace(
-            # Fighters usable as clerics implies fighter.skeleton as if a cleric
+            # Fighters usable as clerics implies fighter.skeleton as if cleric
             skeleton=Default.party.cleric.skeleton,
             dragon=crusader_defeat_dragon,
         ),
         cleric=Default.party.cleric._replace(
-            # Clerics usable as fighters implies cleric.goblin as if a fighter
+            # Clerics usable as fighters implies cleric.goblin as if fighter
             goblin=Default.party.fighter.goblin,
             dragon=crusader_defeat_dragon,
         ),
         mage=Default.party.mage._replace(dragon=crusader_defeat_dragon),
         thief=Default.party.thief._replace(dragon=crusader_defeat_dragon),
-        champion=Default.party.champion._replace(dragon=crusader_defeat_dragon),
+        champion=Default.party.champion._replace(
+            dragon=crusader_defeat_dragon
+        ),
         scroll=Default.party.scroll._replace(dragon=crusader_defeat_dragon),
     ),
 )

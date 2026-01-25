@@ -8,3 +8,16 @@ from .crusader import Crusader, Paladin
 from .knight import Knight, DragonSlayer
 from .minstrel import Minstrel, Bard
 from .spellsword import Spellsword, Battlemage
+
+__all__ = (
+    Bard.name,
+    Battlemage.name,
+    Beguiler.name,
+    Crusader.name,
+    DragonSlayer.name,
+    Enchantress.name,
+    Knight.name,
+    Minstrel.name,
+    Paladin.name,
+    Spellsword.name,
+)
