@@ -211,6 +211,35 @@ def defeat_dragon_heroes(
     return True
 
 
+def defeat_dragon_heroes_wildcard(
+    *heroes,
+    _wildcard: typing.Sequence[str] = ("scroll",),
+    _distinct_heroes: int = 3
+) -> bool:
+    """Have sufficiently many distinct heroes been provided to slay dragon?
+
+    Specifically, in the case when some hero is fungible for all others.
+    """
+    distinct_heroes = _distinct_heroes  # Allow mutation saving original
+    if len(heroes) != distinct_heroes:
+        raise error.DrollError(
+            "Exactly {} heroes must be specified.".format(distinct_heroes)
+        )
+
+    # Account for wildcards by having each wildcard reduce the distinct count
+    heroes = list(heroes)
+    for hero in heroes:
+        if hero in _wildcard:
+            heroes.remove(hero)
+            distinct_heroes -= 1
+
+    if len({*heroes}) != distinct_heroes:
+        raise error.DrollError(  # Error message uses original count
+            "The {} heroes must all be distinct.".format(_distinct_heroes)
+        )
+    return True
+
+
 def defeat_dragon_heroes_interchangeable(
     *heroes,
     _interchangeable: typing.Set[str],

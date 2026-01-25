@@ -267,3 +267,62 @@ def test_defeat_dragon_heroes_interchangeable():
         action.defeat_dragon_heroes_interchangeable(
             "mage", "fighter", "fighter", _interchangeable={"mage", "fighter"}
         )
+
+# Again directly test some more complicated hero-vs-dragon logic
+def test_defeat_dragon_heroes_wildcard():
+    # Less interesting successful cases first
+    assert action.defeat_dragon_heroes_wildcard(
+        "cleric", "thief", "mage",
+    )
+    assert action.defeat_dragon_heroes_wildcard(
+        "cleric", "thief", "fighter", _wildcard={"scroll"}
+    )
+
+    # Less interesting failure cases next
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "cleric", "thief", _wildcard={"scroll"}
+        )
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "cleric", "fighter", _wildcard={"fighter"}
+        )
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "cleric", "thief", "champion", "mage", _wildcard={"fighter"}
+        )
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "cleric",
+            "thief",
+            "champion",
+            "fighter",
+            _wildcard={"fighter"},
+        )
+
+    # More than one could be wildcard, but does not appear in the game.
+    # Therefore, only one wildcard case is checked below.
+
+    # More interesting successful cases
+    assert action.defeat_dragon_heroes_wildcard(
+        "cleric", "thief", "scroll",
+    )
+    assert action.defeat_dragon_heroes_wildcard(
+        "cleric", "scroll", "scroll",
+    )
+    assert action.defeat_dragon_heroes_wildcard(
+        "scroll", "scroll", "scroll",
+    )
+
+    # More interesting failure cases last
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "mage", "mage", "scroll",
+        )
+    with pytest.raises(error.DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "fighter",
+            "fighter",
+            "fighter",
+            _wildcard={"mage"},
+        )
