@@ -102,12 +102,10 @@ Paladin = Default._replace(
         Default.party, _crusader_defeat_dragon
     )._replace(
         fighter=Default.party.fighter._replace(
-            skeleton=Default.party.cleric.skeleton,  # defeat all skeletons
-            dragon=_crusader_defeat_dragon,
+            skeleton=Default.party.cleric.skeleton
         ),
         cleric=Default.party.cleric._replace(
-            goblin=Default.party.fighter.goblin,  # defeat all goblins
-            dragon=_crusader_defeat_dragon,
+            goblin=Default.party.fighter.goblin
         ),
     ),
 )

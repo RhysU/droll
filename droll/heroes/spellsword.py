@@ -70,14 +70,8 @@ Battlemage = Default._replace(
     party=action.update_party_dragon(
         Default.party, _spellsword_defeat_dragon
     )._replace(
-        fighter=Default.party.fighter._replace(
-            ooze=Default.party.mage.ooze,  # defeat all oozes like mages
-            dragon=_spellsword_defeat_dragon,
-        ),
-        mage=Default.party.mage._replace(
-            goblin=Default.party.fighter.goblin,  # Mages defeat all goblins
-            dragon=_spellsword_defeat_dragon,
-        ),
+        fighter=Default.party.fighter._replace(ooze=Default.party.mage.ooze),
+        mage=Default.party.mage._replace(goblin=Default.party.fighter.goblin),
     ),
 )
 

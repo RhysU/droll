@@ -40,14 +40,8 @@ _minstrel_defeat_dragon = functools.partial(
 _Minstrel_Party = action.update_party_dragon(
     Default.party, _minstrel_defeat_dragon
 )._replace(
-    mage=Default.party.mage._replace(
-        chest=Default.party.thief.chest,  # Mages open all chests like thieves
-        dragon=_minstrel_defeat_dragon,
-    ),
-    thief=Default.party.thief._replace(
-        ooze=Default.party.mage.ooze,  # Thieves defeat all oozes like mages
-        dragon=_minstrel_defeat_dragon,
-    ),
+    mage=Default.party.mage._replace(chest=Default.party.thief.chest),
+    thief=Default.party.thief._replace(ooze=Default.party.mage.ooze),
 )
 
 # Defined in terms of Default, not Minstrel, to permit advance(...) closure
