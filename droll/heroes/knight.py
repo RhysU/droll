@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Knight advancing to DragonSlayer."""
+import dataclasses
 import functools
 
 from .. import action
@@ -13,8 +14,8 @@ from ..player import Default
 def knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
     """Roll a new Party, changing all Scrolls into Champions."""
     default = dice.roll_party(dice=count, randrange=randrange)
-    return default._replace(
-        scroll=0, champion=default.champion + default.scroll
+    return dataclasses.replace(
+        default, scroll=0, champion=default.champion + default.scroll
     )
 
 
@@ -34,20 +35,22 @@ _dragonslayer_defeat_dragon = functools.partial(
 )
 
 # Defined in terms of Default, not Knight, to permit advance(...) closure
-DragonSlayer = Default._replace(
+DragonSlayer = dataclasses.replace(
+    Default,
     name="DragonSlayer",
     ability=knight_bait_dragon,
     advance=(lambda _: DragonSlayer),
-    roll=Default.roll._replace(party=knight_roll_party),
+    roll=dataclasses.replace(Default.roll, party=knight_roll_party),
     party=struct.update_party_dragon(
         Default.party, _dragonslayer_defeat_dragon
     ),
 )
 
 # Defined after DragonSlayer to permit advance(...) closure
-Knight = Default._replace(
+Knight = dataclasses.replace(
+    Default,
     name="Knight",
     ability=knight_bait_dragon,
     advance=(lambda world: Knight if world.experience < 5 else DragonSlayer),
-    roll=Default.roll._replace(party=knight_roll_party),
+    roll=dataclasses.replace(Default.roll, party=knight_roll_party),
 )

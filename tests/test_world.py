@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of basic world-to-world transitions."""
 
+import dataclasses
 import random
 
 import pytest
@@ -53,7 +54,9 @@ def test_draw_treasure(state):
 
 def test_replace_treasure():
     pre = droll.world.new_world()
-    pre = pre._replace(treasure=pre.treasure._replace(elixir=1))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, elixir=1)
+    )
     post = droll.world.replace_treasure(pre, "elixir")
     assert sum(pre.treasure) == 1
     assert sum(post.treasure) == 0
@@ -63,7 +66,8 @@ def test_replace_treasure():
 def test_retire_simple(state):
     pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
-    pre = pre._replace(
+    pre = dataclasses.replace(
+        pre,
         depth=3,
         dungeon=droll.struct.Dungeon(
             goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=0
@@ -77,7 +81,8 @@ def test_retire_simple(state):
 def test_retire_monsters(state):
     pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
-    pre = pre._replace(
+    pre = dataclasses.replace(
+        pre,
         depth=3,
         dungeon=droll.struct.Dungeon(
             goblin=0, skeleton=1, ooze=0, chest=2, potion=5, dragon=0
@@ -90,12 +95,16 @@ def test_retire_monsters(state):
         droll.world.retire(pre)
 
     # Ring of invisibility
-    pre = pre._replace(treasure=pre.treasure._replace(ring=1))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=1)
+    )
     with pytest.raises(droll.error.DrollError):
         droll.world.retire(pre)
 
     # Town portal
-    pre = pre._replace(treasure=pre.treasure._replace(portal=1))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, portal=1)
+    )
     post = droll.world.retire(pre)
     assert post.experience == pre.depth + pre.experience
     assert post.treasure.portal == 0
@@ -104,7 +113,8 @@ def test_retire_monsters(state):
 def test_retire_dragon(state):
     pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
-    pre = pre._replace(
+    pre = dataclasses.replace(
+        pre,
         depth=3,
         dungeon=droll.struct.Dungeon(
             goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=3
@@ -117,21 +127,27 @@ def test_retire_dragon(state):
         droll.world.retire(pre)
 
     # Ring of invisibility
-    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=0))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=1, portal=0)
+    )
     post1 = droll.world.retire(pre)
     assert post1.experience == pre.depth + pre.experience
     assert post1.treasure.ring == 0
     assert post1.treasure.portal == 0
 
     # Town portal
-    pre = pre._replace(treasure=pre.treasure._replace(ring=0, portal=1))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=0, portal=1)
+    )
     post2 = droll.world.retire(pre)
     assert post2.experience == pre.depth + pre.experience
     assert post2.treasure.ring == 0
     assert post2.treasure.portal == 0
 
     # Both should consume the ring of invisibility first
-    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=1))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=1, portal=1)
+    )
     post3 = droll.world.retire(pre)
     assert post3.experience == pre.depth + pre.experience
     assert post3.treasure.ring == 0
@@ -141,7 +157,8 @@ def test_retire_dragon(state):
 def test_next_dungeon_simple(state):
     pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
-    pre = pre._replace(
+    pre = dataclasses.replace(
+        pre,
         depth=3,
         dungeon=droll.struct.Dungeon(
             goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=0
@@ -156,7 +173,8 @@ def test_next_dungeon_simple(state):
 def test_next_dungeon_monsters(state):
     pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
-    pre = pre._replace(
+    pre = dataclasses.replace(
+        pre,
         depth=3,
         dungeon=droll.struct.Dungeon(
             goblin=0, skeleton=1, ooze=0, chest=2, potion=5, dragon=1
@@ -169,12 +187,16 @@ def test_next_dungeon_monsters(state):
         droll.world.next_dungeon(pre, droll.dice.roll_dungeon, state.randrange)
 
     # Ring of invisibility
-    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=0))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=1, portal=0)
+    )
     with pytest.raises(droll.error.DrollError):
         droll.world.next_dungeon(pre, droll.dice.roll_dungeon, state.randrange)
 
     # Town portal
-    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=0))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=1, portal=0)
+    )
     with pytest.raises(droll.error.DrollError):
         droll.world.next_dungeon(pre, droll.dice.roll_dungeon, state.randrange)
 
@@ -182,7 +204,8 @@ def test_next_dungeon_monsters(state):
 def test_next_dungeon_dragon(state):
     pre = droll.world.new_world()
     pre = droll.world.next_delve(pre, droll.dice.roll_party, state.randrange)
-    pre = pre._replace(
+    pre = dataclasses.replace(
+        pre,
         depth=3,
         dungeon=droll.struct.Dungeon(
             goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=3
@@ -195,7 +218,9 @@ def test_next_dungeon_dragon(state):
         droll.world.next_dungeon(pre, droll.dice.roll_dungeon, state.randrange)
 
     # Ring of invisibility
-    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=0))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=1, portal=0)
+    )
     post1 = droll.world.next_dungeon(
         pre, droll.dice.roll_dungeon, state.randrange
     )
@@ -204,12 +229,16 @@ def test_next_dungeon_dragon(state):
     assert post1.treasure.portal == 0
 
     # Town portal
-    pre = pre._replace(treasure=pre.treasure._replace(ring=0, portal=1))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=0, portal=1)
+    )
     with pytest.raises(droll.error.DrollError):
         droll.world.next_dungeon(pre, droll.dice.roll_dungeon, state.randrange)
 
     # Both should consume the ring of invisibility
-    pre = pre._replace(treasure=pre.treasure._replace(ring=1, portal=1))
+    pre = dataclasses.replace(
+        pre, treasure=dataclasses.replace(pre.treasure, ring=1, portal=1)
+    )
     post3 = droll.world.next_dungeon(
         pre, droll.dice.roll_dungeon, state.randrange
     )

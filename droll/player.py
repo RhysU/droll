@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
 
+import dataclasses
 import typing
 
 from . import action
@@ -124,8 +125,10 @@ def apply(
     # Many treasures behave exactly like party members, so
     # convert into party members prior to action invocation.
     prior_treasure = game.treasure
-    game = game._replace(
-        party=game.party._replace(
+    game = dataclasses.replace(
+        game,
+        party=dataclasses.replace(
+            game.party,
             **{
                 hero: getattr(game.party, hero)
                 + getattr(prior_treasure, artifact)
@@ -154,8 +157,10 @@ def apply(
             raise error.DrollError(str(cause)) from cause
 
     # Undo the prior transformation by subtracting prior_treasure.
-    game = game._replace(
-        party=game.party._replace(
+    game = dataclasses.replace(
+        game,
+        party=dataclasses.replace(
+            game.party,
             **{
                 hero: getattr(game.party, hero)
                 - getattr(prior_treasure, artifact)
@@ -174,7 +179,9 @@ def apply(
         for _ in range(-min(0, quantity)):
             game = world.replace_treasure(
                     game, getattr(player.artifacts, hero))
-        game = game._replace(party=game.party._replace(**{hero: 0}))
+        game = dataclasses.replace(
+            game, party=dataclasses.replace(game.party, **{hero: 0})
+        )
 
     return game
 

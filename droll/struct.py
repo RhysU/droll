@@ -18,9 +18,6 @@ class Dungeon:
 
     _fields = ("goblin", "skeleton", "ooze", "chest", "potion", "dragon")
 
-    def _replace(self, **changes):
-        return dataclasses.replace(self, **changes)
-
     def __iter__(self):
         return iter((self.goblin, self.skeleton, self.ooze, self.chest,
                      self.potion, self.dragon))
@@ -40,9 +37,6 @@ class Party:
 
     _fields = ("fighter", "cleric", "mage", "thief", "champion", "scroll")
 
-    def _replace(self, **changes):
-        return dataclasses.replace(self, **changes)
-
     def __iter__(self):
         return iter((self.fighter, self.cleric, self.mage, self.thief,
                      self.champion, self.scroll))
@@ -56,9 +50,6 @@ class Roll:
     party: typing.Any = None
 
     _fields = ("dungeon", "party")
-
-    def _replace(self, **changes):
-        return dataclasses.replace(self, **changes)
 
     def __iter__(self):
         return iter((self.dungeon, self.party))
@@ -79,9 +70,6 @@ class Player:
 
     _fields = ("name", "ability", "advance", "bait", "elixir", "roll",
                "artifacts", "party")
-
-    def _replace(self, **changes):
-        return dataclasses.replace(self, **changes)
 
     def __iter__(self):
         return iter((self.name, self.ability, self.advance, self.bait,
@@ -121,9 +109,6 @@ class Treasure:
     _fields = ("sword", "talisman", "sceptre", "tools", "scroll", "elixir",
                "bait", "portal", "ring", "scale")
 
-    def _replace(self, **changes):
-        return dataclasses.replace(self, **changes)
-
     def __iter__(self):
         return iter((self.sword, self.talisman, self.sceptre, self.tools,
                      self.scroll, self.elixir, self.bait, self.portal,
@@ -150,9 +135,6 @@ class World:
     _fields = ("delve", "depth", "experience", "dungeon", "party", "ability",
                "treasure", "reserve")
 
-    def _replace(self, **changes):
-        return dataclasses.replace(self, **changes)
-
     def __iter__(self):
         return iter((self.delve, self.depth, self.experience, self.dungeon,
                      self.party, self.ability, self.treasure, self.reserve))
@@ -164,7 +146,7 @@ class World:
 def update_party_dragon(party: Party, dragon_func) -> Party:
     """Update all heroes in a party to use a custom dragon defeat function."""
     return Party(*(
-        hero_dungeon._replace(dragon=dragon_func)
+        dataclasses.replace(hero_dungeon, dragon=dragon_func)
         for hero_dungeon in party
     ))
 
