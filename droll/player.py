@@ -132,9 +132,7 @@ def apply(
             **{
                 hero: getattr(game.party, hero)
                 + getattr(prior_treasure, artifact)
-                for hero, artifact in zip(
-                    player.artifacts._fields, player.artifacts
-                )
+                for hero, artifact in struct.field_items(player.artifacts)
                 if artifact is not None
             }
         )
@@ -164,16 +162,14 @@ def apply(
             **{
                 hero: getattr(game.party, hero)
                 - getattr(prior_treasure, artifact)
-                for hero, artifact in zip(
-                    player.artifacts._fields, player.artifacts
-                )
+                for hero, artifact in struct.field_items(player.artifacts)
                 if artifact is not None
             }
         )
     )
 
     # Consume treasure equivalent to any hero which has gone negative.
-    for hero, quantity in zip(game.party._fields, game.party):
+    for hero, quantity in struct.field_items(game.party):
         if quantity >= 0:
             continue
         for _ in range(-min(0, quantity)):
@@ -190,7 +186,7 @@ def partify(token: str, artifacts: struct.Party):
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None
-    for party, artifact in zip(artifacts._fields, artifacts):
+    for party, artifact in struct.field_items(artifacts):
         if token == artifact:
             return party
     return token
@@ -210,27 +206,27 @@ def complete(
             key
             for source in (game.party, game.treasure)
             if source is not None
-            for key, value in zip(source._fields, source)
+            for key, value in struct.field_items(source)
             if value
         }
         # Special command "reroll" is available iff "scroll" is available
         if "scroll" in candidates:
             candidates.add("reroll")
     elif position == 1 and tokens[0] == "elixir":
-        candidates = {key for key in struct.Party._fields}
+        candidates = {key for key in struct.field_names(struct.Party)}
     elif position == 1:
         candidates = {
             key
             for source in (game.party, game.dungeon)
             if source is not None
-            for key, value in zip(source._fields, source)
+            for key, value in struct.field_items(source)
             if value
         }
     else:
         candidates = {
             key
             for source in (struct.Party, struct.Dungeon)
-            for key in source._fields
+            for key in struct.field_names(source)
         }
 
     # Then filter to retain only those matching requested text prefix

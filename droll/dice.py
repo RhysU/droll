@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with rolling dungeon and party dice."""
 
+from dataclasses import fields
 import typing
 
 from . import struct
@@ -29,7 +30,7 @@ def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
     On Dungeon N one should account for the number of extant dragons."""
     assert dice >= 1, "At least one dice required (requested {})".format(dice)
     return struct.Dungeon(
-        *_roll(dice, 0, len(struct.Dungeon._fields), randrange)
+        *_roll(dice, 0, len(fields(struct.Dungeon)), randrange)
     )
 
 
@@ -37,4 +38,4 @@ def roll_party(dice: int, randrange: RandRange) -> struct.Party:
     """Roll a new Party using given number of dice.
 
     Any implementation must follow type signature of RollParty."""
-    return struct.Party(*_roll(dice, 0, len(struct.Party._fields), randrange))
+    return struct.Party(*_roll(dice, 0, len(fields(struct.Party)), randrange))

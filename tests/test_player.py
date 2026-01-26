@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of world-to-world transitions stemming from player actions."""
 
-from dataclasses import replace
+from dataclasses import fields, replace
 import random
 
 import pytest
@@ -18,8 +18,8 @@ import droll.world as world
 def _game():
     return replace(
         world.new_world(),
-        dungeon=struct.Dungeon(*([2] * len(struct.Dungeon._fields))),
-        party=struct.Party(*([2] * len(struct.Party._fields))),
+        dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
+        party=struct.Party(*([2] * len(fields(struct.Party)))),
     )
 
 
@@ -59,7 +59,7 @@ def test_cleric(game, randrange):
     game = player.apply(player.Default, game, randrange, "cleric", "chest")
     assert game.party.cleric == 0
     assert game.dungeon.chest == 1
-    assert sum(game.treasure) == 1
+    assert sum(struct.field_values(game.treasure)) == 1
 
 
 def test_mage(game):
@@ -81,7 +81,7 @@ def test_thief(game, randrange):
     game = player.apply(player.Default, game, randrange, "thief", "chest")
     assert game.party.thief == 0
     assert game.dungeon.chest == 0
-    assert sum(game.treasure) == 2
+    assert sum(struct.field_values(game.treasure)) == 2
 
     game = replace(
         game, party=replace(game.party, thief=1)
@@ -182,11 +182,11 @@ def test_complete1(game):
     assert [] == complete(game, ("fig", "bai"), "fig", 1)  # treasure
 
     # Special case associated with 'elixir'
-    game = replace(game, party=struct.Party(*([0] * len(game.party))))
+    game = replace(game, party=struct.Party())
     game = replace(
-        game, treasure=struct.Treasure(*([0] * len(game.treasure)))
+        game, treasure=struct.Treasure()
     )
-    assert list(sorted(struct.Party._fields)) == (
+    assert list(sorted(struct.field_names(struct.Party))) == (
         complete(game, ("elixir", ""), "", 1)
     )
 

@@ -22,8 +22,8 @@ def _state():
 def test_game_initial():
     game = droll.world.new_world()
     assert 0 == game.experience
-    assert 0 == sum(game.treasure)
-    assert (6 * 3) + (4 * 3) + 6 == sum(game.reserve)
+    assert 0 == sum(droll.struct.field_values(game.treasure))
+    assert (6 * 3) + (4 * 3) + 6 == sum(droll.struct.field_values(game.reserve))
 
 
 def test_delve_initial(state):
@@ -31,7 +31,7 @@ def test_delve_initial(state):
     game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
     assert 0 == game.depth
     assert game.ability is True
-    assert 7 == sum(game.party)
+    assert 7 == sum(droll.struct.field_values(game.party))
 
 
 def test_dungeon_initial(state):
@@ -41,15 +41,15 @@ def test_dungeon_initial(state):
         game, droll.dice.roll_dungeon, state.randrange
     )
     assert 1 == game.depth
-    assert 1 == sum(game.dungeon)
+    assert 1 == sum(droll.struct.field_values(game.dungeon))
 
 
 def test_draw_treasure(state):
     pre = droll.world.new_world()
     post = droll.world.draw_treasure(pre, state.randrange)
-    assert sum(pre.treasure) == 0
-    assert sum(post.treasure) == 1
-    assert sum(pre.reserve) - sum(post.reserve) == 1
+    assert sum(droll.struct.field_values(pre.treasure)) == 0
+    assert sum(droll.struct.field_values(post.treasure)) == 1
+    assert sum(droll.struct.field_values(pre.reserve)) - sum(droll.struct.field_values(post.reserve)) == 1
 
 
 def test_replace_treasure():
@@ -58,9 +58,9 @@ def test_replace_treasure():
         pre, treasure=replace(pre.treasure, elixir=1)
     )
     post = droll.world.replace_treasure(pre, "elixir")
-    assert sum(pre.treasure) == 1
-    assert sum(post.treasure) == 0
-    assert sum(post.reserve) - sum(pre.reserve) == 1
+    assert sum(droll.struct.field_values(pre.treasure)) == 1
+    assert sum(droll.struct.field_values(post.treasure)) == 0
+    assert sum(droll.struct.field_values(post.reserve)) - sum(droll.struct.field_values(pre.reserve)) == 1
 
 
 def test_retire_simple(state):
