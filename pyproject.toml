@@ -42,3 +42,7 @@ include = ["droll*"]
 
 [tool.setuptools.package-data]
 "*" = ["*"]
+
+[tool.mutmut]
+paths_to_mutate = ["droll/"]
+tests_dir = ["tests/"]
