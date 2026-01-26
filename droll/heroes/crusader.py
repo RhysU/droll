@@ -79,7 +79,7 @@ def paladin_ability(
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
     game = replace(
-        game, dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields)))
+        game, dungeon=struct.Dungeon(*([0] * len(struct.field_names(struct.Dungeon))))
     )
 
     return action.consume_ability(game)

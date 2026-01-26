@@ -198,7 +198,9 @@ def reroll(
     return replace(
         game,
         party=_decrement_hero(game.party, hero),
-        dungeon=struct.Dungeon(*tuple(map(operator.add, reduced, increased))),
+        dungeon=struct.Dungeon(*tuple(map(operator.add,
+                                           struct.field_values(reduced),
+                                           struct.field_values(increased)))),
     )
 
 

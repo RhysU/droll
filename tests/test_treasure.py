@@ -18,8 +18,8 @@ import droll.world as world
 def _game():
     return replace(
         world.new_world(),
-        dungeon=struct.Dungeon(*([2] * len(struct.Dungeon._fields))),
-        party=struct.Party(*([0] * len(struct.Party._fields))),
+        dungeon=struct.Dungeon(*([2] * len(struct.field_names(struct.Dungeon)))),
+        party=struct.Party(*([0] * len(struct.field_names(struct.Party)))),
     )
 
 

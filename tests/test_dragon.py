@@ -23,7 +23,7 @@ def _game():
         dungeon=struct.Dungeon(
             goblin=0, skeleton=0, ooze=0, chest=1, potion=2, dragon=3
         ),
-        party=struct.Party(*([2] * len(struct.Party._fields))),
+        party=struct.Party(*([2] * len(struct.field_names(struct.Party)))),
     )
 
 
@@ -41,7 +41,7 @@ def test_successful(game, randrange):
     assert game.party.mage == 1
     assert game.dungeon.dragon == 0
     assert game.experience == 1
-    assert sum(game.treasure) == 1
+    assert sum(struct.field_values(game.treasure)) == 1
 
 
 def test_treasure_slot1(game, randrange):
@@ -66,7 +66,7 @@ def test_treasure_slot1(game, randrange):
     assert game.party.mage == 1
     assert game.dungeon.dragon == 0
     assert game.experience == 1
-    assert sum(game.treasure) == 7
+    assert sum(struct.field_values(game.treasure)) == 7
 
 
 def test_treasure_slot3(game, randrange):
@@ -91,7 +91,7 @@ def test_treasure_slot3(game, randrange):
     assert game.party.mage == 1
     assert game.dungeon.dragon == 0
     assert game.experience == 1
-    assert sum(game.treasure) == 7
+    assert sum(struct.field_values(game.treasure)) == 7
 
 
 def test_treasure_slot2(game, randrange):
@@ -116,7 +116,7 @@ def test_treasure_slot2(game, randrange):
     assert game.party.mage == 0
     assert game.dungeon.dragon == 0
     assert game.experience == 1
-    assert sum(game.treasure) == 7
+    assert sum(struct.field_values(game.treasure)) == 7
 
 
 def test_monsters_remain(game, randrange):

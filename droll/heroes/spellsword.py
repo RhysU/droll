@@ -58,7 +58,7 @@ def battlemage_ability(
         raise error.DrollError("No targets accepted for {}".format(noun))
     return action.consume_ability(
         replace(
-            game, dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields)))
+            game, dungeon=struct.Dungeon(*([0] * len(struct.field_names(struct.Dungeon))))
         )
     )
 
