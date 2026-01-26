@@ -45,6 +45,14 @@ class Game:
             and self.randhash() == other.randhash()
         )
 
+    def __copy__(self):
+        """Shallow copy sharing frozen dataclass fields, copying random state."""
+        new = object.__new__(type(self))
+        new._player = self._player  # Frozen dataclass, safe to share
+        new._world = self._world  # Frozen dataclass, safe to share
+        new._random = copy.copy(self._random)  # Mutable, needs state copy
+        return new
+
     def randhash(self) -> int:
         """Hash of the current random state."""
         return hash(self._random.getstate())
