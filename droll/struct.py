@@ -6,17 +6,17 @@ import dataclasses
 import typing
 
 
-def field_names(cls_or_instance) -> typing.Generator[str, None, None]:
+def field_names(cls_or_instance: typing.Any) -> typing.Iterator[str]:
     """Yield field names for a dataclass or instance thereof."""
     return (f.name for f in dataclasses.fields(cls_or_instance))
 
 
-def field_values(instance) -> typing.Generator[typing.Any, None, None]:
+def field_values(instance: typing.Any) -> typing.Iterator[typing.Any]:
     """Yield field values for a dataclass instance."""
     return (getattr(instance, f.name) for f in dataclasses.fields(instance))
 
 
-def field_items(instance) -> typing.Generator[typing.Tuple[str, typing.Any], None, None]:
+def field_items(instance: typing.Any) -> typing.Iterator[typing.Tuple[str, typing.Any]]:
     """Yield (name, value) pairs for a dataclass instance."""
     return ((f.name, getattr(instance, f.name)) for f in dataclasses.fields(instance))
 
@@ -58,16 +58,16 @@ class Player:
 
 @dataclasses.dataclass(frozen=True)
 class Treasure:
-    sword: typing.Any = 0
-    talisman: typing.Any = 0
-    sceptre: typing.Any = 0
-    tools: typing.Any = 0
-    scroll: typing.Any = 0
-    elixir: typing.Any = 0
-    bait: typing.Any = 0
-    portal: typing.Any = 0
-    ring: typing.Any = 0
-    scale: typing.Any = 0
+    sword: int = 0
+    talisman: int = 0
+    sceptre: int = 0
+    tools: int = 0
+    scroll: int = 0
+    elixir: int = 0
+    bait: int = 0
+    portal: int = 0
+    ring: int = 0
+    scale: int = 0
 
 TREASURE_INITIAL = Treasure()
 
@@ -86,14 +86,14 @@ RESERVE_INITIAL = Treasure(
 
 @dataclasses.dataclass(frozen=True)
 class World:
-    delve: typing.Any = None
-    depth: typing.Any = None
-    experience: typing.Any = None
-    dungeon: typing.Any = None
-    party: typing.Any = None
-    ability: typing.Any = None
-    treasure: typing.Any = None
-    reserve: typing.Any = None
+    delve: int = 0
+    depth: typing.Optional[int] = None
+    experience: int = 0
+    dungeon: typing.Optional[Dungeon] = None
+    party: typing.Optional[Party] = None
+    ability: typing.Optional[bool] = None
+    treasure: Treasure = dataclasses.field(default_factory=Treasure)
+    reserve: Treasure = dataclasses.field(default_factory=Treasure)
 
 
 def update_party_dragon(party: Party, dragon_func) -> Party:
@@ -104,7 +104,7 @@ def update_party_dragon(party: Party, dragon_func) -> Party:
     ))
 
 
-def brief(o: typing.Any, *, omitted: typing.Set[str] = {"reserve"}) -> str:
+def brief(o: typing.Any, *, omitted: typing.AbstractSet[str] = frozenset({"reserve"})) -> str:
     """A __str__(...) variant suppressing False fields within dataclasses."""
     try:
         names = field_names(o)
