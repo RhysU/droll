@@ -5,8 +5,7 @@
 
 from dataclasses import fields, replace
 import random
-
-import pytest
+import unittest
 
 import droll.action as action
 import droll.error as error
@@ -16,329 +15,315 @@ import droll.struct as struct
 import droll.world as world
 
 
-@pytest.fixture(name="game")
-def _game():
-    return replace(
-        world.new_world(),
-        dungeon=struct.Dungeon(
-            goblin=0, skeleton=0, ooze=0, chest=1, potion=2, dragon=3
-        ),
-        party=struct.Party(*([2] * len(fields(struct.Party)))),
-    )
+class TestDragon(unittest.TestCase):
 
+    def setUp(self):
+        self.game = replace(
+            world.new_world(),
+            dungeon=struct.Dungeon(
+                goblin=0, skeleton=0, ooze=0, chest=1, potion=2, dragon=3
+            ),
+            party=struct.Party(*([2] * len(fields(struct.Party)))),
+        )
+        self.randrange = random.Random(4).randrange
 
-@pytest.fixture(name="randrange")
-def _randrange():
-    return random.Random(4).randrange
+    def test_successful(self):
+        game = player.apply(
+            player.Default, self.game, self.randrange, "fighter", "dragon", "cleric", "mage"
+        )
+        assert game.party.fighter == 1
+        assert game.party.cleric == 1
+        assert game.party.mage == 1
+        assert game.dungeon.dragon == 0
+        assert game.experience == 1
+        assert sum(struct.field_values(game.treasure)) == 1
 
-
-def test_successful(game, randrange):
-    game = player.apply(
-        player.Default, game, randrange, "fighter", "dragon", "cleric", "mage"
-    )
-    assert game.party.fighter == 1
-    assert game.party.cleric == 1
-    assert game.party.mage == 1
-    assert game.dungeon.dragon == 0
-    assert game.experience == 1
-    assert sum(struct.field_values(game.treasure)) == 1
-
-
-def test_treasure_slot1(game, randrange):
-    game = replace(
-        game, treasure=replace(game.treasure, sword=7)
-    )
-    game = replace(
-        game, party=replace(game.party, fighter=0)
-    )
-    game = player.apply(
-        player.Default,
-        game,
-        randrange,  # Notice sword!
-        "fighter",
-        "dragon",
-        "cleric",
-        "mage",
-    )
-    assert game.treasure.sword == 6
-    assert game.party.fighter == 0
-    assert game.party.cleric == 1
-    assert game.party.mage == 1
-    assert game.dungeon.dragon == 0
-    assert game.experience == 1
-    assert sum(struct.field_values(game.treasure)) == 7
-
-
-def test_treasure_slot3(game, randrange):
-    game = replace(
-        game, treasure=replace(game.treasure, talisman=7)
-    )
-    game = replace(
-        game, party=replace(game.party, cleric=0)
-    )
-    game = player.apply(
-        player.Default,
-        game,
-        randrange,  # Notice talisman!
-        "fighter",
-        "dragon",
-        "cleric",
-        "mage",
-    )
-    assert game.treasure.talisman == 6
-    assert game.party.fighter == 1
-    assert game.party.cleric == 0
-    assert game.party.mage == 1
-    assert game.dungeon.dragon == 0
-    assert game.experience == 1
-    assert sum(struct.field_values(game.treasure)) == 7
-
-
-def test_treasure_slot2(game, randrange):
-    game = replace(
-        game, treasure=replace(game.treasure, sceptre=7)
-    )
-    game = replace(
-        game, party=replace(game.party, mage=0)
-    )
-    game = player.apply(
-        player.Default,
-        game,
-        randrange,  # Notice talisman!
-        "fighter",
-        "dragon",
-        "cleric",
-        "mage",
-    )
-    assert game.treasure.sceptre == 6
-    assert game.party.fighter == 1
-    assert game.party.cleric == 1
-    assert game.party.mage == 0
-    assert game.dungeon.dragon == 0
-    assert game.experience == 1
-    assert sum(struct.field_values(game.treasure)) == 7
-
-
-def test_monsters_remain(game, randrange):
-    game = replace(
-        game, dungeon=replace(game.dungeon, goblin=1)
-    )
-    with pytest.raises(error.DrollError):
-        player.apply(
+    def test_treasure_slot1(self):
+        game = replace(
+            self.game, treasure=replace(self.game.treasure, sword=7)
+        )
+        game = replace(
+            game, party=replace(game.party, fighter=0)
+        )
+        game = player.apply(
             player.Default,
             game,
-            randrange,
+            self.randrange,  # Notice sword!
             "fighter",
             "dragon",
             "cleric",
             "mage",
         )
+        assert game.treasure.sword == 6
+        assert game.party.fighter == 0
+        assert game.party.cleric == 1
+        assert game.party.mage == 1
+        assert game.dungeon.dragon == 0
+        assert game.experience == 1
+        assert sum(struct.field_values(game.treasure)) == 7
 
-
-def test_too_few_specified(game, randrange):
-    with pytest.raises(error.DrollError):
-        player.apply(
-            player.Default, game, randrange, "fighter", "dragon", "cleric"
+    def test_treasure_slot3(self):
+        game = replace(
+            self.game, treasure=replace(self.game.treasure, talisman=7)
         )
-
-    with pytest.raises(error.DrollError):
-        player.apply(player.Default, game, randrange, "fighter", "dragon")
-
-    # Dragon Slayer requires only two
-    with pytest.raises(error.DrollError):
-        player.apply(heroes.DragonSlayer, game, randrange, "fighter", "dragon")
-
-
-def test_too_many_specified(game, randrange):
-    with pytest.raises(error.DrollError):
-        player.apply(
+        game = replace(
+            game, party=replace(game.party, cleric=0)
+        )
+        game = player.apply(
             player.Default,
             game,
-            randrange,
-            "fighter",
-            "dragon",
-            "cleric",
-            "mage",
-            "thief",
-        )
-
-    # Dragon Slayer requires only two
-    with pytest.raises(error.DrollError):
-        player.apply(
-            heroes.DragonSlayer,
-            game,
-            randrange,
+            self.randrange,  # Notice talisman!
             "fighter",
             "dragon",
             "cleric",
             "mage",
         )
+        assert game.treasure.talisman == 6
+        assert game.party.fighter == 1
+        assert game.party.cleric == 0
+        assert game.party.mage == 1
+        assert game.dungeon.dragon == 0
+        assert game.experience == 1
+        assert sum(struct.field_values(game.treasure)) == 7
 
-
-def test_only_heroes_accepted(game, randrange):
-    with pytest.raises(error.DrollError):
-        player.apply(
+    def test_treasure_slot2(self):
+        game = replace(
+            self.game, treasure=replace(self.game.treasure, sceptre=7)
+        )
+        game = replace(
+            game, party=replace(game.party, mage=0)
+        )
+        game = player.apply(
             player.Default,
             game,
-            randrange,
+            self.randrange,  # Notice talisman!
             "fighter",
             "dragon",
             "cleric",
-            "foo",
+            "mage",
         )
+        assert game.treasure.sceptre == 6
+        assert game.party.fighter == 1
+        assert game.party.cleric == 1
+        assert game.party.mage == 0
+        assert game.dungeon.dragon == 0
+        assert game.experience == 1
+        assert sum(struct.field_values(game.treasure)) == 7
+
+    def test_monsters_remain(self):
+        game = replace(
+            self.game, dungeon=replace(self.game.dungeon, goblin=1)
+        )
+        with self.assertRaises(error.DrollError):
+            player.apply(
+                player.Default,
+                game,
+                self.randrange,
+                "fighter",
+                "dragon",
+                "cleric",
+                "mage",
+            )
+
+    def test_too_few_specified(self):
+        with self.assertRaises(error.DrollError):
+            player.apply(
+                player.Default, self.game, self.randrange, "fighter", "dragon", "cleric"
+            )
+
+        with self.assertRaises(error.DrollError):
+            player.apply(player.Default, self.game, self.randrange, "fighter", "dragon")
+
+        # Dragon Slayer requires only two
+        with self.assertRaises(error.DrollError):
+            player.apply(heroes.DragonSlayer, self.game, self.randrange, "fighter", "dragon")
+
+    def test_too_many_specified(self):
+        with self.assertRaises(error.DrollError):
+            player.apply(
+                player.Default,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
+                "cleric",
+                "mage",
+                "thief",
+            )
+
+        # Dragon Slayer requires only two
+        with self.assertRaises(error.DrollError):
+            player.apply(
+                heroes.DragonSlayer,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
+                "cleric",
+                "mage",
+            )
+
+    def test_only_heroes_accepted(self):
+        with self.assertRaises(error.DrollError):
+            player.apply(
+                player.Default,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
+                "cleric",
+                "foo",
+            )
+
+    def test_one_scroll(self):
+        with self.assertRaises(error.DrollError):
+            player.apply(
+                player.Default,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
+                "cleric",
+                "scroll",
+            )
+
+        # Dragon Slayer requires only two
+        with self.assertRaises(error.DrollError):
+            player.apply(
+                heroes.DragonSlayer, self.game, self.randrange, "fighter", "dragon", "scroll"
+            )
+
+    def test_not_enough_distinct(self):
+        with self.assertRaises(error.DrollError):
+            player.apply(
+                player.Default, self.game, self.randrange, "fighter", "dragon", "mage", "mage"
+            )
 
 
-def test_one_scroll(game, randrange):
-    with pytest.raises(error.DrollError):
-        player.apply(
-            player.Default,
-            game,
-            randrange,
-            "fighter",
-            "dragon",
-            "cleric",
-            "scroll",
+class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
+
+    def test_less_interesting_successful_cases(self):
+        assert action.defeat_dragon_heroes_interchangeable(
+            "cleric", "thief", "mage", _interchangeable={"fighter"}
+        )
+        assert action.defeat_dragon_heroes_interchangeable(
+            "cleric", "thief", "fighter", _interchangeable={"fighter"}
         )
 
-    # Dragon Slayer requires only two
-    with pytest.raises(error.DrollError):
-        player.apply(
-            heroes.DragonSlayer, game, randrange, "fighter", "dragon", "scroll"
+    def test_less_interesting_failure_cases(self):
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "cleric", "thief", _interchangeable={"fighter"}
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "cleric", "fighter", _interchangeable={"fighter"}
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "cleric", "thief", "champion", "mage", _interchangeable={"fighter"}
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "cleric",
+                "thief",
+                "champion",
+                "fighter",
+                _interchangeable={"fighter"},
+            )
+
+    def test_more_interesting_successful_cases(self):
+        # More than two could be interchangeable, but does not appear in the game.
+        # Therefore, only two interchangeable case is checked below.
+        assert action.defeat_dragon_heroes_interchangeable(
+            "cleric", "thief", "mage", _interchangeable={"mage", "fighter"}
+        )
+        assert action.defeat_dragon_heroes_interchangeable(
+            "cleric", "fighter", "mage", _interchangeable={"mage", "fighter"}
+        )
+        assert action.defeat_dragon_heroes_interchangeable(
+            "cleric", "fighter", "fighter", _interchangeable={"mage", "fighter"}
+        )
+        assert action.defeat_dragon_heroes_interchangeable(
+            "cleric", "mage", "mage", _interchangeable={"mage", "fighter"}
         )
 
+    def test_more_interesting_failure_cases(self):
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "mage", "mage", "mage", _interchangeable={"mage", "fighter"}
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "fighter",
+                "fighter",
+                "fighter",
+                _interchangeable={"mage", "fighter"},
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "fighter", "mage", "mage", _interchangeable={"mage", "fighter"}
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "mage", "fighter", "fighter", _interchangeable={"mage", "fighter"}
+            )
 
-def test_not_enough_distinct(game, randrange):
-    with pytest.raises(error.DrollError):
-        player.apply(
-            player.Default, game, randrange, "fighter", "dragon", "mage", "mage"
-        )
 
+class TestDefeatDragonHeroesWildcard(unittest.TestCase):
 
-# More directly test some hero-vs-dragon logic as it is more complicated.
-def test_defeat_dragon_heroes_interchangeable():
-    # Less interesting successful cases first
-    assert action.defeat_dragon_heroes_interchangeable(
-        "cleric", "thief", "mage", _interchangeable={"fighter"}
-    )
-    assert action.defeat_dragon_heroes_interchangeable(
-        "cleric", "thief", "fighter", _interchangeable={"fighter"}
-    )
-
-    # Less interesting failure cases next
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_interchangeable(
-            "cleric", "thief", _interchangeable={"fighter"}
+    def test_less_interesting_successful_cases(self):
+        assert action.defeat_dragon_heroes_wildcard(
+            "cleric", "thief", "mage",
         )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_interchangeable(
-            "cleric", "fighter", _interchangeable={"fighter"}
-        )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_interchangeable(
-            "cleric", "thief", "champion", "mage", _interchangeable={"fighter"}
-        )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_interchangeable(
-            "cleric",
-            "thief",
-            "champion",
-            "fighter",
-            _interchangeable={"fighter"},
+        assert action.defeat_dragon_heroes_wildcard(
+            "cleric", "thief", "fighter", _wildcard={"scroll"}
         )
 
-    # More than two could be interchangeable, but does not appear in the game.
-    # Therefore, only two interchangeable case is checked below.
+    def test_less_interesting_failure_cases(self):
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_wildcard(
+                "cleric", "thief", _wildcard={"scroll"}
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_wildcard(
+                "cleric", "fighter", _wildcard={"fighter"}
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_wildcard(
+                "cleric", "thief", "champion", "mage", _wildcard={"fighter"}
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_wildcard(
+                "cleric",
+                "thief",
+                "champion",
+                "fighter",
+                _wildcard={"fighter"},
+            )
 
-    # More interesting successful cases
-    assert action.defeat_dragon_heroes_interchangeable(
-        "cleric", "thief", "mage", _interchangeable={"mage", "fighter"}
-    )
-    assert action.defeat_dragon_heroes_interchangeable(
-        "cleric", "fighter", "mage", _interchangeable={"mage", "fighter"}
-    )
-    assert action.defeat_dragon_heroes_interchangeable(
-        "cleric", "fighter", "fighter", _interchangeable={"mage", "fighter"}
-    )
-    assert action.defeat_dragon_heroes_interchangeable(
-        "cleric", "mage", "mage", _interchangeable={"mage", "fighter"}
-    )
-
-    # More interesting failure cases last
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_interchangeable(
-            "mage", "mage", "mage", _interchangeable={"mage", "fighter"}
+    def test_more_interesting_successful_cases(self):
+        # More than one could be wildcard, but does not appear in the game.
+        # Therefore, only one wildcard case is checked below.
+        assert action.defeat_dragon_heroes_wildcard(
+            "cleric", "thief", "scroll",
         )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_interchangeable(
-            "fighter",
-            "fighter",
-            "fighter",
-            _interchangeable={"mage", "fighter"},
+        assert action.defeat_dragon_heroes_wildcard(
+            "cleric", "scroll", "scroll",
         )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_interchangeable(
-            "fighter", "mage", "mage", _interchangeable={"mage", "fighter"}
-        )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_interchangeable(
-            "mage", "fighter", "fighter", _interchangeable={"mage", "fighter"}
+        assert action.defeat_dragon_heroes_wildcard(
+            "scroll", "scroll", "scroll",
         )
 
-# Again directly test some more complicated hero-vs-dragon logic
-def test_defeat_dragon_heroes_wildcard():
-    # Less interesting successful cases first
-    assert action.defeat_dragon_heroes_wildcard(
-        "cleric", "thief", "mage",
-    )
-    assert action.defeat_dragon_heroes_wildcard(
-        "cleric", "thief", "fighter", _wildcard={"scroll"}
-    )
-
-    # Less interesting failure cases next
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_wildcard(
-            "cleric", "thief", _wildcard={"scroll"}
-        )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_wildcard(
-            "cleric", "fighter", _wildcard={"fighter"}
-        )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_wildcard(
-            "cleric", "thief", "champion", "mage", _wildcard={"fighter"}
-        )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_wildcard(
-            "cleric",
-            "thief",
-            "champion",
-            "fighter",
-            _wildcard={"fighter"},
-        )
-
-    # More than one could be wildcard, but does not appear in the game.
-    # Therefore, only one wildcard case is checked below.
-
-    # More interesting successful cases
-    assert action.defeat_dragon_heroes_wildcard(
-        "cleric", "thief", "scroll",
-    )
-    assert action.defeat_dragon_heroes_wildcard(
-        "cleric", "scroll", "scroll",
-    )
-    assert action.defeat_dragon_heroes_wildcard(
-        "scroll", "scroll", "scroll",
-    )
-
-    # More interesting failure cases last
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_wildcard(
-            "mage", "mage", "scroll",
-        )
-    with pytest.raises(error.DrollError):
-        action.defeat_dragon_heroes_wildcard(
-            "fighter",
-            "fighter",
-            "fighter",
-            _wildcard={"mage"},
-        )
+    def test_more_interesting_failure_cases(self):
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_wildcard(
+                "mage", "mage", "scroll",
+            )
+        with self.assertRaises(error.DrollError):
+            action.defeat_dragon_heroes_wildcard(
+                "fighter",
+                "fighter",
+                "fighter",
+                _wildcard={"mage"},
+            )
