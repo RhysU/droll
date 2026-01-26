@@ -247,6 +247,67 @@ def test_next_dungeon_dragon(state):
     assert post3.treasure.portal == 1
 
 
+def test_exhausted_dungeon():
+    """Test exhausted_dungeon detects when no actions remain."""
+    # None dungeon is exhausted
+    assert droll.world.exhausted_dungeon(None)
+
+    # Empty dungeon is exhausted
+    assert droll.world.exhausted_dungeon(droll.struct.Dungeon())
+
+    # Dungeon with only dragons (blocking) is not exhausted
+    assert not droll.world.exhausted_dungeon(droll.struct.Dungeon(dragon=3))
+
+    # Dungeon with monsters is not exhausted
+    assert not droll.world.exhausted_dungeon(droll.struct.Dungeon(goblin=1))
+    assert not droll.world.exhausted_dungeon(droll.struct.Dungeon(skeleton=2))
+    assert not droll.world.exhausted_dungeon(droll.struct.Dungeon(ooze=1))
+
+    # Dungeon with chests/potions still has actions (not exhausted)
+    assert not droll.world.exhausted_dungeon(droll.struct.Dungeon(chest=2, potion=3))
+
+
+def test_retreat_valid(state):
+    """Test valid retreat scenarios."""
+    game = droll.world.new_world()
+    game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
+    game = replace(game, depth=2, dungeon=droll.struct.Dungeon(goblin=1))
+
+    result = droll.world.retreat(game)
+    assert result.depth == 0
+    assert result.dungeon is None
+
+
+def test_retreat_without_descending(state):
+    """Test retreat fails if not yet descended."""
+    game = droll.world.new_world()
+    game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
+    assert game.depth == 0
+
+    with pytest.raises(droll.error.DrollError):
+        droll.world.retreat(game)
+
+
+def test_retreat_when_could_retire(state):
+    """Test retreat fails when dungeon is defeated (should retire instead)."""
+    game = droll.world.new_world()
+    game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
+    game = replace(game, depth=2, dungeon=droll.struct.Dungeon())
+
+    with pytest.raises(droll.error.DrollError):
+        droll.world.retreat(game)
+
+
+def test_max_dungeon_depth(state):
+    """Test maximum dungeon depth limit is enforced."""
+    game = droll.world.new_world()
+    game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
+    game = replace(game, depth=10, dungeon=droll.struct.Dungeon())
+
+    with pytest.raises(droll.error.DrollError):
+        droll.world.next_dungeon(game, droll.dice.roll_dungeon, state.randrange)
+
+
 def test_score():
     world = droll.struct.World(
         delve=3,

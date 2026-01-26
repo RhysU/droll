@@ -1,0 +1,56 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+"""Tests for Minstrel/Bard hero abilities."""
+
+import random
+
+import pytest
+
+import droll.error
+import droll.struct
+from droll.heroes.minstrel import Minstrel, Bard, minstrel_ability
+
+
+def test_minstrel_ability_discards_dragons():
+    """Minstrel ability discards all dragon dice."""
+    state = random.Random(4)
+    world = droll.struct.World(
+        delve=1, depth=1, experience=0, ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
+        party=droll.struct.Party(fighter=1),
+        treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+    )
+    result = minstrel_ability(world, state.randrange, "ability")
+    assert result.dungeon.dragon == 0
+    assert result.dungeon.goblin == 1
+    assert result.ability is False
+
+
+def test_minstrel_ability_rejects_non_dragon():
+    """Minstrel ability only works on dragons."""
+    state = random.Random(4)
+    world = droll.struct.World(
+        delve=1, depth=1, experience=0, ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
+        party=droll.struct.Party(fighter=1),
+        treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+    )
+    with pytest.raises(droll.error.DrollError):
+        minstrel_ability(world, state.randrange, "ability", "goblin")
+
+
+def test_minstrel_advances_to_bard():
+    """Minstrel advances to Bard at 5+ experience."""
+    low_xp = droll.struct.World(
+        delve=1, depth=0, experience=4, ability=True,
+        dungeon=None, party=None, treasure=droll.struct.Treasure(),
+        reserve=droll.struct.Treasure(),
+    )
+    high_xp = droll.struct.World(
+        delve=1, depth=0, experience=5, ability=True,
+        dungeon=None, party=None, treasure=droll.struct.Treasure(),
+        reserve=droll.struct.Treasure(),
+    )
+    assert Minstrel.advance(low_xp) == Minstrel
+    assert Minstrel.advance(high_xp) == Bard
