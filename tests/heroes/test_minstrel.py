@@ -10,6 +10,7 @@ import pytest
 import droll.error
 import droll.struct
 from droll.heroes.minstrel import Minstrel, Bard, minstrel_ability
+import droll.action
 
 
 def test_minstrel_ability_discards_dragons():
@@ -54,3 +55,50 @@ def test_minstrel_advances_to_bard():
     )
     assert Minstrel.advance(low_xp) == Minstrel
     assert Minstrel.advance(high_xp) == Bard
+
+
+def test_bard_champion_defeats_plus_one():
+    """Bard's champion defeats all of one type plus one additional."""
+    state = random.Random(4)
+    world = droll.struct.World(
+        delve=1, depth=1, experience=0, ability=True,
+        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+        party=droll.struct.Party(champion=1),
+        treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+    )
+    result = droll.action.defeat_all_plus_additional(
+        world, state.randrange, "champion", "goblin", "skeleton"
+    )
+    assert result.dungeon.goblin == 0
+    assert result.dungeon.skeleton == 0
+    assert result.party.champion == 0
+
+
+def test_bard_champion_no_additional_when_cleared():
+    """Bard's champion needs no additional when monsters cleared."""
+    state = random.Random(4)
+    world = droll.struct.World(
+        delve=1, depth=1, experience=0, ability=True,
+        dungeon=droll.struct.Dungeon(goblin=2),
+        party=droll.struct.Party(champion=1),
+        treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+    )
+    result = droll.action.defeat_all_plus_additional(
+        world, state.randrange, "champion", "goblin"
+    )
+    assert result.dungeon.goblin == 0
+
+
+def test_bard_champion_rejects_extra_additional():
+    """Bard's champion rejects more than one additional target."""
+    state = random.Random(4)
+    world = droll.struct.World(
+        delve=1, depth=1, experience=0, ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
+        party=droll.struct.Party(champion=1),
+        treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+    )
+    with pytest.raises(droll.error.DrollError):
+        droll.action.defeat_all_plus_additional(
+            world, state.randrange, "champion", "goblin", "skeleton", "skeleton"
+        )
