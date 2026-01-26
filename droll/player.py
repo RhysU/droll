@@ -132,10 +132,7 @@ def apply(
             **{
                 hero: getattr(game.party, hero)
                 + getattr(prior_treasure, artifact)
-                for hero, artifact in zip(
-                    struct.field_names(player.artifacts),
-                    struct.field_values(player.artifacts)
-                )
+                for hero, artifact in struct.field_items(player.artifacts)
                 if artifact is not None
             }
         )
@@ -165,18 +162,14 @@ def apply(
             **{
                 hero: getattr(game.party, hero)
                 - getattr(prior_treasure, artifact)
-                for hero, artifact in zip(
-                    struct.field_names(player.artifacts),
-                    struct.field_values(player.artifacts)
-                )
+                for hero, artifact in struct.field_items(player.artifacts)
                 if artifact is not None
             }
         )
     )
 
     # Consume treasure equivalent to any hero which has gone negative.
-    for hero, quantity in zip(struct.field_names(game.party),
-                               struct.field_values(game.party)):
+    for hero, quantity in struct.field_items(game.party):
         if quantity >= 0:
             continue
         for _ in range(-min(0, quantity)):
@@ -193,8 +186,7 @@ def partify(token: str, artifacts: struct.Party):
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None
-    for party, artifact in zip(struct.field_names(artifacts),
-                                struct.field_values(artifacts)):
+    for party, artifact in struct.field_items(artifacts):
         if token == artifact:
             return party
     return token
@@ -214,8 +206,7 @@ def complete(
             key
             for source in (game.party, game.treasure)
             if source is not None
-            for key, value in zip(struct.field_names(source),
-                                   struct.field_values(source))
+            for key, value in struct.field_items(source)
             if value
         }
         # Special command "reroll" is available iff "scroll" is available
@@ -228,8 +219,7 @@ def complete(
             key
             for source in (game.party, game.dungeon)
             if source is not None
-            for key, value in zip(struct.field_names(source),
-                                   struct.field_values(source))
+            for key, value in struct.field_items(source)
             if value
         }
     else:

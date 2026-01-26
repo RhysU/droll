@@ -17,6 +17,11 @@ def field_values(instance) -> typing.Generator[typing.Any, None, None]:
     return (getattr(instance, f.name) for f in dataclass_fields(instance))
 
 
+def field_items(instance) -> typing.Generator[typing.Tuple[str, typing.Any], None, None]:
+    """Yield (name, value) pairs for a dataclass instance."""
+    return ((f.name, getattr(instance, f.name)) for f in dataclass_fields(instance))
+
+
 @dataclass(frozen=True)
 class Dungeon:
     goblin: typing.Any = 0

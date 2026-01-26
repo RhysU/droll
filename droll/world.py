@@ -166,8 +166,7 @@ def score(world: struct.World) -> int:
 
 def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
     """Draw a random treasure from the reserve, weighted by counts."""
-    items = [name for name, count in zip(struct.field_names(reserve),
-                                          struct.field_values(reserve))
+    items = [name for name, count in struct.field_items(reserve)
              for _ in range(count)]
     assert items, "No items remaining in the reserve"
     return items[randrange(0, len(items))]
