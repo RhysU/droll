@@ -279,13 +279,13 @@ def test_retreat_valid(state):
 
 
 def test_retreat_at_depth_one(state):
-    """Test retreat succeeds at depth 1 (boundary condition)."""
+    """Test retreat fails at depth 1 (must descend at least twice)."""
     game = droll.world.new_world()
     game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
     game = replace(game, depth=1, dungeon=droll.struct.Dungeon(goblin=1))
 
-    result = droll.world.retreat(game)
-    assert result.depth == 0
+    with pytest.raises(droll.error.DrollError):
+        droll.world.retreat(game)
 
 
 def test_retreat_without_descending(state):
