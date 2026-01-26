@@ -4,6 +4,7 @@
 """Functionality associated with world state and world mechanics."""
 
 import copy
+from dataclasses import replace
 
 from . import dice
 from . import error
@@ -64,7 +65,8 @@ def next_delve(
     Argument roll_party can be dice.roll_party but other choices okay."""
     if world.delve >= 3:
         raise error.DrollError("At most three delves are permitted.")
-    return world._replace(
+    return replace(
+        world,
         delve=(world.delve if world.delve else 0) + 1,
         depth=0,
         ability=True,
@@ -105,8 +107,8 @@ def next_dungeon(
     dungeon = roll_dungeon(
         min(_dungeon_dice - prior_dragons, next_depth), randrange
     )
-    dungeon = dungeon._replace(dragon=dungeon.dragon + prior_dragons)
-    return world._replace(depth=next_depth, dungeon=dungeon)
+    dungeon = replace(dungeon, dragon=dungeon.dragon + prior_dragons)
+    return replace(world, depth=next_depth, dungeon=dungeon)
 
 
 def retire(world: struct.World) -> struct.World:
@@ -137,8 +139,8 @@ def retire(world: struct.World) -> struct.World:
 
     # Success above, so update the world in anticipation of the next delve
     # Upgrading a hero's ability after 5 experience points is done elsewhere.
-    return world._replace(
-        depth=0, experience=world.experience + world.depth, dungeon=None
+    return replace(
+        world, depth=0, experience=world.experience + world.depth, dungeon=None
     )
 
 
@@ -149,7 +151,7 @@ def retreat(world: struct.World) -> struct.World:
     if defeated_dungeon(world.dungeon):
         raise error.DrollError("Why retreat when you could instead retire?")
 
-    return world._replace(depth=0, dungeon=None)
+    return replace(world, depth=0, dungeon=None)
 
 
 def score(world: struct.World) -> int:
@@ -175,13 +177,13 @@ def draw_treasure(
 ) -> struct.World:
     """Draw a single item from the reserve into the player's treasures."""
     drawn = _draw(reserve=world.reserve, randrange=randrange)
-    treasure = world.treasure._replace(
-        **{drawn: getattr(world.treasure, drawn) + 1}
+    treasure = replace(
+        world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}
     )
-    reserve = world.reserve._replace(
-        **{drawn: getattr(world.reserve, drawn) - 1}
+    reserve = replace(
+        world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}
     )
-    return world._replace(treasure=treasure, reserve=reserve)
+    return replace(world, treasure=treasure, reserve=reserve)
 
 
 def replace_treasure(world: struct.World, item: str) -> struct.World:
@@ -189,10 +191,11 @@ def replace_treasure(world: struct.World, item: str) -> struct.World:
     prior_count = getattr(world.treasure, item)
     if not prior_count:
         raise error.DrollError("'{}' not in player's treasure".format(item))
-    return world._replace(
-        treasure=world.treasure._replace(**{item: prior_count - 1}),
-        reserve=world.reserve._replace(
-            **{item: getattr(world.reserve, item) + 1}
+    return replace(
+        world,
+        treasure=replace(world.treasure, **{item: prior_count - 1}),
+        reserve=replace(
+            world.reserve, **{item: getattr(world.reserve, item) + 1}
         ),
     )
 
@@ -204,7 +207,9 @@ def apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
             "A dragon must be present to use a {}".format(noun)
         )
     world = replace_treasure(world, noun)
-    return world._replace(dungeon=world.dungeon._replace(dragon=0))
+    return replace(
+        world, dungeon=replace(world.dungeon, dragon=0)
+    )
 
 
 def apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
@@ -214,6 +219,7 @@ def apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
         raise error.DrollError(
             "No need to apply {} when dungeon clear".format(noun)
         )
-    return replace_treasure(world, "portal")._replace(
+    return replace(
+        replace_treasure(world, "portal"),
         dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields)))
     )
