@@ -278,6 +278,16 @@ def test_retreat_valid(state):
     assert result.dungeon is None
 
 
+def test_retreat_at_depth_one(state):
+    """Test retreat succeeds at depth 1 (boundary condition)."""
+    game = droll.world.new_world()
+    game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
+    game = replace(game, depth=1, dungeon=droll.struct.Dungeon(goblin=1))
+
+    result = droll.world.retreat(game)
+    assert result.depth == 0
+
+
 def test_retreat_without_descending(state):
     """Test retreat fails if not yet descended."""
     game = droll.world.new_world()
@@ -306,6 +316,20 @@ def test_max_dungeon_depth(state):
 
     with pytest.raises(droll.error.DrollError):
         droll.world.next_dungeon(game, droll.dice.roll_dungeon, state.randrange)
+
+
+def test_dungeon_dice_count(state):
+    """Test that dungeon rolls use exactly 7 dice (minus dragons)."""
+    game = droll.world.new_world()
+    game = droll.world.next_delve(game, droll.dice.roll_party, state.randrange)
+    game = droll.world.next_dungeon(game, droll.dice.roll_dungeon, state.randrange)
+    # First dungeon at depth 1 should have exactly 1 die (min of depth and 7)
+    assert sum(droll.struct.field_values(game.dungeon)) == 1
+
+    # At depth 7+, should have 7 dice
+    game2 = replace(game, depth=6, dungeon=droll.struct.Dungeon())
+    game2 = droll.world.next_dungeon(game2, droll.dice.roll_dungeon, state.randrange)
+    assert sum(droll.struct.field_values(game2.dungeon)) == 7
 
 
 def test_score():
