@@ -95,6 +95,15 @@ class Game:
         )
         return GameState.PLAY
 
+    def reroll(self, *args: str) -> GameState:
+        """Reroll any number of party or dungeon dice by consuming a scroll."""
+        # Reroll implemented in player.apply(...) because close to apply(...)
+        # except for fact that it does not name a hero die as initial token.
+        self._world = player.apply(
+            self._player, self._world, self._random.randrange, "reroll", *args
+        )
+        return GameState.PLAY
+
     def retire(self) -> GameState:
         """Retire to the tavern after successfully clearing a dungeon depth..
 
@@ -154,5 +163,5 @@ class Game:
 
 
 def dummy_randrange(start, stop=None):
-    """Non-random psuedorandom generator so that completion is stateless."""
+    """Non-random pseudorandom generator so that completion is stateless."""
     return start

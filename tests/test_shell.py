@@ -10,7 +10,7 @@ import pytest
 
 from droll.error import DrollError
 from droll.game import Game
-from droll.heroes import Crusader, Knight, Minstrel, Spellsword
+from droll.heroes import Crusader, Enchantress, Knight, Minstrel, Spellsword
 from droll.player import Default
 from droll.shell import Shell
 
@@ -64,7 +64,7 @@ def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     return zip(summaries, commands)
 
 
-# Confirm the parsing helper above is doing hat is required.
+# Confirm the parsing helper above is doing what is required.
 def test_summary_command():
     """Confirm parse_summary_command(...) helper working as required."""
     sc = parse_summary_command(parse_summary_command.__doc__)
@@ -579,6 +579,7 @@ def test_minstrel():
         )
         s.onecmd(following_command)
 
+
 def test_crusader():
     """
     Runs the following scenario involving unique Crusader/Paladin details:
@@ -684,6 +685,171 @@ def test_crusader():
     """
     # Drive the game according to the script in the above docstring.
     s = Shell(Game(random=random.Random(35), player=Crusader))
+    s.preloop()
+    parsed = parse_summary_command(test_crusader.__doc__)
+    for index, (expected_summary, following_command) in enumerate(parsed):
+        assert expected_summary == s.summary(), "Summary mismatch at {}".format(
+            index
+        )
+        s.onecmd(following_command)
+
+
+def test_enchantress():
+    """
+    Runs the following scenario involving unique Enchantress/Beguiler details:
+
+    (delve=1, party=(cleric=1, mage=2, thief=1, champion=1, scroll=2), ability=True, treasure=())
+    (Enchantress  0) descend
+
+    (delve=1, depth=1, dungeon=(chest=1), party=(cleric=1, mage=2, thief=1, champion=1, scroll=2), ability=True, treasure=())
+    (Enchantress  0) reroll chest
+
+    (delve=1, depth=1, dungeon=(goblin=1), party=(cleric=1, mage=2, thief=1, champion=1, scroll=1), ability=True, treasure=())
+    (Enchantress  0) cleric goblin
+
+    (delve=1, depth=1, dungeon=(), party=(mage=2, thief=1, champion=1, scroll=1), ability=True, treasure=())
+    (Enchantress  0) descend
+
+    (delve=1, depth=2, dungeon=(ooze=1, chest=1), party=(mage=2, thief=1, champion=1, scroll=1), ability=True, treasure=())
+    (Enchantress  0) ability ooze
+
+    (delve=1, depth=2, dungeon=(chest=1, potion=1), party=(mage=2, thief=1, champion=1, scroll=1), treasure=())
+    (Enchantress  0) mage chest
+
+    (delve=1, depth=2, dungeon=(potion=1), party=(mage=1, thief=1, champion=1, scroll=1), treasure=(elixir=1))
+    (Enchantress  1) elixir scroll
+
+    (delve=1, depth=2, dungeon=(potion=1), party=(mage=1, thief=1, champion=1, scroll=2), treasure=())
+    (Enchantress  0) descend
+
+    (delve=1, depth=3, dungeon=(chest=1, dragon=2), party=(mage=1, thief=1, champion=1, scroll=2), treasure=())
+    (Enchantress  0) descend
+
+    (delve=1, depth=4, dungeon=(goblin=1, skeleton=1, potion=2, dragon=2), party=(mage=1, thief=1, champion=1, scroll=2), treasure=())
+    (Enchantress  0) mage goblin
+
+    (delve=1, depth=4, dungeon=(skeleton=1, potion=2, dragon=2), party=(thief=1, champion=1, scroll=2), treasure=())
+    (Enchantress  0) thief skeleton
+
+    (delve=1, depth=4, dungeon=(potion=2, dragon=2), party=(champion=1, scroll=2), treasure=())
+    (Enchantress  0) champion potion scroll scroll
+
+    (delve=1, depth=4, dungeon=(dragon=2), party=(scroll=4), treasure=())
+    (Enchantress  0) descend
+
+    (delve=1, depth=5, dungeon=(skeleton=1, ooze=1, chest=1, potion=1, dragon=3), party=(scroll=4), treasure=())
+    (Enchantress  0) scroll skeleton
+
+    (delve=1, depth=5, dungeon=(ooze=1, chest=1, potion=1, dragon=3), party=(scroll=3), treasure=())
+    (Enchantress  0) scroll ooze
+
+    (delve=1, depth=5, dungeon=(chest=1, potion=1, dragon=3), party=(scroll=2), treasure=())
+    (Enchantress  0) scroll chest
+
+    (delve=1, depth=5, dungeon=(potion=1, dragon=3), party=(scroll=1), treasure=(tools=1))
+    (Enchantress  1) scroll potion champion
+
+    (delve=1, depth=5, dungeon=(dragon=3), party=(champion=1), treasure=(tools=1))
+    (Enchantress  1) retreat
+
+    (delve=2, party=(fighter=2, cleric=2, mage=1, champion=2), ability=True, treasure=(tools=1))
+    (Enchantress  1) descend
+
+    (delve=2, depth=1, dungeon=(dragon=1), party=(fighter=2, cleric=2, mage=1, champion=2), ability=True, treasure=(tools=1))
+    (Enchantress  1) descend
+
+    (delve=2, depth=2, dungeon=(ooze=1, dragon=2), party=(fighter=2, cleric=2, mage=1, champion=2), ability=True, treasure=(tools=1))
+    (Enchantress  1) fighter ooze
+
+    (delve=2, depth=2, dungeon=(dragon=2), party=(fighter=1, cleric=2, mage=1, champion=2), ability=True, treasure=(tools=1))
+    (Enchantress  1) descend
+
+    (delve=2, depth=3, dungeon=(goblin=2, chest=1, dragon=2), party=(fighter=1, cleric=2, mage=1, champion=2), ability=True, treasure=(tools=1))
+    (Enchantress  1) fighter goblin
+
+    (delve=2, depth=3, dungeon=(chest=1, dragon=2), party=(cleric=2, mage=1, champion=2), ability=True, treasure=(tools=1))
+    (Enchantress  1) descend
+
+    (delve=2, depth=4, dungeon=(goblin=1, skeleton=1, potion=1, dragon=3), party=(cleric=2, mage=1, champion=2), ability=True, treasure=(tools=1))
+    (Enchantress  1) ability skeleton
+
+    (delve=2, depth=4, dungeon=(goblin=1, potion=2, dragon=3), party=(cleric=2, mage=1, champion=2), treasure=(tools=1))
+    (Enchantress  1) cleric goblin
+
+    (delve=2, depth=4, dungeon=(potion=2, dragon=3), party=(cleric=1, mage=1, champion=2), treasure=(tools=1))
+    (Enchantress  1) champion potion scroll scroll
+
+    (delve=2, depth=4, dungeon=(dragon=3), party=(cleric=1, mage=1, champion=1, scroll=2), treasure=(tools=1))
+    (Enchantress  1) cleric dragon mage champion
+
+    (delve=2, depth=4, experience=1, dungeon=(), party=(scroll=2), treasure=(talisman=1, tools=1))
+    (Enchantress  3) retire
+
+    (delve=3, experience=5, party=(fighter=1, cleric=1, thief=3, champion=1, scroll=1), ability=True, treasure=(talisman=1, tools=1))
+    (Beguiler  7) descend
+
+    (delve=3, depth=1, experience=5, dungeon=(ooze=1), party=(fighter=1, cleric=1, thief=3, champion=1, scroll=1), ability=True, treasure=(talisman=1, tools=1))
+    (Beguiler  7) thief ooze
+
+    (delve=3, depth=1, experience=5, dungeon=(), party=(fighter=1, cleric=1, thief=2, champion=1, scroll=1), ability=True, treasure=(talisman=1, tools=1))
+    (Beguiler  7) descend
+
+    (delve=3, depth=2, experience=5, dungeon=(potion=2), party=(fighter=1, cleric=1, thief=2, champion=1, scroll=1), ability=True, treasure=(talisman=1, tools=1))
+    (Beguiler  7) thief potion scroll scroll
+
+    (delve=3, depth=2, experience=5, dungeon=(), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), ability=True, treasure=(talisman=1, tools=1))
+    (Beguiler  7) descend
+
+    (delve=3, depth=3, experience=5, dungeon=(goblin=1, skeleton=1, dragon=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), ability=True, treasure=(talisman=1, tools=1))
+    (Beguiler  7) fighter goblin
+
+    (delve=3, depth=3, experience=5, dungeon=(skeleton=1, dragon=1), party=(cleric=1, thief=1, champion=1, scroll=3), ability=True, treasure=(talisman=1, tools=1))
+    (Beguiler  7) undo
+
+    (delve=3, depth=3, experience=5, dungeon=(goblin=1, skeleton=1, dragon=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), ability=True, treasure=(talisman=1, tools=1))
+    (Beguiler  7) ability goblin skeleton
+
+    (delve=3, depth=3, experience=5, dungeon=(potion=1, dragon=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), treasure=(talisman=1, tools=1))
+    (Beguiler  7) descend
+
+    (delve=3, depth=4, experience=5, dungeon=(goblin=1, skeleton=1, potion=2, dragon=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=3), treasure=(talisman=1, tools=1))
+    (Beguiler  7) scroll goblin
+
+    (delve=3, depth=4, experience=5, dungeon=(skeleton=1, potion=2, dragon=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=2), treasure=(talisman=1, tools=1))
+    (Beguiler  7) cleric skeleton
+
+    (delve=3, depth=4, experience=5, dungeon=(potion=2, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=2), treasure=(talisman=1, tools=1))
+    (Beguiler  7) thief potion scroll scroll
+
+    (delve=3, depth=4, experience=5, dungeon=(dragon=1), party=(fighter=1, champion=1, scroll=4), treasure=(talisman=1, tools=1))
+    (Beguiler  7) descend
+
+    (delve=3, depth=5, experience=5, dungeon=(chest=2, potion=2, dragon=2), party=(fighter=1, champion=1, scroll=4), treasure=(talisman=1, tools=1))
+    (Beguiler  7) scroll chest
+
+    (delve=3, depth=5, experience=5, dungeon=(potion=2, dragon=2), party=(fighter=1, champion=1, scroll=3), treasure=(talisman=1, tools=1, scale=2))
+    (Beguiler 11) scroll potion scroll scroll
+
+    (delve=3, depth=5, experience=5, dungeon=(dragon=2), party=(fighter=1, champion=1, scroll=4), treasure=(talisman=1, tools=1, scale=2))
+    (Beguiler 11) descend
+
+    (delve=3, depth=6, experience=5, dungeon=(goblin=1, chest=1, potion=2, dragon=3), party=(fighter=1, champion=1, scroll=4), treasure=(talisman=1, tools=1, scale=2))
+    (Beguiler 11) fighter goblin
+
+    (delve=3, depth=6, experience=5, dungeon=(chest=1, potion=2, dragon=3), party=(champion=1, scroll=4), treasure=(talisman=1, tools=1, scale=2))
+    (Beguiler 11) scroll potion scroll scroll
+
+    (delve=3, depth=6, experience=5, dungeon=(chest=1, dragon=3), party=(champion=1, scroll=5), treasure=(talisman=1, tools=1, scale=2))
+    (Beguiler 11) champion chest
+
+    (delve=3, depth=6, experience=5, dungeon=(dragon=3), party=(scroll=5), treasure=(talisman=1, sceptre=1, tools=1, scale=2))
+    (Beguiler 12) scroll dragon scroll scroll
+
+    (delve=3, depth=6, experience=6, dungeon=(), party=(scroll=2), treasure=(talisman=1, sceptre=1, tools=1, scale=3))
+    (Beguiler 14) EOF
+    """
+    # Drive the game according to the script in the above docstring.
+    s = Shell(Game(random=random.Random(12), player=Enchantress))
     s.preloop()
     parsed = parse_summary_command(test_crusader.__doc__)
     for index, (expected_summary, following_command) in enumerate(parsed):

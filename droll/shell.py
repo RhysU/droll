@@ -101,6 +101,10 @@ class Shell(cmd.Cmd):
         no_arguments(line)
         return self._game.descend()
 
+    @functools.wraps(Game.reroll)
+    def do_reroll(self, line) -> GameState:
+        return self._game.reroll(*parse(line))
+
     @functools.wraps(Game.retire)
     def do_retire(self, line) -> GameState:
         no_arguments(line)
@@ -194,8 +198,14 @@ class Shell(cmd.Cmd):
             """
             scroll potion mage thief    # Drink 2 potions obtaining mage, thief
             scroll skeleton goblin      # Re-roll all skeletons and goblins
-        """
+            """
         )
+        print("Heroes like the Enchantress instead kill enemies with 'scroll'")
+        print(
+            """
+            scroll skeleton             # Enchantress would kill skeleton...
+            reroll skeleton goblin      # ...but 'reroll' forces re-rolling"""
+        )  # TODO Amend while working on Issue #21
 
     def help_scale(self):
         print("""Scales are treasures that score 2 points per pair.""")

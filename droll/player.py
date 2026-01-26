@@ -116,8 +116,8 @@ def apply(
             'To use a ring, directly "descend" or "retire".')
     if noun in {"ability", "bait", "elixir"}:
         try:
-            action = getattr(player, noun)
-            return action(game, randrange, noun, target, *additional)
+            action_ = getattr(player, noun)  # Else name collision w/ import
+            return action_(game, randrange, noun, target, *additional)
         except AttributeError as cause:
             raise error.DrollError(str(cause)) from cause
 
@@ -137,15 +137,21 @@ def apply(
         )
     )
 
-    # Apply a hero (possibly phantom per above) to some collection of targets.
-    try:
-        action = getattr(player.party, noun)
-        if target is None:
-            raise error.DrollError('"{}" requires some target'.format(noun))
-        action = getattr(action, target)
-        game = action(game, randrange, noun, target, *additional)
-    except AttributeError as cause:
-        raise error.DrollError(str(cause)) from cause
+    if noun == "reroll":
+        # Re-roll is a special verb that always overrides scroll settings
+        # found within struct.Player so, e.g., Beguiler can re-roll dice
+        # with "reroll skeleton" because "scroll skeleton" kills a skeleton.
+        game = action.reroll(game, randrange, "scroll", target, *additional)
+    else:
+        # Apply a hero (possibly phantom per above) to some targets.
+        try:
+            action_ = getattr(player.party, noun)
+            if target is None:
+                raise error.DrollError('"{}" requires some target'.format(noun))
+            action_ = getattr(action_, target)
+            game = action_(game, randrange, noun, target, *additional)
+        except AttributeError as cause:
+            raise error.DrollError(str(cause)) from cause
 
     # Undo the prior transformation by subtracting prior_treasure.
     game = game._replace(
@@ -193,29 +199,32 @@ def complete(
     """Possible completions for text with position among (partial) tokens."""
     # First compute candidate completions independent of observed text
     if position == 0:
-        candidates = (
+        candidates = {
             key
             for source in (game.party, game.treasure)
             if source is not None
             for key, value in zip(source._fields, source)
             if value
-        )
+        }
+        # Special command "reroll" is available iff "scroll" is available
+        if "scroll" in candidates:
+            candidates.add("reroll")
     elif position == 1 and tokens[0] == "elixir":
-        candidates = (key for key in struct.Party._fields)
+        candidates = {key for key in struct.Party._fields}
     elif position == 1:
-        candidates = (
+        candidates = {
             key
             for source in (game.party, game.dungeon)
             if source is not None
             for key, value in zip(source._fields, source)
             if value
-        )
+        }
     else:
-        candidates = (
+        candidates = {
             key
             for source in (struct.Party, struct.Dungeon)
             for key in source._fields
-        )
+        }
 
     # Then filter to retain only those matching requested text prefix
-    return [key for key in candidates if key.startswith(text)]
+    return sorted(key for key in candidates if key.startswith(text))
