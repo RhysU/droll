@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Beguiler advancing to Enchantress."""
-import dataclasses
+from dataclasses import replace
 import functools
 import typing
 
@@ -24,7 +24,7 @@ def enchantress_ability(
     dungeon = game.dungeon
     dungeon = action._decrement_target(dungeon, target)
     dungeon = action._increment_target(dungeon, "potion")
-    return action.consume_ability(dataclasses.replace(game, dungeon=dungeon))
+    return action.consume_ability(replace(game, dungeon=dungeon))
 
 
 def beguiler_ability(
@@ -49,7 +49,7 @@ def beguiler_ability(
     else:
         pass
     dungeon = action._increment_target(dungeon, "potion")
-    return action.consume_ability(dataclasses.replace(game, dungeon=dungeon))
+    return action.consume_ability(replace(game, dungeon=dungeon))
 
 
 # Scrolls act as wildcards for dragon defeats
@@ -61,12 +61,12 @@ _beguiler_defeat_dragon = functools.partial(
 )
 
 # Defined in terms of Default, not Enchantress, to permit advance(...) closure
-Beguiler = dataclasses.replace(
+Beguiler = replace(
     Default,
     name="Beguiler",
     ability=beguiler_ability,
     advance=(lambda _: Beguiler),
-    party=dataclasses.replace(
+    party=replace(
         Default.party,
         # Scrolls act offensively (defeat enemies, not re-roll)
         scroll=struct.Dungeon(
@@ -81,7 +81,7 @@ Beguiler = dataclasses.replace(
 )
 
 # Defined after Beguiler to permit advance(...) closure
-Enchantress = dataclasses.replace(
+Enchantress = replace(
     Default,
     name="Enchantress",
     ability=enchantress_ability,

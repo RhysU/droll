@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of world-to-world transitions stemming from attacking dragons."""
 
-import dataclasses
+from dataclasses import replace
 import random
 
 import pytest
@@ -18,7 +18,7 @@ import droll.world as world
 
 @pytest.fixture(name="game")
 def _game():
-    return dataclasses.replace(
+    return replace(
         world.new_world(),
         dungeon=struct.Dungeon(
             goblin=0, skeleton=0, ooze=0, chest=1, potion=2, dragon=3
@@ -45,11 +45,11 @@ def test_successful(game, randrange):
 
 
 def test_treasure_slot1(game, randrange):
-    game = dataclasses.replace(
-        game, treasure=dataclasses.replace(game.treasure, sword=7)
+    game = replace(
+        game, treasure=replace(game.treasure, sword=7)
     )
-    game = dataclasses.replace(
-        game, party=dataclasses.replace(game.party, fighter=0)
+    game = replace(
+        game, party=replace(game.party, fighter=0)
     )
     game = player.apply(
         player.Default,
@@ -70,11 +70,11 @@ def test_treasure_slot1(game, randrange):
 
 
 def test_treasure_slot3(game, randrange):
-    game = dataclasses.replace(
-        game, treasure=dataclasses.replace(game.treasure, talisman=7)
+    game = replace(
+        game, treasure=replace(game.treasure, talisman=7)
     )
-    game = dataclasses.replace(
-        game, party=dataclasses.replace(game.party, cleric=0)
+    game = replace(
+        game, party=replace(game.party, cleric=0)
     )
     game = player.apply(
         player.Default,
@@ -95,11 +95,11 @@ def test_treasure_slot3(game, randrange):
 
 
 def test_treasure_slot2(game, randrange):
-    game = dataclasses.replace(
-        game, treasure=dataclasses.replace(game.treasure, sceptre=7)
+    game = replace(
+        game, treasure=replace(game.treasure, sceptre=7)
     )
-    game = dataclasses.replace(
-        game, party=dataclasses.replace(game.party, mage=0)
+    game = replace(
+        game, party=replace(game.party, mage=0)
     )
     game = player.apply(
         player.Default,
@@ -120,8 +120,8 @@ def test_treasure_slot2(game, randrange):
 
 
 def test_monsters_remain(game, randrange):
-    game = dataclasses.replace(
-        game, dungeon=dataclasses.replace(game.dungeon, goblin=1)
+    game = replace(
+        game, dungeon=replace(game.dungeon, goblin=1)
     )
     with pytest.raises(error.DrollError):
         player.apply(

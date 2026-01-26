@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Spellsword advancing to Battlemage."""
-import dataclasses
+from dataclasses import replace
 import functools
 import typing
 
@@ -31,7 +31,7 @@ def spellsword_ability(
             "Target {} not one of {}".format(target, _acceptable_targets)
         )
     return action.consume_ability(
-        dataclasses.replace(game, party=action._increment_hero(game.party, target))
+        replace(game, party=action._increment_hero(game.party, target))
     )
 
 
@@ -57,31 +57,31 @@ def battlemage_ability(
     if target is not None:
         raise error.DrollError("No targets accepted for {}".format(noun))
     return action.consume_ability(
-        dataclasses.replace(
+        replace(
             game, dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields)))
         )
     )
 
 
 # Defined in terms of Default, not Spellsword, to permit advance(...) closure
-Battlemage = dataclasses.replace(
+Battlemage = replace(
     Default,
     name="Battlemage",
     ability=battlemage_ability,
     advance=(lambda _: Battlemage),
-    party=dataclasses.replace(
+    party=replace(
         struct.update_party_dragon(Default.party, _spellsword_defeat_dragon),
-        fighter=dataclasses.replace(
+        fighter=replace(
             Default.party.fighter, ooze=Default.party.mage.ooze
         ),
-        mage=dataclasses.replace(
+        mage=replace(
             Default.party.mage, goblin=Default.party.fighter.goblin
         ),
     ),
 )
 
 # Defined after Battlemage to permit advance(...) closure
-Spellsword = dataclasses.replace(
+Spellsword = replace(
     Default,
     name="Spellsword",
     ability=spellsword_ability,

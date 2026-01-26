@@ -3,11 +3,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Type definitions, generally of the struct-like variety."""
 import collections
-import dataclasses
+from dataclasses import dataclass, replace
 import typing
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Dungeon:
     goblin: typing.Any = 0
     skeleton: typing.Any = 0
@@ -26,7 +26,7 @@ class Dungeon:
         return 6
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Party:
     fighter: typing.Any = 0
     cleric: typing.Any = 0
@@ -44,7 +44,7 @@ class Party:
     def __len__(self):
         return 6
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Roll:
     dungeon: typing.Any = None
     party: typing.Any = None
@@ -57,7 +57,7 @@ class Roll:
     def __len__(self):
         return 2
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Player:
     name: typing.Any = None
     ability: typing.Any = None
@@ -93,7 +93,7 @@ _RESERVE = collections.OrderedDict(
     )
 )
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Treasure:
     sword: typing.Any = 0
     talisman: typing.Any = 0
@@ -121,7 +121,7 @@ RESERVE_INITIAL = Treasure(*_RESERVE.values())
 
 TREASURE_INITIAL = Treasure(*([0] * len(_RESERVE)))
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class World:
     delve: typing.Any = None
     depth: typing.Any = None
@@ -146,7 +146,7 @@ class World:
 def update_party_dragon(party: Party, dragon_func) -> Party:
     """Update all heroes in a party to use a custom dragon defeat function."""
     return Party(*(
-        dataclasses.replace(hero_dungeon, dragon=dragon_func)
+        replace(hero_dungeon, dragon=dragon_func)
         for hero_dungeon in party
     ))
 

@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Minstrel advancing to Bard."""
-import dataclasses
+from dataclasses import replace
 import functools
 import typing
 
@@ -24,7 +24,7 @@ def minstrel_ability(
     if target != "dragon":
         raise error.DrollError("Can only discard {} dice".format(target))
     return action.consume_ability(
-        dataclasses.replace(
+        replace(
             game, dungeon=action._eliminate_targets(game.dungeon, target)
         )
     )
@@ -40,21 +40,21 @@ _minstrel_defeat_dragon = functools.partial(
 )
 
 # Building block: dragon defeat + mage/thief interchangeability in combat
-_Minstrel_Party = dataclasses.replace(
+_Minstrel_Party = replace(
     struct.update_party_dragon(Default.party, _minstrel_defeat_dragon),
-    mage=dataclasses.replace(Default.party.mage, chest=Default.party.thief.chest),
-    thief=dataclasses.replace(Default.party.thief, ooze=Default.party.mage.ooze),
+    mage=replace(Default.party.mage, chest=Default.party.thief.chest),
+    thief=replace(Default.party.thief, ooze=Default.party.mage.ooze),
 )
 
 # Defined in terms of Default, not Minstrel, to permit advance(...) closure
-Bard = dataclasses.replace(
+Bard = replace(
     Default,
     name="Bard",
     ability=minstrel_ability,
     advance=(lambda _: Bard),  # Cannot advance further
-    party=dataclasses.replace(
+    party=replace(
         _Minstrel_Party,
-        champion=dataclasses.replace(
+        champion=replace(
             _Minstrel_Party.champion,
             # Champions defeat one additional monster when attacking monsters
             goblin=action.defeat_all_plus_additional,
@@ -65,7 +65,7 @@ Bard = dataclasses.replace(
 )
 
 # Defined after Bard to permit advance(...) closure
-Minstrel = dataclasses.replace(
+Minstrel = replace(
     Default,
     name="Minstrel",
     ability=minstrel_ability,

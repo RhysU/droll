@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of world-to-world transitions stemming from using treasure."""
 
-import dataclasses
+from dataclasses import replace
 import random
 
 import pytest
@@ -16,7 +16,7 @@ import droll.world as world
 
 @pytest.fixture(name="game")
 def _game():
-    return dataclasses.replace(
+    return replace(
         world.new_world(),
         dungeon=struct.Dungeon(*([2] * len(struct.Dungeon._fields))),
         party=struct.Party(*([0] * len(struct.Party._fields))),
@@ -29,8 +29,8 @@ def _randrange():
 
 
 def test_elixir(game, randrange):
-    game = dataclasses.replace(
-        game, treasure=dataclasses.replace(game.treasure, elixir=1)
+    game = replace(
+        game, treasure=replace(game.treasure, elixir=1)
     )
     game = player.apply(player.Default, game, randrange, "elixir", "cleric")
     assert game.party.cleric == 1
@@ -41,8 +41,8 @@ def test_elixir(game, randrange):
 
 
 def test_bait(game, randrange):
-    game = dataclasses.replace(
-        game, treasure=dataclasses.replace(game.treasure, bait=2)
+    game = replace(
+        game, treasure=replace(game.treasure, bait=2)
     )
     game = player.apply(player.Default, game, randrange, "bait", "dragon")
     assert game.treasure.bait == 1
@@ -58,8 +58,8 @@ def test_bait(game, randrange):
 # Should behave identically to test_fighter inside test_player.py,
 def helper_sword(identifier, game):
     """Test sword when referred to via identifier (e.g. 'sword', 'fighter'."""
-    game = dataclasses.replace(
-        game, treasure=dataclasses.replace(game.treasure, sword=2)
+    game = replace(
+        game, treasure=replace(game.treasure, sword=2)
     )
     game = player.apply(player.Default, game, None, identifier, "goblin")
     assert game.treasure.sword == 1

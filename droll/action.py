@@ -4,7 +4,7 @@
 """Functionality associated with player action mechanics."""
 
 import collections
-import dataclasses
+from dataclasses import replace
 import operator
 import typing
 
@@ -18,7 +18,7 @@ def defeat_one(
     game: struct.World, randrange: dice.RandRange, hero: str, target: str
 ) -> struct.World:
     """Update game after hero handles exactly one target."""
-    return dataclasses.replace(
+    return replace(
         game,
         party=_decrement_hero(game.party, hero),
         dungeon=_decrement_target(game.dungeon, target),
@@ -31,13 +31,13 @@ def _decrement_hero(party: struct.Party, hero: str) -> struct.Party:
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
         raise error.DrollError("Require at least one hero {}.".format(hero))
-    return dataclasses.replace(party, **{hero: prior_heroes - 1})
+    return replace(party, **{hero: prior_heroes - 1})
 
 
 def _increment_hero(party: struct.Party, hero: str) -> struct.Party:
     if party is None:
         raise error.DrollError("No party currently active.")
-    return dataclasses.replace(party, **{hero: getattr(party, hero) + 1})
+    return replace(party, **{hero: getattr(party, hero) + 1})
 
 
 def _decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
@@ -46,21 +46,21 @@ def _decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise ValueError("Require at least one target {}.".format(target))
-    return dataclasses.replace(dungeon, **{target: prior_targets - 1})
+    return replace(dungeon, **{target: prior_targets - 1})
 
 
 def _increment_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     if dungeon is None:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target, 0)
-    return dataclasses.replace(dungeon, **{target: prior_targets + 1})
+    return replace(dungeon, **{target: prior_targets + 1})
 
 
 def defeat_all(
     game: struct.World, randrange: dice.RandRange, hero: str, target: str
 ) -> struct.World:
     """Update game after hero handles all of one type of target."""
-    return dataclasses.replace(
+    return replace(
         game,
         party=_decrement_hero(game.party, hero),
         dungeon=_eliminate_targets(game.dungeon, target),
@@ -94,7 +94,7 @@ def defeat_all_plus_additional(
 
     # Last, attempt to defeat the additional monster using the same hero
     return defeat_one(
-        game=dataclasses.replace(game, party=_increment_hero(game.party, hero)),
+        game=replace(game, party=_increment_hero(game.party, hero)),
         randrange=randrange,
         hero=hero,
         target=additional[0],
@@ -109,7 +109,7 @@ def _eliminate_targets(
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise error.DrollError("Require at least 1 target {}.".format(target))
-    return dataclasses.replace(dungeon, **{target: 0})
+    return replace(dungeon, **{target: 0})
 
 
 def open_one(
@@ -123,7 +123,7 @@ def open_one(
     """Update game after hero opens exactly one chest."""
     if _after_monsters and not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Monsters must be defeated before opening.")
-    return dataclasses.replace(
+    return replace(
         world.draw_treasure(game, randrange),
         party=_decrement_hero(game.party, hero),
         dungeon=_decrement_target(game.dungeon, target),
@@ -146,7 +146,7 @@ def open_all(
         raise error.DrollError("At least 1 {} required.".format(target))
     for _ in range(howmany):
         game = world.draw_treasure(game, randrange)
-    return dataclasses.replace(
+    return replace(
         game,
         party=_decrement_hero(game.party, hero),
         dungeon=_eliminate_targets(game.dungeon, target),
@@ -174,7 +174,7 @@ def quaff(
     party = _decrement_hero(game.party, hero)
     for revived in revivable:
         party = _increment_hero(party, revived)
-    return dataclasses.replace(
+    return replace(
         game, party=party, dungeon=_eliminate_targets(game.dungeon, target)
     )
 
@@ -195,7 +195,7 @@ def reroll(
 
     # Re-roll the necessary number of dice then add to anything left fixed
     increased = dice.roll_dungeon(dice=len(targets), randrange=randrange)
-    return dataclasses.replace(
+    return replace(
         game,
         party=_decrement_hero(game.party, hero),
         dungeon=struct.Dungeon(*tuple(map(operator.add, reduced, increased))),
@@ -330,7 +330,7 @@ def defeat_dragon(
         raise RuntimeError("Unexpected result from _defeat_dragon_heroes")
 
     # Attempt was successful, so update experience and treasure
-    return dataclasses.replace(
+    return replace(
         world.draw_treasure(game, randrange),
         experience=game.experience + 1,
         party=party,
@@ -361,16 +361,16 @@ def bait_dragon(
     if dungeon is not None:
         for enemy in _enemies:
             new_targets += getattr(game.dungeon, enemy)
-            dungeon = dataclasses.replace(dungeon, **{enemy: 0})
+            dungeon = replace(dungeon, **{enemy: 0})
     if not new_targets:
         raise error.DrollError(
             "At least one of {} required for '{}'.".format(_enemies, noun)
         )
 
     # Increment the number of targets (i.e. dragons)
-    return dataclasses.replace(
+    return replace(
         game,
-        dungeon=dataclasses.replace(
+        dungeon=replace(
             dungeon, **{target: getattr(dungeon, target) + new_targets}
         )
     )
@@ -380,7 +380,7 @@ def elixir(
     game: struct.World, randrange: dice.RandRange, noun: str, target: str
 ) -> struct.World:
     """Add one hero die of any requested type."""
-    return dataclasses.replace(
+    return replace(
         world.replace_treasure(game, noun),
         party=_increment_hero(game.party, target)
     )
@@ -389,7 +389,7 @@ def elixir(
 def consume_ability(game: struct.World):
     if not game.ability:
         raise error.DrollError("Ability not available for use.")
-    return dataclasses.replace(game, ability=False)
+    return replace(game, ability=False)
 
 
 def nop_ability(

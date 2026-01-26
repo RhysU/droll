@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Crusader advancing to Paladin."""
-import dataclasses
+from dataclasses import replace
 import functools
 import typing
 
@@ -32,7 +32,7 @@ def crusader_ability(
             "Target {} not one of {}".format(target, _acceptable_targets)
         )
     return action.consume_ability(
-        dataclasses.replace(game, party=action._increment_hero(game.party, target))
+        replace(game, party=action._increment_hero(game.party, target))
     )
 
 
@@ -75,10 +75,10 @@ def paladin_ability(
         party = game.party
         for revived in revivable:
             party = action._increment_hero(party, revived)
-        game = dataclasses.replace(game, party=party)
+        game = replace(game, party=party)
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
-    game = dataclasses.replace(
+    game = replace(
         game, dungeon=struct.Dungeon(*([0] * len(struct.Dungeon._fields)))
     )
 
@@ -95,24 +95,24 @@ _crusader_defeat_dragon = functools.partial(
 )
 
 # Defined in terms of Default, not Crusader, to permit advance(...) closure
-Paladin = dataclasses.replace(
+Paladin = replace(
     Default,
     name="Paladin",
     ability=paladin_ability,
     advance=(lambda _: Paladin),
-    party=dataclasses.replace(
+    party=replace(
         struct.update_party_dragon(Default.party, _crusader_defeat_dragon),
-        fighter=dataclasses.replace(
+        fighter=replace(
             Default.party.fighter, skeleton=Default.party.cleric.skeleton
         ),
-        cleric=dataclasses.replace(
+        cleric=replace(
             Default.party.cleric, goblin=Default.party.fighter.goblin
         ),
     ),
 )
 
 # Defined after Paladin to permit advance(...) closure
-Crusader = dataclasses.replace(
+Crusader = replace(
     Default,
     name="Crusader",
     ability=crusader_ability,

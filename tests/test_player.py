@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of world-to-world transitions stemming from player actions."""
 
-import dataclasses
+from dataclasses import replace
 import random
 
 import pytest
@@ -16,7 +16,7 @@ import droll.world as world
 
 @pytest.fixture(name="game")
 def _game():
-    return dataclasses.replace(
+    return replace(
         world.new_world(),
         dungeon=struct.Dungeon(*([2] * len(struct.Dungeon._fields))),
         party=struct.Party(*([2] * len(struct.Party._fields))),
@@ -24,8 +24,8 @@ def _game():
 
 
 def __remove_monsters(game: struct.World) -> struct.World:
-    return dataclasses.replace(
-        game, dungeon=dataclasses.replace(game.dungeon, goblin=0, skeleton=0, ooze=0)
+    return replace(
+        game, dungeon=replace(game.dungeon, goblin=0, skeleton=0, ooze=0)
     )
 
 
@@ -83,8 +83,8 @@ def test_thief(game, randrange):
     assert game.dungeon.chest == 0
     assert sum(game.treasure) == 2
 
-    game = dataclasses.replace(
-        game, party=dataclasses.replace(game.party, thief=1)
+    game = replace(
+        game, party=replace(game.party, thief=1)
     )  # Add one
     with pytest.raises(error.DrollError):
         player.apply(player.Default, game, None, "thief", "chest")
@@ -151,14 +151,14 @@ def complete(*args):
 def test_complete0(game):
     """Complete available party and treasure in the zeroth position."""
     assert ["fighter"] == complete(game, ("fig",), "fig", 0)
-    game = dataclasses.replace(
-        game, party=dataclasses.replace(game.party, fighter=0)
+    game = replace(
+        game, party=replace(game.party, fighter=0)
     )
     assert [] == complete(game, ("fig",), "fig", 0)  # party
     assert [] == complete(game, ("gob",), "gob", 0)  # dungeon
     assert [] == complete(game, ("bai",), "bai", 0)  # treasure
-    game = dataclasses.replace(
-        game, treasure=dataclasses.replace(game.treasure, bait=1)
+    game = replace(
+        game, treasure=replace(game.treasure, bait=1)
     )
     assert ["bait"] == complete(game, ("bai",), "bai", 0)  # treasure
 
@@ -168,22 +168,22 @@ def test_complete1(game):
     # Vanilla first position stuff
     assert ["goblin"] == complete(game, ("fig", "gob"), "gob", 1)
     assert ["fighter"] == complete(game, ("fig", "fig"), "fig", 1)  # party
-    game = dataclasses.replace(
-        game, dungeon=dataclasses.replace(game.dungeon, goblin=0)
+    game = replace(
+        game, dungeon=replace(game.dungeon, goblin=0)
     )
     assert [] == complete(game, ("fig", "gob"), "gob", 1)  # dungeon
-    game = dataclasses.replace(
-        game, party=dataclasses.replace(game.party, fighter=0)
+    game = replace(
+        game, party=replace(game.party, fighter=0)
     )
     assert [] == complete(game, ("fig", "fig"), "fig", 1)  # dungeon
-    game = dataclasses.replace(
-        game, treasure=dataclasses.replace(game.treasure, bait=1)
+    game = replace(
+        game, treasure=replace(game.treasure, bait=1)
     )
     assert [] == complete(game, ("fig", "bai"), "fig", 1)  # treasure
 
     # Special case associated with 'elixir'
-    game = dataclasses.replace(game, party=struct.Party(*([0] * len(game.party))))
-    game = dataclasses.replace(
+    game = replace(game, party=struct.Party(*([0] * len(game.party))))
+    game = replace(
         game, treasure=struct.Treasure(*([0] * len(game.treasure)))
     )
     assert list(sorted(struct.Party._fields)) == (
@@ -193,8 +193,8 @@ def test_complete1(game):
 
 def test_complete2(game):
     """Complete all party and dungeon in the second position."""
-    game = dataclasses.replace(
-        game, party=dataclasses.replace(game.party, fighter=0)
+    game = replace(
+        game, party=replace(game.party, fighter=0)
     )
     game = __remove_monsters(game)
     assert ["fighter"] == complete(game, ("X", "Y", "fig"), "fig", 2)
