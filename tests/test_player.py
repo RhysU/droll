@@ -182,9 +182,9 @@ def test_complete1(game):
     assert [] == complete(game, ("fig", "bai"), "fig", 1)  # treasure
 
     # Special case associated with 'elixir'
-    game = replace(game, party=struct.Party(*([0] * len(fields(game.party)))))
+    game = replace(game, party=struct.Party())
     game = replace(
-        game, treasure=struct.Treasure(*([0] * len(fields(game.treasure))))
+        game, treasure=struct.Treasure()
     )
     assert list(sorted(struct.field_names(struct.Party))) == (
         complete(game, ("elixir", ""), "", 1)

@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Spellsword advancing to Battlemage."""
-from dataclasses import fields, replace
+from dataclasses import replace
 import functools
 import typing
 
@@ -58,7 +58,7 @@ def battlemage_ability(
         raise error.DrollError("No targets accepted for {}".format(noun))
     return action.consume_ability(
         replace(
-            game, dungeon=struct.Dungeon(*([0] * len(fields(struct.Dungeon))))
+            game, dungeon=struct.Dungeon()
         )
     )
 

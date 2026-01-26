@@ -4,7 +4,7 @@
 """Functionality associated with world state and world mechanics."""
 
 import copy
-from dataclasses import fields, replace
+from dataclasses import replace
 
 from . import dice
 from . import error
@@ -222,5 +222,5 @@ def apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
         )
     return replace(
         replace_treasure(world, "portal"),
-        dungeon=struct.Dungeon(*([0] * len(fields(struct.Dungeon))))
+        dungeon=struct.Dungeon()
     )

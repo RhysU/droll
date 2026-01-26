@@ -19,7 +19,7 @@ def _game():
     return replace(
         world.new_world(),
         dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
-        party=struct.Party(*([0] * len(fields(struct.Party)))),
+        party=struct.Party(),
     )
 
 

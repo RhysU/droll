@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Crusader advancing to Paladin."""
-from dataclasses import fields, replace
+from dataclasses import replace
 import functools
 import typing
 
@@ -79,7 +79,7 @@ def paladin_ability(
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
     game = replace(
-        game, dungeon=struct.Dungeon(*([0] * len(fields(struct.Dungeon))))
+        game, dungeon=struct.Dungeon()
     )
 
     return action.consume_ability(game)
