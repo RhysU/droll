@@ -18,12 +18,12 @@ def defeat_one(
 ) -> struct.World:
     """Update game after hero handles exactly one target."""
     return game._replace(
-        party=__decrement_hero(game.party, hero),
-        dungeon=__decrement_target(game.dungeon, target),
+        party=_decrement_hero(game.party, hero),
+        dungeon=_decrement_target(game.dungeon, target),
     )
 
 
-def __decrement_hero(party: struct.Party, hero: str) -> struct.Party:
+def _decrement_hero(party: struct.Party, hero: str) -> struct.Party:
     if party is None:
         raise error.DrollError("No party currently active.")
     prior_heroes = getattr(party, hero)
@@ -32,13 +32,13 @@ def __decrement_hero(party: struct.Party, hero: str) -> struct.Party:
     return party._replace(**{hero: prior_heroes - 1})
 
 
-def __increment_hero(party: struct.Party, hero: str) -> struct.Party:
+def _increment_hero(party: struct.Party, hero: str) -> struct.Party:
     if party is None:
         raise error.DrollError("No party currently active.")
     return party._replace(**{hero: getattr(party, hero) + 1})
 
 
-def __decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
+def _decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     if dungeon is None:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
@@ -47,7 +47,7 @@ def __decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     return dungeon._replace(**{target: prior_targets - 1})
 
 
-def __increment_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
+def _increment_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     if dungeon is None:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target, 0)
@@ -59,8 +59,8 @@ def defeat_all(
 ) -> struct.World:
     """Update game after hero handles all of one type of target."""
     return game._replace(
-        party=__decrement_hero(game.party, hero),
-        dungeon=__eliminate_targets(game.dungeon, target),
+        party=_decrement_hero(game.party, hero),
+        dungeon=_eliminate_targets(game.dungeon, target),
     )
 
 
@@ -91,14 +91,14 @@ def defeat_all_plus_additional(
 
     # Last, attempt to defeat the additional monster using the same hero
     return defeat_one(
-        game=game._replace(party=__increment_hero(game.party, hero)),
+        game=game._replace(party=_increment_hero(game.party, hero)),
         randrange=randrange,
         hero=hero,
         target=additional[0],
     )
 
 
-def __eliminate_targets(
+def _eliminate_targets(
     dungeon: struct.Dungeon, target: str
 ) -> struct.Dungeon:
     if dungeon is None:
@@ -121,8 +121,8 @@ def open_one(
     if _after_monsters and not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Monsters must be defeated before opening.")
     return world.draw_treasure(game, randrange)._replace(
-        party=__decrement_hero(game.party, hero),
-        dungeon=__decrement_target(game.dungeon, target),
+        party=_decrement_hero(game.party, hero),
+        dungeon=_decrement_target(game.dungeon, target),
     )
 
 
@@ -143,8 +143,8 @@ def open_all(
     for _ in range(howmany):
         game = world.draw_treasure(game, randrange)
     return game._replace(
-        party=__decrement_hero(game.party, hero),
-        dungeon=__eliminate_targets(game.dungeon, target),
+        party=_decrement_hero(game.party, hero),
+        dungeon=_eliminate_targets(game.dungeon, target),
     )
 
 
@@ -166,11 +166,11 @@ def quaff(
         raise error.DrollError("Require exactly {} to revive.".format(howmany))
     if _after_monsters and not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Monsters must be defeated before quaffing.")
-    party = __decrement_hero(game.party, hero)
+    party = _decrement_hero(game.party, hero)
     for revived in revivable:
-        party = __increment_hero(party, revived)
+        party = _increment_hero(party, revived)
     return game._replace(
-        party=party, dungeon=__eliminate_targets(game.dungeon, target)
+        party=party, dungeon=_eliminate_targets(game.dungeon, target)
     )
 
 
@@ -186,12 +186,12 @@ def reroll(
     for target in targets:
         if target in {"potion", "dragon"}:
             raise error.DrollError("{} cannot be re-rolled".format(target))
-        reduced = __decrement_target(reduced, target)
+        reduced = _decrement_target(reduced, target)
 
     # Re-roll the necessary number of dice then add to anything left fixed
     increased = dice.roll_dungeon(dice=len(targets), randrange=randrange)
     return game._replace(
-        party=__decrement_hero(game.party, hero),
+        party=_decrement_hero(game.party, hero),
         dungeon=struct.Dungeon(*tuple(map(operator.add, reduced, increased))),
     )
 
@@ -315,10 +315,10 @@ def defeat_dragon(
         )
 
     # Confirm required number of distinct heroes available
-    party = __decrement_hero(game.party, hero)
+    party = _decrement_hero(game.party, hero)
     heroes = [hero]
     for other in others:
-        party = __decrement_hero(party, other)
+        party = _decrement_hero(party, other)
         heroes.append(other)
     if not _defeat_dragon_heroes(*heroes):
         raise RuntimeError("Unexpected result from _defeat_dragon_heroes")
@@ -327,7 +327,7 @@ def defeat_dragon(
     return world.draw_treasure(game, randrange)._replace(
         experience=game.experience + 1,
         party=party,
-        dungeon=__eliminate_targets(game.dungeon, target),
+        dungeon=_eliminate_targets(game.dungeon, target),
     )
 
 
@@ -373,7 +373,7 @@ def elixir(
 ) -> struct.World:
     """Add one hero die of any requested type."""
     return world.replace_treasure(game, noun)._replace(
-        party=__increment_hero(game.party, target)
+        party=_increment_hero(game.party, target)
     )
 
 

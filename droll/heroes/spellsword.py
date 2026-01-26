@@ -30,22 +30,18 @@ def spellsword_ability(
             "Target {} not one of {}".format(target, _acceptable_targets)
         )
     return action.consume_ability(
-        game._replace(party=action.__increment_hero(game.party, target))
+        game._replace(party=action._increment_hero(game.party, target))
     )
 
 
-@functools.wraps(action.defeat_dragon)
-def spellsword_defeat_dragon(*args, **kwargs):
-    return action.defeat_dragon(
-        *args, **kwargs, _defeat_dragon_heroes=spellsword_defeat_dragon_heroes
-    )
-
-
-@functools.wraps(action.defeat_dragon_heroes_interchangeable)
-def spellsword_defeat_dragon_heroes(*args, **kwargs):
-    return action.defeat_dragon_heroes_interchangeable(
-        *args, **kwargs, _interchangeable={"fighter", "mage"}
-    )
+# Fighter/mage are interchangeable for dragon defeats
+_spellsword_defeat_dragon = functools.partial(
+    action.defeat_dragon,
+    _defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes_interchangeable,
+        _interchangeable={"fighter", "mage"},
+    ),
+)
 
 
 def battlemage_ability(
@@ -70,24 +66,12 @@ def battlemage_ability(
 Battlemage = Default._replace(
     name="Battlemage",
     ability=battlemage_ability,
-    advance=(lambda _: Battlemage),  # Cannot advance further
-    party=Default.party._replace(
-        fighter=Default.party.fighter._replace(
-            # Fighters usable as mages implies fighter.ooze as if a mage
-            ooze=Default.party.mage.ooze,
-            dragon=spellsword_defeat_dragon,
-        ),
-        cleric=Default.party.cleric._replace(dragon=spellsword_defeat_dragon),
-        mage=Default.party.mage._replace(
-            # Mages usable as fighters implies mage.goblin as if a fighter
-            goblin=Default.party.fighter.goblin,
-            dragon=spellsword_defeat_dragon,
-        ),
-        thief=Default.party.thief._replace(dragon=spellsword_defeat_dragon),
-        champion=Default.party.champion._replace(
-            dragon=spellsword_defeat_dragon
-        ),
-        scroll=Default.party.scroll._replace(dragon=spellsword_defeat_dragon),
+    advance=(lambda _: Battlemage),
+    party=struct.update_party_dragon(
+        Default.party, _spellsword_defeat_dragon
+    )._replace(
+        fighter=Default.party.fighter._replace(ooze=Default.party.mage.ooze),
+        mage=Default.party.mage._replace(goblin=Default.party.fighter.goblin),
     ),
 )
 

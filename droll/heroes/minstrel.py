@@ -17,48 +17,31 @@ def minstrel_ability(
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
-    *,
-    _acceptable_targets: typing.Set[str] = {"fighter", "mage"}
 ) -> struct.World:
     """Minstrel may discard all dragon dice."""
     target = "dragon" if target is None else target
     if target != "dragon":
         raise error.DrollError("Can only discard {} dice".format(target))
     return action.consume_ability(
-        game._replace(dungeon=action.__eliminate_targets(game.dungeon, target))
+        game._replace(dungeon=action._eliminate_targets(game.dungeon, target))
     )
 
 
-@functools.wraps(action.defeat_dragon)
-def minstrel_defeat_dragon(*args, **kwargs):
-    return action.defeat_dragon(
-        *args, **kwargs, _defeat_dragon_heroes=minstrel_defeat_dragon_heroes
-    )
-
-
-@functools.wraps(action.defeat_dragon_heroes_interchangeable)
-def minstrel_defeat_dragon_heroes(*args, **kwargs):
-    return action.defeat_dragon_heroes_interchangeable(
-        *args, **kwargs, _interchangeable={"mage", "thief"}
-    )
-
-
-# Building block common to both Bard and Minstrel
-_Minstrel_Party = Default.party._replace(
-    fighter=Default.party.fighter._replace(dragon=minstrel_defeat_dragon),
-    cleric=Default.party.cleric._replace(dragon=minstrel_defeat_dragon),
-    mage=Default.party.mage._replace(
-        # Mages usable as thieves implies mage.chest as if a thief
-        chest=Default.party.thief.chest,
-        dragon=minstrel_defeat_dragon,
+# Mage/thief are interchangeable for dragon defeats
+_minstrel_defeat_dragon = functools.partial(
+    action.defeat_dragon,
+    _defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes_interchangeable,
+        _interchangeable={"mage", "thief"},
     ),
-    thief=Default.party.thief._replace(
-        # Thieves usable as mages implies thief.ooze as if a mage
-        ooze=Default.party.mage.ooze,
-        dragon=minstrel_defeat_dragon,
-    ),
-    champion=Default.party.champion._replace(dragon=minstrel_defeat_dragon),
-    scroll=Default.party.scroll._replace(dragon=minstrel_defeat_dragon),
+)
+
+# Building block: dragon defeat + mage/thief interchangeability in combat
+_Minstrel_Party = struct.update_party_dragon(
+    Default.party, _minstrel_defeat_dragon
+)._replace(
+    mage=Default.party.mage._replace(chest=Default.party.thief.chest),
+    thief=Default.party.thief._replace(ooze=Default.party.mage.ooze),
 )
 
 # Defined in terms of Default, not Minstrel, to permit advance(...) closure

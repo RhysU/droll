@@ -4,8 +4,6 @@
 """Functionality associated with world state and world mechanics."""
 
 import copy
-import functools
-import itertools
 
 from . import dice
 from . import error
@@ -158,26 +156,18 @@ def score(world: struct.World) -> int:
     """Compute the present score for the world, including all treasure."""
     return (
         world.experience
-        + sum(world.treasure)
-        + world.treasure.portal  # Each piece of treasure is +1 point
-        + 2  # Portals are each +1 point (2 total)
-        * (world.treasure.scale // 2)  # Pairs of scales are +2 points
+        + sum(world.treasure)  # Each piece of treasure is +1 point
+        + world.treasure.portal  # Portals are +1 extra (2 total each)
+        + 2 * (world.treasure.scale // 2)  # Pairs of scales are +2 extra
     )
 
 
-# There are definitely much, much better implementations.
 def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
-    seq = functools.reduce(
-        itertools.chain,
-        (
-            itertools.repeat(t, reserve[i])
-            for i, t in enumerate(struct.Treasure._fields)
-        ),
-        [],
-    )
-    seq = tuple(seq)
-    assert len(seq) > 1, "Presently no items remaining in the reserve"
-    return seq[randrange(0, len(seq))]
+    """Draw a random treasure from the reserve, weighted by counts."""
+    items = [name for name, count in zip(reserve._fields, reserve)
+             for _ in range(count)]
+    assert items, "No items remaining in the reserve"
+    return items[randrange(0, len(items))]
 
 
 def draw_treasure(

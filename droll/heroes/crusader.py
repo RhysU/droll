@@ -31,7 +31,7 @@ def crusader_ability(
             "Target {} not one of {}".format(target, _acceptable_targets)
         )
     return action.consume_ability(
-        game._replace(party=action.__increment_hero(game.party, target))
+        game._replace(party=action._increment_hero(game.party, target))
     )
 
 
@@ -73,7 +73,7 @@ def paladin_ability(
         # Revive heroes for each potion
         party = game.party
         for revived in revivable:
-            party = action.__increment_hero(party, revived)
+            party = action._increment_hero(party, revived)
         game = game._replace(party=party)
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
@@ -84,42 +84,29 @@ def paladin_ability(
     return action.consume_ability(game)
 
 
-@functools.wraps(action.defeat_dragon)
-def crusader_defeat_dragon(*args, **kwargs):
-    return action.defeat_dragon(
-        *args, **kwargs, _defeat_dragon_heroes=crusader_defeat_dragon_heroes
-    )
-
-
-@functools.wraps(action.defeat_dragon_heroes_interchangeable)
-def crusader_defeat_dragon_heroes(*args, **kwargs):
-    return action.defeat_dragon_heroes_interchangeable(
-        *args, **kwargs, _interchangeable={"fighter", "cleric"}
-    )
-
+# Fighter/cleric are interchangeable for dragon defeats
+_crusader_defeat_dragon = functools.partial(
+    action.defeat_dragon,
+    _defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes_interchangeable,
+        _interchangeable={"fighter", "cleric"},
+    ),
+)
 
 # Defined in terms of Default, not Crusader, to permit advance(...) closure
 Paladin = Default._replace(
     name="Paladin",
     ability=paladin_ability,
-    advance=(lambda _: Paladin),  # Cannot advance further
-    party=Default.party._replace(
+    advance=(lambda _: Paladin),
+    party=struct.update_party_dragon(
+        Default.party, _crusader_defeat_dragon
+    )._replace(
         fighter=Default.party.fighter._replace(
-            # Fighters usable as clerics implies fighter.skeleton as if cleric
-            skeleton=Default.party.cleric.skeleton,
-            dragon=crusader_defeat_dragon,
+            skeleton=Default.party.cleric.skeleton
         ),
         cleric=Default.party.cleric._replace(
-            # Clerics usable as fighters implies cleric.goblin as if fighter
-            goblin=Default.party.fighter.goblin,
-            dragon=crusader_defeat_dragon,
+            goblin=Default.party.fighter.goblin
         ),
-        mage=Default.party.mage._replace(dragon=crusader_defeat_dragon),
-        thief=Default.party.thief._replace(dragon=crusader_defeat_dragon),
-        champion=Default.party.champion._replace(
-            dragon=crusader_defeat_dragon
-        ),
-        scroll=Default.party.scroll._replace(dragon=crusader_defeat_dragon),
     ),
 )
 
