@@ -7,14 +7,14 @@ from dataclasses import dataclass, fields as dataclass_fields, replace
 import typing
 
 
-def field_names(cls_or_instance) -> typing.Tuple[str, ...]:
-    """Return field names for a dataclass or instance thereof."""
-    return tuple(f.name for f in dataclass_fields(cls_or_instance))
+def field_names(cls_or_instance) -> typing.Generator[str, None, None]:
+    """Yield field names for a dataclass or instance thereof."""
+    return (f.name for f in dataclass_fields(cls_or_instance))
 
 
-def field_values(instance) -> typing.Tuple[typing.Any, ...]:
-    """Return field values for a dataclass instance."""
-    return tuple(getattr(instance, f.name) for f in dataclass_fields(instance))
+def field_values(instance) -> typing.Generator[typing.Any, None, None]:
+    """Yield field values for a dataclass instance."""
+    return (getattr(instance, f.name) for f in dataclass_fields(instance))
 
 
 @dataclass(frozen=True)
