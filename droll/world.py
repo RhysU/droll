@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with world state and world mechanics."""
 
-import copy
 from dataclasses import replace
 
 from . import dice
@@ -48,8 +47,8 @@ def new_world() -> struct.World:
         ability=None,
         dungeon=None,
         party=None,
-        treasure=copy.deepcopy(struct.TREASURE_INITIAL),
-        reserve=copy.deepcopy(struct.RESERVE_INITIAL),
+        treasure=struct.TREASURE_INITIAL,
+        reserve=struct.RESERVE_INITIAL,
     )
 
 
