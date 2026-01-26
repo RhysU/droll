@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of world-to-world transitions stemming from using treasure."""
 
-from dataclasses import replace
+from dataclasses import fields, replace
 import random
 
 import pytest
@@ -18,8 +18,8 @@ import droll.world as world
 def _game():
     return replace(
         world.new_world(),
-        dungeon=struct.Dungeon(*([2] * len(struct.field_names(struct.Dungeon)))),
-        party=struct.Party(*([0] * len(struct.field_names(struct.Party)))),
+        dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
+        party=struct.Party(*([0] * len(fields(struct.Party)))),
     )
 
 

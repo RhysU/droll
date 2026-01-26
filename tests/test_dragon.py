@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of world-to-world transitions stemming from attacking dragons."""
 
-from dataclasses import replace
+from dataclasses import fields, replace
 import random
 
 import pytest
@@ -23,7 +23,7 @@ def _game():
         dungeon=struct.Dungeon(
             goblin=0, skeleton=0, ooze=0, chest=1, potion=2, dragon=3
         ),
-        party=struct.Party(*([2] * len(struct.field_names(struct.Party)))),
+        party=struct.Party(*([2] * len(fields(struct.Party)))),
     )
 
 
