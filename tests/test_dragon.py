@@ -29,7 +29,13 @@ class TestDragon(unittest.TestCase):
 
     def test_successful(self):
         game = player.apply(
-            player.Default, self.game, self.randrange, "fighter", "dragon", "cleric", "mage"
+            player.Default,
+            self.game,
+            self.randrange,
+            "fighter",
+            "dragon",
+            "cleric",
+            "mage",
         )
         assert game.party.fighter == 1
         assert game.party.cleric == 1
@@ -42,9 +48,7 @@ class TestDragon(unittest.TestCase):
         game = replace(
             self.game, treasure=replace(self.game.treasure, sword=7)
         )
-        game = replace(
-            game, party=replace(game.party, fighter=0)
-        )
+        game = replace(game, party=replace(game.party, fighter=0))
         game = player.apply(
             player.Default,
             game,
@@ -66,9 +70,7 @@ class TestDragon(unittest.TestCase):
         game = replace(
             self.game, treasure=replace(self.game.treasure, talisman=7)
         )
-        game = replace(
-            game, party=replace(game.party, cleric=0)
-        )
+        game = replace(game, party=replace(game.party, cleric=0))
         game = player.apply(
             player.Default,
             game,
@@ -90,9 +92,7 @@ class TestDragon(unittest.TestCase):
         game = replace(
             self.game, treasure=replace(self.game.treasure, sceptre=7)
         )
-        game = replace(
-            game, party=replace(game.party, mage=0)
-        )
+        game = replace(game, party=replace(game.party, mage=0))
         game = player.apply(
             player.Default,
             game,
@@ -111,9 +111,7 @@ class TestDragon(unittest.TestCase):
         assert sum(struct.field_values(game.treasure)) == 7
 
     def test_monsters_remain(self):
-        game = replace(
-            self.game, dungeon=replace(self.game.dungeon, goblin=1)
-        )
+        game = replace(self.game, dungeon=replace(self.game.dungeon, goblin=1))
         with self.assertRaises(error.DrollError):
             player.apply(
                 player.Default,
@@ -128,15 +126,28 @@ class TestDragon(unittest.TestCase):
     def test_too_few_specified(self):
         with self.assertRaises(error.DrollError):
             player.apply(
-                player.Default, self.game, self.randrange, "fighter", "dragon", "cleric"
+                player.Default,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
+                "cleric",
             )
 
         with self.assertRaises(error.DrollError):
-            player.apply(player.Default, self.game, self.randrange, "fighter", "dragon")
+            player.apply(
+                player.Default, self.game, self.randrange, "fighter", "dragon"
+            )
 
         # Dragon Slayer requires only two
         with self.assertRaises(error.DrollError):
-            player.apply(heroes.DragonSlayer, self.game, self.randrange, "fighter", "dragon")
+            player.apply(
+                heroes.DragonSlayer,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
+            )
 
     def test_too_many_specified(self):
         with self.assertRaises(error.DrollError):
@@ -190,13 +201,24 @@ class TestDragon(unittest.TestCase):
         # Dragon Slayer requires only two
         with self.assertRaises(error.DrollError):
             player.apply(
-                heroes.DragonSlayer, self.game, self.randrange, "fighter", "dragon", "scroll"
+                heroes.DragonSlayer,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
+                "scroll",
             )
 
     def test_not_enough_distinct(self):
         with self.assertRaises(error.DrollError):
             player.apply(
-                player.Default, self.game, self.randrange, "fighter", "dragon", "mage", "mage"
+                player.Default,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
+                "mage",
+                "mage",
             )
 
 
@@ -221,7 +243,11 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
             )
         with self.assertRaises(error.DrollError):
             action.defeat_dragon_heroes_interchangeable(
-                "cleric", "thief", "champion", "mage", _interchangeable={"fighter"}
+                "cleric",
+                "thief",
+                "champion",
+                "mage",
+                _interchangeable={"fighter"},
             )
         with self.assertRaises(error.DrollError):
             action.defeat_dragon_heroes_interchangeable(
@@ -242,7 +268,10 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
             "cleric", "fighter", "mage", _interchangeable={"mage", "fighter"}
         )
         assert action.defeat_dragon_heroes_interchangeable(
-            "cleric", "fighter", "fighter", _interchangeable={"mage", "fighter"}
+            "cleric",
+            "fighter",
+            "fighter",
+            _interchangeable={"mage", "fighter"},
         )
         assert action.defeat_dragon_heroes_interchangeable(
             "cleric", "mage", "mage", _interchangeable={"mage", "fighter"}
@@ -266,7 +295,10 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
             )
         with self.assertRaises(error.DrollError):
             action.defeat_dragon_heroes_interchangeable(
-                "mage", "fighter", "fighter", _interchangeable={"mage", "fighter"}
+                "mage",
+                "fighter",
+                "fighter",
+                _interchangeable={"mage", "fighter"},
             )
 
 
@@ -274,7 +306,9 @@ class TestDefeatDragonHeroesWildcard(unittest.TestCase):
 
     def test_less_interesting_successful_cases(self):
         assert action.defeat_dragon_heroes_wildcard(
-            "cleric", "thief", "mage",
+            "cleric",
+            "thief",
+            "mage",
         )
         assert action.defeat_dragon_heroes_wildcard(
             "cleric", "thief", "fighter", _wildcard={"scroll"}
@@ -306,19 +340,27 @@ class TestDefeatDragonHeroesWildcard(unittest.TestCase):
         # More than one could be wildcard, but does not appear in the game.
         # Therefore, only one wildcard case is checked below.
         assert action.defeat_dragon_heroes_wildcard(
-            "cleric", "thief", "scroll",
+            "cleric",
+            "thief",
+            "scroll",
         )
         assert action.defeat_dragon_heroes_wildcard(
-            "cleric", "scroll", "scroll",
+            "cleric",
+            "scroll",
+            "scroll",
         )
         assert action.defeat_dragon_heroes_wildcard(
-            "scroll", "scroll", "scroll",
+            "scroll",
+            "scroll",
+            "scroll",
         )
 
     def test_more_interesting_failure_cases(self):
         with self.assertRaises(error.DrollError):
             action.defeat_dragon_heroes_wildcard(
-                "mage", "mage", "scroll",
+                "mage",
+                "mage",
+                "scroll",
             )
         with self.assertRaises(error.DrollError):
             action.defeat_dragon_heroes_wildcard(

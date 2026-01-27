@@ -30,7 +30,9 @@ class TestPlayer(unittest.TestCase):
         self.randrange = random.Random(4).randrange
 
     def test_fighter(self):
-        game = player.apply(player.Default, self.game, None, "fighter", "goblin")
+        game = player.apply(
+            player.Default, self.game, None, "fighter", "goblin"
+        )
         assert game.party.fighter == 1
         assert game.dungeon.goblin == 0
 
@@ -45,12 +47,16 @@ class TestPlayer(unittest.TestCase):
         with self.assertRaises(error.DrollError):
             player.apply(player.Default, self.game, None, "cleric", "dragon")
 
-        game = player.apply(player.Default, self.game, None, "cleric", "skeleton")
+        game = player.apply(
+            player.Default, self.game, None, "cleric", "skeleton"
+        )
         assert game.party.cleric == 1
         assert game.dungeon.skeleton == 0
 
         game = _remove_monsters(game)  # Required for opening chest
-        game = player.apply(player.Default, game, self.randrange, "cleric", "chest")
+        game = player.apply(
+            player.Default, game, self.randrange, "cleric", "chest"
+        )
         assert game.party.cleric == 0
         assert game.dungeon.chest == 1
         assert sum(struct.field_values(game.treasure)) == 1
@@ -70,19 +76,21 @@ class TestPlayer(unittest.TestCase):
         assert game.dungeon.ooze == 1
 
         game = _remove_monsters(game)  # Required for opening chest
-        game = player.apply(player.Default, game, self.randrange, "thief", "chest")
+        game = player.apply(
+            player.Default, game, self.randrange, "thief", "chest"
+        )
         assert game.party.thief == 0
         assert game.dungeon.chest == 0
         assert sum(struct.field_values(game.treasure)) == 2
 
-        game = replace(
-            game, party=replace(game.party, thief=1)
-        )  # Add one
+        game = replace(game, party=replace(game.party, thief=1))  # Add one
         with self.assertRaises(error.DrollError):
             player.apply(player.Default, game, None, "thief", "chest")
 
     def test_champion(self):
-        game = player.apply(player.Default, self.game, None, "champion", "goblin")
+        game = player.apply(
+            player.Default, self.game, None, "champion", "goblin"
+        )
         assert game.party.champion == 1
         assert game.dungeon.goblin == 0
 
@@ -98,12 +106,24 @@ class TestPlayer(unittest.TestCase):
     def test_scroll_quaff(self):
         with self.assertRaises(error.DrollError):
             player.apply(
-                player.Default, self.game, None, "scroll", "potion", "fighter", "fighter"
+                player.Default,
+                self.game,
+                None,
+                "scroll",
+                "potion",
+                "fighter",
+                "fighter",
             )  # Too soon
 
         game = _remove_monsters(self.game)  # Required for drinking potions
         game = player.apply(
-            player.Default, game, None, "scroll", "potion", "fighter", "fighter"
+            player.Default,
+            game,
+            None,
+            "scroll",
+            "potion",
+            "fighter",
+            "fighter",
         )  # Duplicate
         assert game.party.scroll == 1
         assert game.dungeon.potion == 0
@@ -150,15 +170,11 @@ class TestComplete(unittest.TestCase):
         """Complete available party and treasure in the zeroth position."""
         game = self.game
         assert ["fighter"] == complete(game, ("fig",), "fig", 0)
-        game = replace(
-            game, party=replace(game.party, fighter=0)
-        )
+        game = replace(game, party=replace(game.party, fighter=0))
         assert [] == complete(game, ("fig",), "fig", 0)  # party
         assert [] == complete(game, ("gob",), "gob", 0)  # dungeon
         assert [] == complete(game, ("bai",), "bai", 0)  # treasure
-        game = replace(
-            game, treasure=replace(game.treasure, bait=1)
-        )
+        game = replace(game, treasure=replace(game.treasure, bait=1))
         assert ["bait"] == complete(game, ("bai",), "bai", 0)  # treasure
 
     def test_complete1(self):
@@ -167,34 +183,26 @@ class TestComplete(unittest.TestCase):
         # Vanilla first position stuff
         assert ["goblin"] == complete(game, ("fig", "gob"), "gob", 1)
         assert ["fighter"] == complete(game, ("fig", "fig"), "fig", 1)  # party
-        game = replace(
-            game, dungeon=replace(game.dungeon, goblin=0)
-        )
+        game = replace(game, dungeon=replace(game.dungeon, goblin=0))
         assert [] == complete(game, ("fig", "gob"), "gob", 1)  # dungeon
-        game = replace(
-            game, party=replace(game.party, fighter=0)
-        )
+        game = replace(game, party=replace(game.party, fighter=0))
         assert [] == complete(game, ("fig", "fig"), "fig", 1)  # dungeon
-        game = replace(
-            game, treasure=replace(game.treasure, bait=1)
-        )
+        game = replace(game, treasure=replace(game.treasure, bait=1))
         assert [] == complete(game, ("fig", "bai"), "fig", 1)  # treasure
 
         # Special case associated with 'elixir'
         game = replace(game, party=struct.Party())
-        game = replace(
-            game, treasure=struct.Treasure()
-        )
+        game = replace(game, treasure=struct.Treasure())
         assert list(sorted(struct.field_names(struct.Party))) == (
             complete(game, ("elixir", ""), "", 1)
         )
 
     def test_complete2(self):
         """Complete all party and dungeon in the second position."""
-        game = replace(
-            self.game, party=replace(self.game.party, fighter=0)
-        )
+        game = replace(self.game, party=replace(self.game.party, fighter=0))
         game = _remove_monsters(game)
         assert ["fighter"] == complete(game, ("X", "Y", "fig"), "fig", 2)
         assert ["goblin"] == complete(game, ("X", "Y", "gob"), "gob", 2)
-        assert ["champion", "chest"] == complete(game, ("X", "Y", "ch"), "ch", 2)
+        assert ["champion", "chest"] == complete(
+            game, ("X", "Y", "ch"), "ch", 2
+        )

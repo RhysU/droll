@@ -20,7 +20,9 @@ def crusader_ability(
     noun: str,
     target: typing.Optional[str] = None,
     *,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset({"fighter", "cleric"})
+    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+        {"fighter", "cleric"}
+    )
 ) -> struct.World:
     """Crusader usable as a fighter or a cleric, adding one hero.
 
@@ -42,7 +44,9 @@ def paladin_ability(
     noun: str,
     target: typing.Optional[str] = None,
     *revivable: str,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset({"fighter", "cleric"})
+    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+        {"fighter", "cleric"}
+    )
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
 
@@ -78,9 +82,7 @@ def paladin_ability(
         game = replace(game, party=party)
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
-    game = replace(
-        game, dungeon=struct.Dungeon()
-    )
+    game = replace(game, dungeon=struct.Dungeon())
 
     return action.consume_ability(game)
 

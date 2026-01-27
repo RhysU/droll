@@ -150,9 +150,9 @@ class TestSimple(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_simple.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert expected_summary == s.summary(), "Summary mismatch at {}".format(
-                index
-            )
+            assert (
+                expected_summary == s.summary()
+            ), "Summary mismatch at {}".format(index)
             s.onecmd(following_command)
 
 
@@ -355,9 +355,9 @@ class TestKnight(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_knight.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert expected_summary == s.summary(), "Summary mismatch at {}".format(
-                index
-            )
+            assert (
+                expected_summary == s.summary()
+            ), "Summary mismatch at {}".format(index)
             s.onecmd(following_command)
 
 
@@ -434,9 +434,9 @@ class TestSpellsword(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_spellsword.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert expected_summary == s.summary(), "Summary mismatch at {}".format(
-                index
-            )
+            assert (
+                expected_summary == s.summary()
+            ), "Summary mismatch at {}".format(index)
             s.onecmd(following_command)
 
 
@@ -585,9 +585,9 @@ class TestMinstrel(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_minstrel.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert expected_summary == s.summary(), "Summary mismatch at {}".format(
-                index
-            )
+            assert (
+                expected_summary == s.summary()
+            ), "Summary mismatch at {}".format(index)
             s.onecmd(following_command)
 
 
@@ -701,9 +701,9 @@ class TestCrusader(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_crusader.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert expected_summary == s.summary(), "Summary mismatch at {}".format(
-                index
-            )
+            assert (
+                expected_summary == s.summary()
+            ), "Summary mismatch at {}".format(index)
             s.onecmd(following_command)
 
 
@@ -868,7 +868,7 @@ class TestEnchantress(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_enchantress.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert expected_summary == s.summary(), "Summary mismatch at {}".format(
-                index
-            )
+            assert (
+                expected_summary == s.summary()
+            ), "Summary mismatch at {}".format(index)
             s.onecmd(following_command)

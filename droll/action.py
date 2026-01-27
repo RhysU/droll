@@ -101,9 +101,7 @@ def defeat_all_plus_additional(
     )
 
 
-def _eliminate_targets(
-    dungeon: struct.Dungeon, target: str
-) -> struct.Dungeon:
+def _eliminate_targets(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
     if dungeon is None:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
@@ -198,9 +196,15 @@ def reroll(
     return replace(
         game,
         party=_decrement_hero(game.party, hero),
-        dungeon=struct.Dungeon(*tuple(map(operator.add,
-                                           struct.field_values(reduced),
-                                           struct.field_values(increased)))),
+        dungeon=struct.Dungeon(
+            *tuple(
+                map(
+                    operator.add,
+                    struct.field_values(reduced),
+                    struct.field_values(increased),
+                )
+            )
+        ),
     )
 
 
@@ -374,7 +378,7 @@ def bait_dragon(
         game,
         dungeon=replace(
             dungeon, **{target: getattr(dungeon, target) + new_targets}
-        )
+        ),
     )
 
 
@@ -384,7 +388,7 @@ def elixir(
     """Add one hero die of any requested type."""
     return replace(
         world.replace_treasure(game, noun),
-        party=_increment_hero(game.party, target)
+        party=_increment_hero(game.party, target),
     )
 
 

@@ -27,18 +27,22 @@ class TestTreasure(unittest.TestCase):
         game = replace(
             self.game, treasure=replace(self.game.treasure, elixir=1)
         )
-        game = player.apply(player.Default, game, self.randrange, "elixir", "cleric")
+        game = player.apply(
+            player.Default, game, self.randrange, "elixir", "cleric"
+        )
         assert game.party.cleric == 1
         assert game.treasure.elixir == 0
 
         with self.assertRaises(error.DrollError):
-            player.apply(player.Default, game, self.randrange, "elixir", "mage")
+            player.apply(
+                player.Default, game, self.randrange, "elixir", "mage"
+            )
 
     def test_bait(self):
-        game = replace(
-            self.game, treasure=replace(self.game.treasure, bait=2)
+        game = replace(self.game, treasure=replace(self.game.treasure, bait=2))
+        game = player.apply(
+            player.Default, game, self.randrange, "bait", "dragon"
         )
-        game = player.apply(player.Default, game, self.randrange, "bait", "dragon")
         assert game.treasure.bait == 1
         assert game.dungeon.goblin == 0
         assert game.dungeon.skeleton == 0

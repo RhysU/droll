@@ -22,10 +22,14 @@ def test_knight_ability_baits_dragon():
     """Knight ability converts monsters to dragons without treasure."""
     state = random.Random(4)
     world = droll.struct.World(
-        delve=1, depth=1, experience=0, ability=True,
+        delve=1,
+        depth=1,
+        experience=0,
+        ability=True,
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=2, champion=1),
-        treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+        treasure=droll.struct.Treasure(),
+        reserve=droll.struct.Treasure(),
     )
     result = Knight.ability(world, state.randrange, "ability")
     assert result.dungeon.dragon == 3
@@ -37,8 +41,13 @@ def test_knight_ability_baits_dragon():
 def test_dragonslayer_advance():
     """DragonSlayer stays DragonSlayer after advancing."""
     world = droll.struct.World(
-        delve=1, depth=0, experience=10, ability=True,
-        dungeon=None, party=None, treasure=droll.struct.Treasure(),
+        delve=1,
+        depth=0,
+        experience=10,
+        ability=True,
+        dungeon=None,
+        party=None,
+        treasure=droll.struct.Treasure(),
         reserve=droll.struct.Treasure(),
     )
     assert DragonSlayer.advance(world) == DragonSlayer

@@ -9,7 +9,10 @@ import unittest
 import droll.error
 import droll.struct
 from droll.heroes.spellsword import (
-    Spellsword, Battlemage, spellsword_ability, battlemage_ability
+    Spellsword,
+    Battlemage,
+    spellsword_ability,
+    battlemage_ability,
 )
 
 
@@ -19,12 +22,18 @@ class TestSpellsword(unittest.TestCase):
         """Spellsword ability adds a fighter to party."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
             dungeon=droll.struct.Dungeon(),
             party=droll.struct.Party(fighter=1, mage=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
-        result = spellsword_ability(world, state.randrange, "ability", "fighter")
+        result = spellsword_ability(
+            world, state.randrange, "ability", "fighter"
+        )
         assert result.party.fighter == 2
         assert result.ability is False
 
@@ -32,10 +41,14 @@ class TestSpellsword(unittest.TestCase):
         """Spellsword ability adds a mage to party."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
             dungeon=droll.struct.Dungeon(),
             party=droll.struct.Party(fighter=1, mage=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
         result = spellsword_ability(world, state.randrange, "ability", "mage")
         assert result.party.mage == 2
@@ -44,10 +57,14 @@ class TestSpellsword(unittest.TestCase):
         """Spellsword ability rejects invalid targets like cleric."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
             dungeon=droll.struct.Dungeon(),
             party=droll.struct.Party(fighter=1, mage=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
         with self.assertRaises(droll.error.DrollError):
             spellsword_ability(world, state.randrange, "ability", "cleric")
@@ -56,10 +73,16 @@ class TestSpellsword(unittest.TestCase):
         """Battlemage ability clears entire dungeon."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
-            dungeon=droll.struct.Dungeon(goblin=2, chest=1, potion=1, dragon=2),
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
+            dungeon=droll.struct.Dungeon(
+                goblin=2, chest=1, potion=1, dragon=2
+            ),
             party=droll.struct.Party(fighter=1, mage=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
         result = battlemage_ability(world, state.randrange, "ability")
         assert sum(droll.struct.field_values(result.dungeon)) == 0
@@ -68,13 +91,23 @@ class TestSpellsword(unittest.TestCase):
     def test_spellsword_advances_to_battlemage(self):
         """Spellsword advances to Battlemage at 5+ experience."""
         low_xp = droll.struct.World(
-            delve=1, depth=0, experience=4, ability=True,
-            dungeon=None, party=None, treasure=droll.struct.Treasure(),
+            delve=1,
+            depth=0,
+            experience=4,
+            ability=True,
+            dungeon=None,
+            party=None,
+            treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
         high_xp = droll.struct.World(
-            delve=1, depth=0, experience=5, ability=True,
-            dungeon=None, party=None, treasure=droll.struct.Treasure(),
+            delve=1,
+            depth=0,
+            experience=5,
+            ability=True,
+            dungeon=None,
+            party=None,
+            treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
         assert Spellsword.advance(low_xp) == Spellsword

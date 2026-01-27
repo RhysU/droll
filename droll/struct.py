@@ -16,9 +16,14 @@ def field_values(instance: typing.Any) -> typing.Iterator[typing.Any]:
     return (getattr(instance, f.name) for f in dataclasses.fields(instance))
 
 
-def field_items(instance: typing.Any) -> typing.Iterator[typing.Tuple[str, typing.Any]]:
+def field_items(
+    instance: typing.Any,
+) -> typing.Iterator[typing.Tuple[str, typing.Any]]:
     """Yield (name, value) pairs for a dataclass instance."""
-    return ((f.name, getattr(instance, f.name)) for f in dataclasses.fields(instance))
+    return (
+        (f.name, getattr(instance, f.name))
+        for f in dataclasses.fields(instance)
+    )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -40,10 +45,12 @@ class Party:
     champion: typing.Any = 0
     scroll: typing.Any = 0
 
+
 @dataclasses.dataclass(frozen=True)
 class Roll:
     dungeon: typing.Any = None
     party: typing.Any = None
+
 
 @dataclasses.dataclass(frozen=True)
 class Player:
@@ -55,6 +62,7 @@ class Player:
     roll: typing.Any = None
     artifacts: typing.Any = None
     party: typing.Any = None
+
 
 @dataclasses.dataclass(frozen=True)
 class Treasure:
@@ -68,6 +76,7 @@ class Treasure:
     portal: int = 0
     ring: int = 0
     scale: int = 0
+
 
 TREASURE_INITIAL = Treasure()
 
@@ -84,6 +93,7 @@ RESERVE_INITIAL = Treasure(
     scale=6,
 )
 
+
 @dataclasses.dataclass(frozen=True)
 class World:
     delve: int = 0
@@ -98,13 +108,17 @@ class World:
 
 def update_party_dragon(party: Party, dragon_func) -> Party:
     """Update all heroes in a party to use a custom dragon defeat function."""
-    return Party(*(
-        dataclasses.replace(hero_dungeon, dragon=dragon_func)
-        for hero_dungeon in field_values(party)
-    ))
+    return Party(
+        *(
+            dataclasses.replace(hero_dungeon, dragon=dragon_func)
+            for hero_dungeon in field_values(party)
+        )
+    )
 
 
-def brief(o: typing.Any, *, omitted: typing.AbstractSet[str] = frozenset({"reserve"})) -> str:
+def brief(
+    o: typing.Any, *, omitted: typing.AbstractSet[str] = frozenset({"reserve"})
+) -> str:
     """A __str__(...) variant suppressing False fields within dataclasses."""
     try:
         names = field_names(o)
