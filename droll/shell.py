@@ -9,6 +9,7 @@ import textwrap
 import typing
 
 from . import action
+from . import display
 from .error import DrollError
 from .game import Game, GameState
 
@@ -16,11 +17,12 @@ from .game import Game, GameState
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
 
-    def __init__(self, game: Game) -> None:
+    def __init__(self, game: Game, *, experimental: bool = False) -> None:
         super(Shell, self).__init__()
         assert game is not None
         self._game = game
         self._undo = None
+        self._experimental = experimental
 
     def preloop(self) -> None:
         """Prepare a new game and start the first delve."""
@@ -30,13 +32,38 @@ class Shell(cmd.Cmd):
 
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
-        self.prompt = self._game.prompt() + " "
-        print()
-        if line != "EOF":
-            print(self._game.summary())
-            if stop:
-                print(self.prompt)
+        if self._experimental:
+            self.prompt = self._game._player.name + "> "
+            print()
+            if line != "EOF":
+                available = self._available_commands()
+                print(display.compact_summary(
+                    self._game._world,
+                    self._game._player.name,
+                    self._game.score(),
+                    available,
+                ))
+                if stop:
+                    print(self.prompt)
+        else:
+            self.prompt = self._game.prompt() + " "
+            print()
+            if line != "EOF":
+                print(self._game.summary())
+                if stop:
+                    print(self.prompt)
         return stop
+
+    def _available_commands(self) -> typing.List[str]:
+        """Get available non-hero/non-treasure commands from help system."""
+        names = self.get_names()
+        commands = set()
+        for name in names:
+            if name.startswith("do_"):
+                cmd_name = name[3:]
+                if cmd_name in ("ability", "descend", "retire", "retreat", "reroll"):
+                    commands.add(cmd_name)
+        return list(commands)
 
     def onecmd(self, line, *, _raises=False) -> GameState:
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""

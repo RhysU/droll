@@ -39,13 +39,18 @@ def main(args=None) -> None:
         default=None,
         help="An integer to seed random number generation.",
     )
+    parser.add_argument(
+        "--experimental",
+        action="store_true",
+        help="Use experimental compact display format.",
+    )
     arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
     g = Game(
         player=AVAILABLE_HEROES.get(arguments.hero),
         random=random.Random(*randseed),
     )
-    s = Shell(g)
+    s = Shell(g, experimental=arguments.experimental)
     return s.cmdloop()
 
 
