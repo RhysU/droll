@@ -114,7 +114,8 @@ def apply(
         raise error.DrollError('To use a portal, directly "retire".')
     if noun == "ring":
         raise error.DrollError(
-            'To use a ring, directly "descend" or "retire".')
+            'To use a ring, directly "descend" or "retire".'
+        )
     if noun in {"ability", "bait", "elixir"}:
         try:
             action_ = getattr(player, noun)  # Else name collision w/ import
@@ -134,8 +135,8 @@ def apply(
                 + getattr(prior_treasure, artifact)
                 for hero, artifact in struct.field_items(player.artifacts)
                 if artifact is not None
-            }
-        )
+            },
+        ),
     )
 
     if noun == "reroll":
@@ -148,7 +149,9 @@ def apply(
         try:
             action_ = getattr(player.party, noun)
             if target is None:
-                raise error.DrollError('"{}" requires some target'.format(noun))
+                raise error.DrollError(
+                    '"{}" requires some target'.format(noun)
+                )
             action_ = getattr(action_, target)
             game = action_(game, randrange, noun, target, *additional)
         except AttributeError as cause:
@@ -164,8 +167,8 @@ def apply(
                 - getattr(prior_treasure, artifact)
                 for hero, artifact in struct.field_items(player.artifacts)
                 if artifact is not None
-            }
-        )
+            },
+        ),
     )
 
     # Consume treasure equivalent to any hero which has gone negative.
@@ -174,10 +177,9 @@ def apply(
             continue
         for _ in range(-min(0, quantity)):
             game = world.replace_treasure(
-                    game, getattr(player.artifacts, hero))
-        game = replace(
-            game, party=replace(game.party, **{hero: 0})
-        )
+                game, getattr(player.artifacts, hero)
+            )
+        game = replace(game, party=replace(game.party, **{hero: 0}))
 
     return game
 

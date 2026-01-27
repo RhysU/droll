@@ -22,7 +22,9 @@ class TestDice(unittest.TestCase):
 
     def test_roll_dungeon_minimum(self):
         """Roll dungeon with minimum (1) dice."""
-        dungeon = droll.dice.roll_dungeon(dice=1, randrange=self.state.randrange)
+        dungeon = droll.dice.roll_dungeon(
+            dice=1, randrange=self.state.randrange
+        )
         assert sum(droll.struct.field_values(dungeon)) == 1
 
     def test_roll_dungeon_zero_fails(self):

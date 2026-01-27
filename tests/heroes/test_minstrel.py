@@ -18,10 +18,14 @@ class TestMinstrel(unittest.TestCase):
         """Minstrel ability discards all dragon dice."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
             dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
             party=droll.struct.Party(fighter=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
         result = minstrel_ability(world, state.randrange, "ability")
         assert result.dungeon.dragon == 0
@@ -32,10 +36,14 @@ class TestMinstrel(unittest.TestCase):
         """Minstrel ability only works on dragons."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
             dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
             party=droll.struct.Party(fighter=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
         with self.assertRaises(droll.error.DrollError):
             minstrel_ability(world, state.randrange, "ability", "goblin")
@@ -43,13 +51,23 @@ class TestMinstrel(unittest.TestCase):
     def test_minstrel_advances_to_bard(self):
         """Minstrel advances to Bard at 5+ experience."""
         low_xp = droll.struct.World(
-            delve=1, depth=0, experience=4, ability=True,
-            dungeon=None, party=None, treasure=droll.struct.Treasure(),
+            delve=1,
+            depth=0,
+            experience=4,
+            ability=True,
+            dungeon=None,
+            party=None,
+            treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
         high_xp = droll.struct.World(
-            delve=1, depth=0, experience=5, ability=True,
-            dungeon=None, party=None, treasure=droll.struct.Treasure(),
+            delve=1,
+            depth=0,
+            experience=5,
+            ability=True,
+            dungeon=None,
+            party=None,
+            treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
         assert Minstrel.advance(low_xp) == Minstrel
@@ -59,10 +77,14 @@ class TestMinstrel(unittest.TestCase):
         """Bard's champion defeats all of one type plus one additional."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
             dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
             party=droll.struct.Party(champion=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
         result = droll.action.defeat_all_plus_additional(
             world, state.randrange, "champion", "goblin", "skeleton"
@@ -75,10 +97,14 @@ class TestMinstrel(unittest.TestCase):
         """Bard's champion needs no additional when monsters cleared."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
             dungeon=droll.struct.Dungeon(goblin=2),
             party=droll.struct.Party(champion=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
         result = droll.action.defeat_all_plus_additional(
             world, state.randrange, "champion", "goblin"
@@ -89,12 +115,21 @@ class TestMinstrel(unittest.TestCase):
         """Bard's champion rejects more than one additional target."""
         state = random.Random(4)
         world = droll.struct.World(
-            delve=1, depth=1, experience=0, ability=True,
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
             dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
             party=droll.struct.Party(champion=1),
-            treasure=droll.struct.Treasure(), reserve=droll.struct.Treasure(),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
         )
         with self.assertRaises(droll.error.DrollError):
             droll.action.defeat_all_plus_additional(
-                world, state.randrange, "champion", "goblin", "skeleton", "skeleton"
+                world,
+                state.randrange,
+                "champion",
+                "goblin",
+                "skeleton",
+                "skeleton",
             )

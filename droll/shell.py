@@ -14,7 +14,7 @@ from .game import Game, GameState
 
 
 class Shell(cmd.Cmd):
-    """"REPL permitting playing a Game via tab-completion shell."""
+    """REPL permitting playing a Game via tab-completion shell."""
 
     def __init__(self, game: Game) -> None:
         super(Shell, self).__init__()
