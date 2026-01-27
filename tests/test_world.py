@@ -259,17 +259,24 @@ class TestWorld(unittest.TestCase):
         game = droll.world.new_world()
         game = droll.world.next_delve(game, droll.dice.roll_party, self.state.randrange)
         game = replace(game, depth=2, dungeon=droll.struct.Dungeon(goblin=1))
-
         result = droll.world.retreat(game)
         assert result.depth == 0
         assert result.dungeon is None
 
-    def test_retreat_at_depth_one(self):
-        """Test retreat fails at depth 1 (must descend at least twice)."""
+    def test_retreat_at_depth_one_with_monster(self):
+        """Test retreat succeeds at depth 1 when a monster is present"""
         game = droll.world.new_world()
         game = droll.world.next_delve(game, droll.dice.roll_party, self.state.randrange)
         game = replace(game, depth=1, dungeon=droll.struct.Dungeon(goblin=1))
+        result = droll.world.retreat(game)
+        assert result.depth == 0
+        assert result.dungeon is None
 
+    def test_retreat_at_depth_one_without_monster(self):
+        """Test retreat fails at depth 1 when no monster is present"""
+        game = droll.world.new_world()
+        game = droll.world.next_delve(game, droll.dice.roll_party, self.state.randrange)
+        game = replace(game, depth=1)
         with self.assertRaises(droll.error.DrollError):
             droll.world.retreat(game)
 
