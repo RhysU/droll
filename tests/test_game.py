@@ -40,6 +40,22 @@ class TestGame(unittest.TestCase):
         # Scroll consumed, dungeon rerolled
         assert g._world.party.scroll == pre_scroll - 1
 
+    def test_reroll_portion(self):
+        """Test rerolling potion using a scroll."""
+        g = Game(random=random.Random(4), player=Default)
+        g.descend()  # Start delve
+        # Set up dungeon with goblin and party with scroll
+        g._world = replace(
+            g._world,
+            depth=1,
+            party=replace(g._world.party, scroll=1),
+            dungeon=droll.struct.Dungeon(potion=2),
+        )
+        pre_scroll = g._world.party.scroll
+        g.reroll("potion")
+        # Scroll consumed, dungeon rerolled
+        assert g._world.party.scroll == pre_scroll - 1
+
     def test_reroll_multiple_targets(self):
         """Test rerolling multiple dungeon dice."""
         g = Game(random=random.Random(4), player=Default)
