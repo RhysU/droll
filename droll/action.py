@@ -189,7 +189,7 @@ def reroll(
     # Remove requested target from the dungeon
     reduced = game.dungeon
     for target in targets:
-        if target in {"potion", "dragon"}:
+        if target == "dragon":
             raise error.DrollError("{} cannot be re-rolled".format(target))
         reduced = _decrement_target(reduced, target)
 
