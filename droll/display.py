@@ -33,7 +33,7 @@ def format_treasure(treasure: struct.Treasure) -> str:
 
 def format_available(available: typing.Sequence[str]) -> str:
     """Format available commands alphabetically."""
-    return " ".join(sorted(available))
+    return " ".join(sorted(available)) or "none"
 
 
 def format_dungeon(dungeon: typing.Optional[struct.Dungeon]) -> typing.Optional[str]:

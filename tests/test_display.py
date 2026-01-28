@@ -60,7 +60,7 @@ class TestFormatAvailable(unittest.TestCase):
         )
 
     def test_empty(self):
-        self.assertEqual(display.format_available([]), "")
+        self.assertEqual(display.format_available([]), "none")
 
 
 class TestFormatDungeon(unittest.TestCase):
@@ -181,4 +181,21 @@ class TestCompactSummary(unittest.TestCase):
         self.assertIn("scale×4 sceptre talisman tools", lines[1])
         self.assertIn("retire", lines[2])
         self.assertIn("champion scroll×2", lines[3])
+        self.assertEqual(len(lines), 4)  # No Dungeon line
+
+    def test_ending_state(self):
+        """After final delve, Available should show 'none'."""
+        world = struct.World(
+            delve=3,
+            experience=16,
+            dungeon=None,
+            party=struct.Party(champion=1),
+            ability=False,
+            treasure=struct.Treasure(scroll=1, elixir=1, bait=2, portal=1, scale=1),
+        )
+        result = display.compact_summary(world, "DragonSlayer", 23, [])
+        lines = result.split("\n")
+        self.assertIn("delve 3 with experience 16", lines[0])
+        self.assertIn("Available:", lines[2])
+        self.assertIn("none", lines[2])
         self.assertEqual(len(lines), 4)  # No Dungeon line
