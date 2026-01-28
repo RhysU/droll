@@ -70,8 +70,8 @@ def compact_summary(
     lines = [
         f"{'Score ' + str(score) + ':':<{width}} {location}",
         f"{'Treasure:':<{width}} {treasure_str}",
-        f"{'Party:':<{width}} {party_str}",
         f"{'Available:':<{width}} {available_str}",
+        f"{'Party:':<{width}} {party_str}",
     ]
     if dungeon_str:
         lines.append(f"{'Dungeon:':<{width}} {dungeon_str}")
