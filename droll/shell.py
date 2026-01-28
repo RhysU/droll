@@ -36,7 +36,7 @@ class Shell(cmd.Cmd):
             self.prompt = self._game._player.name + "> "
             print()
             if line != "EOF":
-                available = self._available_commands()
+                available = [] if stop else self._available_commands()
                 print(display.compact_summary(
                     self._game._world,
                     self._game._player.name,
