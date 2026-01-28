@@ -60,7 +60,32 @@ Score 0:   delve 1 with experience 0
 Treasure:  none
 Available: ability descend
 Party:     fighter×2 cleric mage thief champion×2
+Knight> help
+
+Feasible commands (help <command>):
+===================================
+ability  descend
+
+
+Score 0:   delve 1 with experience 0
+Treasure:  none
+Available: ability descend
+Party:     fighter×2 cleric mage thief champion×2
 Knight> descend
+
+Score 0:   depth 1 in delve 1 with experience 0
+Treasure:  none
+Available: ability retreat
+Party:     fighter×2 cleric mage thief champion×2
+Dungeon:   goblin
+Knight> help fighter
+Attack monsters, quaff potions, and open chests with a fighter like so:
+
+        champion skeleton            # Attack skeleton(s)
+        thief chest                  # Open chest(s)
+        fighter potion mage thief    # Drink 2 potions obtaining mage, thief
+        mage dragon champion cleric  # Attack dragon with party of 3
+
 
 Score 0:   depth 1 in delve 1 with experience 0
 Treasure:  none
@@ -94,6 +119,16 @@ Treasure:  none
 Available: ability descend retire undo
 Party:     fighter cleric mage thief champion
 Knight> descend
+
+Score 0:   depth 3 in delve 1 with experience 0
+Treasure:  none
+Available: ability retreat
+Party:     fighter cleric mage thief champion
+Dungeon:   goblin skeleton potion
+Knight> help ability
+Invoke the player's ability.
+
+    Convert all monster faces into dragon dice.
 
 Score 0:   depth 3 in delve 1 with experience 0
 Treasure:  none
@@ -150,6 +185,16 @@ Available: descend retire undo
 Party:     cleric thief champion
 Dungeon:   chest dragon×2
 Knight> thief chest
+
+Score 3:   depth 5 in delve 1 with experience 0
+Treasure:  elixir sceptre talisman
+Available: descend retire
+Party:     cleric champion
+Dungeon:   dragon×2
+Knight> help retreat
+Retreat from the dungeon at any time (e.g. after being defeated).
+
+        Automatically starts a new delve or ends game, as suitable.
 
 Score 3:   depth 5 in delve 1 with experience 0
 Treasure:  elixir sceptre talisman
