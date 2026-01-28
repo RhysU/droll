@@ -198,6 +198,12 @@ def partify(token: str, artifacts: struct.Party):
 # Later tokens contain mixtures of present and requested items.
 # Attempts to specialize much beyond this seem to quickly go awry.
 # One notable special case is 'elixir' as any party die follows.
+
+# Treasures excluded from completion because they lack associated commands.
+# Portal and ring are auto-used; scale is for scoring only.
+TREASURE_NO_COMMAND = frozenset({"portal", "ring", "scale"})
+
+
 def complete(
     game: struct.World, tokens: typing.Sequence[str], text: str, position: int
 ) -> typing.Sequence[str]:
@@ -209,7 +215,7 @@ def complete(
             for source in (game.party, game.treasure)
             if source is not None
             for key, value in struct.field_items(source)
-            if value
+            if value and key not in TREASURE_NO_COMMAND
         }
         # Special command "reroll" is available iff "scroll" is available
         if "scroll" in candidates:
