@@ -31,7 +31,7 @@ This game has always seemed like a neat problem to throw into reinforcement
 learning algorithms as (a) the strategy isn't too complicated, (b) the score
 is very straightforward, and (c) there's probabilistic behavior in both the
 basic die mechanics as well as the expected value of the treasure.  That
-said, I've not such things in either 2018 nor 2026.
+said, I've not done such things in either 2018 nor 2026.
 
 ## What does it look like?
 
