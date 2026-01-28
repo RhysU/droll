@@ -41,9 +41,9 @@ def main(args=None) -> None:
         help="An integer to seed random number generation.",
     )
     parser.add_argument(
-        "--legacy",
+        "--mechanical",
         action="store_true",
-        help="Use legacy verbose display format.",
+        help="Use mechanical verbose display format.",
     )
     arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
@@ -51,7 +51,7 @@ def main(args=None) -> None:
         player=AVAILABLE_HEROES.get(arguments.hero),
         random=random.Random(*randseed),
     )
-    display_mode = DisplayMode.LEGACY if arguments.legacy else DisplayMode.CURRENT
+    display_mode = DisplayMode.MECHANICAL if arguments.mechanical else DisplayMode.CURRENT
     s = Shell(g, display_mode=display_mode)
     return s.cmdloop()
 

@@ -35,11 +35,9 @@ said, I've not done such things in either 2018 nor 2026.
 
 ## What does it look like?
 
-NOTE: There's a `--legacy` option providing a verbose experience.
-
 ```
 $ droll --help
-usage: droll [-h] [--seed N] [--legacy]
+usage: droll [-h] [--seed N]
              {Default,Crusader,Enchantress,Knight,Minstrel,Spellsword}
 
 Command-line version of droll.
@@ -51,7 +49,6 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --seed N              An integer to seed random number generation.
-  --legacy              Use legacy verbose display format.
 
 
 $ droll --seed 7 Knight
