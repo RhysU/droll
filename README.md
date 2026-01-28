@@ -35,140 +35,173 @@ said, I've not done such things in either 2018 nor 2026.
 
 ## What does it look like?
 
-NOTE: There's an `--experimental` option providing a superior experience.
+NOTE: There's a `--legacy` option providing a verbose experience.
 
 ```
 $ droll --help
-usage: droll [-h] [--seed N] {Default,Crusader,Enchantress,Knight,Minstrel,Spellsword}
+usage: droll [-h] [--seed N] [--legacy]
+             {Default,Crusader,Enchantress,Knight,Minstrel,Spellsword}
 
 Command-line version of droll.
 
 positional arguments:
-  {Default,Crusader,Knight,Minstrel,Spellsword}
+  {Default,Crusader,Enchantress,Knight,Minstrel,Spellsword}
                         Select the hero for this game.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --seed N              An integer to seed random number generation.
+  --legacy              Use legacy verbose display format.
 
 
 $ droll --seed 7 Knight
 
-(delve=1, party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(Knight  0) help
+Score 0:   delve 1 with experience 0
+Treasure:  none
+Available: ability descend
+Party:     fighter×2 cleric mage thief champion×2
+Knight> descend
 
-Feasible commands (help <command>):
-===================================
-descend
+Score 0:   depth 1 in delve 1 with experience 0
+Treasure:  none
+Available: ability retreat
+Party:     fighter×2 cleric mage thief champion×2
+Dungeon:   goblin
+Knight> fighter goblin
 
+Score 0:   depth 1 in delve 1 with experience 0
+Treasure:  none
+Available: ability descend retire undo
+Party:     fighter cleric mage thief champion×2
+Knight> descend
 
-(delve=1, party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(Knight  0) descend
+Score 0:   depth 2 in delve 1 with experience 0
+Treasure:  none
+Available: ability retreat
+Party:     fighter cleric mage thief champion×2
+Dungeon:   ooze potion
+Knight> mage ooze
 
-(delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(Knight  0) help
+Score 0:   depth 2 in delve 1 with experience 0
+Treasure:  none
+Available: ability descend retire undo
+Party:     fighter cleric thief champion×2
+Dungeon:   potion
+Knight> champion potion mage
 
-Feasible commands (help <command>):
-===================================
-ability  champion   cleric   fighter   mage   retreat  thief
+Score 0:   depth 2 in delve 1 with experience 0
+Treasure:  none
+Available: ability descend retire undo
+Party:     fighter cleric mage thief champion
+Knight> descend
 
+Score 0:   depth 3 in delve 1 with experience 0
+Treasure:  none
+Available: ability retreat
+Party:     fighter cleric mage thief champion
+Dungeon:   goblin skeleton potion
+Knight> ability
 
-(delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(Knight  0) help fighter
-Attack monsters, quaff potions, and open chests with a fighter like so:
+Score 0:   depth 3 in delve 1 with experience 0
+Treasure:  none
+Available: descend retire undo
+Party:     fighter cleric mage thief champion
+Dungeon:   potion dragon×2
+Knight> descend
 
-        champion skeleton            # Attack skeleton(s)
-        thief chest                  # Open chest(s)
-        fighter potion mage thief    # Drink 2 potions obtaining mage, thief
-        mage dragon champion cleric  # Attack dragon with party of 3
+Score 0:   depth 4 in delve 1 with experience 0
+Treasure:  none
+Available: retreat
+Party:     fighter cleric mage thief champion
+Dungeon:   goblin×2 chest×2 dragon×2
+Knight> fighter goblin
 
+Score 0:   depth 4 in delve 1 with experience 0
+Treasure:  none
+Available: descend retire undo
+Party:     cleric mage thief champion
+Dungeon:   chest×2 dragon×2
+Knight> thief chest
 
-(delve=1, depth=1, dungeon=(goblin=1), party=(fighter=2, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(Knight  0) fighter goblin
+Score 2:   depth 4 in delve 1 with experience 0
+Treasure:  elixir talisman
+Available: descend retire
+Party:     cleric mage champion
+Dungeon:   dragon×2
+Knight> descend
 
-(delve=1, depth=1, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(Knight  0) descend
+Score 2:   depth 5 in delve 1 with experience 0
+Treasure:  elixir talisman
+Available: retreat
+Party:     cleric mage champion
+Dungeon:   goblin×2 chest potion×2 dragon×2
+Knight> champion goblin
 
-(delve=1, depth=2, dungeon=(ooze=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=2), ability=True, treasure=())
-(Knight  0) mage ooze
+Score 2:   depth 5 in delve 1 with experience 0
+Treasure:  elixir talisman
+Available: descend retire undo
+Party:     cleric mage
+Dungeon:   chest potion×2 dragon×2
+Knight> mage potion champion thief
 
-(delve=1, depth=2, dungeon=(potion=1), party=(fighter=1, cleric=1, thief=1, champion=2), ability=True, treasure=())
-(Knight  0) champion potion mage
+Score 2:   depth 5 in delve 1 with experience 0
+Treasure:  elixir talisman
+Available: descend retire undo
+Party:     cleric thief champion
+Dungeon:   chest dragon×2
+Knight> thief chest
 
-(delve=1, depth=2, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
-(Knight  0) descend
+Score 3:   depth 5 in delve 1 with experience 0
+Treasure:  elixir sceptre talisman
+Available: descend retire
+Party:     cleric champion
+Dungeon:   dragon×2
+Knight> retire
 
-(delve=1, depth=3, dungeon=(goblin=1, skeleton=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
-(Knight  0) help ability
-Invoke the player's ability.
+Score 8:      delve 2 with experience 5
+Treasure:     elixir sceptre talisman
+Available:    ability descend
+Party:        fighter cleric champion×5
+DragonSlayer> descend
 
-    Convert all monster faces into dragon dice.
+Score 8:      depth 1 in delve 2 with experience 5
+Treasure:     elixir sceptre talisman
+Available:    ability descend retire
+Party:        fighter cleric champion×5
+Dungeon:      chest
+DragonSlayer> champion chest
 
-(delve=1, depth=3, dungeon=(goblin=1, skeleton=1, potion=1), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), ability=True, treasure=())
-(Knight  0) ability
+Score 9:      depth 1 in delve 2 with experience 5
+Treasure:     elixir sceptre talisman×2
+Available:    ability descend retire
+Party:        fighter cleric champion×4
+DragonSlayer> descend
 
-(delve=1, depth=3, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
-(Knight  0) help
+Score 9:      depth 2 in delve 2 with experience 5
+Treasure:     elixir sceptre talisman×2
+Available:    ability retreat
+Party:        fighter cleric champion×4
+Dungeon:      goblin skeleton
+DragonSlayer> talisman goblin
 
-Feasible commands (help <command>):
-===================================
-champion   cleric   descend  fighter   mage   retire  thief
+Score 9:      depth 2 in delve 2 with experience 5
+Treasure:     elixir sceptre talisman×2
+Available:    ability retreat undo
+Party:        fighter champion×4
+Dungeon:      skeleton
+DragonSlayer> sceptre skeleton
 
+Score 8:      depth 2 in delve 2 with experience 5
+Treasure:     elixir talisman×2
+Available:    ability descend retire undo
+Party:        fighter champion×4
+DragonSlayer> elixir mage
 
-(delve=1, depth=3, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
-(Knight  0) descend
-
-(delve=1, depth=4, dungeon=(goblin=2, chest=2, dragon=2), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1), treasure=())
-(Knight  0) fighter goblin
-
-(delve=1, depth=4, dungeon=(chest=2, dragon=2), party=(cleric=1, mage=1, thief=1, champion=1), treasure=())
-(Knight  0) thief chest
-
-(delve=1, depth=4, dungeon=(dragon=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1, elixir=1))
-(Knight  2) descend
-
-(delve=1, depth=5, dungeon=(goblin=2, chest=1, potion=2, dragon=2), party=(cleric=1, mage=1, champion=1), treasure=(talisman=1, elixir=1))
-(Knight  2) champion goblin
-
-(delve=1, depth=5, dungeon=(chest=1, potion=2, dragon=2), party=(cleric=1, mage=1), treasure=(talisman=1, elixir=1))
-(Knight  2) mage potion champion thief
-
-(delve=1, depth=5, dungeon=(chest=1, dragon=2), party=(cleric=1, thief=1, champion=1), treasure=(talisman=1, elixir=1))
-(Knight  2) thief chest
-
-(delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
-(Knight  3) help retreat
-Retreat from the dungeon at any time (e.g. after being defeated).
-
-        Automatically starts a new delve or ends game, as suitable.
-
-(delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
-(Knight  3) retreat
-Why retreat when you could instead retire?
-
-(delve=1, depth=5, dungeon=(dragon=2), party=(cleric=1, champion=1), treasure=(talisman=1, sceptre=1, elixir=1))
-(Knight  3) retire
-
-(delve=2, experience=5, party=(fighter=1, cleric=1, champion=5), ability=True, treasure=(talisman=1, sceptre=1, elixir=1))
-(DragonSlayer  8) descend
-
-(delve=2, depth=1, experience=5, dungeon=(chest=1), party=(fighter=1, cleric=1, champion=5), ability=True, treasure=(talisman=1, sceptre=1, elixir=1))
-(DragonSlayer  8) champion chest
-
-(delve=2, depth=1, experience=5, dungeon=(), party=(fighter=1, cleric=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
-(DragonSlayer  9) descend
-
-(delve=2, depth=2, experience=5, dungeon=(goblin=1, skeleton=1), party=(fighter=1, cleric=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
-(DragonSlayer  9) talisman goblin
-
-(delve=2, depth=2, experience=5, dungeon=(skeleton=1), party=(fighter=1, champion=4), ability=True, treasure=(talisman=2, sceptre=1, elixir=1))
-(DragonSlayer  9) sceptre skeleton
-
-(delve=2, depth=2, experience=5, dungeon=(), party=(fighter=1, champion=4), ability=True, treasure=(talisman=2, elixir=1))
-(DragonSlayer  8) elixir mage
-
-(delve=2, depth=2, experience=5, dungeon=(), party=(fighter=1, mage=1, champion=4), ability=True, treasure=(talisman=2))
-(DragonSlayer  7) ^D
+Score 7:      depth 2 in delve 2 with experience 5
+Treasure:     talisman×2
+Available:    ability descend retire
+Party:        fighter mage champion×4
+DragonSlayer> ^D
 ```
 
 ## Without Installation
