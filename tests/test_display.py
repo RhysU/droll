@@ -101,10 +101,10 @@ class TestCompactSummary(unittest.TestCase):
         self.assertIn("delve 1 with experience 0", lines[0])
         self.assertIn("Treasure:", lines[1])
         self.assertIn("none", lines[1])
-        self.assertIn("Party:", lines[2])
-        self.assertIn("fighter×2", lines[2])
-        self.assertIn("Available:", lines[3])
-        self.assertIn("ability descend", lines[3])
+        self.assertIn("Available:", lines[2])
+        self.assertIn("ability descend", lines[2])
+        self.assertIn("Party:", lines[3])
+        self.assertIn("fighter×2", lines[3])
 
     def test_in_dungeon(self):
         world = struct.World(
@@ -123,8 +123,8 @@ class TestCompactSummary(unittest.TestCase):
         self.assertEqual(len(lines), 5)
         self.assertIn("depth 3 in delve 1 with experience 0", lines[0])
         self.assertIn("talisman", lines[1])
-        self.assertIn("fighter champion", lines[2])
-        self.assertIn("ability retreat", lines[3])
+        self.assertIn("ability retreat", lines[2])
+        self.assertIn("fighter champion", lines[3])
         self.assertIn("goblin skeleton×2 ooze×2", lines[4])
 
     def test_long_player_name_alignment(self):
@@ -179,6 +179,6 @@ class TestCompactSummary(unittest.TestCase):
         lines = result.split("\n")
         self.assertIn("depth 10 in delve 3 with experience 16", lines[0])
         self.assertIn("scale×4 sceptre talisman tools", lines[1])
-        self.assertIn("champion scroll×2", lines[2])
-        self.assertIn("retire", lines[3])
+        self.assertIn("retire", lines[2])
+        self.assertIn("champion scroll×2", lines[3])
         self.assertEqual(len(lines), 4)  # No Dungeon line
