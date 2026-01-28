@@ -19,7 +19,7 @@ class TestShell(unittest.TestCase):
 
     def test_EOF(self):
         """Confirm providing EOF exits cmdloop(...)."""
-        s = Shell(Game(), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(), display_mode=DisplayMode.MECHANICAL)
         assert not s.cmdqueue
         s.cmdqueue.append("EOF")
         s.cmdloop()
@@ -28,7 +28,7 @@ class TestShell(unittest.TestCase):
 
     def test_help(self):
         """Confirm help invocations do not throw exceptions."""
-        s = Shell(Game(), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(), display_mode=DisplayMode.MECHANICAL)
         s.help_ability()
         s.help_bait()
         s.help_champion()
@@ -147,7 +147,7 @@ class TestSimple(unittest.TestCase):
         (Default  5) EOF
         """
         # Drive the game according to the script in the above docstring.
-        s = Shell(Game(random=random.Random(4), player=Default), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(random=random.Random(4), player=Default), display_mode=DisplayMode.MECHANICAL)
         s.preloop()
         parsed = parse_summary_command(self.test_simple.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
@@ -161,7 +161,7 @@ class TestUndo(unittest.TestCase):
 
     def test_undo(self):
         """Based upon test_simple(...), verify undo behaving as expected."""
-        s = Shell(Game(random=random.Random(4), player=Default), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(random=random.Random(4), player=Default), display_mode=DisplayMode.MECHANICAL)
 
         # Supplies a private flag so that DrollErrors percolate to this level
         def onecmd(line):
@@ -221,7 +221,7 @@ class TestUndo(unittest.TestCase):
 
     def test_undo_in_available_commands(self):
         """Verify undo appears in available commands only when undo stack is not empty."""
-        s = Shell(Game(random=random.Random(42), player=Default), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(random=random.Random(42), player=Default), display_mode=DisplayMode.MECHANICAL)
         s.preloop()
 
         # Initially, undo stack is empty, so "undo" should not be available
@@ -375,7 +375,7 @@ class TestKnight(unittest.TestCase):
         (DragonSlayer 23) EOF
         """
         # Drive the game according to the script in the above docstring.
-        s = Shell(Game(random=random.Random(4), player=Knight), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(random=random.Random(4), player=Knight), display_mode=DisplayMode.MECHANICAL)
         s.preloop()
         parsed = parse_summary_command(self.test_knight.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
@@ -454,7 +454,7 @@ class TestSpellsword(unittest.TestCase):
         (Battlemage  8) EOF
         """
         # Drive the game according to the script in the above docstring.
-        s = Shell(Game(random=random.Random(17), player=Spellsword), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(random=random.Random(17), player=Spellsword), display_mode=DisplayMode.MECHANICAL)
         s.preloop()
         parsed = parse_summary_command(self.test_spellsword.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
@@ -605,7 +605,7 @@ class TestMinstrel(unittest.TestCase):
         (Bard 13) EOF
         """
         # Drive the game according to the script in the above docstring.
-        s = Shell(Game(random=random.Random(27), player=Minstrel), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(random=random.Random(27), player=Minstrel), display_mode=DisplayMode.MECHANICAL)
         s.preloop()
         parsed = parse_summary_command(self.test_minstrel.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
@@ -721,7 +721,7 @@ class TestCrusader(unittest.TestCase):
         (Paladin  9) EOF
         """
         # Drive the game according to the script in the above docstring.
-        s = Shell(Game(random=random.Random(35), player=Crusader), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(random=random.Random(35), player=Crusader), display_mode=DisplayMode.MECHANICAL)
         s.preloop()
         parsed = parse_summary_command(self.test_crusader.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
@@ -888,7 +888,7 @@ class TestEnchantress(unittest.TestCase):
         (Beguiler 14) EOF
         """
         # Drive the game according to the script in the above docstring.
-        s = Shell(Game(random=random.Random(12), player=Enchantress), display_mode=DisplayMode.LEGACY)
+        s = Shell(Game(random=random.Random(12), player=Enchantress), display_mode=DisplayMode.MECHANICAL)
         s.preloop()
         parsed = parse_summary_command(self.test_enchantress.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
