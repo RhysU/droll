@@ -86,10 +86,16 @@ def defeat_all_plus_additional(
             )
         return game
 
-    # Third, confirm at most one additional provided
-    if len(additional) != 1:
+    # Third, confirm exactly one additional provided
+    if len(additional) == 0:
         raise error.DrollError(
-            "One additional target okay but {} provided.".format(additional)
+            "Monsters remain so one additional target required."
+        )
+    if len(additional) > 1:
+        raise error.DrollError(
+            "Only one additional target allowed but {} provided.".format(
+                len(additional)
+            )
         )
 
     # Last, attempt to defeat the additional monster using the same hero
