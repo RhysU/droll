@@ -177,6 +177,22 @@ class TestComplete(unittest.TestCase):
         game = replace(game, treasure=replace(game.treasure, bait=1))
         assert ["bait"] == complete(game, ("bai",), "bai", 0)  # treasure
 
+    def test_complete0_excludes_noncommand_treasures(self):
+        """Non-command treasures (portal, ring, scale) excluded from position 0."""
+        game = self.game
+        # Add all three non-command treasures
+        game = replace(
+            game,
+            treasure=replace(game.treasure, portal=1, ring=1, scale=1),
+        )
+        # None of them should appear in completions
+        assert [] == complete(game, ("por",), "por", 0)
+        assert [] == complete(game, ("rin",), "rin", 0)
+        assert [] == complete(game, ("sca",), "sca", 0)
+        # But a command treasure like elixir should still work
+        game = replace(game, treasure=replace(game.treasure, elixir=1))
+        assert ["elixir"] == complete(game, ("eli",), "eli", 0)
+
     def test_complete1(self):
         """Complete available party and dungeon in the first position."""
         game = self.game
