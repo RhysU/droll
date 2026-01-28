@@ -24,7 +24,7 @@ def defeated_dungeon(dungeon: struct.Dungeon) -> bool:
     )
 
 
-def blocking_dragon(dungeon: struct.Dungeon) -> bool:
+def _blocking_dragon(dungeon: struct.Dungeon) -> bool:
     """Is a dragon blocking progress to the next level?"""
     return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
 
@@ -35,7 +35,7 @@ def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
     In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
     return (dungeon is None) or (
         (0 == sum(struct.field_values(dungeon)) - dungeon.dragon)
-        and not blocking_dragon(dungeon)
+        and not _blocking_dragon(dungeon)
     )
 
 
@@ -93,7 +93,7 @@ def next_dungeon(
 
     if not defeated_dungeon(world.dungeon):
         try:
-            world = apply_ring(world)
+            world = _apply_ring(world)
         except error.DrollError:
             raise error.DrollError(
                 "Dragon remains but a ring of" " invisibility is not in hand."
@@ -121,16 +121,16 @@ def retire(world: struct.World) -> struct.World:
 
     if not defeated_monsters(world.dungeon):
         try:
-            world = apply_portal(world)
+            world = _apply_portal(world)
         except error.DrollError:
             raise error.DrollError("Monsters remain but no portal in hand.")
-    elif blocking_dragon(world.dungeon):
+    elif _blocking_dragon(world.dungeon):
         # First attempt to use a ring then a portal (because portals are +2)
         try:
-            world = apply_ring(world)
+            world = _apply_ring(world)
         except error.DrollError:
             try:
-                world = apply_portal(world)
+                world = _apply_portal(world)
             except error.DrollError:
                 raise error.DrollError(
                     "Dragon remains but neither a ring of"
@@ -205,9 +205,9 @@ def replace_treasure(world: struct.World, item: str) -> struct.World:
     )
 
 
-def apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
+def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
-    if not blocking_dragon(world.dungeon):
+    if not _blocking_dragon(world.dungeon):
         raise error.DrollError(
             "A dragon must be present to use a {}".format(noun)
         )
@@ -215,7 +215,7 @@ def apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
 
 
-def apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
+def _apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):

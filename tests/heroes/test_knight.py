@@ -7,13 +7,13 @@ import random
 
 import droll.dice
 import droll.struct
-from droll.heroes.knight import Knight, DragonSlayer, knight_roll_party
+from droll.heroes.knight import Knight, DragonSlayer, _knight_roll_party
 
 
 def test_knight_roll_party_converts_scrolls():
     """Knight converts scrolls to champions when rolling party."""
     state = random.Random(4)
-    party = knight_roll_party(7, state.randrange)
+    party = _knight_roll_party(7, state.randrange)
     assert party.scroll == 0
     assert sum(droll.struct.field_values(party)) == 7
 

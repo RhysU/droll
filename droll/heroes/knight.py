@@ -11,7 +11,7 @@ from .. import struct
 from ..player import Default
 
 
-def knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
+def _knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
     """Roll a new Party, changing all Scrolls into Champions."""
     default = dice.roll_party(dice=count, randrange=randrange)
     return replace(
@@ -19,7 +19,7 @@ def knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
     )
 
 
-def knight_bait_dragon(*args, **kwargs):
+def _knight_bait_dragon(*args, **kwargs):
     """Convert all monster faces into dragon dice."""
     return action.consume_ability(
         action.bait_dragon(*args, _require_treasure=False, **kwargs)
@@ -38,9 +38,9 @@ _dragonslayer_defeat_dragon = functools.partial(
 DragonSlayer = replace(
     Default,
     name="DragonSlayer",
-    ability=knight_bait_dragon,
+    ability=_knight_bait_dragon,
     advance=(lambda _: DragonSlayer),
-    roll=replace(Default.roll, party=knight_roll_party),
+    roll=replace(Default.roll, party=_knight_roll_party),
     party=struct.update_party_dragon(
         Default.party, _dragonslayer_defeat_dragon
     ),
@@ -50,7 +50,7 @@ DragonSlayer = replace(
 Knight = replace(
     Default,
     name="Knight",
-    ability=knight_bait_dragon,
+    ability=_knight_bait_dragon,
     advance=(lambda world: Knight if world.experience < 5 else DragonSlayer),
-    roll=replace(Default.roll, party=knight_roll_party),
+    roll=replace(Default.roll, party=_knight_roll_party),
 )

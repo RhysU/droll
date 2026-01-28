@@ -105,9 +105,9 @@ def apply(
     Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
     # Convert any artifacts in the command into any corresponding hero types
-    noun = partify(noun, player.artifacts)
-    target = partify(target, player.artifacts)
-    additional = tuple(partify(i, player.artifacts) for i in additional)
+    noun = _partify(noun, player.artifacts)
+    target = _partify(target, player.artifacts)
+    additional = tuple(_partify(i, player.artifacts) for i in additional)
 
     # One-off handling of some treasures, with error wrapping to aid usability
     if noun == "portal":
@@ -184,7 +184,7 @@ def apply(
     return game
 
 
-def partify(token: str, artifacts: struct.Party):
+def _partify(token: str, artifacts: struct.Party):
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None

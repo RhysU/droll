@@ -8,7 +8,7 @@ import unittest
 
 import droll.error
 import droll.struct
-from droll.heroes.minstrel import Minstrel, Bard, minstrel_ability
+from droll.heroes.minstrel import Minstrel, Bard, _minstrel_ability
 import droll.action
 
 
@@ -27,7 +27,7 @@ class TestMinstrel(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = minstrel_ability(world, state.randrange, "ability")
+        result = _minstrel_ability(world, state.randrange, "ability")
         assert result.dungeon.dragon == 0
         assert result.dungeon.goblin == 1
         assert result.ability is False
@@ -46,7 +46,7 @@ class TestMinstrel(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         with self.assertRaises(droll.error.DrollError):
-            minstrel_ability(world, state.randrange, "ability", "goblin")
+            _minstrel_ability(world, state.randrange, "ability", "goblin")
 
     def test_minstrel_advances_to_bard(self):
         """Minstrel advances to Bard at 5+ experience."""

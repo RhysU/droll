@@ -12,41 +12,41 @@ class TestFormatItems(unittest.TestCase):
 
     def test_empty_party(self):
         party = struct.Party()
-        self.assertEqual(display.format_items(party), "none")
+        self.assertEqual(display._format_items(party), "none")
 
     def test_single_items(self):
         party = struct.Party(fighter=1, cleric=1, mage=1)
-        self.assertEqual(display.format_items(party), "fighter cleric mage")
+        self.assertEqual(display._format_items(party), "fighter cleric mage")
 
     def test_multiple_items(self):
         party = struct.Party(fighter=2, cleric=1, mage=3)
         self.assertEqual(
-            display.format_items(party), "fighter×2 cleric mage×3"
+            display._format_items(party), "fighter×2 cleric mage×3"
         )
 
     def test_dragon_always_shows_count(self):
         dungeon = struct.Dungeon(dragon=1)
-        self.assertEqual(display.format_items(dungeon), "dragon×1")
+        self.assertEqual(display._format_items(dungeon), "dragon×1")
 
     def test_dragon_multiple(self):
         dungeon = struct.Dungeon(goblin=1, dragon=2)
-        self.assertEqual(display.format_items(dungeon), "goblin dragon×2")
+        self.assertEqual(display._format_items(dungeon), "goblin dragon×2")
 
 
 class TestFormatTreasure(unittest.TestCase):
 
     def test_empty_treasure(self):
         treasure = struct.Treasure()
-        self.assertEqual(display.format_treasure(treasure), "none")
+        self.assertEqual(display._format_treasure(treasure), "none")
 
     def test_single_items_alphabetized(self):
         treasure = struct.Treasure(talisman=1, elixir=1)
-        self.assertEqual(display.format_treasure(treasure), "elixir talisman")
+        self.assertEqual(display._format_treasure(treasure), "elixir talisman")
 
     def test_multiple_items_alphabetized(self):
         treasure = struct.Treasure(scale=4, sceptre=1, talisman=1, tools=1)
         self.assertEqual(
-            display.format_treasure(treasure),
+            display._format_treasure(treasure),
             "scale×4 sceptre talisman tools",
         )
 
@@ -56,29 +56,29 @@ class TestFormatAvailable(unittest.TestCase):
     def test_alphabetized(self):
         available = ["retreat", "ability", "reroll"]
         self.assertEqual(
-            display.format_available(available), "ability reroll retreat"
+            display._format_available(available), "ability reroll retreat"
         )
 
     def test_empty(self):
-        self.assertEqual(display.format_available([]), "None")
+        self.assertEqual(display._format_available([]), "None")
 
 
 class TestFormatDungeon(unittest.TestCase):
 
     def test_none_dungeon(self):
-        self.assertIsNone(display.format_dungeon(None))
+        self.assertIsNone(display._format_dungeon(None))
 
     def test_empty_dungeon(self):
         dungeon = struct.Dungeon()
-        self.assertIsNone(display.format_dungeon(dungeon))
+        self.assertIsNone(display._format_dungeon(dungeon))
 
     def test_with_monsters(self):
         dungeon = struct.Dungeon(goblin=1, skeleton=2)
-        self.assertEqual(display.format_dungeon(dungeon), "goblin skeleton×2")
+        self.assertEqual(display._format_dungeon(dungeon), "goblin skeleton×2")
 
     def test_with_dragon(self):
         dungeon = struct.Dungeon(dragon=2)
-        self.assertEqual(display.format_dungeon(dungeon), "dragon×2")
+        self.assertEqual(display._format_dungeon(dungeon), "dragon×2")
 
 
 class TestCompactSummary(unittest.TestCase):

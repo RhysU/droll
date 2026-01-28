@@ -14,7 +14,7 @@ from .. import world
 from ..player import Default
 
 
-def crusader_ability(
+def _crusader_ability(
     game: struct.World,
     randrange: dice.RandRange,
     noun: str,
@@ -38,7 +38,7 @@ def crusader_ability(
     )
 
 
-def paladin_ability(
+def _paladin_ability(
     game: struct.World,
     randrange: dice.RandRange,
     noun: str,
@@ -100,7 +100,7 @@ _crusader_defeat_dragon = functools.partial(
 Paladin = replace(
     Default,
     name="Paladin",
-    ability=paladin_ability,
+    ability=_paladin_ability,
     advance=(lambda _: Paladin),
     party=replace(
         struct.update_party_dragon(Default.party, _crusader_defeat_dragon),
@@ -117,7 +117,7 @@ Paladin = replace(
 Crusader = replace(
     Default,
     name="Crusader",
-    ability=crusader_ability,
+    ability=_crusader_ability,
     advance=(lambda world: Crusader if world.experience < 5 else Paladin),
     party=Paladin.party,
 )

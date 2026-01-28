@@ -11,8 +11,8 @@ import droll.struct
 from droll.heroes.crusader import (
     Crusader,
     Paladin,
-    crusader_ability,
-    paladin_ability,
+    _crusader_ability,
+    _paladin_ability,
 )
 
 
@@ -31,7 +31,7 @@ class TestCrusader(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = crusader_ability(world, state.randrange, "ability", "fighter")
+        result = _crusader_ability(world, state.randrange, "ability", "fighter")
         assert result.party.fighter == 2
         assert result.ability is False
 
@@ -48,7 +48,7 @@ class TestCrusader(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = crusader_ability(world, state.randrange, "ability", "cleric")
+        result = _crusader_ability(world, state.randrange, "ability", "cleric")
         assert result.party.cleric == 2
 
     def test_crusader_ability_rejects_invalid_target(self):
@@ -65,7 +65,7 @@ class TestCrusader(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         with self.assertRaises(droll.error.DrollError):
-            crusader_ability(world, state.randrange, "ability", "mage")
+            _crusader_ability(world, state.randrange, "ability", "mage")
 
     def test_crusader_advances_to_paladin(self):
         """Crusader advances to Paladin at 5+ experience."""
@@ -105,7 +105,7 @@ class TestCrusader(unittest.TestCase):
             treasure=droll.struct.Treasure(elixir=1),
             reserve=droll.struct.Treasure(sword=1, talisman=1),
         )
-        result = paladin_ability(world, state.randrange, "ability", "elixir")
+        result = _paladin_ability(world, state.randrange, "ability", "elixir")
         assert sum(droll.struct.field_values(result.dungeon)) == 0
         assert result.treasure.elixir == 0
         assert result.ability is False
@@ -124,7 +124,7 @@ class TestCrusader(unittest.TestCase):
             reserve=droll.struct.Treasure(sword=1, talisman=1, sceptre=1),
         )
         pre_treasure = sum(droll.struct.field_values(world.treasure))
-        result = paladin_ability(world, state.randrange, "ability", "bait")
+        result = _paladin_ability(world, state.randrange, "ability", "bait")
         post_treasure = sum(droll.struct.field_values(result.treasure))
         assert (
             post_treasure == pre_treasure - 1 + 2
@@ -143,7 +143,7 @@ class TestCrusader(unittest.TestCase):
             treasure=droll.struct.Treasure(elixir=1),
             reserve=droll.struct.Treasure(),
         )
-        result = paladin_ability(
+        result = _paladin_ability(
             world, state.randrange, "ability", "elixir", "mage", "thief"
         )
         assert result.party.mage == 1
@@ -163,4 +163,4 @@ class TestCrusader(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         with self.assertRaises(droll.error.DrollError):
-            paladin_ability(world, state.randrange, "ability")
+            _paladin_ability(world, state.randrange, "ability")

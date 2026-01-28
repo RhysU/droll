@@ -13,7 +13,7 @@ from .. import struct
 from ..player import Default
 
 
-def spellsword_ability(
+def _spellsword_ability(
     game: struct.World,
     randrange: dice.RandRange,
     noun: str,
@@ -45,7 +45,7 @@ _spellsword_defeat_dragon = functools.partial(
 )
 
 
-def battlemage_ability(
+def _battlemage_ability(
     game: struct.World,
     randrange: dice.RandRange,
     noun: str,
@@ -63,7 +63,7 @@ def battlemage_ability(
 Battlemage = replace(
     Default,
     name="Battlemage",
-    ability=battlemage_ability,
+    ability=_battlemage_ability,
     advance=(lambda _: Battlemage),
     party=replace(
         struct.update_party_dragon(Default.party, _spellsword_defeat_dragon),
@@ -76,7 +76,7 @@ Battlemage = replace(
 Spellsword = replace(
     Default,
     name="Spellsword",
-    ability=spellsword_ability,
+    ability=_spellsword_ability,
     advance=(lambda world: Spellsword if world.experience < 5 else Battlemage),
     party=Battlemage.party,
 )
