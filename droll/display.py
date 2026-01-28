@@ -2,9 +2,17 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Compact display formatting for the experimental CLI mode."""
+import enum
 import typing
 
 from . import struct
+
+
+class DisplayMode(enum.Enum):
+    """Display mode for the droll CLI."""
+
+    CURRENT = "current"
+    LEGACY = "legacy"
 
 # Dragons always show count (tracking them is crucial to gameplay)
 _ALWAYS_COUNT = frozenset({"dragon"})
