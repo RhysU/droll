@@ -6,30 +6,29 @@ import typing
 
 from . import struct
 
+# Dragons always show count (tracking them is crucial to gameplay)
+_ALWAYS_COUNT = frozenset({"dragon"})
 
-def format_items(
-    instance: typing.Any,
-    always_count: typing.AbstractSet[str] = frozenset({"dragon"}),
-) -> str:
-    """Format dataclass fields as 'name' or 'name×N', sorted by field order."""
-    parts = []
-    for name, count in struct.field_items(instance):
-        if count == 1 and name not in always_count:
-            parts.append(name)
-        elif count > 1 or (count == 1 and name in always_count):
-            parts.append(f"{name}×{count}")
-    return " ".join(parts) if parts else "none"
+
+def _format_item(name: str, count: int) -> typing.Optional[str]:
+    """Format a single item, returning None if count is zero."""
+    if not count:
+        return None
+    if count > 1 or name in _ALWAYS_COUNT:
+        return f"{name}×{count}"
+    return name
+
+
+def format_items(instance: typing.Any) -> str:
+    """Format dataclass fields as 'name' or 'name×N', in field order."""
+    parts = [_format_item(n, c) for n, c in struct.field_items(instance)]
+    return " ".join(filter(None, parts)) or "none"
 
 
 def format_treasure(treasure: struct.Treasure) -> str:
     """Format treasure alphabetically."""
-    items = []
-    for name, count in sorted(struct.field_items(treasure)):
-        if count == 1:
-            items.append(name)
-        elif count > 1:
-            items.append(f"{name}×{count}")
-    return " ".join(items) if items else "none"
+    parts = [_format_item(n, c) for n, c in sorted(struct.field_items(treasure))]
+    return " ".join(filter(None, parts)) or "none"
 
 
 def format_available(available: typing.Sequence[str]) -> str:
@@ -39,9 +38,7 @@ def format_available(available: typing.Sequence[str]) -> str:
 
 def format_dungeon(dungeon: typing.Optional[struct.Dungeon]) -> typing.Optional[str]:
     """Format dungeon contents, returning None if empty."""
-    if dungeon is None:
-        return None
-    if sum(struct.field_values(dungeon)) == 0:
+    if dungeon is None or not any(struct.field_values(dungeon)):
         return None
     return format_items(dungeon)
 
