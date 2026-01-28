@@ -4,36 +4,38 @@ Droll
 
 ## What is it?
 
-Droll is an implementation of some of the game mechanics underneath [Dungeon
-Roll](https://boardgamegeek.com/boardgame/138788/dungeon-roll), a product
-of [Tasty Minstrel Games](http://playtmg.com/).  This code is in no way
-affiliated with either the game or the publisher.  Go buy their game,
-learn how to play it, and then come back here.
+Droll implements [Dungeon Roll](https://boardgamegeek.com/boardgame/138788/dungeon-roll),
+a product of [Tasty Minstrel Games](http://playtmg.com/).  Droll code is
+in no way affiliated with either the game or the publisher.  Go buy their
+excellent game, learn [how to play](https://www.youtube.com/watch?v=PzZ8hUzXBtE)
+it, and then come back here.
 
 ## What is implemented?
 
-Default player semantics (i.e. no special abilities).  Special semantics for
-the Crusader with advancement to Paladin after 5 experience points.  Also,
-Knight with advancement to DragonSlayer.  Likewise, Minstrel with advancement
-to Bard.  Ditto, Enchantress with advancement to Beguiler.  And, Spellsword
-with advancement to Battlemage.  Other characters remain to be done.  Known
-shortcomings are flagged with TODOs.  Tab-completion is present in the shell,
-which greatly speeds up playing.  Deterministic actions can be undone using
-the 'undo' command.
+A REPL providing the classic game, including tab completion to speed playing.
+All heroes are implement with the exception of:
+
+ - Half-Goblin advancing to Chieftain
+ - Occultist advancing to Necromancer
+
+Additionally, a "Default" hero with no special abilities is present.
 
 ## Why implement it?
 
-It seemed like a fun thing to hack on.  Also, I was curious how much code
-was required to capture a game that children will catch onto in the space
-of 20 minutes.
+In 2018, it seemed like a fun thing to hack on.  Also, I was curious how
+much code was required to capture a game that children will catch onto in
+the space of 20 minutes.  In 2026, this codebase has been a self-contained
+playspace for LLM-assisted coding.
 
-This game seems like a fun problem to throw into reinforcement learning
-algorithms as (a) the strategy isn't too complicated, (b) the score is
-very straightforward, and (c) there's probabilistic behavior in both the
+This game has always seemed like a neat problem to throw into reinforcement
+learning algorithms as (a) the strategy isn't too complicated, (b) the score
+is very straightforward, and (c) there's probabilistic behavior in both the
 basic die mechanics as well as the expected value of the treasure.  That
-said, I've not yet tried such a thing.
+said, I've not such things in either 2018 nor 2026.
 
 ## What does it look like?
+
+NOTE: There's an `--experimental` option providing a superior experience.
 
 ```
 $ droll --help
@@ -169,32 +171,29 @@ Why retreat when you could instead retire?
 (DragonSlayer  7) ^D
 ```
 
+## Without Installation
+
+Clone this repository then run via:
+
+```
+PYTHONPATH=. python3 -m droll --help
+```
+
 ## Installation
 
 Install the package in development mode with:
-
 ```
 pip install -e .
 ```
 
-Or install with development dependencies:
-
-```
-pip install -e ".[dev]"
-```
-
 ## Testing
 
-Run unit tests with pytest:
+When not installed, run unit tests with:
+```
+PYTHONPATH=. python -m pytest ./tests/
+```
 
+When installed, run unit tests with:
 ```
 python -m pytest
-```
-
-## Documentation
-
-Generate Sphinx documentation in `docs/_build` by running:
-
-```
-sphinx-build docs docs/_build
 ```
