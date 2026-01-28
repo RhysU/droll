@@ -60,7 +60,7 @@ class TestFormatAvailable(unittest.TestCase):
         )
 
     def test_empty(self):
-        self.assertEqual(display.format_available([]), "none")
+        self.assertEqual(display.format_available([]), "None")
 
 
 class TestFormatDungeon(unittest.TestCase):
@@ -184,7 +184,7 @@ class TestCompactSummary(unittest.TestCase):
         self.assertEqual(len(lines), 4)  # No Dungeon line
 
     def test_ending_state(self):
-        """After final delve, Available should show 'none'."""
+        """After final delve, Available should show 'None'."""
         world = struct.World(
             delve=3,
             experience=16,
@@ -197,5 +197,5 @@ class TestCompactSummary(unittest.TestCase):
         lines = result.split("\n")
         self.assertIn("delve 3 with experience 16", lines[0])
         self.assertIn("Available:", lines[2])
-        self.assertIn("none", lines[2])
+        self.assertIn("None", lines[2])
         self.assertEqual(len(lines), 4)  # No Dungeon line
