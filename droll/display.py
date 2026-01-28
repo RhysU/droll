@@ -21,13 +21,13 @@ def _format_item(name: str, count: int) -> typing.Optional[str]:
 
 def format_items(instance: typing.Any) -> str:
     """Format dataclass fields as 'name' or 'name×N', in field order."""
-    parts = [_format_item(n, c) for n, c in struct.field_items(instance)]
+    parts = (_format_item(n, c) for n, c in struct.field_items(instance))
     return " ".join(filter(None, parts)) or "none"
 
 
 def format_treasure(treasure: struct.Treasure) -> str:
     """Format treasure alphabetically."""
-    parts = [_format_item(n, c) for n, c in sorted(struct.field_items(treasure))]
+    parts = (_format_item(n, c) for n, c in sorted(struct.field_items(treasure)))
     return " ".join(filter(None, parts)) or "none"
 
 
