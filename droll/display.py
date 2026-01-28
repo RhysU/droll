@@ -27,28 +27,28 @@ def _format_item(name: str, count: int) -> typing.Optional[str]:
     return name
 
 
-def format_items(instance: typing.Any) -> str:
+def _format_items(instance: typing.Any) -> str:
     """Format dataclass fields as 'name' or 'name×N', in field order."""
     parts = (_format_item(n, c) for n, c in struct.field_items(instance))
     return " ".join(filter(None, parts)) or "none"
 
 
-def format_treasure(treasure: struct.Treasure) -> str:
+def _format_treasure(treasure: struct.Treasure) -> str:
     """Format treasure alphabetically."""
     parts = (_format_item(n, c) for n, c in sorted(struct.field_items(treasure)))
     return " ".join(filter(None, parts)) or "none"
 
 
-def format_available(available: typing.Sequence[str]) -> str:
+def _format_available(available: typing.Sequence[str]) -> str:
     """Format available commands alphabetically."""
     return " ".join(sorted(available)) or "None"
 
 
-def format_dungeon(dungeon: typing.Optional[struct.Dungeon]) -> typing.Optional[str]:
+def _format_dungeon(dungeon: typing.Optional[struct.Dungeon]) -> typing.Optional[str]:
     """Format dungeon contents, returning None if empty."""
     if dungeon is None or not any(struct.field_values(dungeon)):
         return None
-    return format_items(dungeon)
+    return _format_items(dungeon)
 
 
 def compact_summary(
@@ -69,10 +69,10 @@ def compact_summary(
         location = f"delve {w.delve} with experience {w.experience}"
 
     # Format each component
-    treasure_str = format_treasure(w.treasure)
-    party_str = format_items(w.party) if w.party else "none"
-    available_str = format_available(available)
-    dungeon_str = format_dungeon(w.dungeon)
+    treasure_str = _format_treasure(w.treasure)
+    party_str = _format_items(w.party) if w.party else "none"
+    available_str = _format_available(available)
+    dungeon_str = _format_dungeon(w.dungeon)
 
     # Build lines with aligned colons
     lines = [

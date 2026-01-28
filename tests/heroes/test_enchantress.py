@@ -11,8 +11,8 @@ import droll.struct
 from droll.heroes.enchantress import (
     Enchantress,
     Beguiler,
-    enchantress_ability,
-    beguiler_ability,
+    _enchantress_ability,
+    _beguiler_ability,
 )
 
 
@@ -31,7 +31,7 @@ class TestEnchantress(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = enchantress_ability(
+        result = _enchantress_ability(
             world, state.randrange, "ability", "goblin"
         )
         assert result.dungeon.goblin == 1
@@ -51,7 +51,7 @@ class TestEnchantress(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = beguiler_ability(
+        result = _beguiler_ability(
             world, state.randrange, "ability", "goblin", "skeleton"
         )
         assert result.dungeon.goblin == 1
@@ -72,7 +72,7 @@ class TestEnchantress(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         with self.assertRaises(droll.error.DrollError):
-            beguiler_ability(world, state.randrange, "ability", "goblin")
+            _beguiler_ability(world, state.randrange, "ability", "goblin")
 
     def test_enchantress_advances_to_beguiler(self):
         """Enchantress advances to Beguiler at 5+ experience."""

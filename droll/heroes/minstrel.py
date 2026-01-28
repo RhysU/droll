@@ -13,7 +13,7 @@ from .. import struct
 from ..player import Default
 
 
-def minstrel_ability(
+def _minstrel_ability(
     game: struct.World,
     randrange: dice.RandRange,
     noun: str,
@@ -48,7 +48,7 @@ _Minstrel_Party = replace(
 Bard = replace(
     Default,
     name="Bard",
-    ability=minstrel_ability,
+    ability=_minstrel_ability,
     advance=(lambda _: Bard),  # Cannot advance further
     party=replace(
         _Minstrel_Party,
@@ -66,7 +66,7 @@ Bard = replace(
 Minstrel = replace(
     Default,
     name="Minstrel",
-    ability=minstrel_ability,
+    ability=_minstrel_ability,
     advance=(lambda world: Minstrel if world.experience < 5 else Bard),
     party=_Minstrel_Party,
 )

@@ -14,7 +14,7 @@ from .. import world
 from ..player import Default
 
 
-def enchantress_ability(
+def _enchantress_ability(
     game: struct.World,
     randrange: dice.RandRange,
     noun: str,
@@ -27,7 +27,7 @@ def enchantress_ability(
     return action.consume_ability(replace(game, dungeon=dungeon))
 
 
-def beguiler_ability(
+def _beguiler_ability(
     game: struct.World,
     randrange: dice.RandRange,
     noun: str,
@@ -64,7 +64,7 @@ _beguiler_defeat_dragon = functools.partial(
 Beguiler = replace(
     Default,
     name="Beguiler",
-    ability=beguiler_ability,
+    ability=_beguiler_ability,
     advance=(lambda _: Beguiler),
     party=replace(
         Default.party,
@@ -84,7 +84,7 @@ Beguiler = replace(
 Enchantress = replace(
     Default,
     name="Enchantress",
-    ability=enchantress_ability,
+    ability=_enchantress_ability,
     advance=(lambda world: Enchantress if world.experience < 5 else Beguiler),
     party=Beguiler.party,
 )

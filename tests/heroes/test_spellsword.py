@@ -11,8 +11,8 @@ import droll.struct
 from droll.heroes.spellsword import (
     Spellsword,
     Battlemage,
-    spellsword_ability,
-    battlemage_ability,
+    _spellsword_ability,
+    _battlemage_ability,
 )
 
 
@@ -31,7 +31,7 @@ class TestSpellsword(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = spellsword_ability(
+        result = _spellsword_ability(
             world, state.randrange, "ability", "fighter"
         )
         assert result.party.fighter == 2
@@ -50,7 +50,7 @@ class TestSpellsword(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = spellsword_ability(world, state.randrange, "ability", "mage")
+        result = _spellsword_ability(world, state.randrange, "ability", "mage")
         assert result.party.mage == 2
 
     def test_spellsword_ability_rejects_invalid_target(self):
@@ -67,7 +67,7 @@ class TestSpellsword(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         with self.assertRaises(droll.error.DrollError):
-            spellsword_ability(world, state.randrange, "ability", "cleric")
+            _spellsword_ability(world, state.randrange, "ability", "cleric")
 
     def test_battlemage_ability_clears_dungeon(self):
         """Battlemage ability clears entire dungeon."""
@@ -84,7 +84,7 @@ class TestSpellsword(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = battlemage_ability(world, state.randrange, "ability")
+        result = _battlemage_ability(world, state.randrange, "ability")
         assert sum(droll.struct.field_values(result.dungeon)) == 0
         assert result.ability is False
 

@@ -97,7 +97,7 @@ class Shell(cmd.Cmd):
 
     def do_undo(self, line) -> GameState:
         """Undo prior commands.  Only permitted when nothing rolled/drawn."""
-        no_arguments(line)
+        _no_arguments(line)
         if self._undo:
             # Assertion confirms onecmd(...) processing matches expectations
             assert self._game.randhash() == self._undo[-1].randhash()
@@ -120,29 +120,29 @@ class Shell(cmd.Cmd):
 
     @functools.wraps(Game.ability)
     def do_ability(self, line) -> GameState:
-        return self._game.ability(*parse(line))
+        return self._game.ability(*_parse(line))
 
     @functools.wraps(Game.apply)
     def default(self, line) -> GameState:
-        return self._game.apply(*parse(line))
+        return self._game.apply(*_parse(line))
 
     @functools.wraps(Game.descend)
     def do_descend(self, line) -> GameState:
-        no_arguments(line)
+        _no_arguments(line)
         return self._game.descend()
 
     @functools.wraps(Game.reroll)
     def do_reroll(self, line) -> GameState:
-        return self._game.reroll(*parse(line))
+        return self._game.reroll(*_parse(line))
 
     @functools.wraps(Game.retire)
     def do_retire(self, line) -> GameState:
-        no_arguments(line)
+        _no_arguments(line)
         return self._game.retire()
 
     @functools.wraps(Game.retreat)
     def do_retreat(self, line) -> GameState:
-        no_arguments(line)
+        _no_arguments(line)
         return self._game.retreat()
 
     #######################
@@ -152,7 +152,7 @@ class Shell(cmd.Cmd):
     def completedefault(self, text, line, begidx, endidx):
         # Break line into tokens until and starting from present text
         names = self._game.completenames(
-            text=text, head=parse(line[:begidx]), tail=parse(line[begidx:])
+            text=text, head=_parse(line[:begidx]), tail=_parse(line[begidx:])
         )
         if self._undo and "undo".startswith(text):
             names.append("undo")
@@ -254,12 +254,12 @@ class Shell(cmd.Cmd):
         print("""Tools behave identically to a thief.""")
 
 
-def parse(line: str) -> typing.Tuple[str]:
+def _parse(line: str) -> typing.Tuple[str]:
     """Split a line into a tuple of whitespace-delimited tokens."""
     return tuple(line.split())
 
 
-def no_arguments(line):
+def _no_arguments(line):
     """Raise DrollError if line is non-empty."""
     if line:
         raise DrollError("Command accepts no arguments.")

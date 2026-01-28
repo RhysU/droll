@@ -137,7 +137,7 @@ class Game:
             possible.append("ability")
         try:
             world.next_dungeon(
-                self._world, self._player.roll.dungeon, dummy_randrange
+                self._world, self._player.roll.dungeon, _dummy_randrange
             )
             possible.append("descend")
         except error.DrollError:
@@ -170,6 +170,6 @@ class Game:
         )
 
 
-def dummy_randrange(start, stop=None):
+def _dummy_randrange(start, stop=None):
     """Non-random pseudorandom generator so that completion is stateless."""
     return start
