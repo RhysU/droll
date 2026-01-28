@@ -63,6 +63,8 @@ class Shell(cmd.Cmd):
                 cmd_name = name[3:]
                 if cmd_name in ("ability", "descend", "retire", "retreat", "reroll"):
                     commands.add(cmd_name)
+        if self._undo:
+            commands.add("undo")
         return list(commands)
 
     def onecmd(self, line, *, _raises=False) -> GameState:
