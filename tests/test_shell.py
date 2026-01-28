@@ -218,6 +218,29 @@ class TestUndo(unittest.TestCase):
         onecmd("scroll potion thief")
         onecmd("descend")
 
+    def test_undo_in_available_commands(self):
+        """Verify undo appears in available commands only when undo stack is not empty."""
+        s = Shell(Game(random=random.Random(42), player=Default))
+        s.preloop()
+
+        # Initially, undo stack is empty, so "undo" should not be available
+        available = s._available_commands()
+        self.assertNotIn("undo", available)
+
+        # Execute a command that can be undone (ability doesn't change random state)
+        s.onecmd("ability")
+
+        # Now undo stack has one item, so "undo" should be available
+        available = s._available_commands()
+        self.assertIn("undo", available)
+
+        # Execute undo to restore previous state
+        s.onecmd("undo")
+
+        # Undo stack is empty again, so "undo" should not be available
+        available = s._available_commands()
+        self.assertNotIn("undo", available)
+
 
 class TestKnight(unittest.TestCase):
 
