@@ -8,6 +8,7 @@ import random
 import sys
 
 from .shell import Game
+from .display import DisplayMode
 from .heroes import Crusader, Enchantress, Knight, Minstrel, Spellsword
 from .player import Default
 from .shell import Shell
@@ -40,9 +41,9 @@ def main(args=None) -> None:
         help="An integer to seed random number generation.",
     )
     parser.add_argument(
-        "--experimental",
+        "--legacy",
         action="store_true",
-        help="Use experimental compact display format.",
+        help="Use legacy verbose display format.",
     )
     arguments = parser.parse_args(args)
     randseed = arguments.seed if arguments.seed else ()
@@ -50,7 +51,8 @@ def main(args=None) -> None:
         player=AVAILABLE_HEROES.get(arguments.hero),
         random=random.Random(*randseed),
     )
-    s = Shell(g, experimental=arguments.experimental)
+    display_mode = DisplayMode.LEGACY if arguments.legacy else DisplayMode.CURRENT
+    s = Shell(g, display_mode=display_mode)
     return s.cmdloop()
 
 

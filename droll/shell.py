@@ -10,6 +10,7 @@ import typing
 
 from . import action
 from . import display
+from .display import DisplayMode
 from .error import DrollError
 from .game import Game, GameState
 
@@ -17,12 +18,12 @@ from .game import Game, GameState
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
 
-    def __init__(self, game: Game, *, experimental: bool = False) -> None:
+    def __init__(self, game: Game, *, display_mode: DisplayMode) -> None:
         super(Shell, self).__init__()
         assert game is not None
         self._game = game
         self._undo = None
-        self._experimental = experimental
+        self._display_mode = display_mode
 
     def preloop(self) -> None:
         """Prepare a new game and start the first delve."""
@@ -32,7 +33,7 @@ class Shell(cmd.Cmd):
 
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
-        if self._experimental:
+        if self._display_mode == DisplayMode.CURRENT:
             self.prompt = self._game._player.name + "> "
             print()
             if line != "EOF":
