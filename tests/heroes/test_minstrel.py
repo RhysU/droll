@@ -15,7 +15,7 @@ import droll.action
 class TestMinstrel(unittest.TestCase):
 
     def test_minstrel_ability_discards_dragons(self):
-        """Minstrel ability discards all dragon dice."""
+        """Minstrel/Bard ability discards all dragon dice."""
         state = random.Random(4)
         world = droll.struct.World(
             delve=1,
@@ -33,7 +33,7 @@ class TestMinstrel(unittest.TestCase):
         assert result.ability is False
 
     def test_minstrel_ability_rejects_non_dragon(self):
-        """Minstrel ability only works on dragons."""
+        """Minstrel/Bard ability only works on dragons."""
         state = random.Random(4)
         world = droll.struct.World(
             delve=1,

@@ -19,7 +19,7 @@ def minstrel_ability(
     noun: str,
     target: typing.Optional[str] = None,
 ) -> struct.World:
-    """Minstrel may discard all dragon dice."""
+    """May discard all dragon dice."""
     target = "dragon" if target is None else target
     if target != "dragon":
         raise error.DrollError("Can only discard {} dice".format(target))
