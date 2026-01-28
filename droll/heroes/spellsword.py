@@ -31,7 +31,7 @@ def spellsword_ability(
             "Target {} not one of {}".format(target, _acceptable_targets)
         )
     return action.consume_ability(
-        replace(game, party=action._increment_hero(game.party, target))
+        replace(game, party=action.increment_hero(game.party, target))
     )
 
 

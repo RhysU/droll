@@ -22,8 +22,8 @@ def enchantress_ability(
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion."""
     dungeon = game.dungeon
-    dungeon = action._decrement_target(dungeon, target)
-    dungeon = action._increment_target(dungeon, "potion")
+    dungeon = action.decrement_target(dungeon, target)
+    dungeon = action.increment_target(dungeon, "potion")
     return action.consume_ability(replace(game, dungeon=dungeon))
 
 
@@ -38,17 +38,17 @@ def beguiler_ability(
 
     Requires transforming 2 monsters when 2+ monsters available."""
     dungeon = game.dungeon
-    dungeon = action._decrement_target(dungeon, target)
+    dungeon = action.decrement_target(dungeon, target)
     if len(extra_targets) > 1:
         raise error.DrollError("At most 2 targets can be transformed.")
     elif len(extra_targets) == 1:
-        dungeon = action._decrement_target(dungeon, extra_targets[0])
+        dungeon = action.decrement_target(dungeon, extra_targets[0])
     elif not world.defeated_monsters(dungeon):
         assert len(extra_targets) == 0
         raise error.DrollError("Require 2 targets when 2+ available.")
     else:
         pass
-    dungeon = action._increment_target(dungeon, "potion")
+    dungeon = action.increment_target(dungeon, "potion")
     return action.consume_ability(replace(game, dungeon=dungeon))
 
 

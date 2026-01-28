@@ -34,7 +34,7 @@ def crusader_ability(
             "Target {} not one of {}".format(target, _acceptable_targets)
         )
     return action.consume_ability(
-        replace(game, party=action._increment_hero(game.party, target))
+        replace(game, party=action.increment_hero(game.party, target))
     )
 
 
@@ -78,7 +78,7 @@ def paladin_ability(
         # Revive heroes for each potion
         party = game.party
         for revived in revivable:
-            party = action._increment_hero(party, revived)
+            party = action.increment_hero(party, revived)
         game = replace(game, party=party)
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
