@@ -133,3 +133,24 @@ class TestMinstrel(unittest.TestCase):
                 "skeleton",
                 "skeleton",
             )
+
+    def test_bard_champion_requires_additional_when_monsters_remain(self):
+        """Bard's champion requires additional target when monsters remain."""
+        state = random.Random(4)
+        world = droll.struct.World(
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
+            dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
+            party=droll.struct.Party(champion=1),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            droll.action.defeat_all_plus_additional(
+                world,
+                state.randrange,
+                "champion",
+                "goblin",
+            )
