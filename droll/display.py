@@ -12,7 +12,7 @@ class DisplayMode(enum.Enum):
     """Display mode for the droll CLI."""
 
     CURRENT = "current"
-    LEGACY = "legacy"
+    MECHANICAL = "mechanical"
 
 # Dragons always show count (tracking them is crucial to gameplay)
 _ALWAYS_COUNT = frozenset({"dragon"})
