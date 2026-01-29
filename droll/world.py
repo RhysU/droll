@@ -53,7 +53,7 @@ def new_world() -> struct.World:
     )
 
 
-def next_delve(
+def delve(
     world: struct.World,
     roll_party: dice.RollParty,
     randrange: dice.RandRange,
@@ -75,7 +75,7 @@ def next_delve(
     )
 
 
-def next_dungeon(
+def descend(
     world: struct.World,
     roll_dungeon: dice.RollDungeon,
     randrange: dice.RandRange,
