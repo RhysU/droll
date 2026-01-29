@@ -10,6 +10,22 @@ from . import error
 from . import struct
 
 
+TREASURE_INITIAL = struct.Treasure()
+
+RESERVE_INITIAL = struct.Treasure(
+    sword=3,
+    talisman=3,
+    sceptre=3,
+    tools=3,
+    scroll=3,
+    elixir=3,
+    bait=4,
+    portal=4,
+    ring=4,
+    scale=6,
+)
+
+
 def defeated_monsters(dungeon: struct.Dungeon) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""
     return (dungeon is None) or 0 == (
@@ -48,8 +64,8 @@ def new_world() -> struct.World:
         ability=None,
         dungeon=None,
         party=None,
-        treasure=struct.TREASURE_INITIAL,
-        reserve=struct.RESERVE_INITIAL,
+        treasure=TREASURE_INITIAL,
+        reserve=RESERVE_INITIAL,
     )
 
 

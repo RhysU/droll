@@ -78,22 +78,6 @@ class Treasure:
     scale: int = 0
 
 
-TREASURE_INITIAL = Treasure()
-
-RESERVE_INITIAL = Treasure(
-    sword=3,
-    talisman=3,
-    sceptre=3,
-    tools=3,
-    scroll=3,
-    elixir=3,
-    bait=4,
-    portal=4,
-    ring=4,
-    scale=6,
-)
-
-
 @dataclasses.dataclass(frozen=True)
 class World:
     delve: int = 0
