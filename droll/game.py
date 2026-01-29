@@ -61,7 +61,7 @@ class Game:
         """Either start next delve or complete this game."""
         try:
             # Record any world updates
-            self._world = world.next_delve(
+            self._world = world.delve(
                 self._world, self._player.roll.party, self._random.randrange
             )
             # Permit the player to advance to higher abilities
@@ -98,7 +98,7 @@ class Game:
 
     def descend(self) -> GameState:
         """Descend to the next depth (in contrast to retiring/retreating)."""
-        self._world = world.next_dungeon(
+        self._world = world.descend(
             self._world, self._player.roll.dungeon, self._random.randrange
         )
         return GameState.PLAY
@@ -136,7 +136,7 @@ class Game:
         if self._world.ability:
             possible.append("ability")
         try:
-            world.next_dungeon(
+            world.descend(
                 self._world, self._player.roll.dungeon, _dummy_randrange
             )
             possible.append("descend")

@@ -28,7 +28,7 @@ class TestWorld(unittest.TestCase):
 
     def test_delve_initial(self):
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
         assert 0 == game.depth
@@ -37,10 +37,10 @@ class TestWorld(unittest.TestCase):
 
     def test_dungeon_initial(self):
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
-        game = droll.world.next_dungeon(
+        game = droll.world.descend(
             game, droll.dice.roll_dungeon, self.state.randrange
         )
         assert 1 == game.depth
@@ -71,7 +71,7 @@ class TestWorld(unittest.TestCase):
 
     def test_retire_simple(self):
         pre = droll.world.new_world()
-        pre = droll.world.next_delve(
+        pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
         )
         pre = replace(
@@ -87,7 +87,7 @@ class TestWorld(unittest.TestCase):
 
     def test_retire_monsters(self):
         pre = droll.world.new_world()
-        pre = droll.world.next_delve(
+        pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
         )
         pre = replace(
@@ -116,7 +116,7 @@ class TestWorld(unittest.TestCase):
 
     def test_retire_dragon(self):
         pre = droll.world.new_world()
-        pre = droll.world.next_delve(
+        pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
         )
         pre = replace(
@@ -153,9 +153,9 @@ class TestWorld(unittest.TestCase):
         assert post3.treasure.ring == 0
         assert post3.treasure.portal == 1
 
-    def test_next_dungeon_simple(self):
+    def test_descend_simple(self):
         pre = droll.world.new_world()
-        pre = droll.world.next_delve(
+        pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
         )
         pre = replace(
@@ -165,14 +165,14 @@ class TestWorld(unittest.TestCase):
                 goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=0
             ),
         )
-        post = droll.world.next_dungeon(
+        post = droll.world.descend(
             pre, droll.dice.roll_dungeon, self.state.randrange
         )
         assert post.depth == pre.depth + 1
 
-    def test_next_dungeon_monsters(self):
+    def test_descend_monsters(self):
         pre = droll.world.new_world()
-        pre = droll.world.next_delve(
+        pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
         )
         pre = replace(
@@ -186,27 +186,27 @@ class TestWorld(unittest.TestCase):
 
         # Neither town portal nor ring of invisibility
         with self.assertRaises(droll.error.DrollError):
-            droll.world.next_dungeon(
+            droll.world.descend(
                 pre, droll.dice.roll_dungeon, self.state.randrange
             )
 
         # Ring of invisibility
         pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=0))
         with self.assertRaises(droll.error.DrollError):
-            droll.world.next_dungeon(
+            droll.world.descend(
                 pre, droll.dice.roll_dungeon, self.state.randrange
             )
 
         # Town portal
         pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=0))
         with self.assertRaises(droll.error.DrollError):
-            droll.world.next_dungeon(
+            droll.world.descend(
                 pre, droll.dice.roll_dungeon, self.state.randrange
             )
 
-    def test_next_dungeon_dragon(self):
+    def test_descend_dragon(self):
         pre = droll.world.new_world()
-        pre = droll.world.next_delve(
+        pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
         )
         pre = replace(
@@ -220,13 +220,13 @@ class TestWorld(unittest.TestCase):
 
         # Neither town portal nor ring of invisibility
         with self.assertRaises(droll.error.DrollError):
-            droll.world.next_dungeon(
+            droll.world.descend(
                 pre, droll.dice.roll_dungeon, self.state.randrange
             )
 
         # Ring of invisibility
         pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=0))
-        post1 = droll.world.next_dungeon(
+        post1 = droll.world.descend(
             pre, droll.dice.roll_dungeon, self.state.randrange
         )
         assert post1.depth == pre.depth + 1
@@ -236,13 +236,13 @@ class TestWorld(unittest.TestCase):
         # Town portal
         pre = replace(pre, treasure=replace(pre.treasure, ring=0, portal=1))
         with self.assertRaises(droll.error.DrollError):
-            droll.world.next_dungeon(
+            droll.world.descend(
                 pre, droll.dice.roll_dungeon, self.state.randrange
             )
 
         # Both should consume the ring of invisibility
         pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=1))
-        post3 = droll.world.next_dungeon(
+        post3 = droll.world.descend(
             pre, droll.dice.roll_dungeon, self.state.randrange
         )
         assert post3.depth == pre.depth + 1
@@ -279,7 +279,7 @@ class TestWorld(unittest.TestCase):
     def test_retreat_valid(self):
         """Test valid retreat scenarios."""
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
         game = replace(game, depth=2, dungeon=droll.struct.Dungeon(goblin=1))
@@ -290,7 +290,7 @@ class TestWorld(unittest.TestCase):
     def test_retreat_at_depth_one_with_monster(self):
         """Test retreat succeeds at depth 1 when a monster is present"""
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
         game = replace(game, depth=1, dungeon=droll.struct.Dungeon(goblin=1))
@@ -301,7 +301,7 @@ class TestWorld(unittest.TestCase):
     def test_retreat_at_depth_one_without_monster(self):
         """Test retreat fails at depth 1 when no monster is present"""
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
         game = replace(game, depth=1)
@@ -311,7 +311,7 @@ class TestWorld(unittest.TestCase):
     def test_retreat_without_descending(self):
         """Test retreat fails if not yet descended."""
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
         assert game.depth == 0
@@ -322,7 +322,7 @@ class TestWorld(unittest.TestCase):
     def test_retreat_when_could_retire(self):
         """Test retreat fails when dungeon is defeated (should retire instead)."""
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
         game = replace(game, depth=2, dungeon=droll.struct.Dungeon())
@@ -333,23 +333,23 @@ class TestWorld(unittest.TestCase):
     def test_max_dungeon_depth(self):
         """Test maximum dungeon depth limit is enforced."""
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
         game = replace(game, depth=10, dungeon=droll.struct.Dungeon())
 
         with self.assertRaises(droll.error.DrollError):
-            droll.world.next_dungeon(
+            droll.world.descend(
                 game, droll.dice.roll_dungeon, self.state.randrange
             )
 
     def test_dungeon_dice_count(self):
         """Test that dungeon rolls use exactly 7 dice (minus dragons)."""
         game = droll.world.new_world()
-        game = droll.world.next_delve(
+        game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
-        game = droll.world.next_dungeon(
+        game = droll.world.descend(
             game, droll.dice.roll_dungeon, self.state.randrange
         )
         # First dungeon at depth 1 should have exactly 1 die (min of depth and 7)
@@ -357,7 +357,7 @@ class TestWorld(unittest.TestCase):
 
         # At depth 7+, should have 7 dice
         game2 = replace(game, depth=6, dungeon=droll.struct.Dungeon())
-        game2 = droll.world.next_dungeon(
+        game2 = droll.world.descend(
             game2, droll.dice.roll_dungeon, self.state.randrange
         )
         assert sum(droll.struct.field_values(game2.dungeon)) == 7
