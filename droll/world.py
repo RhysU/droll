@@ -86,6 +86,12 @@ def delve(
     )
 
 
+def _regroup(world: struct.World) -> struct.World:
+    """The regroup phase occurs when descending, retiring, or retreating."""
+    # TODO Possibly discard dice as dictated by, e.g., Half-Goblin ability
+    return world
+
+
 def descend(
     world: struct.World,
     roll_dungeon: dice.RollDungeon,
@@ -110,7 +116,10 @@ def descend(
                 "Dragon remains but a ring of" " invisibility is not in hand."
             )
 
-    # Success above, so update the world in anticipation of the next dungeon
+    # Success above, so regroup just prior to descending
+    world = _regroup(world)
+
+    # Update the world in anticipation of the next dungeon
     next_depth = (world.depth if world.depth else 0) + 1
     if next_depth > _max_depth:
         raise error.DrollError("The maximum depth is {}".format(_max_depth))
@@ -148,8 +157,12 @@ def retire(world: struct.World) -> struct.World:
                     " invisibility nor a portal in hand."
                 )
 
-    # Success above, so update the world in anticipation of the next delve
-    # Upgrading a hero's ability after 5 experience points is done elsewhere.
+    # Regroup just prior to retiring
+    world = _regroup(world)
+
+    # Update the world in anticipation of the next delve
+    # (Upgrading a hero's ability after 5 experience points is done elsewhere
+    # because it requires struct.Player information not available in World)
     return replace(
         world, depth=0, experience=world.experience + world.depth, dungeon=None
     )
@@ -161,6 +174,9 @@ def retreat(world: struct.World) -> struct.World:
         raise error.DrollError("Descend at least once prior to retreating.")
     if defeated_dungeon(world.dungeon):
         raise error.DrollError("Why retreat when you could instead retire?")
+
+    # Regroup just prior to retreating
+    world = _regroup(world)
 
     return replace(world, depth=0, dungeon=None)
 
