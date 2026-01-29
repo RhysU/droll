@@ -86,8 +86,8 @@ class World:
     dungeon: typing.Optional[Dungeon] = None
     party: typing.Optional[Party] = None
     ability: typing.Optional[bool] = None
-    treasure: Treasure = dataclasses.field(default_factory=Treasure)
-    reserve: Treasure = dataclasses.field(default_factory=Treasure)
+    treasure: Treasure = Treasure()
+    reserve: Treasure = Treasure()
 
 
 def update_party_dragon(party: Party, dragon_func) -> Party:
