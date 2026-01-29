@@ -153,7 +153,7 @@ class TestWorld(unittest.TestCase):
         assert post3.treasure.ring == 0
         assert post3.treasure.portal == 1
 
-    def test_next_dungeon_simple(self):
+    def test_descend_simple(self):
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
@@ -170,7 +170,7 @@ class TestWorld(unittest.TestCase):
         )
         assert post.depth == pre.depth + 1
 
-    def test_next_dungeon_monsters(self):
+    def test_descend_monsters(self):
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
@@ -204,7 +204,7 @@ class TestWorld(unittest.TestCase):
                 pre, droll.dice.roll_dungeon, self.state.randrange
             )
 
-    def test_next_dungeon_dragon(self):
+    def test_descend_dragon(self):
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
