@@ -13,7 +13,7 @@ it, and then come back here.
 ## What is implemented?
 
 A REPL providing the classic game, including tab completion to speed playing.
-All heroes are implement with the exception of:
+All heroes are implemented with the exception of:
 
  - Half-Goblin advancing to Chieftain
  - Occultist advancing to Necromancer
