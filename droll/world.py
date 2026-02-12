@@ -45,9 +45,10 @@ def new_world() -> struct.World:
         delve=0,
         depth=None,
         experience=0,
-        ability=None,
         dungeon=None,
         party=None,
+        ability=None,
+        regroup=struct.Regroup(),
         treasure=struct.Treasure(),
         reserve=struct.Treasure(
             sword=3,

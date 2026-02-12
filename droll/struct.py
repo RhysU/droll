@@ -78,6 +78,12 @@ class Treasure:
     scale: int = 0
 
 
+# Bookkeeping for operations performed during the regroup phase
+@dataclasses.dataclass(frozen=True)
+class Regroup:
+    discard: Party = Party()  # Discard N party dice in regroup phase
+
+
 @dataclasses.dataclass(frozen=True)
 class World:
     delve: int = 0
@@ -86,6 +92,7 @@ class World:
     dungeon: typing.Optional[Dungeon] = None
     party: typing.Optional[Party] = None
     ability: typing.Optional[bool] = None
+    regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
     reserve: Treasure = Treasure()
 
