@@ -82,6 +82,7 @@ def delve(
         delve=(world.delve if world.delve else 0) + 1,
         depth=0,
         ability=True,
+        regroup=struct.Regroup(),
         dungeon=None,
         party=roll_party(_party_dice, randrange),
     )
@@ -89,8 +90,17 @@ def delve(
 
 def _regroup(world: struct.World) -> struct.World:
     """The regroup phase occurs when descending, retiring, or retreating."""
-    # TODO Possibly discard dice as dictated by, e.g., Half-Goblin ability
-    return world
+    # Possibly discard dice as dictated by, e.g., Half-Goblin ability
+    # Suppose the player must use, say, 2 fighter dice or lose during regroup
+    # Then, we decrement the fighters in the party by the discard count
+    # where decrementing never takes the allotted result below 0 fighters
+    party = struct.Party(
+        **{
+            name: max(0, getattr(world.party, name, 0) - count)
+            for name, count in struct.field_items(world.regroup.discard)
+        }
+    )
+    return replace(world, party=party, regroup=struct.Regroup())
 
 
 def descend(
