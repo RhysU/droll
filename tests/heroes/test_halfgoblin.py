@@ -105,3 +105,29 @@ class TestHalfGoblin(unittest.TestCase):
         )
         assert HalfGoblin.advance(low_xp) == HalfGoblin
         assert HalfGoblin.advance(high_xp) == Chieftain
+
+    def test_halfgoblin_fighter_chests_potions(self):
+        """HalfGoblin opens chests and quaff portions when monsters present."""
+        randrange = random.Random(4).randrange
+        world = droll.struct.World(
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=True,
+            dungeon=droll.struct.Dungeon(goblin=1, chest=1, potion=1),
+            party=droll.struct.Party(fighter=5),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(scale=1),
+        )
+
+        result1 = HalfGoblin.party.fighter.chest(world, randrange, "fighter", "chest")
+        assert result1.dungeon.chest == 0
+        assert result1.dungeon.goblin == 1
+        assert result1.party.fighter == 4
+        assert result1.treasure.scale == 1
+
+        result2 = HalfGoblin.party.fighter.potion(world, randrange, "fighter", "potion", "mage")
+        assert result2.dungeon.goblin == 1
+        assert result2.dungeon.potion == 0
+        assert result2.party.fighter == 4
+        assert result2.party.mage == 1

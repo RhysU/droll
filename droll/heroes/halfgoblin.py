@@ -77,7 +77,7 @@ def _chieftain_ability(
     return action.consume_ability(game)
 
 
-# You may open chests and quaff potions at any time during monster phase
+# You may open chests and quaff potions at any time during the monster phase
 _halfgoblin_open_one = functools.partial(
     action.open_one,
     _after_monsters=False,
