@@ -249,6 +249,59 @@ class TestWorld(unittest.TestCase):
         assert post3.treasure.ring == 0
         assert post3.treasure.portal == 1
 
+    def test_regroup_discard(self):
+        """Temporary party dice must be discarded during next regroup phase."""
+        # Largely the same test case for descending, retiring, and retreating
+        pre1 = droll.world.new_world()
+        pre1 = droll.world.delve(
+            pre1, droll.dice.roll_party, self.state.randrange
+        )
+        pre1 = replace(
+            pre1,
+            depth=3,
+            party=droll.struct.Party(
+                fighter=5, cleric=4, mage=3, thief=2, champion=1, scroll=0
+            ),
+            regroup=droll.struct.Regroup(
+                discard=droll.struct.Party(
+                    fighter=0, cleric=5, mage=3, thief=1, champion=0, scroll=0
+                )
+            )
+        )
+
+        # First, confirm descending works as expected
+        descended = droll.world.descend(
+            pre1, droll.dice.roll_dungeon, self.state.randrange
+        )
+        assert descended.party == droll.struct.Party(
+            fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
+        )
+        assert descended.regroup.discard == droll.struct.Party(
+            fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
+        )
+
+        # Second, confirm retiring works as expected
+        retired = droll.world.retire(pre1)
+        assert retired.party == droll.struct.Party(
+            fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
+        )
+        assert retired.regroup.discard == droll.struct.Party(
+            fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
+        )
+
+        # Third, confirm retreating works as expected
+        pre2 = replace(
+            pre1,
+            dungeon=droll.struct.Dungeon(goblin=1)  # Threat required!
+        )
+        retreated = droll.world.retreat(pre2)
+        assert retreated.party == droll.struct.Party(
+            fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
+        )
+        assert retreated.regroup.discard == droll.struct.Party(
+            fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
+        )
+
     def test_exhausted_dungeon(self):
         """Test exhausted_dungeon detects when no actions remain."""
         # None dungeon is exhausted
