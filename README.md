@@ -264,10 +264,10 @@ pip install -e .
 
 When not installed, run unit tests with:
 ```
-PYTHONPATH=. python -m pytest ./tests/
+PYTHONPATH=. python -m unittest discover -s tests
 ```
 
 When installed, run unit tests with:
 ```
-python -m pytest
+python -m unittest discover -s tests
 ```
