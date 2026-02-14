@@ -15,7 +15,6 @@ it, and then come back here.
 A REPL providing the classic game, including tab completion to speed playing.
 All heroes are implemented with the exception of:
 
- - Half-Goblin advancing to Chieftain
  - Occultist advancing to Necromancer
 
 Additionally, a "Default" hero with no special abilities is present.
@@ -43,7 +42,7 @@ usage: droll [-h] [--seed N]
 Command-line version of droll.
 
 positional arguments:
-  {Default,Crusader,Enchantress,Knight,Minstrel,Spellsword}
+  {Default,Crusader,Enchantress,HalfGoblin,Knight,Minstrel,Spellsword}
                         Select the hero for this game.
 
 options:

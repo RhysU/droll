@@ -9,7 +9,9 @@ import sys
 
 from .shell import Game
 from .display import DisplayMode
-from .heroes import Crusader, Enchantress, Knight, Minstrel, Spellsword
+from .heroes import (
+    Crusader, Enchantress, HalfGoblin, Knight, Minstrel, Spellsword
+)
 from .player import Default
 from .shell import Shell
 
@@ -18,6 +20,7 @@ AVAILABLE_HEROES = collections.OrderedDict(
         ("Default", Default),
         ("Crusader", Crusader),
         ("Enchantress", Enchantress),
+        ("HalfGoblin", HalfGoblin),
         ("Knight", Knight),
         ("Minstrel", Minstrel),
         ("Spellsword", Spellsword),
