@@ -17,12 +17,8 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest",
     "flake8",
     "Sphinx",
-]
-test = [
-    "pytest",
 ]
 
 [project.scripts]
