@@ -26,21 +26,20 @@ def _halfgoblin_ability(
         raise error.DrollError("Ability can only target 1 goblin")
 
     # Change 1 goblin into 1 thief
-    dungeon = game.dungeon
-    dungeon = action.decrement_target(dungeon, "goblin")
-    dungeon = action.increment_target(dungeon, "thief")
+    dungeon = action.decrement_target(game.dungeon, "goblin")
+    party = action.increment_target(game.party, "thief")
 
     # Discarding if unused at the next regroup phase
     regroup = game.regroup
-    disband = regroup.disband
-    disband = replace(disband, thief=getattr(disband, "thief", 0) + 1)
-    regroup = replace(regroup, disband=disband)
+    discard = regroup.discard
+    discard = replace(discard, thief=getattr(discard, "thief", 0) + 1)
+    regroup = replace(regroup, discard=discard)
 
-    game = replace(game, dungeon=dungeon, regroup=regroup)
+    game = replace(game, dungeon=dungeon, party=party, regroup=regroup)
     return action.consume_ability(game)
 
 
-def _chieftan_ability(
+def _chieftain_ability(
     game: struct.World,
     randrange: dice.RandRange,
     noun: str,
@@ -57,23 +56,24 @@ def _chieftan_ability(
         raise error.DrollError("At most 2 targets can be changed.")
 
     dungeon = game.dungeon
+    party = game.party
     regroup = game.regroup
-    disband = regroup.disband
+    discard = regroup.discard
 
     # Always transform 2 when 2 are available
     if dungeon.goblin >= 2:
         dungeon = action.decrement_target(dungeon, "goblin")
         dungeon = action.decrement_target(dungeon, "goblin")
-        dungeon = action.increment_target(dungeon, "thief")
-        dungeon = action.increment_target(dungeon, "thief")
-        disband = replace(disband, thief=getattr(disband, "thief", 0) + 2)
+        party = action.increment_target(party, "thief")
+        party = action.increment_target(party, "thief")
+        discard = replace(discard, thief=getattr(discard, "thief", 0) + 2)
     else:
         dungeon = action.decrement_target(dungeon, "goblin")
-        dungeon = action.increment_target(dungeon, "thief")
-        disband = replace(disband, thief=getattr(disband, "thief", 0) + 1)
+        party = action.increment_target(party, "thief")
+        discard = replace(discard, thief=getattr(discard, "thief", 0) + 1)
 
-    regroup = replace(regroup, disband=disband)
-    game = replace(game, dungeon=dungeon, regroup=regroup)
+    regroup = replace(regroup, discard=discard)
+    game = replace(game, dungeon=dungeon, party=party, regroup=regroup)
     return action.consume_ability(game)
 
 
@@ -95,7 +95,7 @@ _halfgoblin_quaff = functools.partial(
 Chieftain = replace(
     Default,
     name="Chieftain",
-    ability=_chieftan_ability,
+    ability=_chieftain_ability,
     advance=(lambda _: Chieftain),
     party=replace(
         Default.party,
