@@ -226,12 +226,10 @@ def reroll(
     return replace(
         world,
         dungeon=struct.Dungeon(
-            *tuple(
-                map(
-                    operator.add,
-                    struct.field_values(reduced),
-                    struct.field_values(increased),
-                )
+            *map(
+                operator.add,
+                struct.field_values(reduced),
+                struct.field_values(increased),
             )
         ),
         party=_decrement_party(world.party, hero),
@@ -248,7 +246,8 @@ def defeat_dragon_heroes(
 
     Specifically, in the case when all heroes must be distinct.
     """
-    if {*heroes} & {*_disallowed_heroes}:
+    hero_set = {*heroes}
+    if hero_set & {*_disallowed_heroes}:
         raise error.DrollError(
             "Heroes {} cannot defeat a dragon.".format(_disallowed_heroes)
         )
@@ -256,7 +255,7 @@ def defeat_dragon_heroes(
         raise error.DrollError(
             "Exactly {} heroes must be specified.".format(_distinct_heroes)
         )
-    if len({*heroes}) != _distinct_heroes:
+    if len(hero_set) != _distinct_heroes:
         raise error.DrollError(
             "The {} heroes must all be distinct.".format(_distinct_heroes)
         )
@@ -313,7 +312,7 @@ def defeat_dragon_heroes_interchangeable(
 
     # Count all heroes, accumulating all _interchangable into just one hero
     counter = collections.Counter(heroes)
-    interchangeable = list(sorted(_interchangeable))
+    interchangeable = sorted(_interchangeable)
     assert len(interchangeable) > 0, "At least one interchangeable required."
     while len(interchangeable) > 1:
         counter[interchangeable[0]] += counter.pop(interchangeable.pop(), 0)
