@@ -6,34 +6,32 @@
 import random
 import unittest
 
-import droll.dice
-import droll.struct
+from droll.dice import roll_dungeon, roll_party
+from droll.struct import field_values
 
 
 class TestDice(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures with a seeded random number generator."""
-        self.state = random.Random(4)
+        self.randrange = random.Random(4).randrange
 
     def test_roll_zero_dice(self):
         """Rolling zero dice should return empty results."""
-        party = droll.dice.roll_party(dice=0, randrange=self.state.randrange)
-        self.assertEqual(sum(droll.struct.field_values(party)), 0)
+        party = roll_party(dice=0, randrange=self.randrange)
+        self.assertEqual(sum(field_values(party)), 0)
 
     def test_roll_dungeon_minimum(self):
         """Roll dungeon with minimum (1) dice."""
-        dungeon = droll.dice.roll_dungeon(
-            dice=1, randrange=self.state.randrange
-        )
-        self.assertEqual(sum(droll.struct.field_values(dungeon)), 1)
+        dungeon = roll_dungeon(dice=1, randrange=self.randrange)
+        self.assertEqual(sum(field_values(dungeon)), 1)
 
     def test_roll_dungeon_zero_fails(self):
         """Rolling dungeon with zero dice should fail."""
         with self.assertRaises(AssertionError):
-            droll.dice.roll_dungeon(dice=0, randrange=self.state.randrange)
+            roll_dungeon(dice=0, randrange=self.randrange)
 
     def test_roll_party_many_dice(self):
         """Roll party with many dice to ensure no overflow issues."""
-        party = droll.dice.roll_party(dice=100, randrange=self.state.randrange)
-        self.assertEqual(sum(droll.struct.field_values(party)), 100)
+        party = roll_party(dice=100, randrange=self.randrange)
+        self.assertEqual(sum(field_values(party)), 100)
