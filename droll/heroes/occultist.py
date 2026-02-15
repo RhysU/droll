@@ -26,7 +26,7 @@ def _occultist_ability(
 
     # Change 1 skeleton into 1 fighter
     dungeon = action.decrement_dungeon(game.dungeon, "skeleton")
-    party = action.increment_dungeon(game.party, "fighter")
+    party = action.increment_party(game.party, "fighter")
 
     # Discarding if unused at the next regroup phase
     regroup = game.regroup
@@ -63,12 +63,12 @@ def _necromancer_ability(
     if dungeon.skeleton >= 2:
         dungeon = action.decrement_dungeon(dungeon, "skeleton")
         dungeon = action.decrement_dungeon(dungeon, "skeleton")
-        party = action.increment_dungeon(party, "fighter")
-        party = action.increment_dungeon(party, "fighter")
+        party = action.increment_party(party, "fighter")
+        party = action.increment_party(party, "fighter")
         discard = replace(discard, fighter=getattr(discard, "fighter", 0) + 2)
     else:
         dungeon = action.decrement_dungeon(dungeon, "skeleton")
-        party = action.increment_dungeon(party, "fighter")
+        party = action.increment_party(party, "fighter")
         discard = replace(discard, fighter=getattr(discard, "fighter", 0) + 1)
 
     regroup = replace(regroup, discard=discard)
