@@ -15,6 +15,7 @@ from .heroes import (
     HalfGoblin,
     Knight,
     Minstrel,
+    Occultist,
     Spellsword,
 )
 from .player import Default
@@ -28,6 +29,7 @@ AVAILABLE_HEROES = collections.OrderedDict(
         ("HalfGoblin", HalfGoblin),
         ("Knight", Knight),
         ("Minstrel", Minstrel),
+        ("Occultist", Occultist),
         ("Spellsword", Spellsword),
     ]
 )

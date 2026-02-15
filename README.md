@@ -13,10 +13,7 @@ it, and then come back here.
 ## What is implemented?
 
 A REPL providing the classic game, including tab completion to speed playing.
-All heroes are implemented with the exception of:
-
- - Occultist advancing to Necromancer
-
+All heroes are implemented.
 Additionally, a "Default" hero with no special abilities is present.
 
 ## Why implement it?
@@ -37,12 +34,12 @@ said, I've done such things in neither 2018 nor 2026.
 ```
 $ droll --help
 usage: droll [-h] [--seed N]
-             {Default,Crusader,Enchantress,Knight,Minstrel,Spellsword}
+             {Default,Crusader,Enchantress,Knight,Minstrel,Occultist,Spellsword}
 
 Command-line version of droll.
 
 positional arguments:
-  {Default,Crusader,Enchantress,HalfGoblin,Knight,Minstrel,Spellsword}
+  {Default,Crusader,Enchantress,HalfGoblin,Knight,Minstrel,Occultist,Spellsword}
                         Select the hero for this game.
 
 options:
