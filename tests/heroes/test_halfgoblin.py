@@ -15,25 +15,20 @@ from droll.heroes.halfgoblin import (
     _halfgoblin_ability,
 )
 
+# Known to be unused because it would raise NameErrors on any use
+_UNUSED = object()
+
 
 class TestHalfGoblin(unittest.TestCase):
 
     def test_halfgoblin_transforms_goblin_to_thief(self):
         """HalfGoblin transforms 1 goblin into 1 thief."""
-        state = random.Random(4)
         world = droll.struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
             ability=True,
             dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
             party=droll.struct.Party(fighter=1),
-            treasure=droll.struct.Treasure(),
-            reserve=droll.struct.Treasure(),
         )
-        result = _halfgoblin_ability(
-            world, state.randrange, "ability", "goblin"
-        )
+        result = _halfgoblin_ability(world, _UNUSED, "ability", "goblin")
         # Discard during subsequent regroup phase tested elsewhere
         self.assertEqual(result.dungeon.goblin, 1)
         self.assertEqual(result.party.thief, 1)
@@ -41,19 +36,13 @@ class TestHalfGoblin(unittest.TestCase):
 
     def test_chieftain_transforms_two_monsters(self):
         """Chieftain transforms 2 goblins into 2 thieves when available."""
-        state = random.Random(4)
         world = droll.struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
             ability=True,
             dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
             party=droll.struct.Party(fighter=1),
-            treasure=droll.struct.Treasure(),
-            reserve=droll.struct.Treasure(),
         )
         result = _chieftain_ability(
-            world, state.randrange, "ability", "goblin", "goblin"
+            world, _UNUSED, "ability", "goblin", "goblin"
         )
         # Discard during subsequent regroup phase tested elsewhere
         self.assertEqual(result.dungeon.goblin, 0)
@@ -62,20 +51,14 @@ class TestHalfGoblin(unittest.TestCase):
 
     def test_chieftain_transforms_two_monsters(self):
         """Chieftain transforms 1 goblin into 1 thieves when 1 available."""
-        state = random.Random(4)
         world = droll.struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
             ability=True,
             dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
             party=droll.struct.Party(fighter=1),
-            treasure=droll.struct.Treasure(),
-            reserve=droll.struct.Treasure(),
         )
         result = _chieftain_ability(
             world,
-            state.randrange,
+            _UNUSED,
             "ability",
             "goblin",
         )
@@ -86,26 +69,8 @@ class TestHalfGoblin(unittest.TestCase):
 
     def test_halfgoblin_advances_to_chieftain(self):
         """HalfGoblin advances to Chieftain at 5+ experience."""
-        low_xp = droll.struct.World(
-            delve=1,
-            depth=0,
-            experience=4,
-            ability=True,
-            dungeon=None,
-            party=None,
-            treasure=droll.struct.Treasure(),
-            reserve=droll.struct.Treasure(),
-        )
-        high_xp = droll.struct.World(
-            delve=1,
-            depth=0,
-            experience=5,
-            ability=True,
-            dungeon=None,
-            party=None,
-            treasure=droll.struct.Treasure(),
-            reserve=droll.struct.Treasure(),
-        )
+        low_xp = droll.struct.World(experience=4)
+        high_xp = droll.struct.World(experience=5)
         self.assertEqual(HalfGoblin.advance(low_xp), HalfGoblin)
         self.assertEqual(HalfGoblin.advance(high_xp), Chieftain)
 
@@ -115,7 +80,6 @@ class TestHalfGoblin(unittest.TestCase):
         world = droll.struct.World(
             delve=1,
             depth=1,
-            experience=0,
             ability=True,
             dungeon=droll.struct.Dungeon(goblin=1, chest=1, potion=1),
             party=droll.struct.Party(fighter=5),

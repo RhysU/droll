@@ -10,45 +10,37 @@ import droll.dice
 import droll.struct
 from droll.heroes.knight import Knight, DragonSlayer, _knight_roll_party
 
+# Known to be unused because it would raise NameErrors on any use
+_UNUSED = object()
+
 
 class TestKnight(unittest.TestCase):
 
     def test_knight_roll_party_converts_scrolls(self):
         """Knight converts scrolls to champions when rolling party."""
-        state = random.Random(4)
-        party = _knight_roll_party(7, state.randrange)
+        randrange = random.Random(4).randrange
+        party = _knight_roll_party(7, randrange)
         self.assertEqual(party.scroll, 0)
         self.assertEqual(sum(droll.struct.field_values(party)), 7)
 
     def test_knight_ability_baits_dragon(self):
         """Knight ability converts monsters to dragons without treasure."""
-        state = random.Random(4)
         world = droll.struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
             ability=True,
             dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
             party=droll.struct.Party(fighter=2, champion=1),
-            treasure=droll.struct.Treasure(),
-            reserve=droll.struct.Treasure(),
         )
-        result = Knight.ability(world, state.randrange, "ability")
+        result = Knight.ability(world, _UNUSED, "ability")
         self.assertEqual(result.dungeon.dragon, 3)
         self.assertEqual(result.dungeon.goblin, 0)
         self.assertEqual(result.dungeon.skeleton, 0)
         self.assertFalse(result.ability)
 
     def test_dragonslayer_advance(self):
-        """DragonSlayer stays DragonSlayer after advancing."""
-        world = droll.struct.World(
-            delve=1,
-            depth=0,
-            experience=10,
-            ability=True,
-            dungeon=None,
-            party=None,
-            treasure=droll.struct.Treasure(),
-            reserve=droll.struct.Treasure(),
-        )
-        self.assertEqual(DragonSlayer.advance(world), DragonSlayer)
+        """Knight advances to DragonSlayer advances to DragonSlayer."""
+        low_xp = droll.struct.World(experience=2)
+        mid_xp = droll.struct.World(experience=7)
+        high_xp = droll.struct.World(experience=15)
+        self.assertEqual(Knight.advance(low_xp), Knight)
+        self.assertEqual(Knight.advance(mid_xp), DragonSlayer)
+        self.assertEqual(DragonSlayer.advance(high_xp), DragonSlayer)

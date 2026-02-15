@@ -347,11 +347,7 @@ class TestWorld(unittest.TestCase):
             ability=False,
             dungeon=droll.struct.Dungeon(potion=1),
             party=droll.struct.Party(thief=1),
-            regroup=droll.struct.Regroup(
-                discard=droll.struct.Party(thief=1)
-            ),
-            treasure=droll.struct.Treasure(),
-            reserve=droll.struct.Treasure(),
+            regroup=droll.struct.Regroup(discard=droll.struct.Party(thief=1)),
         )
         # Thief quaffs potion, reviving another thief
         post = droll.action.quaff(pre, None, "thief", "potion", "thief")
@@ -361,7 +357,9 @@ class TestWorld(unittest.TestCase):
 
         # After descending the revived thief must survive regroup
         descended = droll.world.descend(
-            post, droll.dice.roll_dungeon, random.Random(4).randrange,
+            post,
+            droll.dice.roll_dungeon,
+            random.Random(4).randrange,
         )
         self.assertEqual(descended.party.thief, 1)
 
@@ -375,11 +373,8 @@ class TestWorld(unittest.TestCase):
             ability=False,
             dungeon=droll.struct.Dungeon(ooze=1),
             party=droll.struct.Party(thief=1),
-            regroup=droll.struct.Regroup(
-                discard=droll.struct.Party(thief=1)
-            ),
+            regroup=droll.struct.Regroup(discard=droll.struct.Party(thief=1)),
             treasure=droll.struct.Treasure(elixir=1),
-            reserve=droll.struct.Treasure(),
         )
 
         # Force-discard thief kills the ooze
@@ -394,7 +389,9 @@ class TestWorld(unittest.TestCase):
 
         # After descending the revived thief must survive regroup
         descended = droll.world.descend(
-            post2, droll.dice.roll_dungeon, random.Random(4).randrange,
+            post2,
+            droll.dice.roll_dungeon,
+            random.Random(4).randrange,
         )
         self.assertEqual(descended.party.thief, 1)
 
@@ -408,11 +405,8 @@ class TestWorld(unittest.TestCase):
             ability=False,
             dungeon=droll.struct.Dungeon(ooze=1),
             party=droll.struct.Party(thief=1),
-            regroup=droll.struct.Regroup(
-                discard=droll.struct.Party(thief=1)
-            ),
+            regroup=droll.struct.Regroup(discard=droll.struct.Party(thief=1)),
             treasure=droll.struct.Treasure(elixir=1),
-            reserve=droll.struct.Treasure(),
         )
 
         # Elixir revives a new thief
@@ -427,7 +421,9 @@ class TestWorld(unittest.TestCase):
 
         # After descending the revived thief must survive regroup
         descended = droll.world.descend(
-            post2, droll.dice.roll_dungeon, random.Random(4).randrange,
+            post2,
+            droll.dice.roll_dungeon,
+            random.Random(4).randrange,
         )
         self.assertEqual(descended.party.thief, 1)
 
