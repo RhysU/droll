@@ -7,18 +7,13 @@ from dataclasses import fields, replace
 import random
 import unittest
 
-import droll.action as action
-import droll.error as error
-import droll.heroes as heroes
-import droll.player as player
-import droll.struct as struct
-import droll.world as world
+from droll import action, error, heroes, player, struct, world
 
 
 class TestDragon(unittest.TestCase):
 
     def setUp(self):
-        """Set up test fixtures with a game containing dragons and party members."""
+        """Set up fixture for a game containing dragons and party members."""
         self.game = replace(
             world.new_world(),
             dungeon=struct.Dungeon(
@@ -47,7 +42,7 @@ class TestDragon(unittest.TestCase):
         self.assertEqual(sum(struct.field_values(game.treasure)), 1)
 
     def test_treasure_slot1(self):
-        """Test that sword treasure can substitute for fighter in dragon combat."""
+        """Sword treasure can substitute for fighter in dragon combat."""
         game = replace(
             self.game, treasure=replace(self.game.treasure, sword=7)
         )
@@ -70,7 +65,7 @@ class TestDragon(unittest.TestCase):
         self.assertEqual(sum(struct.field_values(game.treasure)), 7)
 
     def test_treasure_slot3(self):
-        """Test that talisman treasure can substitute for cleric in dragon combat."""
+        """Talisman treasure can substitute for cleric in dragon combat."""
         game = replace(
             self.game, treasure=replace(self.game.treasure, talisman=7)
         )
@@ -93,7 +88,7 @@ class TestDragon(unittest.TestCase):
         self.assertEqual(sum(struct.field_values(game.treasure)), 7)
 
     def test_treasure_slot2(self):
-        """Test that sceptre treasure can substitute for mage in dragon combat."""
+        """Sceptre treasure can substitute for mage in dragon combat."""
         game = replace(
             self.game, treasure=replace(self.game.treasure, sceptre=7)
         )
@@ -116,7 +111,7 @@ class TestDragon(unittest.TestCase):
         self.assertEqual(sum(struct.field_values(game.treasure)), 7)
 
     def test_monsters_remain(self):
-        """Test that dragon cannot be attacked while monsters remain in dungeon."""
+        """Dragon cannot be attacked while monsters remain in dungeon."""
         game = replace(self.game, dungeon=replace(self.game.dungeon, goblin=1))
         with self.assertRaises(error.DrollError):
             player.apply(
@@ -130,7 +125,7 @@ class TestDragon(unittest.TestCase):
             )
 
     def test_too_few_specified(self):
-        """Test that attacking dragon with too few heroes raises an error."""
+        """Attacking dragon with too few heroes raises an error."""
         with self.assertRaises(error.DrollError):
             player.apply(
                 player.Default,
@@ -157,7 +152,7 @@ class TestDragon(unittest.TestCase):
             )
 
     def test_too_many_specified(self):
-        """Test that attacking dragon with too many heroes raises an error."""
+        """Attacking dragon with too many heroes raises an error."""
         with self.assertRaises(error.DrollError):
             player.apply(
                 player.Default,
@@ -183,7 +178,7 @@ class TestDragon(unittest.TestCase):
             )
 
     def test_only_heroes_accepted(self):
-        """Test that only valid heroes can be used against dragons."""
+        """Only valid heroes can be used against dragons."""
         with self.assertRaises(error.DrollError):
             player.apply(
                 player.Default,
@@ -196,7 +191,7 @@ class TestDragon(unittest.TestCase):
             )
 
     def test_one_scroll(self):
-        """Test that a single scroll cannot be used as a hero substitute."""
+        """A single scroll cannot be used as a hero substitute."""
         with self.assertRaises(error.DrollError):
             player.apply(
                 player.Default,
@@ -220,7 +215,7 @@ class TestDragon(unittest.TestCase):
             )
 
     def test_not_enough_distinct(self):
-        """Test that duplicate heroes cannot defeat a dragon."""
+        """Duplicate heroes cannot defeat a dragon."""
         with self.assertRaises(error.DrollError):
             player.apply(
                 player.Default,
@@ -276,7 +271,7 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
             )
 
     def test_more_interesting_successful_cases(self):
-        """Test valid dragon defeats with multiple interchangeable hero types."""
+        """Valid dragon defeats with multiple interchangeable hero types."""
         # More than two could be interchangeable, but complexity not in game.
         # Therefore, only two interchangeable case is checked below.
         self.assertTrue(
@@ -315,7 +310,7 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
         )
 
     def test_more_interesting_failure_cases(self):
-        """Test invalid dragon defeats with multiple interchangeable hero types."""
+        """Invalid dragon defeats with multiple interchangeable hero types."""
         with self.assertRaises(error.DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "mage", "mage", "mage", _interchangeable={"mage", "fighter"}
