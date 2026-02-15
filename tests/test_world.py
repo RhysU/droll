@@ -333,11 +333,12 @@ class TestWorld(unittest.TestCase):
         )
 
     def test_regroup_discard_after_quaff(self):
-        """Quaffing with a force-discard thief should clear its discard counter.
+        """
+        Quaffing a new thief with a force-discard thief clears discarding.
 
         A thief gained via Half-Goblin ability (marked for discard) quaffs a
-        potion to revive another thief.  The revived thief should survive
-        regroup."""
+        potion to revive another thief.  The revived thief survives regroup.
+        """
         # Setup: thief from ability (marked for discard), 1 potion available
         pre = droll.struct.World(
             delve=1,
@@ -353,10 +354,7 @@ class TestWorld(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         # Thief quaffs potion, reviving another thief
-        post = droll.action.quaff(
-            pre, None, "thief", "potion", "thief",
-            _after_monsters=False,
-        )
+        post = droll.action.quaff(pre, None, "thief", "potion", "thief")
         # The marked thief was consumed so the discard counter must drop
         self.assertEqual(post.regroup.discard.thief, 0)
         self.assertEqual(post.party.thief, 1)
