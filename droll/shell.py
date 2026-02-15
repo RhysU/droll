@@ -254,7 +254,7 @@ class Shell(cmd.Cmd):
             """
             scroll skeleton             # Enchantress would kill skeleton...
             reroll skeleton goblin      # ...but 'reroll' forces re-rolling"""
-        )  # TODO Amend while working on Issue #21
+        )
 
     def help_scale(self):
         """Display help for scale treasures."""
