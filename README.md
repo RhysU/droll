@@ -13,7 +13,7 @@ it, and then come back here.
 ## What is implemented?
 
 A REPL providing the classic game, including tab completion to speed playing.
-All heroes are implemented.
+All base game heroes are implemented.
 Additionally, a "Default" hero with no special abilities is present.
 
 ## Why implement it?
