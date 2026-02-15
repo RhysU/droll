@@ -7,14 +7,11 @@ from dataclasses import fields, replace
 import random
 import unittest
 
-import droll.error as error
-import droll.player as player
-import droll.struct as struct
-import droll.world as world
+from droll import error, player, struct, world
 
 
 def _remove_monsters(game: struct.World) -> struct.World:
-    """Remove all monsters from the dungeon for testing treasure interactions."""
+    """Remove all monsters from dungeon for testing treasure interactions."""
     return replace(
         game, dungeon=replace(game.dungeon, goblin=0, skeleton=0, ooze=0)
     )
@@ -23,7 +20,7 @@ def _remove_monsters(game: struct.World) -> struct.World:
 class TestPlayer(unittest.TestCase):
 
     def setUp(self):
-        """Set up test fixtures with a game containing 2 of each dungeon and party item."""
+        """Fixtures with a game containing 2 of each dungeon and party item."""
         self.game = replace(
             world.new_world(),
             dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
@@ -143,7 +140,7 @@ class TestPlayer(unittest.TestCase):
         sequence = [0, 1, 2]
 
         def canned_sequence(start, stop):
-            """Return predetermined sequence values for deterministic testing."""
+            """Predetermined sequence values for deterministic testing."""
             return start + sequence.pop(0)
 
         # Notice scroll causes chests to be re-rolled
@@ -195,7 +192,7 @@ class TestComplete(unittest.TestCase):
         )  # treasure
 
     def test_complete0_excludes_noncommand_treasures(self):
-        """Non-command treasures (portal, ring, scale) excluded from position 0."""
+        """Non-command treasures (portal, ring, scale) excluded from pos 0."""
         game = self.game
         # Add all three non-command treasures
         game = replace(
