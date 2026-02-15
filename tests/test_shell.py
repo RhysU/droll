@@ -6,7 +6,9 @@
 import random
 import typing
 import unittest
+from dataclasses import replace
 
+from droll import struct
 from droll.display import DisplayMode
 from droll.error import DrollError
 from droll.game import Game
@@ -33,6 +35,31 @@ class TestShell(unittest.TestCase):
         s.cmdloop()
         self.assertEqual(s.prompt, "(Default  0) ")
         self.assertEqual(s.lastcmd, "")
+
+    def test_reroll(self):
+        """Confirm reroll command forwards to game."""
+        s = Shell(
+            Game(random=random.Random(4), player=Default),
+            display_mode=DisplayMode.MECHANICAL,
+        )
+        s.preloop()
+        s.onecmd("descend")
+        # Depth 1 with seed 4 has a single goblin; reroll it
+        s.onecmd("reroll goblin")
+
+    def test_retreat(self):
+        """Confirm retreat command forwards to game."""
+        s = Shell(
+            Game(random=random.Random(4), player=Default),
+            display_mode=DisplayMode.MECHANICAL,
+        )
+        s.preloop()
+        s.onecmd("descend")
+        # Need a monster present so retreat is valid
+        s._game._world = replace(
+            s._game._world, dungeon=struct.Dungeon(goblin=1)
+        )
+        s.onecmd("retreat")
 
     def test_help(self):
         """Confirm help invocations do not throw exceptions."""

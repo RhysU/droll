@@ -474,6 +474,16 @@ class TestWorld(unittest.TestCase):
         game2 = world.descend(game2, dice.roll_dungeon, self.state.randrange)
         self.assertEqual(sum(struct.field_values(game2.dungeon)), 7)
 
+    def test_delve_maximum(self):
+        """Test that a fourth delve is rejected after three."""
+        game = world.new_world()
+        game = world.delve(game, dice.roll_party, self.state.randrange)
+        game = world.delve(game, dice.roll_party, self.state.randrange)
+        game = world.delve(game, dice.roll_party, self.state.randrange)
+        self.assertEqual(game.delve, 3)
+        with self.assertRaises(error.DrollError):
+            world.delve(game, dice.roll_party, self.state.randrange)
+
     def test_score(self):
         """Test score calculation includes experience and treasure bonuses."""
         game = struct.World(
