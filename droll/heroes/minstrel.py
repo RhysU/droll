@@ -33,15 +33,38 @@ _minstrel_defeat_dragon = functools.partial(
     action.defeat_dragon,
     _defeat_dragon_heroes=functools.partial(
         action.defeat_dragon_heroes_interchangeable,
-        _interchangeable={"mage", "thief"},
+        _interchangeable=frozenset({"mage", "thief"}),
     ),
 )
 
 # Building block: dragon defeat + mage/thief interchangeability in combat
-_Minstrel_Party = replace(
-    struct.update_party_dragon(Default.party, _minstrel_defeat_dragon),
-    mage=replace(Default.party.mage, chest=Default.party.thief.chest),
-    thief=replace(Default.party.thief, ooze=Default.party.mage.ooze),
+_Minstrel_Party = struct.Party(
+    fighter=replace(
+        Default.party.fighter,
+        dragon=_minstrel_defeat_dragon,
+    ),
+    cleric=replace(
+        Default.party.cleric,
+        dragon=_minstrel_defeat_dragon,
+    ),
+    mage=replace(
+        Default.party.mage,
+        chest=Default.party.thief.chest,
+        dragon=_minstrel_defeat_dragon,
+    ),
+    thief=replace(
+        Default.party.thief,
+        dragon=_minstrel_defeat_dragon,
+        ooze=Default.party.mage.ooze,
+    ),
+    champion=replace(
+        Default.party.champion,
+        dragon=_minstrel_defeat_dragon,
+    ),
+    scroll=replace(
+        Default.party.scroll,
+        dragon=_minstrel_defeat_dragon,
+    ),
 )
 
 # Defined in terms of Default, not Minstrel, to permit advance(...) closure

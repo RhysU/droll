@@ -59,7 +59,7 @@ def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     for line in (x.strip() for x in text.splitlines()):
         if line.startswith("(delve="):
             summaries.append(line)
-        elif line.startswith("(droll "):
+        elif line.startswith("("):  # For example, "(Bard  6) descend"
             command = line[line.index(") ") + 2 :]
             commands.append(command)
     return zip(summaries, commands)
@@ -152,10 +152,13 @@ class TestSimple(unittest.TestCase):
         parsed = parse_summary_command(self.test_simple.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
             self.assertEqual(
-                expected_summary, s.summary(),
+                expected_summary, s._game.summary(),
                 "Summary mismatch at {}".format(index)
             )
             s.onecmd(following_command)
+
+        # Confirm some non-trivial processing occurred
+        self.assertEqual(index, 18)
 
 
 class TestUndo(unittest.TestCase):
@@ -382,10 +385,13 @@ class TestKnight(unittest.TestCase):
         parsed = parse_summary_command(self.test_knight.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
             self.assertEqual(
-                expected_summary, s.summary(),
+                expected_summary, s._game.summary(),
                 "Summary mismatch at {}".format(index)
             )
             s.onecmd(following_command)
+
+        # Confirm some non-trivial processing occurred
+        self.assertEqual(index, 41)
 
 
 class TestSpellsword(unittest.TestCase):
@@ -462,10 +468,13 @@ class TestSpellsword(unittest.TestCase):
         parsed = parse_summary_command(self.test_spellsword.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
             self.assertEqual(
-                expected_summary, s.summary(),
+                expected_summary, s._game.summary(),
                 "Summary mismatch at {}".format(index)
             )
             s.onecmd(following_command)
+
+        # Confirm some non-trivial processing occurred
+        self.assertEqual(index, 20)
 
 
 class TestMinstrel(unittest.TestCase):
@@ -536,31 +545,31 @@ class TestMinstrel(unittest.TestCase):
         (delve=2, depth=3, experience=5, dungeon=(skeleton=1, ooze=1, chest=1, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
         (Bard  6) champion skeleton ooze
 
-        (delve=2, depth=3, experience=5, dungeon=(chest=1, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+        (delve=2, depth=3, experience=5, dungeon=(chest=1, dragon=1), party=(fighter=1, thief=1, scroll=2), ability=True, treasure=(talisman=1))
         (Bard  6) descend
 
-        (delve=2, depth=4, experience=5, dungeon=(ooze=1, potion=2, dragon=2), party=(fighter=1, thief=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+        (delve=2, depth=4, experience=5, dungeon=(ooze=1, potion=2, dragon=2), party=(fighter=1, thief=1, scroll=2), ability=True, treasure=(talisman=1))
         (Bard  6) thief ooze
 
-        (delve=2, depth=4, experience=5, dungeon=(potion=2, dragon=2), party=(fighter=1, champion=1, scroll=2), ability=True, treasure=(talisman=1))
+        (delve=2, depth=4, experience=5, dungeon=(potion=2, dragon=2), party=(fighter=1, scroll=2), ability=True, treasure=(talisman=1))
         (Bard  6) scroll potion mage cleric
 
-        (delve=2, depth=4, experience=5, dungeon=(dragon=2), party=(fighter=1, cleric=1, mage=1, champion=1, scroll=1), ability=True, treasure=(talisman=1))
+        (delve=2, depth=4, experience=5, dungeon=(dragon=2), party=(fighter=1, cleric=1, mage=1, scroll=1), ability=True, treasure=(talisman=1))
         (Bard  6) descend
 
-        (delve=2, depth=5, experience=5, dungeon=(goblin=1, skeleton=2, potion=1, dragon=3), party=(fighter=1, cleric=1, mage=1, champion=1, scroll=1), ability=True, treasure=(talisman=1))
+        (delve=2, depth=5, experience=5, dungeon=(goblin=1, skeleton=2, potion=1, dragon=3), party=(fighter=1, cleric=1, mage=1, scroll=1), ability=True, treasure=(talisman=1))
         (Bard  6) scroll goblin skeleton skeleton
 
-        (delve=2, depth=5, experience=5, dungeon=(ooze=1, chest=1, potion=1, dragon=4), party=(fighter=1, cleric=1, mage=1, champion=1), ability=True, treasure=(talisman=1))
+        (delve=2, depth=5, experience=5, dungeon=(ooze=1, chest=1, potion=1, dragon=4), party=(fighter=1, cleric=1, mage=1), ability=True, treasure=(talisman=1))
         (Bard  6) mage ooze
 
-        (delve=2, depth=5, experience=5, dungeon=(chest=1, potion=1, dragon=4), party=(fighter=1, cleric=1, champion=1), ability=True, treasure=(talisman=1))
+        (delve=2, depth=5, experience=5, dungeon=(chest=1, potion=1, dragon=4), party=(fighter=1, cleric=1), ability=True, treasure=(talisman=1))
         (Bard  6) fighter chest
 
-        (delve=2, depth=5, experience=5, dungeon=(potion=1, dragon=4), party=(cleric=1, champion=1), ability=True, treasure=(sword=1, talisman=1))
+        (delve=2, depth=5, experience=5, dungeon=(potion=1, dragon=4), party=(cleric=1), ability=True, treasure=(sword=1, talisman=1))
         (Bard  7) ability
 
-        (delve=2, depth=5, experience=5, dungeon=(potion=1), party=(cleric=1, champion=1), treasure=(sword=1, talisman=1))
+        (delve=2, depth=5, experience=5, dungeon=(potion=1), party=(cleric=1), treasure=(sword=1, talisman=1))
         (Bard  7) retire
 
         (delve=3, experience=10, party=(fighter=1, cleric=2, thief=1, champion=1, scroll=2), ability=True, treasure=(sword=1, talisman=1))
@@ -614,10 +623,13 @@ class TestMinstrel(unittest.TestCase):
         parsed = parse_summary_command(self.test_minstrel.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
             self.assertEqual(
-                expected_summary, s.summary(),
+                expected_summary, s._game.summary(),
                 "Summary mismatch at {}".format(index)
             )
             s.onecmd(following_command)
+
+        # Confirm some non-trivial processing occurred
+        self.assertEqual(index, 44)
 
 
 class TestCrusader(unittest.TestCase):
@@ -731,10 +743,13 @@ class TestCrusader(unittest.TestCase):
         parsed = parse_summary_command(self.test_crusader.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
             self.assertEqual(
-                expected_summary, s.summary(),
+                expected_summary, s._game.summary(),
                 "Summary mismatch at {}".format(index)
             )
             s.onecmd(following_command)
+
+        # Confirm some non-trivial processing occurred
+        self.assertEqual(index, 32)
 
 
 class TestEnchantress(unittest.TestCase):
@@ -899,7 +914,10 @@ class TestEnchantress(unittest.TestCase):
         parsed = parse_summary_command(self.test_enchantress.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
             self.assertEqual(
-                expected_summary, s.summary(),
+                expected_summary, s._game.summary(),
                 "Summary mismatch at {}".format(index)
             )
             s.onecmd(following_command)
+
+        # Confirm some non-trivial processing occurred
+        self.assertEqual(index, 49)

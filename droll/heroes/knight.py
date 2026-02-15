@@ -41,8 +41,31 @@ DragonSlayer = replace(
     ability=_knight_bait_dragon,
     advance=(lambda _: DragonSlayer),
     roll=replace(Default.roll, party=_knight_roll_party),
-    party=struct.update_party_dragon(
-        Default.party, _dragonslayer_defeat_dragon
+    party=struct.Party(
+        fighter=replace(
+            Default.party.fighter,
+            dragon=_dragonslayer_defeat_dragon,
+        ),
+        cleric=replace(
+            Default.party.cleric,
+            dragon=_dragonslayer_defeat_dragon,
+        ),
+        mage=replace(
+            Default.party.mage,
+            dragon=_dragonslayer_defeat_dragon,
+        ),
+        thief=replace(
+            Default.party.thief,
+            dragon=_dragonslayer_defeat_dragon,
+        ),
+        champion=replace(
+            Default.party.champion,
+            dragon=_dragonslayer_defeat_dragon,
+        ),
+        scroll=replace(
+            Default.party.scroll,
+            dragon=_dragonslayer_defeat_dragon,
+        ),
     ),
 )
 

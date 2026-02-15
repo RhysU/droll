@@ -97,18 +97,9 @@ class World:
     reserve: Treasure = Treasure()
 
 
-def update_party_dragon(party: Party, dragon_func) -> Party:
-    """Update all heroes in a party to use a custom dragon defeat function."""
-    return Party(
-        *(
-            dataclasses.replace(hero_dungeon, dragon=dragon_func)
-            for hero_dungeon in field_values(party)
-        )
-    )
-
-
+# TODO Remove regroup from the omitted set
 def brief(
-    o: typing.Any, *, omitted: typing.AbstractSet[str] = frozenset({"reserve"})
+    o: typing.Any, *, omitted: typing.AbstractSet[str] = frozenset({"reserve", "regroup"})
 ) -> str:
     """A __str__(...) variant suppressing False fields within dataclasses."""
     try:

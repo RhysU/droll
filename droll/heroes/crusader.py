@@ -92,7 +92,7 @@ _crusader_defeat_dragon = functools.partial(
     action.defeat_dragon,
     _defeat_dragon_heroes=functools.partial(
         action.defeat_dragon_heroes_interchangeable,
-        _interchangeable={"fighter", "cleric"},
+        _interchangeable=frozenset({"fighter", "cleric"}),
     ),
 )
 
@@ -102,20 +102,39 @@ Paladin = replace(
     name="Paladin",
     ability=_paladin_ability,
     advance=(lambda _: Paladin),
-    party=replace(
-        struct.update_party_dragon(Default.party, _crusader_defeat_dragon),
+    party=struct.Party(
         fighter=replace(
-            Default.party.fighter, skeleton=Default.party.cleric.skeleton
+            Default.party.fighter,
+            dragon=_crusader_defeat_dragon,
+            skeleton=Default.party.cleric.skeleton
         ),
         cleric=replace(
-            Default.party.cleric, goblin=Default.party.fighter.goblin
+            Default.party.cleric,
+            dragon=_crusader_defeat_dragon,
+            goblin=Default.party.fighter.goblin
+        ),
+        mage=replace(
+            Default.party.mage,
+            dragon=_crusader_defeat_dragon,
+        ),
+        thief=replace(
+            Default.party.thief,
+            dragon=_crusader_defeat_dragon,
+        ),
+        champion=replace(
+            Default.party.champion,
+            dragon=_crusader_defeat_dragon,
+        ),
+        scroll=replace(
+            Default.party.scroll,
+            dragon=_crusader_defeat_dragon,
         ),
     ),
 )
 
 # Defined after Paladin to permit advance(...) closure
 Crusader = replace(
-    Default,
+    Paladin,
     name="Crusader",
     ability=_crusader_ability,
     advance=(lambda world: Crusader if world.experience < 5 else Paladin),

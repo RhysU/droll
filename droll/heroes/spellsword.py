@@ -40,7 +40,7 @@ _spellsword_defeat_dragon = functools.partial(
     action.defeat_dragon,
     _defeat_dragon_heroes=functools.partial(
         action.defeat_dragon_heroes_interchangeable,
-        _interchangeable={"fighter", "mage"},
+        _interchangeable=frozenset({"fighter", "mage"}),
     ),
 )
 
@@ -66,9 +66,33 @@ Battlemage = replace(
     ability=_battlemage_ability,
     advance=(lambda _: Battlemage),
     party=replace(
-        struct.update_party_dragon(Default.party, _spellsword_defeat_dragon),
-        fighter=replace(Default.party.fighter, ooze=Default.party.mage.ooze),
-        mage=replace(Default.party.mage, goblin=Default.party.fighter.goblin),
+        Default.party,
+        fighter=replace(
+            Default.party.fighter,
+            dragon=_spellsword_defeat_dragon,
+            ooze=Default.party.mage.ooze,
+        ),
+        cleric=replace(
+            Default.party.cleric,
+            dragon=_spellsword_defeat_dragon,
+        ),
+        mage=replace(
+            Default.party.mage,
+            dragon=_spellsword_defeat_dragon,
+            goblin=Default.party.fighter.goblin,
+        ),
+        thief=replace(
+            Default.party.thief,
+            dragon=_spellsword_defeat_dragon,
+        ),
+        champion=replace(
+            Default.party.champion,
+            dragon=_spellsword_defeat_dragon,
+        ),
+        scroll=replace(
+            Default.party.scroll,
+            dragon=_spellsword_defeat_dragon,
+        ),
     ),
 )
 

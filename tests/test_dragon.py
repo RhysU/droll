@@ -273,7 +273,7 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
 
     def test_more_interesting_successful_cases(self):
         """Test valid dragon defeats with multiple interchangeable hero types."""
-        # More than two could be interchangeable, but does not appear in the game.
+        # More than two could be interchangeable, but complexity not in game.
         # Therefore, only two interchangeable case is checked below.
         self.assertTrue(action.defeat_dragon_heroes_interchangeable(
             "cleric", "thief", "mage", _interchangeable={"mage", "fighter"}
@@ -289,6 +289,10 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
         ))
         self.assertTrue(action.defeat_dragon_heroes_interchangeable(
             "cleric", "mage", "mage", _interchangeable={"mage", "fighter"}
+        ))
+        self.assertTrue(action.defeat_dragon_heroes_interchangeable(
+            "cleric", "cleric", "champion",
+            _interchangeable={"fighter", "cleric"}
         ))
 
     def test_more_interesting_failure_cases(self):
