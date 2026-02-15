@@ -18,7 +18,6 @@ classifiers = [
 [project.optional-dependencies]
 dev = [
     "flake8",
-    "Sphinx",
 ]
 
 [project.scripts]
