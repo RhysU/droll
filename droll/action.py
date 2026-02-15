@@ -246,7 +246,8 @@ def defeat_dragon_heroes(
 
     Specifically, in the case when all heroes must be distinct.
     """
-    if {*heroes} & {*_disallowed_heroes}:
+    hero_set = {*heroes}
+    if hero_set & {*_disallowed_heroes}:
         raise error.DrollError(
             "Heroes {} cannot defeat a dragon.".format(_disallowed_heroes)
         )
@@ -254,7 +255,7 @@ def defeat_dragon_heroes(
         raise error.DrollError(
             "Exactly {} heroes must be specified.".format(_distinct_heroes)
         )
-    if len({*heroes}) != _distinct_heroes:
+    if len(hero_set) != _distinct_heroes:
         raise error.DrollError(
             "The {} heroes must all be distinct.".format(_distinct_heroes)
         )
