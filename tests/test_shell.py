@@ -1060,7 +1060,7 @@ class TestHalfGoblin(unittest.TestCase):
         (delve=3, depth=3, experience=8, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, thief=1, champion=2, scroll=2), regroup=(discard=(thief=1)), treasure=(talisman=1, elixir=1))
         (Chieftain 10) thief potion cleric
 
-        (delve=3, depth=3, experience=8, dungeon=(dragon=2), party=(fighter=1, cleric=2, champion=2, scroll=2), regroup=(discard=(thief=1)), treasure=(talisman=1, elixir=1))
+        (delve=3, depth=3, experience=8, dungeon=(dragon=2), party=(fighter=1, cleric=2, champion=2, scroll=2), regroup=(discard=()), treasure=(talisman=1, elixir=1))
         (Chieftain 10) EOF
         """
         # Drive the game according to the script in the above docstring.
