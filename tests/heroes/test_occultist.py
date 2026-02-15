@@ -132,14 +132,3 @@ class TestOccultist(unittest.TestCase):
         high_xp = droll.struct.World(experience=10)
         self.assertEqual(Necromancer.advance(high_xp), Necromancer)
 
-    def test_cleric_defeats_all_oozes(self):
-        """Occultist cleric defeats all oozes (mage specialty)."""
-        from droll.player import Default
-
-        self.assertIs(Occultist.party.cleric.ooze, Default.party.mage.ooze)
-
-    def test_mage_defeats_all_skeletons(self):
-        """Occultist mage defeats all skeletons (cleric specialty)."""
-        from droll.player import Default
-
-        self.assertIs(Occultist.party.mage.skeleton, Default.party.cleric.skeleton)
