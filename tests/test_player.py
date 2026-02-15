@@ -14,6 +14,7 @@ import droll.world as world
 
 
 def _remove_monsters(game: struct.World) -> struct.World:
+    """Remove all monsters from the dungeon for testing treasure interactions."""
     return replace(
         game, dungeon=replace(game.dungeon, goblin=0, skeleton=0, ooze=0)
     )
@@ -22,6 +23,7 @@ def _remove_monsters(game: struct.World) -> struct.World:
 class TestPlayer(unittest.TestCase):
 
     def setUp(self):
+        """Set up test fixtures with a game containing 2 of each dungeon and party item."""
         self.game = replace(
             world.new_world(),
             dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
@@ -30,6 +32,7 @@ class TestPlayer(unittest.TestCase):
         self.randrange = random.Random(4).randrange
 
     def test_fighter(self):
+        """Test fighter hero attacking goblins and oozes."""
         game = player.apply(
             player.Default, self.game, None, "fighter", "goblin"
         )
@@ -44,6 +47,7 @@ class TestPlayer(unittest.TestCase):
             player.apply(player.Default, game, None, "fighter", "ooze")
 
     def test_cleric(self):
+        """Test cleric hero attacking skeletons and opening chests."""
         with self.assertRaises(error.DrollError):
             player.apply(player.Default, self.game, None, "cleric", "dragon")
 
@@ -62,6 +66,7 @@ class TestPlayer(unittest.TestCase):
         assert sum(struct.field_values(game.treasure)) == 1
 
     def test_mage(self):
+        """Test mage hero attacking oozes and goblins."""
         game = player.apply(player.Default, self.game, None, "mage", "ooze")
         assert game.party.mage == 1
         assert game.dungeon.ooze == 0
@@ -71,6 +76,7 @@ class TestPlayer(unittest.TestCase):
         assert game.dungeon.goblin == 1
 
     def test_thief(self):
+        """Test thief hero opening chests without consuming monsters."""
         game = player.apply(player.Default, self.game, None, "thief", "ooze")
         assert game.party.thief == 1
         assert game.dungeon.ooze == 1
@@ -88,6 +94,7 @@ class TestPlayer(unittest.TestCase):
             player.apply(player.Default, game, None, "thief", "chest")
 
     def test_champion(self):
+        """Test champion hero attacking goblins and drinking potions."""
         game = player.apply(
             player.Default, self.game, None, "champion", "goblin"
         )
@@ -104,6 +111,7 @@ class TestPlayer(unittest.TestCase):
         assert game.party.mage == 3
 
     def test_scroll_quaff(self):
+        """Test scroll used to drink potions and obtain duplicate heroes."""
         with self.assertRaises(error.DrollError):
             player.apply(
                 player.Default,
@@ -130,10 +138,12 @@ class TestPlayer(unittest.TestCase):
         assert game.party.fighter == 4
 
     def test_scroll_reroll(self):
+        """Test scroll used to reroll dungeon dice."""
         # Consumed by canned_sequence just below
         sequence = [0, 1, 2]
 
         def canned_sequence(start, stop):
+            """Return predetermined sequence values for deterministic testing."""
             return start + sequence.pop(0)
 
         # Notice scroll causes chests to be re-rolled
@@ -154,12 +164,14 @@ class TestPlayer(unittest.TestCase):
 
 # Shorthand for testing completions given that method returns unsorted generator
 def complete(*args):
+    """Return sorted list of completions for testing purposes."""
     return list(sorted(player.complete(*args)))
 
 
 class TestComplete(unittest.TestCase):
 
     def setUp(self):
+        """Set up test fixtures for completion testing."""
         self.game = replace(
             world.new_world(),
             dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),

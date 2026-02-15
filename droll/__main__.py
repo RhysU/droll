@@ -29,6 +29,7 @@ AVAILABLE_HEROES = collections.OrderedDict(
 
 
 def main(args=None) -> None:
+    """Run the droll command-line game with the specified hero and options."""
     parser = argparse.ArgumentParser(prog="droll", description=__doc__)
     parser.add_argument(
         "hero",

@@ -16,6 +16,7 @@ import droll.world as world
 class TestTreasure(unittest.TestCase):
 
     def setUp(self):
+        """Set up test fixtures with a game containing dungeon items but no party."""
         self.game = replace(
             world.new_world(),
             dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
@@ -24,6 +25,7 @@ class TestTreasure(unittest.TestCase):
         self.randrange = random.Random(4).randrange
 
     def test_elixir(self):
+        """Test elixir treasure used to revive a party member."""
         game = replace(
             self.game, treasure=replace(self.game.treasure, elixir=1)
         )
@@ -39,6 +41,7 @@ class TestTreasure(unittest.TestCase):
             )
 
     def test_bait(self):
+        """Test bait treasure used to convert monsters to dragons."""
         game = replace(self.game, treasure=replace(self.game.treasure, bait=2))
         game = player.apply(
             player.Default, game, self.randrange, "bait", "dragon"
@@ -71,7 +74,9 @@ class TestTreasure(unittest.TestCase):
             player.apply(player.Default, game, None, identifier, "ooze")
 
     def test_sword_via_fighter(self):
+        """Test sword treasure referred to as 'fighter'."""
         self._helper_sword("fighter")
 
     def test_sword_via_itself(self):
+        """Test sword treasure referred to as 'sword'."""
         self._helper_sword("sword")

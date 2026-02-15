@@ -13,6 +13,7 @@ import droll.struct
 class TestDice(unittest.TestCase):
 
     def setUp(self):
+        """Set up test fixtures with a seeded random number generator."""
         self.state = random.Random(4)
 
     def test_roll_zero_dice(self):

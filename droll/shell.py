@@ -19,6 +19,7 @@ class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
 
     def __init__(self, game: Game, *, display_mode: DisplayMode) -> None:
+        """Initialize the shell with a game instance and display mode."""
         super(Shell, self).__init__()
         assert game is not None
         self._game = game
@@ -120,28 +121,34 @@ class Shell(cmd.Cmd):
 
     @functools.wraps(Game.ability)
     def do_ability(self, line) -> GameState:
+        """Execute the player's special ability with the given arguments."""
         return self._game.ability(*_parse(line))
 
     @functools.wraps(Game.apply)
     def default(self, line) -> GameState:
+        """Handle unknown commands by attempting to apply them as game actions."""
         return self._game.apply(*_parse(line))
 
     @functools.wraps(Game.descend)
     def do_descend(self, line) -> GameState:
+        """Descend to the next dungeon level."""
         _no_arguments(line)
         return self._game.descend()
 
     @functools.wraps(Game.reroll)
     def do_reroll(self, line) -> GameState:
+        """Reroll the specified dungeon dice."""
         return self._game.reroll(*_parse(line))
 
     @functools.wraps(Game.retire)
     def do_retire(self, line) -> GameState:
+        """Retire from the dungeon and end the game."""
         _no_arguments(line)
         return self._game.retire()
 
     @functools.wraps(Game.retreat)
     def do_retreat(self, line) -> GameState:
+        """Retreat from the current level back to the previous one."""
         _no_arguments(line)
         return self._game.retreat()
 
@@ -150,6 +157,7 @@ class Shell(cmd.Cmd):
     #######################
 
     def completedefault(self, text, line, begidx, endidx):
+        """Provide tab completion suggestions for default commands."""
         # Break line into tokens until and starting from present text
         names = self._game.completenames(
             text=text, head=_parse(line[:begidx]), tail=_parse(line[begidx:])
@@ -160,6 +168,7 @@ class Shell(cmd.Cmd):
         return [x + " " for x in names]
 
     def completenames(self, text, line, begidx, endidx):
+        """Provide tab completion suggestions for command names."""
         return self.completedefault(text, line, begidx, endidx)
 
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
@@ -189,40 +198,50 @@ class Shell(cmd.Cmd):
     """
 
     def help_ability(self):
+        """Display help for the ability command."""
         print(self.do_ability.__doc__)
         print()
         print(textwrap.indent(self._game._player.ability.__doc__, "    "))
 
     def help_bait(self):
+        """Display help for using bait against dragons."""
         print(action.bait_dragon.__doc__)
 
     def help_champion(self):
+        """Display help for using the champion hero."""
         print(self.doc_hero_template.format("champion"))
         print(self.doc_hero_example)
 
     def help_cleric(self):
+        """Display help for using the cleric hero."""
         print(self.doc_hero_template.format("cleric"))
         print(self.doc_hero_example)
 
     def help_elixir(self):
+        """Display help for using elixir treasures."""
         print(action.elixir.__doc__)
 
     def help_fighter(self):
+        """Display help for using the fighter hero."""
         print(self.doc_hero_template.format("fighter"))
         print(self.doc_hero_example)
 
     def help_mage(self):
+        """Display help for using the mage hero."""
         print(self.doc_hero_template.format("mage"))
         print(self.doc_hero_example)
 
     def help_ring(self):
+        """Display help for using rings of invisibility."""
         print("""Rings of invisibility sneak past a blocking dragon.""")
         print("""They are used automatically when descending or retiring.""")
 
     def help_sceptre(self):
+        """Display help for using sceptre treasures."""
         print("""Sceptres behave identically to a mage.""")
 
     def help_scroll(self):
+        """Display help for using scroll treasures."""
         print("Scrolls may quaff potions and re-roll dungeon dice like so:")
         print(
             """
@@ -238,19 +257,24 @@ class Shell(cmd.Cmd):
         )  # TODO Amend while working on Issue #21
 
     def help_scale(self):
+        """Display help for scale treasures."""
         print("""Scales are treasures that score 2 points per pair.""")
 
     def help_sword(self):
+        """Display help for using sword treasures."""
         print("""Swords behave identically to a fighter.""")
 
     def help_talisman(self):
+        """Display help for using talisman treasures."""
         print("""Talismans behave identically to a cleric.""")
 
     def help_thief(self):
+        """Display help for using the thief hero."""
         print(self.doc_hero_template.format("thief"))
         print(self.doc_hero_example)
 
     def help_tools(self):
+        """Display help for using tools treasures."""
         print("""Tools behave identically to a thief.""")
 
 

@@ -30,6 +30,7 @@ class Game:
     def __init__(
         self, player: struct.Player = player.Default, random: Random = None
     ) -> None:
+        """Initialize a new game with the specified player and random number generator."""
         self._player = player
         self._random = Random() if random is None else copy.copy(random)
         self._world = world.new_world()

@@ -16,9 +16,11 @@ import droll.world
 class TestWorld(unittest.TestCase):
 
     def setUp(self):
+        """Set up test fixtures with a seeded random number generator."""
         self.state = random.Random(4)
 
     def test_game_initial(self):
+        """Test initial game state has correct experience, treasure, and reserve."""
         game = droll.world.new_world()
         assert 0 == game.experience
         assert 0 == sum(droll.struct.field_values(game.treasure))
@@ -27,6 +29,7 @@ class TestWorld(unittest.TestCase):
         )
 
     def test_delve_initial(self):
+        """Test starting a new delve rolls party dice correctly."""
         game = droll.world.new_world()
         game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
@@ -36,6 +39,7 @@ class TestWorld(unittest.TestCase):
         assert 7 == sum(droll.struct.field_values(game.party))
 
     def test_dungeon_initial(self):
+        """Test descending into first dungeon level rolls dice correctly."""
         game = droll.world.new_world()
         game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
@@ -47,6 +51,7 @@ class TestWorld(unittest.TestCase):
         assert 1 == sum(droll.struct.field_values(game.dungeon))
 
     def test_draw_treasure(self):
+        """Test drawing treasure moves one item from reserve to treasure."""
         pre = droll.world.new_world()
         post = droll.world.draw_treasure(pre, self.state.randrange)
         assert sum(droll.struct.field_values(pre.treasure)) == 0
@@ -58,6 +63,7 @@ class TestWorld(unittest.TestCase):
         )
 
     def test_replace_treasure(self):
+        """Test replacing treasure moves one item from treasure to reserve."""
         pre = droll.world.new_world()
         pre = replace(pre, treasure=replace(pre.treasure, elixir=1))
         post = droll.world.replace_treasure(pre, "elixir")
@@ -70,6 +76,7 @@ class TestWorld(unittest.TestCase):
         )
 
     def test_retire_simple(self):
+        """Test retiring from dungeon with no obstacles grants experience."""
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
@@ -86,6 +93,7 @@ class TestWorld(unittest.TestCase):
         assert post.experience == pre.depth + pre.experience
 
     def test_retire_monsters(self):
+        """Test retiring with monsters requires portal, not ring."""
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
@@ -115,6 +123,7 @@ class TestWorld(unittest.TestCase):
         assert post.treasure.portal == 0
 
     def test_retire_dragon(self):
+        """Test retiring with dragons can use ring or portal, ring preferred."""
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
@@ -154,6 +163,7 @@ class TestWorld(unittest.TestCase):
         assert post3.treasure.portal == 1
 
     def test_descend_simple(self):
+        """Test descending to next level with no obstacles increments depth."""
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
@@ -171,6 +181,7 @@ class TestWorld(unittest.TestCase):
         assert post.depth == pre.depth + 1
 
     def test_descend_monsters(self):
+        """Test descending with monsters or dragons blocks without appropriate treasure."""
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
@@ -205,6 +216,7 @@ class TestWorld(unittest.TestCase):
             )
 
     def test_descend_dragon(self):
+        """Test descending with dragons requires ring, portal doesn't work."""
         pre = droll.world.new_world()
         pre = droll.world.delve(
             pre, droll.dice.roll_party, self.state.randrange
@@ -416,6 +428,7 @@ class TestWorld(unittest.TestCase):
         assert sum(droll.struct.field_values(game2.dungeon)) == 7
 
     def test_score(self):
+        """Test score calculation includes experience and treasure bonuses."""
         world = droll.struct.World(
             delve=3,
             depth=1,
