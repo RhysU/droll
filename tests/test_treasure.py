@@ -7,16 +7,13 @@ from dataclasses import fields, replace
 import random
 import unittest
 
-import droll.error as error
-import droll.player as player
-import droll.struct as struct
-import droll.world as world
+from droll import error, player, struct, world
 
 
 class TestTreasure(unittest.TestCase):
 
     def setUp(self):
-        """Set up test fixtures with a game containing dungeon items but no party."""
+        """Fixture with a game containing dungeon items but no party."""
         self.game = replace(
             world.new_world(),
             dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
@@ -56,7 +53,7 @@ class TestTreasure(unittest.TestCase):
             player.apply(player.Default, game, self.randrange, "bait")
 
     def _helper_sword(self, identifier):
-        """Test sword when referred to via identifier (e.g. 'sword', 'fighter')."""
+        """Sword when referred to via identifier (e.g. 'sword', 'fighter')."""
         game = replace(
             self.game, treasure=replace(self.game.treasure, sword=2)
         )
