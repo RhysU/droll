@@ -20,11 +20,11 @@ class TestShell(unittest.TestCase):
     def test_EOF(self):
         """Confirm providing EOF exits cmdloop(...)."""
         s = Shell(Game(), display_mode=DisplayMode.MECHANICAL)
-        assert not s.cmdqueue
+        self.assertFalse(s.cmdqueue)
         s.cmdqueue.append("EOF")
         s.cmdloop()
-        assert s.prompt == "(Default  0) "
-        assert s.lastcmd == ""
+        self.assertEqual(s.prompt, "(Default  0) ")
+        self.assertEqual(s.lastcmd, "")
 
     def test_help(self):
         """Confirm help invocations do not throw exceptions."""
@@ -71,14 +71,14 @@ class TestSummaryCommand(unittest.TestCase):
         """Confirm parse_summary_command(...) helper working as required."""
         sc = parse_summary_command(parse_summary_command.__doc__)
         s, c = next(sc)
-        assert s == "(delve=1, hello"
-        assert c == "cleric goblin"
+        self.assertEqual(s, "(delve=1, hello")
+        self.assertEqual(c, "cleric goblin")
         s, c = next(sc)
-        assert s == "(delve=1, world"
-        assert c == "descend"
+        self.assertEqual(s, "(delve=1, world")
+        self.assertEqual(c, "descend")
         try:
             s, c = next(sc)
-            assert False, "StopIteration expected"
+            self.fail("StopIteration expected")
         except StopIteration:
             pass
 
@@ -151,9 +151,10 @@ class TestSimple(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_simple.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert (
-                expected_summary == s.summary()
-            ), "Summary mismatch at {}".format(index)
+            self.assertEqual(
+                expected_summary, s.summary(),
+                "Summary mismatch at {}".format(index)
+            )
             s.onecmd(following_command)
 
 
@@ -193,7 +194,7 @@ class TestUndo(unittest.TestCase):
         onecmd("descend")
 
         # (delve=1, depth=2, dungeon=(goblin=2), ...)
-        assert s._game._world.dungeon.goblin == 2
+        self.assertEqual(s._game._world.dungeon.goblin, 2)
         with self.assertRaises(DrollError):
             onecmd("undo")
         onecmd("thief goblin")
@@ -204,9 +205,9 @@ class TestUndo(unittest.TestCase):
         onecmd("descend")
 
         # (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), ...)
-        assert s._game._world.dungeon.ooze == 1
-        assert s._game._world.dungeon.chest == 1
-        assert s._game._world.dungeon.potion == 1
+        self.assertEqual(s._game._world.dungeon.ooze, 1)
+        self.assertEqual(s._game._world.dungeon.chest, 1)
+        self.assertEqual(s._game._world.dungeon.potion, 1)
         with self.assertRaises(DrollError):
             onecmd("undo")
         onecmd("cleric ooze")
@@ -380,9 +381,10 @@ class TestKnight(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_knight.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert (
-                expected_summary == s.summary()
-            ), "Summary mismatch at {}".format(index)
+            self.assertEqual(
+                expected_summary, s.summary(),
+                "Summary mismatch at {}".format(index)
+            )
             s.onecmd(following_command)
 
 
@@ -459,9 +461,10 @@ class TestSpellsword(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_spellsword.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert (
-                expected_summary == s.summary()
-            ), "Summary mismatch at {}".format(index)
+            self.assertEqual(
+                expected_summary, s.summary(),
+                "Summary mismatch at {}".format(index)
+            )
             s.onecmd(following_command)
 
 
@@ -610,9 +613,10 @@ class TestMinstrel(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_minstrel.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert (
-                expected_summary == s.summary()
-            ), "Summary mismatch at {}".format(index)
+            self.assertEqual(
+                expected_summary, s.summary(),
+                "Summary mismatch at {}".format(index)
+            )
             s.onecmd(following_command)
 
 
@@ -726,9 +730,10 @@ class TestCrusader(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_crusader.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert (
-                expected_summary == s.summary()
-            ), "Summary mismatch at {}".format(index)
+            self.assertEqual(
+                expected_summary, s.summary(),
+                "Summary mismatch at {}".format(index)
+            )
             s.onecmd(following_command)
 
 
@@ -893,7 +898,8 @@ class TestEnchantress(unittest.TestCase):
         s.preloop()
         parsed = parse_summary_command(self.test_enchantress.__doc__)
         for index, (expected_summary, following_command) in enumerate(parsed):
-            assert (
-                expected_summary == s.summary()
-            ), "Summary mismatch at {}".format(index)
+            self.assertEqual(
+                expected_summary, s.summary(),
+                "Summary mismatch at {}".format(index)
+            )
             s.onecmd(following_command)

@@ -22,11 +22,11 @@ class TestWorld(unittest.TestCase):
     def test_game_initial(self):
         """Test initial game state has correct experience, treasure, and reserve."""
         game = droll.world.new_world()
-        assert 0 == game.experience
-        assert 0 == sum(droll.struct.field_values(game.treasure))
-        assert (6 * 3) + (4 * 3) + 6 == sum(
+        self.assertEqual(0, game.experience)
+        self.assertEqual(0, sum(droll.struct.field_values(game.treasure)))
+        self.assertEqual((6 * 3) + (4 * 3) + 6, sum(
             droll.struct.field_values(game.reserve)
-        )
+        ))
 
     def test_delve_initial(self):
         """Test starting a new delve rolls party dice correctly."""
@@ -34,9 +34,9 @@ class TestWorld(unittest.TestCase):
         game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
-        assert 0 == game.depth
-        assert game.ability is True
-        assert 7 == sum(droll.struct.field_values(game.party))
+        self.assertEqual(0, game.depth)
+        self.assertTrue(game.ability is True)
+        self.assertEqual(7, sum(droll.struct.field_values(game.party)))
 
     def test_dungeon_initial(self):
         """Test descending into first dungeon level rolls dice correctly."""
@@ -47,19 +47,19 @@ class TestWorld(unittest.TestCase):
         game = droll.world.descend(
             game, droll.dice.roll_dungeon, self.state.randrange
         )
-        assert 1 == game.depth
-        assert 1 == sum(droll.struct.field_values(game.dungeon))
+        self.assertEqual(1, game.depth)
+        self.assertEqual(1, sum(droll.struct.field_values(game.dungeon)))
 
     def test_draw_treasure(self):
         """Test drawing treasure moves one item from reserve to treasure."""
         pre = droll.world.new_world()
         post = droll.world.draw_treasure(pre, self.state.randrange)
-        assert sum(droll.struct.field_values(pre.treasure)) == 0
-        assert sum(droll.struct.field_values(post.treasure)) == 1
-        assert (
+        self.assertEqual(sum(droll.struct.field_values(pre.treasure)), 0)
+        self.assertEqual(sum(droll.struct.field_values(post.treasure)), 1)
+        self.assertEqual(
             sum(droll.struct.field_values(pre.reserve))
-            - sum(droll.struct.field_values(post.reserve))
-            == 1
+            - sum(droll.struct.field_values(post.reserve)),
+            1
         )
 
     def test_replace_treasure(self):
@@ -67,12 +67,12 @@ class TestWorld(unittest.TestCase):
         pre = droll.world.new_world()
         pre = replace(pre, treasure=replace(pre.treasure, elixir=1))
         post = droll.world.replace_treasure(pre, "elixir")
-        assert sum(droll.struct.field_values(pre.treasure)) == 1
-        assert sum(droll.struct.field_values(post.treasure)) == 0
-        assert (
+        self.assertEqual(sum(droll.struct.field_values(pre.treasure)), 1)
+        self.assertEqual(sum(droll.struct.field_values(post.treasure)), 0)
+        self.assertEqual(
             sum(droll.struct.field_values(post.reserve))
-            - sum(droll.struct.field_values(pre.reserve))
-            == 1
+            - sum(droll.struct.field_values(pre.reserve)),
+            1
         )
 
     def test_retire_simple(self):
@@ -88,9 +88,9 @@ class TestWorld(unittest.TestCase):
                 goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=0
             ),
         )
-        assert pre.depth > 0
+        self.assertGreater(pre.depth, 0)
         post = droll.world.retire(pre)
-        assert post.experience == pre.depth + pre.experience
+        self.assertEqual(post.experience, pre.depth + pre.experience)
 
     def test_retire_monsters(self):
         """Test retiring with monsters requires portal, not ring."""
@@ -105,7 +105,7 @@ class TestWorld(unittest.TestCase):
                 goblin=0, skeleton=1, ooze=0, chest=2, potion=5, dragon=0
             ),
         )
-        assert pre.depth > 0
+        self.assertGreater(pre.depth, 0)
 
         # Neither town portal nor ring of invisibility
         with self.assertRaises(droll.error.DrollError):
@@ -119,8 +119,8 @@ class TestWorld(unittest.TestCase):
         # Town portal
         pre = replace(pre, treasure=replace(pre.treasure, portal=1))
         post = droll.world.retire(pre)
-        assert post.experience == pre.depth + pre.experience
-        assert post.treasure.portal == 0
+        self.assertEqual(post.experience, pre.depth + pre.experience)
+        self.assertEqual(post.treasure.portal, 0)
 
     def test_retire_dragon(self):
         """Test retiring with dragons can use ring or portal, ring preferred."""
@@ -135,7 +135,7 @@ class TestWorld(unittest.TestCase):
                 goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=3
             ),
         )
-        assert pre.depth > 0
+        self.assertGreater(pre.depth, 0)
 
         # Neither town portal nor ring of invisibility
         with self.assertRaises(droll.error.DrollError):
@@ -144,23 +144,23 @@ class TestWorld(unittest.TestCase):
         # Ring of invisibility
         pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=0))
         post1 = droll.world.retire(pre)
-        assert post1.experience == pre.depth + pre.experience
-        assert post1.treasure.ring == 0
-        assert post1.treasure.portal == 0
+        self.assertEqual(post1.experience, pre.depth + pre.experience)
+        self.assertEqual(post1.treasure.ring, 0)
+        self.assertEqual(post1.treasure.portal, 0)
 
         # Town portal
         pre = replace(pre, treasure=replace(pre.treasure, ring=0, portal=1))
         post2 = droll.world.retire(pre)
-        assert post2.experience == pre.depth + pre.experience
-        assert post2.treasure.ring == 0
-        assert post2.treasure.portal == 0
+        self.assertEqual(post2.experience, pre.depth + pre.experience)
+        self.assertEqual(post2.treasure.ring, 0)
+        self.assertEqual(post2.treasure.portal, 0)
 
         # Both should consume the ring of invisibility first
         pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=1))
         post3 = droll.world.retire(pre)
-        assert post3.experience == pre.depth + pre.experience
-        assert post3.treasure.ring == 0
-        assert post3.treasure.portal == 1
+        self.assertEqual(post3.experience, pre.depth + pre.experience)
+        self.assertEqual(post3.treasure.ring, 0)
+        self.assertEqual(post3.treasure.portal, 1)
 
     def test_descend_simple(self):
         """Test descending to next level with no obstacles increments depth."""
@@ -178,7 +178,7 @@ class TestWorld(unittest.TestCase):
         post = droll.world.descend(
             pre, droll.dice.roll_dungeon, self.state.randrange
         )
-        assert post.depth == pre.depth + 1
+        self.assertEqual(post.depth, pre.depth + 1)
 
     def test_descend_monsters(self):
         """Test descending with monsters or dragons blocks without appropriate treasure."""
@@ -193,7 +193,7 @@ class TestWorld(unittest.TestCase):
                 goblin=0, skeleton=1, ooze=0, chest=2, potion=5, dragon=1
             ),
         )
-        assert pre.depth > 0
+        self.assertGreater(pre.depth, 0)
 
         # Neither town portal nor ring of invisibility
         with self.assertRaises(droll.error.DrollError):
@@ -228,7 +228,7 @@ class TestWorld(unittest.TestCase):
                 goblin=0, skeleton=0, ooze=0, chest=2, potion=5, dragon=3
             ),
         )
-        assert pre.depth > 0
+        self.assertGreater(pre.depth, 0)
 
         # Neither town portal nor ring of invisibility
         with self.assertRaises(droll.error.DrollError):
@@ -241,9 +241,9 @@ class TestWorld(unittest.TestCase):
         post1 = droll.world.descend(
             pre, droll.dice.roll_dungeon, self.state.randrange
         )
-        assert post1.depth == pre.depth + 1
-        assert post1.treasure.ring == 0
-        assert post1.treasure.portal == 0
+        self.assertEqual(post1.depth, pre.depth + 1)
+        self.assertEqual(post1.treasure.ring, 0)
+        self.assertEqual(post1.treasure.portal, 0)
 
         # Town portal
         pre = replace(pre, treasure=replace(pre.treasure, ring=0, portal=1))
@@ -257,9 +257,9 @@ class TestWorld(unittest.TestCase):
         post3 = droll.world.descend(
             pre, droll.dice.roll_dungeon, self.state.randrange
         )
-        assert post3.depth == pre.depth + 1
-        assert post3.treasure.ring == 0
-        assert post3.treasure.portal == 1
+        self.assertEqual(post3.depth, pre.depth + 1)
+        self.assertEqual(post3.treasure.ring, 0)
+        self.assertEqual(post3.treasure.portal, 1)
 
     def test_regroup_discard(self):
         """Temporary party dice must be discarded during next regroup phase."""
@@ -285,21 +285,21 @@ class TestWorld(unittest.TestCase):
         descended = droll.world.descend(
             pre1, droll.dice.roll_dungeon, self.state.randrange
         )
-        assert descended.party == droll.struct.Party(
+        self.assertEqual(descended.party, droll.struct.Party(
             fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
-        )
-        assert descended.regroup.discard == droll.struct.Party(
+        ))
+        self.assertEqual(descended.regroup.discard, droll.struct.Party(
             fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
-        )
+        ))
 
         # Second, confirm retiring works as expected
         retired = droll.world.retire(pre1)
-        assert retired.party == droll.struct.Party(
+        self.assertEqual(retired.party, droll.struct.Party(
             fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
-        )
-        assert retired.regroup.discard == droll.struct.Party(
+        ))
+        self.assertEqual(retired.regroup.discard, droll.struct.Party(
             fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
-        )
+        ))
 
         # Third, confirm retreating works as expected
         pre2 = replace(
@@ -307,39 +307,39 @@ class TestWorld(unittest.TestCase):
             dungeon=droll.struct.Dungeon(goblin=1)  # Threat required!
         )
         retreated = droll.world.retreat(pre2)
-        assert retreated.party == droll.struct.Party(
+        self.assertEqual(retreated.party, droll.struct.Party(
             fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
-        )
-        assert retreated.regroup.discard == droll.struct.Party(
+        ))
+        self.assertEqual(retreated.regroup.discard, droll.struct.Party(
             fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
-        )
+        ))
 
     def test_exhausted_dungeon(self):
         """Test exhausted_dungeon detects when no actions remain."""
         # None dungeon is exhausted
-        assert droll.world.exhausted_dungeon(None)
+        self.assertTrue(droll.world.exhausted_dungeon(None))
 
         # Empty dungeon is exhausted
-        assert droll.world.exhausted_dungeon(droll.struct.Dungeon())
+        self.assertTrue(droll.world.exhausted_dungeon(droll.struct.Dungeon()))
 
         # Dungeon with only dragons (blocking) is not exhausted
-        assert not droll.world.exhausted_dungeon(
+        self.assertFalse(droll.world.exhausted_dungeon(
             droll.struct.Dungeon(dragon=3)
-        )
+        ))
 
         # Dungeon with monsters is not exhausted
-        assert not droll.world.exhausted_dungeon(
+        self.assertFalse(droll.world.exhausted_dungeon(
             droll.struct.Dungeon(goblin=1)
-        )
-        assert not droll.world.exhausted_dungeon(
+        ))
+        self.assertFalse(droll.world.exhausted_dungeon(
             droll.struct.Dungeon(skeleton=2)
-        )
-        assert not droll.world.exhausted_dungeon(droll.struct.Dungeon(ooze=1))
+        ))
+        self.assertFalse(droll.world.exhausted_dungeon(droll.struct.Dungeon(ooze=1)))
 
         # Dungeon with chests/potions still has actions (not exhausted)
-        assert not droll.world.exhausted_dungeon(
+        self.assertFalse(droll.world.exhausted_dungeon(
             droll.struct.Dungeon(chest=2, potion=3)
-        )
+        ))
 
     def test_retreat_valid(self):
         """Test valid retreat scenarios."""
@@ -349,8 +349,8 @@ class TestWorld(unittest.TestCase):
         )
         game = replace(game, depth=2, dungeon=droll.struct.Dungeon(goblin=1))
         result = droll.world.retreat(game)
-        assert result.depth == 0
-        assert result.dungeon is None
+        self.assertEqual(result.depth, 0)
+        self.assertIsNone(result.dungeon)
 
     def test_retreat_at_depth_one_with_monster(self):
         """Test retreat succeeds at depth 1 when a monster is present"""
@@ -360,8 +360,8 @@ class TestWorld(unittest.TestCase):
         )
         game = replace(game, depth=1, dungeon=droll.struct.Dungeon(goblin=1))
         result = droll.world.retreat(game)
-        assert result.depth == 0
-        assert result.dungeon is None
+        self.assertEqual(result.depth, 0)
+        self.assertIsNone(result.dungeon)
 
     def test_retreat_at_depth_one_without_monster(self):
         """Test retreat fails at depth 1 when no monster is present"""
@@ -379,7 +379,7 @@ class TestWorld(unittest.TestCase):
         game = droll.world.delve(
             game, droll.dice.roll_party, self.state.randrange
         )
-        assert game.depth == 0
+        self.assertEqual(game.depth, 0)
 
         with self.assertRaises(droll.error.DrollError):
             droll.world.retreat(game)
@@ -418,14 +418,14 @@ class TestWorld(unittest.TestCase):
             game, droll.dice.roll_dungeon, self.state.randrange
         )
         # First dungeon at depth 1 should have exactly 1 die (min of depth and 7)
-        assert sum(droll.struct.field_values(game.dungeon)) == 1
+        self.assertEqual(sum(droll.struct.field_values(game.dungeon)), 1)
 
         # At depth 7+, should have 7 dice
         game2 = replace(game, depth=6, dungeon=droll.struct.Dungeon())
         game2 = droll.world.descend(
             game2, droll.dice.roll_dungeon, self.state.randrange
         )
-        assert sum(droll.struct.field_values(game2.dungeon)) == 7
+        self.assertEqual(sum(droll.struct.field_values(game2.dungeon)), 7)
 
     def test_score(self):
         """Test score calculation includes experience and treasure bonuses."""
@@ -450,4 +450,4 @@ class TestWorld(unittest.TestCase):
             ),
             reserve=None,
         )
-        assert 20 == droll.world.score(world)
+        self.assertEqual(20, droll.world.score(world))

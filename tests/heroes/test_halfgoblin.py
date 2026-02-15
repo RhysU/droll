@@ -35,9 +35,9 @@ class TestHalfGoblin(unittest.TestCase):
             world, state.randrange, "ability", "goblin"
         )
         # Discard during subsequent regroup phase tested elsewhere
-        assert result.dungeon.goblin == 1
-        assert result.party.thief == 1
-        assert result.ability is False
+        self.assertEqual(result.dungeon.goblin, 1)
+        self.assertEqual(result.party.thief, 1)
+        self.assertFalse(result.ability)
 
     def test_chieftain_transforms_two_monsters(self):
         """Chieftain transforms 2 goblins into 2 thieves when available."""
@@ -56,9 +56,9 @@ class TestHalfGoblin(unittest.TestCase):
             world, state.randrange, "ability", "goblin", "goblin"
         )
         # Discard during subsequent regroup phase tested elsewhere
-        assert result.dungeon.goblin == 0
-        assert result.dungeon.skeleton == 1
-        assert result.party.thief == 2
+        self.assertEqual(result.dungeon.goblin, 0)
+        self.assertEqual(result.dungeon.skeleton, 1)
+        self.assertEqual(result.party.thief, 2)
 
     def test_chieftain_transforms_two_monsters(self):
         """Chieftain transforms 1 goblin into 1 thieves when 1 available."""
@@ -77,9 +77,9 @@ class TestHalfGoblin(unittest.TestCase):
             world, state.randrange, "ability", "goblin",
         )
         # Discard during subsequent regroup phase tested elsewhere
-        assert result.dungeon.goblin == 0
-        assert result.dungeon.skeleton == 1
-        assert result.party.thief == 1
+        self.assertEqual(result.dungeon.goblin, 0)
+        self.assertEqual(result.dungeon.skeleton, 1)
+        self.assertEqual(result.party.thief, 1)
 
     def test_halfgoblin_advances_to_chieftain(self):
         """HalfGoblin advances to Chieftain at 5+ experience."""
@@ -103,8 +103,8 @@ class TestHalfGoblin(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        assert HalfGoblin.advance(low_xp) == HalfGoblin
-        assert HalfGoblin.advance(high_xp) == Chieftain
+        self.assertEqual(HalfGoblin.advance(low_xp), HalfGoblin)
+        self.assertEqual(HalfGoblin.advance(high_xp), Chieftain)
 
     def test_halfgoblin_fighter_chests_potions(self):
         """HalfGoblin opens chests and quaff portions when monsters present."""
@@ -121,13 +121,13 @@ class TestHalfGoblin(unittest.TestCase):
         )
 
         result1 = HalfGoblin.party.fighter.chest(world, randrange, "fighter", "chest")
-        assert result1.dungeon.chest == 0
-        assert result1.dungeon.goblin == 1
-        assert result1.party.fighter == 4
-        assert result1.treasure.scale == 1
+        self.assertEqual(result1.dungeon.chest, 0)
+        self.assertEqual(result1.dungeon.goblin, 1)
+        self.assertEqual(result1.party.fighter, 4)
+        self.assertEqual(result1.treasure.scale, 1)
 
         result2 = HalfGoblin.party.fighter.potion(world, randrange, "fighter", "potion", "mage")
-        assert result2.dungeon.goblin == 1
-        assert result2.dungeon.potion == 0
-        assert result2.party.fighter == 4
-        assert result2.party.mage == 1
+        self.assertEqual(result2.dungeon.goblin, 1)
+        self.assertEqual(result2.dungeon.potion, 0)
+        self.assertEqual(result2.party.fighter, 4)
+        self.assertEqual(result2.party.mage, 1)

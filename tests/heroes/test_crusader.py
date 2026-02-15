@@ -32,8 +32,8 @@ class TestCrusader(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         result = _crusader_ability(world, state.randrange, "ability", "fighter")
-        assert result.party.fighter == 2
-        assert result.ability is False
+        self.assertEqual(result.party.fighter, 2)
+        self.assertFalse(result.ability)
 
     def test_crusader_ability_adds_cleric(self):
         """Crusader ability adds a cleric to party."""
@@ -49,7 +49,7 @@ class TestCrusader(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         result = _crusader_ability(world, state.randrange, "ability", "cleric")
-        assert result.party.cleric == 2
+        self.assertEqual(result.party.cleric, 2)
 
     def test_crusader_ability_rejects_invalid_target(self):
         """Crusader ability rejects invalid targets like mage."""
@@ -89,8 +89,8 @@ class TestCrusader(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        assert Crusader.advance(low_xp) == Crusader
-        assert Crusader.advance(high_xp) == Paladin
+        self.assertEqual(Crusader.advance(low_xp), Crusader)
+        self.assertEqual(Crusader.advance(high_xp), Paladin)
 
     def test_paladin_ability_clears_dungeon(self):
         """Paladin ability consumes treasure and clears dungeon."""
@@ -106,9 +106,9 @@ class TestCrusader(unittest.TestCase):
             reserve=droll.struct.Treasure(sword=1, talisman=1),
         )
         result = _paladin_ability(world, state.randrange, "ability", "elixir")
-        assert sum(droll.struct.field_values(result.dungeon)) == 0
-        assert result.treasure.elixir == 0
-        assert result.ability is False
+        self.assertEqual(sum(droll.struct.field_values(result.dungeon)), 0)
+        self.assertEqual(result.treasure.elixir, 0)
+        self.assertFalse(result.ability)
 
     def test_paladin_ability_opens_chests(self):
         """Paladin ability draws treasure for each chest."""
@@ -126,8 +126,8 @@ class TestCrusader(unittest.TestCase):
         pre_treasure = sum(droll.struct.field_values(world.treasure))
         result = _paladin_ability(world, state.randrange, "ability", "bait")
         post_treasure = sum(droll.struct.field_values(result.treasure))
-        assert (
-            post_treasure == pre_treasure - 1 + 2
+        self.assertEqual(
+            post_treasure, pre_treasure - 1 + 2
         )  # -1 consumed, +2 from chests
 
     def test_paladin_ability_revives_from_potions(self):
@@ -146,8 +146,8 @@ class TestCrusader(unittest.TestCase):
         result = _paladin_ability(
             world, state.randrange, "ability", "elixir", "mage", "thief"
         )
-        assert result.party.mage == 1
-        assert result.party.thief == 1
+        self.assertEqual(result.party.mage, 1)
+        self.assertEqual(result.party.thief, 1)
 
     def test_paladin_ability_requires_treasure(self):
         """Paladin ability fails without specifying treasure."""
