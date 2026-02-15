@@ -3,26 +3,26 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of Game (at least driving with basic commands)."""
 
-import random
 from dataclasses import replace
+import random
 import unittest
 
+from droll import struct
 from droll.error import DrollError
 from droll.game import Game, GameState
 from droll.player import Default
-import droll.struct
 
 
 class TestGame(unittest.TestCase):
 
     def test_game_construction(self):
-        """Test that Game can be constructed with various parameter combinations."""
+        """Game can be constructed with various parameter combinations."""
         Game()
         Game(player=Default)
         Game(random=random.Random(4))
 
     def test_gamestate_truthiness(self):
-        """Test that GameState values coerce to boolean correctly for control flow."""
+        """GameState values coerce to boolean correctly for control flow."""
         self.assertTrue(GameState.STOP, "STOP must coerce to True.")
         self.assertFalse(GameState.PLAY, "PLAY must coerce to False.")
 
@@ -35,7 +35,7 @@ class TestGame(unittest.TestCase):
             g._world,
             depth=1,
             party=replace(g._world.party, scroll=1),
-            dungeon=droll.struct.Dungeon(goblin=2),
+            dungeon=struct.Dungeon(goblin=2),
         )
         pre_scroll = g._world.party.scroll
         g.reroll("goblin")
@@ -51,7 +51,7 @@ class TestGame(unittest.TestCase):
             g._world,
             depth=1,
             party=replace(g._world.party, scroll=1),
-            dungeon=droll.struct.Dungeon(potion=2),
+            dungeon=struct.Dungeon(potion=2),
         )
         pre_scroll = g._world.party.scroll
         g.reroll("potion")
@@ -66,7 +66,7 @@ class TestGame(unittest.TestCase):
             g._world,
             depth=1,
             party=replace(g._world.party, scroll=1),
-            dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
+            dungeon=struct.Dungeon(goblin=1, skeleton=1),
         )
         g.reroll("goblin", "skeleton")
         self.assertEqual(g._world.party.scroll, 0)
