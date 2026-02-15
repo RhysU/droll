@@ -10,25 +10,25 @@ from .. import action
 from .. import dice
 from .. import error
 from .. import struct
-from .. import world
+from ..world import defeated_monsters
 from ..player import Default
 
 
 def _enchantress_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion."""
-    dungeon = game.dungeon
+    dungeon = world.dungeon
     dungeon = action.decrement_dungeon(dungeon, target)
     dungeon = action.increment_dungeon(dungeon, "potion")
-    return action.consume_ability(replace(game, dungeon=dungeon))
+    return action.consume_ability(replace(world, dungeon=dungeon))
 
 
 def _beguiler_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -37,19 +37,19 @@ def _beguiler_ability(
     """Transform at most 2 monsters into 1 potion.
 
     Requires transforming 2 monsters when 2+ monsters available."""
-    dungeon = game.dungeon
+    dungeon = world.dungeon
     dungeon = action.decrement_dungeon(dungeon, target)
     if len(extra_targets) > 1:
         raise error.DrollError("At most 2 targets can be transformed.")
     elif len(extra_targets) == 1:
         dungeon = action.decrement_dungeon(dungeon, extra_targets[0])
-    elif not world.defeated_monsters(dungeon):
+    elif not defeated_monsters(dungeon):
         assert len(extra_targets) == 0
         raise error.DrollError("Require 2 targets when 2+ available.")
     else:
         pass
     dungeon = action.increment_dungeon(dungeon, "potion")
-    return action.consume_ability(replace(game, dungeon=dungeon))
+    return action.consume_ability(replace(world, dungeon=dungeon))
 
 
 # Scrolls act as wildcards for dragon defeats

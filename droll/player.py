@@ -10,7 +10,7 @@ from . import action
 from . import dice
 from . import error
 from . import struct
-from . import world
+from .world import replace_treasure
 
 # Rules governing a default player lacking any special abilities.
 # Effectively, this data is one large, dense dispatch table.
@@ -93,13 +93,13 @@ Default = struct.Player(
 
 def apply(
     player: struct.Player,
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: str = None,
     *additional,
 ) -> struct.World:
-    """Apply noun to target within game, returning a new version.
+    """Apply noun to target within world, returning a new version.
 
     Processes hero-like artifacts (i.e. not rings/portals/scales).
     Varargs 'additional' permits passing more required information.
@@ -119,19 +119,19 @@ def apply(
     if noun in {"ability", "bait", "elixir"}:
         try:
             action_ = getattr(player, noun)  # Else name collision w/ import
-            return action_(game, randrange, noun, target, *additional)
+            return action_(world, randrange, noun, target, *additional)
         except AttributeError as cause:
             raise error.DrollError(str(cause)) from cause
 
     # Many treasures behave exactly like party members, so
     # convert into party members prior to action invocation.
-    prior_treasure = game.treasure
-    game = replace(
-        game,
+    prior_treasure = world.treasure
+    world = replace(
+        world,
         party=replace(
-            game.party,
+            world.party,
             **{
-                hero: getattr(game.party, hero)
+                hero: getattr(world.party, hero)
                 + getattr(prior_treasure, artifact)
                 for hero, artifact in struct.field_items(player.artifacts)
                 if artifact is not None
@@ -143,7 +143,7 @@ def apply(
         # Re-roll is a special verb that always overrides scroll settings
         # found within struct.Player so, e.g., Beguiler can re-roll dice
         # with "reroll skeleton" because "scroll skeleton" kills a skeleton.
-        game = action.reroll(game, randrange, "scroll", target, *additional)
+        world = action.reroll(world, randrange, "scroll", target, *additional)
     else:
         # Apply a hero (possibly phantom per above) to some targets.
         try:
@@ -153,17 +153,17 @@ def apply(
                     '"{}" requires some target'.format(noun)
                 )
             action_ = getattr(action_, target)
-            game = action_(game, randrange, noun, target, *additional)
+            world = action_(world, randrange, noun, target, *additional)
         except AttributeError as cause:
             raise error.DrollError(str(cause)) from cause
 
     # Undo the prior transformation by subtracting prior_treasure.
-    game = replace(
-        game,
+    world = replace(
+        world,
         party=replace(
-            game.party,
+            world.party,
             **{
-                hero: getattr(game.party, hero)
+                hero: getattr(world.party, hero)
                 - getattr(prior_treasure, artifact)
                 for hero, artifact in struct.field_items(player.artifacts)
                 if artifact is not None
@@ -172,16 +172,16 @@ def apply(
     )
 
     # Consume treasure equivalent to any hero which has gone negative.
-    for hero, quantity in struct.field_items(game.party):
+    for hero, quantity in struct.field_items(world.party):
         if quantity >= 0:
             continue
         for _ in range(-min(0, quantity)):
-            game = world.replace_treasure(
-                game, getattr(player.artifacts, hero)
+            world = replace_treasure(
+                world, getattr(player.artifacts, hero)
             )
-        game = replace(game, party=replace(game.party, **{hero: 0}))
+        world = replace(world, party=replace(world.party, **{hero: 0}))
 
-    return game
+    return world
 
 
 def _partify(token: str, artifacts: struct.Party):
@@ -205,14 +205,14 @@ TREASURE_NO_COMMAND = frozenset({"portal", "ring", "scale"})
 
 
 def complete(
-    game: struct.World, tokens: typing.Sequence[str], text: str, position: int
+    world: struct.World, tokens: typing.Sequence[str], text: str, position: int
 ) -> typing.Sequence[str]:
     """Possible completions for text with position among (partial) tokens."""
     # First compute candidate completions independent of observed text
     if position == 0:
         candidates = {
             key
-            for source in (game.party, game.treasure)
+            for source in (world.party, world.treasure)
             if source is not None
             for key, value in struct.field_items(source)
             if value and key not in TREASURE_NO_COMMAND
@@ -225,7 +225,7 @@ def complete(
     elif position == 1:
         candidates = {
             key
-            for source in (game.party, game.dungeon)
+            for source in (world.party, world.dungeon)
             if source is not None
             for key, value in struct.field_items(source)
             if value

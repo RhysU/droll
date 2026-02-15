@@ -14,7 +14,7 @@ from ..player import Default
 
 
 def _minstrel_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -24,7 +24,7 @@ def _minstrel_ability(
     if target != "dragon":
         raise error.DrollError("Can only discard {} dice".format(target))
     return action.consume_ability(
-        replace(game, dungeon=action.eliminate_dungeon(game.dungeon, target))
+        replace(world, dungeon=action.eliminate_dungeon(world.dungeon, target))
     )
 
 
