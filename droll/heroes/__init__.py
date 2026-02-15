@@ -8,6 +8,7 @@ from .enchantress import Beguiler, Enchantress
 from .halfgoblin import Chieftain, HalfGoblin
 from .knight import Knight, DragonSlayer
 from .minstrel import Minstrel, Bard
+from .occultist import Occultist, Necromancer
 from .spellsword import Spellsword, Battlemage
 
 __all__ = (
@@ -21,6 +22,8 @@ __all__ = (
     HalfGoblin.name,
     Knight.name,
     Minstrel.name,
+    Necromancer.name,
+    Occultist.name,
     Paladin.name,
     Spellsword.name,
 )
