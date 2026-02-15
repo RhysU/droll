@@ -16,6 +16,7 @@ from droll.heroes import (
     HalfGoblin,
     Knight,
     Minstrel,
+    Occultist,
     Spellsword,
 )
 from droll.player import Default
@@ -268,7 +269,7 @@ class TestUndo(unittest.TestCase):
 class TestKnight(unittest.TestCase):
 
     def test_knight(self):
-        """Runs the following scenario involving unique Knight/Dragonslayer details:
+        """Runs following scenario involving unique Knight/Dragonslayer details:
 
         (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, champion=1), ability=True, regroup=(discard=()), treasure=())
         (Knight  0) descend
@@ -418,7 +419,7 @@ class TestKnight(unittest.TestCase):
 class TestSpellsword(unittest.TestCase):
 
     def test_spellsword(self):
-        """Runs the following scenario involving unique Spellsword/Battlemage details:
+        """Runs following scenario with unique Spellsword/Battlemage details:
 
         (delve=1, party=(cleric=1, mage=3, thief=1, champion=1, scroll=1), ability=True, regroup=(discard=()), treasure=())
         (Spellsword  0) ability fighter
@@ -505,7 +506,7 @@ class TestSpellsword(unittest.TestCase):
 class TestMinstrel(unittest.TestCase):
 
     def test_minstrel(self):
-        """Runs the following scenario involving unique Minstrel/Bard details:
+        """Runs following scenario involving unique Minstrel/Bard details:
 
         (delve=1, party=(fighter=1, cleric=1, mage=2, thief=1, scroll=2), ability=True, regroup=(discard=()), treasure=())
         (Minstrel  0) descend
@@ -665,7 +666,7 @@ class TestCrusader(unittest.TestCase):
 
     def test_crusader(self):
         """
-        Runs the following scenario involving unique Crusader/Paladin details:
+        Runs following scenario involving unique Crusader/Paladin details:
 
         (delve=1, party=(cleric=2, mage=3, champion=1, scroll=1), ability=True, regroup=(discard=()), treasure=())
         (Crusader  0) descend
@@ -789,7 +790,7 @@ class TestEnchantress(unittest.TestCase):
 
     def test_enchantress(self):
         """
-        Runs the following scenario involving unique Enchantress/Beguiler details:
+        Runs following scenario involving unique Enchantress/Beguiler details:
 
         (delve=1, party=(cleric=1, mage=2, thief=1, champion=1, scroll=2), ability=True, regroup=(discard=()), treasure=())
         (Enchantress  0) descend
@@ -964,7 +965,7 @@ class TestHalfGoblin(unittest.TestCase):
 
     def test_halfgoblin(self):
         """
-        Runs the following scenario involving unique HalfGoblin/Chieftain details:
+        Runs following scenario involving unique HalfGoblin/Chieftain details:
 
         (delve=1, party=(fighter=1, cleric=1, mage=2, thief=1, scroll=2), ability=True, regroup=(discard=()), treasure=())
         (HalfGoblin  0) descend
@@ -1080,3 +1081,100 @@ class TestHalfGoblin(unittest.TestCase):
 
         # Confirm some non-trivial processing occurred
         self.assertEqual(index, 31)
+
+
+class TestOccultist(unittest.TestCase):
+
+    def test_occultist(self):
+        """
+        Runs following scenario involving unique Occultist/Necromancer details:
+
+        (delve=1, party=(fighter=3, mage=1, champion=1, scroll=2), ability=True, regroup=(discard=()), treasure=())
+        (Occultist  0) descend
+
+        (delve=1, depth=1, dungeon=(potion=1), party=(fighter=3, mage=1, champion=1, scroll=2), ability=True, regroup=(discard=()), treasure=())
+        (Occultist  0) scroll potion cleric
+
+        (delve=1, depth=1, dungeon=(), party=(fighter=3, cleric=1, mage=1, champion=1, scroll=1), ability=True, regroup=(discard=()), treasure=())
+        (Occultist  0) descend
+
+        (delve=1, depth=2, dungeon=(dragon=2), party=(fighter=3, cleric=1, mage=1, champion=1, scroll=1), ability=True, regroup=(discard=()), treasure=())
+        (Occultist  0) descend
+
+        (delve=1, depth=3, dungeon=(ooze=1, chest=1, dragon=3), party=(fighter=3, cleric=1, mage=1, champion=1, scroll=1), ability=True, regroup=(discard=()), treasure=())
+        (Occultist  0) scroll ooze
+
+        (delve=1, depth=3, dungeon=(goblin=1, chest=1, dragon=3), party=(fighter=3, cleric=1, mage=1, champion=1), ability=True, regroup=(discard=()), treasure=())
+        (Occultist  0) mage goblin
+
+        (delve=1, depth=3, dungeon=(chest=1, dragon=3), party=(fighter=3, cleric=1, champion=1), ability=True, regroup=(discard=()), treasure=())
+        (Occultist  0) fighter chest
+
+        (delve=1, depth=3, dungeon=(dragon=3), party=(fighter=2, cleric=1, champion=1), ability=True, regroup=(discard=()), treasure=(scale=1))
+        (Occultist  1) fighter dragon fighter champion
+
+        (delve=1, depth=3, experience=1, dungeon=(), party=(cleric=1), ability=True, regroup=(discard=()), treasure=(sceptre=1, scale=1))
+        (Occultist  3) descend
+
+        (delve=1, depth=4, experience=1, dungeon=(goblin=1, chest=2, potion=1), party=(cleric=1), ability=True, regroup=(discard=()), treasure=(sceptre=1, scale=1))
+        (Occultist  3) cleric goblin
+
+        (delve=1, depth=4, experience=1, dungeon=(chest=2, potion=1), party=(), ability=True, regroup=(discard=()), treasure=(sceptre=1, scale=1))
+        (Occultist  3) sceptre potion thief
+
+        (delve=1, depth=4, experience=1, dungeon=(chest=2), party=(thief=1), ability=True, regroup=(discard=()), treasure=(scale=1))
+        (Occultist  2) thief chest
+
+        (delve=1, depth=4, experience=1, dungeon=(), party=(), ability=True, regroup=(discard=()), treasure=(scroll=2, scale=1))
+        (Occultist  4) retire
+
+        (delve=2, experience=5, party=(fighter=2, cleric=1, mage=2, thief=2), ability=True, regroup=(discard=()), treasure=(scroll=2, scale=1))
+        (Necromancer  8) descend
+
+        (delve=2, depth=1, experience=5, dungeon=(chest=1), party=(fighter=2, cleric=1, mage=2, thief=2), ability=True, regroup=(discard=()), treasure=(scroll=2, scale=1))
+        (Necromancer  8) descend
+
+        (delve=2, depth=2, experience=5, dungeon=(goblin=1, ooze=1), party=(fighter=2, cleric=1, mage=2, thief=2), ability=True, regroup=(discard=()), treasure=(scroll=2, scale=1))
+        (Necromancer  8) cleric goblin
+
+        (delve=2, depth=2, experience=5, dungeon=(ooze=1), party=(fighter=2, mage=2, thief=2), ability=True, regroup=(discard=()), treasure=(scroll=2, scale=1))
+        (Necromancer  8) mage ooze
+
+        (delve=2, depth=2, experience=5, dungeon=(), party=(fighter=2, mage=1, thief=2), ability=True, regroup=(discard=()), treasure=(scroll=2, scale=1))
+        (Necromancer  8) descend
+
+        (delve=2, depth=3, experience=5, dungeon=(skeleton=1, chest=2), party=(fighter=2, mage=1, thief=2), ability=True, regroup=(discard=()), treasure=(scroll=2, scale=1))
+        (Necromancer  8) ability
+
+        (delve=2, depth=3, experience=5, dungeon=(chest=2), party=(fighter=3, mage=1, thief=2), regroup=(discard=(fighter=1)), treasure=(scroll=2, scale=1))
+        (Necromancer  8) thief chest
+
+        (delve=2, depth=3, experience=5, dungeon=(), party=(fighter=3, mage=1, thief=1), regroup=(discard=(fighter=1)), treasure=(scroll=2, portal=1, scale=2))
+        (Necromancer 13) descend
+
+        (delve=2, depth=4, experience=5, dungeon=(skeleton=1, chest=2, dragon=1), party=(fighter=2, mage=1, thief=1), regroup=(discard=()), treasure=(scroll=2, portal=1, scale=2))
+        (Necromancer 13) fighter skeleton
+
+        (delve=2, depth=4, experience=5, dungeon=(chest=2, dragon=1), party=(fighter=1, mage=1, thief=1), regroup=(discard=()), treasure=(scroll=2, portal=1, scale=2))
+        (Necromancer 13) thief chest
+
+        (delve=2, depth=4, experience=5, dungeon=(dragon=1), party=(fighter=1, mage=1), regroup=(discard=()), treasure=(sceptre=1, scroll=2, portal=1, ring=1, scale=2))
+        (Necromancer 15) EOF
+        """
+        # Drive the game according to the script in the above docstring.
+        s = Shell(
+            Game(random=random.Random(86), player=Occultist),
+            display_mode=DisplayMode.MECHANICAL,
+        )
+        s.preloop()
+        parsed = parse_summary_command(self.test_occultist.__doc__)
+        for index, (expected_summary, following_command) in enumerate(parsed):
+            self.assertEqual(
+                expected_summary,
+                s._game.summary(),
+                "Summary mismatch at {}".format(index),
+            )
+            s.onecmd(following_command)
+
+        # Confirm some non-trivial processing occurred
+        self.assertEqual(index, 23)
