@@ -24,7 +24,7 @@ def _minstrel_ability(
     if target != "dragon":
         raise error.DrollError("Can only discard {} dice".format(target))
     return action.consume_ability(
-        replace(game, dungeon=action.eliminate_targets(game.dungeon, target))
+        replace(game, dungeon=action.eliminate_dungeon(game.dungeon, target))
     )
 
 

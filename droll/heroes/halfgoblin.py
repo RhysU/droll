@@ -26,8 +26,8 @@ def _halfgoblin_ability(
         raise error.DrollError("Ability can only target 1 goblin")
 
     # Change 1 goblin into 1 thief
-    dungeon = action.decrement_target(game.dungeon, "goblin")
-    party = action.increment_target(game.party, "thief")
+    dungeon = action.decrement_dungeon(game.dungeon, "goblin")
+    party = action.increment_dungeon(game.party, "thief")
 
     # Discarding if unused at the next regroup phase
     regroup = game.regroup
@@ -62,14 +62,14 @@ def _chieftain_ability(
 
     # Always transform 2 when 2 are available
     if dungeon.goblin >= 2:
-        dungeon = action.decrement_target(dungeon, "goblin")
-        dungeon = action.decrement_target(dungeon, "goblin")
-        party = action.increment_target(party, "thief")
-        party = action.increment_target(party, "thief")
+        dungeon = action.decrement_dungeon(dungeon, "goblin")
+        dungeon = action.decrement_dungeon(dungeon, "goblin")
+        party = action.increment_dungeon(party, "thief")
+        party = action.increment_dungeon(party, "thief")
         discard = replace(discard, thief=getattr(discard, "thief", 0) + 2)
     else:
-        dungeon = action.decrement_target(dungeon, "goblin")
-        party = action.increment_target(party, "thief")
+        dungeon = action.decrement_dungeon(dungeon, "goblin")
+        party = action.increment_dungeon(party, "thief")
         discard = replace(discard, thief=getattr(discard, "thief", 0) + 1)
 
     regroup = replace(regroup, discard=discard)
