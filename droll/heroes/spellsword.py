@@ -19,7 +19,9 @@ def _spellsword_ability(
     noun: str,
     target: typing.Optional[str] = None,
     *,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset({"fighter", "mage"})
+    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+        {"fighter", "mage"}
+    ),
 ) -> struct.World:
     """Spellsword usable as a fighter or a mage, adding one hero to party.
 
@@ -51,7 +53,9 @@ def _battlemage_ability(
     noun: str,
     target: typing.Optional[str] = None,
     *,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset({"fighter", "mage"})
+    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+        {"fighter", "mage"}
+    ),
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:

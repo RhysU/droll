@@ -76,7 +76,7 @@ def defeat_all_plus_additional(
     randrange: dice.RandRange,
     hero: str,
     target: str,
-    *additional
+    *additional,
 ) -> struct.World:
     """Update game after hero handles all of one target type plus one more."""
     # First, defeat all of the specified target
@@ -127,7 +127,7 @@ def open_one(
     hero: str,
     target: str,
     *,
-    _after_monsters=True
+    _after_monsters=True,
 ) -> struct.World:
     """Update game after hero opens exactly one chest."""
     if _after_monsters and not world.defeated_monsters(game.dungeon):
@@ -145,7 +145,7 @@ def open_all(
     hero: str,
     target: str,
     *,
-    _after_monsters=True
+    _after_monsters=True,
 ) -> struct.World:
     """Update game after hero opens all chests."""
     if _after_monsters and not world.defeated_monsters(game.dungeon):
@@ -168,7 +168,7 @@ def quaff(
     hero: str,
     target: str,
     *revivable,
-    _after_monsters=True
+    _after_monsters=True,
 ) -> struct.World:
     """Update game after hero quaffs all available potions.
 
@@ -222,7 +222,7 @@ def reroll(
 def defeat_dragon_heroes(
     *heroes,
     _disallowed_heroes: typing.Sequence[str] = ("scroll",),
-    _distinct_heroes: int = 3
+    _distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
 
@@ -246,7 +246,7 @@ def defeat_dragon_heroes(
 def defeat_dragon_heroes_wildcard(
     *heroes,
     _wildcard: typing.Sequence[str] = ("scroll",),
-    _distinct_heroes: int = 3
+    _distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
 
@@ -276,7 +276,7 @@ def defeat_dragon_heroes_interchangeable(
     *heroes,
     _interchangeable: typing.Set[str],
     _disallowed_heroes: typing.Sequence[str] = ("scroll",),
-    _required_heroes: int = 3
+    _required_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many heroes been provided to slay dragon?
 
@@ -320,7 +320,7 @@ def defeat_dragon(
     target: str,
     *others,
     _defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
-    _min_dragon_length: int = 3
+    _min_dragon_length: int = 3,
 ) -> struct.World:
     """Update game after hero handles a dragon using multiple distinct heroes.
 
@@ -362,7 +362,7 @@ def bait_dragon(
     target: typing.Optional[str] = None,
     *,
     _enemies: typing.Sequence[str] = ("goblin", "skeleton", "ooze"),
-    _require_treasure: bool = True
+    _require_treasure: bool = True,
 ) -> struct.World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target

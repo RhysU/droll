@@ -157,9 +157,12 @@ class TestPlayer(unittest.TestCase):
             "chest",
         )
         self.assertEqual(game.party.scroll, 1)
-        self.assertEqual(game.dungeon, struct.Dungeon(
-            goblin=3, skeleton=3, ooze=2, chest=0, potion=2, dragon=2
-        ))
+        self.assertEqual(
+            game.dungeon,
+            struct.Dungeon(
+                goblin=3, skeleton=3, ooze=2, chest=0, potion=2, dragon=2
+            ),
+        )
 
 
 # Shorthand for testing completions given that method returns unsorted generator
@@ -187,7 +190,9 @@ class TestComplete(unittest.TestCase):
         self.assertEqual([], complete(game, ("gob",), "gob", 0))  # dungeon
         self.assertEqual([], complete(game, ("bai",), "bai", 0))  # treasure
         game = replace(game, treasure=replace(game.treasure, bait=1))
-        self.assertEqual(["bait"], complete(game, ("bai",), "bai", 0))  # treasure
+        self.assertEqual(
+            ["bait"], complete(game, ("bai",), "bai", 0)
+        )  # treasure
 
     def test_complete0_excludes_noncommand_treasures(self):
         """Non-command treasures (portal, ring, scale) excluded from position 0."""
@@ -210,27 +215,40 @@ class TestComplete(unittest.TestCase):
         game = self.game
         # Vanilla first position stuff
         self.assertEqual(["goblin"], complete(game, ("fig", "gob"), "gob", 1))
-        self.assertEqual(["fighter"], complete(game, ("fig", "fig"), "fig", 1))  # party
+        self.assertEqual(
+            ["fighter"], complete(game, ("fig", "fig"), "fig", 1)
+        )  # party
         game = replace(game, dungeon=replace(game.dungeon, goblin=0))
-        self.assertEqual([], complete(game, ("fig", "gob"), "gob", 1))  # dungeon
+        self.assertEqual(
+            [], complete(game, ("fig", "gob"), "gob", 1)
+        )  # dungeon
         game = replace(game, party=replace(game.party, fighter=0))
-        self.assertEqual([], complete(game, ("fig", "fig"), "fig", 1))  # dungeon
+        self.assertEqual(
+            [], complete(game, ("fig", "fig"), "fig", 1)
+        )  # dungeon
         game = replace(game, treasure=replace(game.treasure, bait=1))
-        self.assertEqual([], complete(game, ("fig", "bai"), "fig", 1))  # treasure
+        self.assertEqual(
+            [], complete(game, ("fig", "bai"), "fig", 1)
+        )  # treasure
 
         # Special case associated with 'elixir'
         game = replace(game, party=struct.Party())
         game = replace(game, treasure=struct.Treasure())
-        self.assertEqual(list(sorted(struct.field_names(struct.Party))),
-            complete(game, ("elixir", ""), "", 1)
+        self.assertEqual(
+            list(sorted(struct.field_names(struct.Party))),
+            complete(game, ("elixir", ""), "", 1),
         )
 
     def test_complete2(self):
         """Complete all party and dungeon in the second position."""
         game = replace(self.game, party=replace(self.game.party, fighter=0))
         game = _remove_monsters(game)
-        self.assertEqual(["fighter"], complete(game, ("X", "Y", "fig"), "fig", 2))
-        self.assertEqual(["goblin"], complete(game, ("X", "Y", "gob"), "gob", 2))
-        self.assertEqual(["champion", "chest"], complete(
-            game, ("X", "Y", "ch"), "ch", 2
-        ))
+        self.assertEqual(
+            ["fighter"], complete(game, ("X", "Y", "fig"), "fig", 2)
+        )
+        self.assertEqual(
+            ["goblin"], complete(game, ("X", "Y", "gob"), "gob", 2)
+        )
+        self.assertEqual(
+            ["champion", "chest"], complete(game, ("X", "Y", "ch"), "ch", 2)
+        )

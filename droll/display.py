@@ -14,6 +14,7 @@ class DisplayMode(enum.Enum):
     CURRENT = "current"
     MECHANICAL = "mechanical"
 
+
 # Dragons always show count (tracking them is crucial to gameplay)
 _ALWAYS_COUNT = frozenset({"dragon"})
 
@@ -35,7 +36,9 @@ def _format_items(instance: typing.Any) -> str:
 
 def _format_treasure(treasure: struct.Treasure) -> str:
     """Format treasure alphabetically."""
-    parts = (_format_item(n, c) for n, c in sorted(struct.field_items(treasure)))
+    parts = (
+        _format_item(n, c) for n, c in sorted(struct.field_items(treasure))
+    )
     return " ".join(filter(None, parts)) or "none"
 
 
@@ -44,7 +47,9 @@ def _format_available(available: typing.Sequence[str]) -> str:
     return " ".join(sorted(available)) or "None"
 
 
-def _format_dungeon(dungeon: typing.Optional[struct.Dungeon]) -> typing.Optional[str]:
+def _format_dungeon(
+    dungeon: typing.Optional[struct.Dungeon],
+) -> typing.Optional[str]:
     """Format dungeon contents, returning None if empty."""
     if dungeon is None or not any(struct.field_values(dungeon)):
         return None

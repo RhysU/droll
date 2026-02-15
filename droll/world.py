@@ -70,7 +70,7 @@ def delve(
     roll_party: dice.RollParty,
     randrange: dice.RandRange,
     *,
-    _party_dice: int = 7
+    _party_dice: int = 7,
 ) -> struct.World:
     """Establish new delve within a world, optionally transforming the party.
 
@@ -109,7 +109,7 @@ def descend(
     randrange: dice.RandRange,
     *,
     _max_depth: int = 10,
-    _dungeon_dice: int = 7
+    _dungeon_dice: int = 7,
 ) -> struct.World:
     """Move one dungeon deeper in the dungeon, retaining any partial dragons.
 
@@ -253,7 +253,9 @@ def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
 
 
-def _apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
+def _apply_portal(
+    world: struct.World, *, noun: str = "portal"
+) -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):

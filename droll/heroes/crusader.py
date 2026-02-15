@@ -22,7 +22,7 @@ def _crusader_ability(
     *,
     _acceptable_targets: typing.FrozenSet[str] = frozenset(
         {"fighter", "cleric"}
-    )
+    ),
 ) -> struct.World:
     """Crusader usable as a fighter or a cleric, adding one hero.
 
@@ -46,7 +46,7 @@ def _paladin_ability(
     *revivable: str,
     _acceptable_targets: typing.FrozenSet[str] = frozenset(
         {"fighter", "cleric"}
-    )
+    ),
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
 
@@ -106,12 +106,12 @@ Paladin = replace(
         fighter=replace(
             Default.party.fighter,
             dragon=_crusader_defeat_dragon,
-            skeleton=Default.party.cleric.skeleton
+            skeleton=Default.party.cleric.skeleton,
         ),
         cleric=replace(
             Default.party.cleric,
             dragon=_crusader_defeat_dragon,
-            goblin=Default.party.fighter.goblin
+            goblin=Default.party.fighter.goblin,
         ),
         mage=replace(
             Default.party.mage,

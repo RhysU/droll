@@ -97,7 +97,7 @@ def apply(
     randrange: dice.RandRange,
     noun: str,
     target: str = None,
-    *additional
+    *additional,
 ) -> struct.World:
     """Apply noun to target within game, returning a new version.
 

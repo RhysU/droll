@@ -10,7 +10,12 @@ import sys
 from .shell import Game
 from .display import DisplayMode
 from .heroes import (
-    Crusader, Enchantress, HalfGoblin, Knight, Minstrel, Spellsword
+    Crusader,
+    Enchantress,
+    HalfGoblin,
+    Knight,
+    Minstrel,
+    Spellsword,
 )
 from .player import Default
 from .shell import Shell
@@ -55,7 +60,9 @@ def main(args=None) -> None:
         player=AVAILABLE_HEROES.get(arguments.hero),
         random=random.Random(*randseed),
     )
-    display_mode = DisplayMode.MECHANICAL if arguments.mechanical else DisplayMode.CURRENT
+    display_mode = (
+        DisplayMode.MECHANICAL if arguments.mechanical else DisplayMode.CURRENT
+    )
     s = Shell(g, display_mode=display_mode)
     return s.cmdloop()
 

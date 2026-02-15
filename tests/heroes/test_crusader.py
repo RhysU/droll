@@ -31,7 +31,9 @@ class TestCrusader(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        result = _crusader_ability(world, state.randrange, "ability", "fighter")
+        result = _crusader_ability(
+            world, state.randrange, "ability", "fighter"
+        )
         self.assertEqual(result.party.fighter, 2)
         self.assertFalse(result.ability)
 

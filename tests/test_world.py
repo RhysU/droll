@@ -24,9 +24,9 @@ class TestWorld(unittest.TestCase):
         game = droll.world.new_world()
         self.assertEqual(0, game.experience)
         self.assertEqual(0, sum(droll.struct.field_values(game.treasure)))
-        self.assertEqual((6 * 3) + (4 * 3) + 6, sum(
-            droll.struct.field_values(game.reserve)
-        ))
+        self.assertEqual(
+            (6 * 3) + (4 * 3) + 6, sum(droll.struct.field_values(game.reserve))
+        )
 
     def test_delve_initial(self):
         """Test starting a new delve rolls party dice correctly."""
@@ -59,7 +59,7 @@ class TestWorld(unittest.TestCase):
         self.assertEqual(
             sum(droll.struct.field_values(pre.reserve))
             - sum(droll.struct.field_values(post.reserve)),
-            1
+            1,
         )
 
     def test_replace_treasure(self):
@@ -72,7 +72,7 @@ class TestWorld(unittest.TestCase):
         self.assertEqual(
             sum(droll.struct.field_values(post.reserve))
             - sum(droll.struct.field_values(pre.reserve)),
-            1
+            1,
         )
 
     def test_retire_simple(self):
@@ -278,41 +278,58 @@ class TestWorld(unittest.TestCase):
                 discard=droll.struct.Party(
                     fighter=0, cleric=5, mage=3, thief=1, champion=0, scroll=0
                 )
-            )
+            ),
         )
 
         # First, confirm descending works as expected
         descended = droll.world.descend(
             pre1, droll.dice.roll_dungeon, self.state.randrange
         )
-        self.assertEqual(descended.party, droll.struct.Party(
-            fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
-        ))
-        self.assertEqual(descended.regroup.discard, droll.struct.Party(
-            fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
-        ))
+        self.assertEqual(
+            descended.party,
+            droll.struct.Party(
+                fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
+            ),
+        )
+        self.assertEqual(
+            descended.regroup.discard,
+            droll.struct.Party(
+                fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
+            ),
+        )
 
         # Second, confirm retiring works as expected
         retired = droll.world.retire(pre1)
-        self.assertEqual(retired.party, droll.struct.Party(
-            fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
-        ))
-        self.assertEqual(retired.regroup.discard, droll.struct.Party(
-            fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
-        ))
+        self.assertEqual(
+            retired.party,
+            droll.struct.Party(
+                fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
+            ),
+        )
+        self.assertEqual(
+            retired.regroup.discard,
+            droll.struct.Party(
+                fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
+            ),
+        )
 
         # Third, confirm retreating works as expected
         pre2 = replace(
-            pre1,
-            dungeon=droll.struct.Dungeon(goblin=1)  # Threat required!
+            pre1, dungeon=droll.struct.Dungeon(goblin=1)  # Threat required!
         )
         retreated = droll.world.retreat(pre2)
-        self.assertEqual(retreated.party, droll.struct.Party(
-            fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
-        ))
-        self.assertEqual(retreated.regroup.discard, droll.struct.Party(
-            fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
-        ))
+        self.assertEqual(
+            retreated.party,
+            droll.struct.Party(
+                fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
+            ),
+        )
+        self.assertEqual(
+            retreated.regroup.discard,
+            droll.struct.Party(
+                fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
+            ),
+        )
 
     def test_exhausted_dungeon(self):
         """Test exhausted_dungeon detects when no actions remain."""
@@ -323,23 +340,27 @@ class TestWorld(unittest.TestCase):
         self.assertTrue(droll.world.exhausted_dungeon(droll.struct.Dungeon()))
 
         # Dungeon with only dragons (blocking) is not exhausted
-        self.assertFalse(droll.world.exhausted_dungeon(
-            droll.struct.Dungeon(dragon=3)
-        ))
+        self.assertFalse(
+            droll.world.exhausted_dungeon(droll.struct.Dungeon(dragon=3))
+        )
 
         # Dungeon with monsters is not exhausted
-        self.assertFalse(droll.world.exhausted_dungeon(
-            droll.struct.Dungeon(goblin=1)
-        ))
-        self.assertFalse(droll.world.exhausted_dungeon(
-            droll.struct.Dungeon(skeleton=2)
-        ))
-        self.assertFalse(droll.world.exhausted_dungeon(droll.struct.Dungeon(ooze=1)))
+        self.assertFalse(
+            droll.world.exhausted_dungeon(droll.struct.Dungeon(goblin=1))
+        )
+        self.assertFalse(
+            droll.world.exhausted_dungeon(droll.struct.Dungeon(skeleton=2))
+        )
+        self.assertFalse(
+            droll.world.exhausted_dungeon(droll.struct.Dungeon(ooze=1))
+        )
 
         # Dungeon with chests/potions still has actions (not exhausted)
-        self.assertFalse(droll.world.exhausted_dungeon(
-            droll.struct.Dungeon(chest=2, potion=3)
-        ))
+        self.assertFalse(
+            droll.world.exhausted_dungeon(
+                droll.struct.Dungeon(chest=2, potion=3)
+            )
+        )
 
     def test_retreat_valid(self):
         """Test valid retreat scenarios."""

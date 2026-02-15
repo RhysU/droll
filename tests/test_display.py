@@ -104,7 +104,9 @@ class TestCompactSummary(unittest.TestCase):
             depth=0,
             experience=0,
             dungeon=None,
-            party=struct.Party(fighter=2, cleric=1, mage=1, thief=1, champion=2),
+            party=struct.Party(
+                fighter=2, cleric=1, mage=1, thief=1, champion=2
+            ),
             ability=True,
             treasure=struct.Treasure(),
         )
@@ -210,7 +212,9 @@ class TestCompactSummary(unittest.TestCase):
             dungeon=None,
             party=struct.Party(champion=1),
             ability=False,
-            treasure=struct.Treasure(scroll=1, elixir=1, bait=2, portal=1, scale=1),
+            treasure=struct.Treasure(
+                scroll=1, elixir=1, bait=2, portal=1, scale=1
+            ),
         )
         result = display.compact_summary(world, "DragonSlayer", 23, [])
         lines = result.split("\n")

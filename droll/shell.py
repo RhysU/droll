@@ -39,12 +39,14 @@ class Shell(cmd.Cmd):
             print()
             if line != "EOF":
                 available = [] if stop else self._available_commands()
-                print(display.compact_summary(
-                    self._game._world,
-                    self._game._player.name,
-                    self._game.score(),
-                    available,
-                ))
+                print(
+                    display.compact_summary(
+                        self._game._world,
+                        self._game._player.name,
+                        self._game.score(),
+                        available,
+                    )
+                )
                 if stop:
                     print(self.prompt)
         else:
@@ -63,7 +65,13 @@ class Shell(cmd.Cmd):
         for name in names:
             if name.startswith("do_"):
                 cmd_name = name[3:]
-                if cmd_name in ("ability", "descend", "retire", "retreat", "reroll"):
+                if cmd_name in (
+                    "ability",
+                    "descend",
+                    "retire",
+                    "retreat",
+                    "reroll",
+                ):
                     commands.add(cmd_name)
         if self._undo:
             commands.add("undo")

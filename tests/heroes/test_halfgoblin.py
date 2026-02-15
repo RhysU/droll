@@ -74,7 +74,10 @@ class TestHalfGoblin(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         result = _chieftain_ability(
-            world, state.randrange, "ability", "goblin",
+            world,
+            state.randrange,
+            "ability",
+            "goblin",
         )
         # Discard during subsequent regroup phase tested elsewhere
         self.assertEqual(result.dungeon.goblin, 0)
@@ -120,13 +123,17 @@ class TestHalfGoblin(unittest.TestCase):
             reserve=droll.struct.Treasure(scale=1),
         )
 
-        result1 = HalfGoblin.party.fighter.chest(world, randrange, "fighter", "chest")
+        result1 = HalfGoblin.party.fighter.chest(
+            world, randrange, "fighter", "chest"
+        )
         self.assertEqual(result1.dungeon.chest, 0)
         self.assertEqual(result1.dungeon.goblin, 1)
         self.assertEqual(result1.party.fighter, 4)
         self.assertEqual(result1.treasure.scale, 1)
 
-        result2 = HalfGoblin.party.fighter.potion(world, randrange, "fighter", "potion", "mage")
+        result2 = HalfGoblin.party.fighter.potion(
+            world, randrange, "fighter", "potion", "mage"
+        )
         self.assertEqual(result2.dungeon.goblin, 1)
         self.assertEqual(result2.dungeon.potion, 0)
         self.assertEqual(result2.party.fighter, 4)
