@@ -27,7 +27,7 @@ def _halfgoblin_ability(
 
     # Change 1 goblin into 1 thief
     dungeon = action.decrement_dungeon(game.dungeon, "goblin")
-    party = action.increment_dungeon(game.party, "thief")
+    party = action.increment_party(game.party, "thief")
 
     # Discarding if unused at the next regroup phase
     regroup = game.regroup
@@ -64,12 +64,12 @@ def _chieftain_ability(
     if dungeon.goblin >= 2:
         dungeon = action.decrement_dungeon(dungeon, "goblin")
         dungeon = action.decrement_dungeon(dungeon, "goblin")
-        party = action.increment_dungeon(party, "thief")
-        party = action.increment_dungeon(party, "thief")
+        party = action.increment_party(party, "thief")
+        party = action.increment_party(party, "thief")
         discard = replace(discard, thief=getattr(discard, "thief", 0) + 2)
     else:
         dungeon = action.decrement_dungeon(dungeon, "goblin")
-        party = action.increment_dungeon(party, "thief")
+        party = action.increment_party(party, "thief")
         discard = replace(discard, thief=getattr(discard, "thief", 0) + 1)
 
     regroup = replace(regroup, discard=discard)
