@@ -7,7 +7,7 @@ from dataclasses import replace
 import random
 import unittest
 
-from droll import struct
+from droll import struct, world
 from droll.error import DrollError
 from droll.game import Game, GameState
 from droll.player import Default
@@ -92,3 +92,32 @@ class TestGame(unittest.TestCase):
         )
         with self.assertRaises(DrollError):
             g.apply("ring")
+
+    def test_retreat(self):
+        """Game.retreat() retreats from dungeon and starts next delve."""
+        g = Game(random=random.Random(4), player=Default)
+        g.descend()
+        # Place a monster so retreat is valid (can't retreat from cleared dungeon)
+        g._world = replace(
+            g._world, dungeon=struct.Dungeon(goblin=1)
+        )
+        result = g.retreat()
+        self.assertEqual(result, GameState.PLAY)
+        # After retreat, a new delve should have started
+        self.assertEqual(g._world.depth, 0)
+        self.assertIsNotNone(g._world.party)
+
+    def test_next_delve_returns_stop_after_three(self):
+        """Game returns STOP when no more delves remain."""
+        g = Game(random=random.Random(4), player=Default)
+        # Play through 3 delves by retiring from each
+        for _ in range(2):
+            g.descend()
+            g._world = replace(g._world, dungeon=struct.Dungeon())
+            result = g.retire()
+            self.assertEqual(result, GameState.PLAY)
+        # Third delve: retire should trigger STOP
+        g.descend()
+        g._world = replace(g._world, dungeon=struct.Dungeon())
+        result = g.retire()
+        self.assertEqual(result, GameState.STOP)
