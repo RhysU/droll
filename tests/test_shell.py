@@ -10,7 +10,9 @@ import unittest
 from droll.display import DisplayMode
 from droll.error import DrollError
 from droll.game import Game
-from droll.heroes import Crusader, Enchantress, Knight, Minstrel, Spellsword
+from droll.heroes import (
+    Crusader, Enchantress, HalfGoblin, Knight, Minstrel, Spellsword
+)
 from droll.player import Default
 from droll.shell import Shell
 
@@ -921,3 +923,121 @@ class TestEnchantress(unittest.TestCase):
 
         # Confirm some non-trivial processing occurred
         self.assertEqual(index, 49)
+
+
+class TestHalfGoblin(unittest.TestCase):
+
+    def test_halfgoblin(self):
+        """
+        Runs the following scenario involving unique HalfGoblin/Chieftain details:
+
+        (delve=1, party=(fighter=1, cleric=1, mage=2, thief=1, scroll=2), ability=True, regroup=(discard=()), treasure=())
+        (HalfGoblin  0) descend
+
+        (delve=1, depth=1, dungeon=(goblin=1), party=(fighter=1, cleric=1, mage=2, thief=1, scroll=2), ability=True, regroup=(discard=()), treasure=())
+        (HalfGoblin  0) ability
+
+        (delve=1, depth=1, dungeon=(), party=(fighter=1, cleric=1, mage=2, thief=2, scroll=2), regroup=(discard=(thief=1)), treasure=())
+        (HalfGoblin  0) descend
+
+        (delve=1, depth=2, dungeon=(ooze=1, potion=1), party=(fighter=1, cleric=1, mage=2, thief=1, scroll=2), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) scroll potion champion
+
+        (delve=1, depth=2, dungeon=(ooze=1), party=(fighter=1, cleric=1, mage=2, thief=1, champion=1, scroll=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) mage ooze
+
+        (delve=1, depth=2, dungeon=(), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1, scroll=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) descend
+
+        (delve=1, depth=3, dungeon=(ooze=3), party=(fighter=1, cleric=1, mage=1, thief=1, champion=1, scroll=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) mage ooze
+
+        (delve=1, depth=3, dungeon=(), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) descend
+
+        (delve=1, depth=4, dungeon=(skeleton=3, chest=1), party=(fighter=1, cleric=1, thief=1, champion=1, scroll=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) cleric skeleton
+
+        (delve=1, depth=4, dungeon=(chest=1), party=(fighter=1, thief=1, champion=1, scroll=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) descend
+
+        (delve=1, depth=5, dungeon=(goblin=1, chest=1, potion=1, dragon=2), party=(fighter=1, thief=1, champion=1, scroll=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) scroll potion cleric
+
+        (delve=1, depth=5, dungeon=(goblin=1, chest=1, dragon=2), party=(fighter=1, cleric=1, thief=1, champion=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) cleric goblin
+
+        (delve=1, depth=5, dungeon=(chest=1, dragon=2), party=(fighter=1, thief=1, champion=1), regroup=(discard=()), treasure=())
+        (HalfGoblin  0) fighter chest
+
+        (delve=1, depth=5, dungeon=(dragon=2), party=(thief=1, champion=1), regroup=(discard=()), treasure=(talisman=1))
+        (HalfGoblin  1) retire
+
+        (delve=2, experience=5, party=(fighter=1, thief=3, champion=1, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1))
+        (Chieftain  6) descend
+
+        (delve=2, depth=1, experience=5, dungeon=(ooze=1), party=(fighter=1, thief=3, champion=1, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1))
+        (Chieftain  6) thief ooze
+
+        (delve=2, depth=1, experience=5, dungeon=(), party=(fighter=1, thief=2, champion=1, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1))
+        (Chieftain  6) descend
+
+        (delve=2, depth=2, experience=5, dungeon=(goblin=1, dragon=1), party=(fighter=1, thief=2, champion=1, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1))
+        (Chieftain  6) scroll goblin
+
+        (delve=2, depth=2, experience=5, dungeon=(chest=1, dragon=1), party=(fighter=1, thief=2, champion=1, scroll=1), ability=True, regroup=(discard=()), treasure=(talisman=1))
+        (Chieftain  6) thief chest
+
+        (delve=2, depth=2, experience=5, dungeon=(dragon=1), party=(fighter=1, thief=1, champion=1, scroll=1), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain  7) descend
+
+        (delve=2, depth=3, experience=5, dungeon=(skeleton=1, ooze=1, potion=1, dragon=1), party=(fighter=1, thief=1, champion=1, scroll=1), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain  7) champion skeleton
+
+        (delve=2, depth=3, experience=5, dungeon=(ooze=1, potion=1, dragon=1), party=(fighter=1, thief=1, scroll=1), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain  7) thief ooze
+
+        (delve=2, depth=3, experience=5, dungeon=(potion=1, dragon=1), party=(fighter=1, scroll=1), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain  7) scroll potion champion
+
+        (delve=2, depth=3, experience=5, dungeon=(dragon=1), party=(fighter=1, champion=1), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain  7) retire
+
+        (delve=3, experience=8, party=(fighter=1, cleric=2, champion=2, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain 10) descend
+
+        (delve=3, depth=1, experience=8, dungeon=(chest=1), party=(fighter=1, cleric=2, champion=2, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain 10) descend
+
+        (delve=3, depth=2, experience=8, dungeon=(ooze=1, dragon=1), party=(fighter=1, cleric=2, champion=2, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain 10) cleric ooze
+
+        (delve=3, depth=2, experience=8, dungeon=(dragon=1), party=(fighter=1, cleric=1, champion=2, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain 10) descend
+
+        (delve=3, depth=3, experience=8, dungeon=(goblin=1, potion=1, dragon=2), party=(fighter=1, cleric=1, champion=2, scroll=2), ability=True, regroup=(discard=()), treasure=(talisman=1, elixir=1))
+        (Chieftain 10) ability
+
+        (delve=3, depth=3, experience=8, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, thief=1, champion=2, scroll=2), regroup=(discard=(thief=1)), treasure=(talisman=1, elixir=1))
+        (Chieftain 10) thief potion
+        Require exactly 1 to revive.
+
+        (delve=3, depth=3, experience=8, dungeon=(potion=1, dragon=2), party=(fighter=1, cleric=1, thief=1, champion=2, scroll=2), regroup=(discard=(thief=1)), treasure=(talisman=1, elixir=1))
+        (Chieftain 10) thief potion cleric
+
+        (delve=3, depth=3, experience=8, dungeon=(dragon=2), party=(fighter=1, cleric=2, champion=2, scroll=2), regroup=(discard=(thief=1)), treasure=(talisman=1, elixir=1))
+        (Chieftain 10) EOF
+        """
+        # Drive the game according to the script in the above docstring.
+        s = Shell(Game(random=random.Random(27), player=HalfGoblin), display_mode=DisplayMode.MECHANICAL)
+        s.preloop()
+        parsed = parse_summary_command(self.test_halfgoblin.__doc__)
+        for index, (expected_summary, following_command) in enumerate(parsed):
+            self.assertEqual(
+                expected_summary, s._game.summary(),
+                "Summary mismatch at {}".format(index)
+            )
+            s.onecmd(following_command)
+
+        # Confirm some non-trivial processing occurred
+        self.assertEqual(index, 31)
