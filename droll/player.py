@@ -175,7 +175,7 @@ def apply(
     for hero, quantity in struct.field_items(world.party):
         if quantity >= 0:
             continue
-        for _ in range(-min(0, quantity)):
+        for _ in range(-quantity):
             world = replace_treasure(
                 world, getattr(player.artifacts, hero)
             )
