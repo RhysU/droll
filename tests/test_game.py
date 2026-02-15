@@ -23,8 +23,8 @@ class TestGame(unittest.TestCase):
 
     def test_gamestate_truthiness(self):
         """Test that GameState values coerce to boolean correctly for control flow."""
-        assert GameState.STOP, "STOP must coerce to True."
-        assert not GameState.PLAY, "PLAY must coerce to False."
+        self.assertTrue(GameState.STOP, "STOP must coerce to True.")
+        self.assertFalse(GameState.PLAY, "PLAY must coerce to False.")
 
     def test_reroll_dungeon_dice(self):
         """Test rerolling dungeon dice using a scroll."""
@@ -40,7 +40,7 @@ class TestGame(unittest.TestCase):
         pre_scroll = g._world.party.scroll
         g.reroll("goblin")
         # Scroll consumed, dungeon rerolled
-        assert g._world.party.scroll == pre_scroll - 1
+        self.assertEqual(g._world.party.scroll, pre_scroll - 1)
 
     def test_reroll_portion(self):
         """Test rerolling potion using a scroll."""
@@ -56,7 +56,7 @@ class TestGame(unittest.TestCase):
         pre_scroll = g._world.party.scroll
         g.reroll("potion")
         # Scroll consumed, dungeon rerolled
-        assert g._world.party.scroll == pre_scroll - 1
+        self.assertEqual(g._world.party.scroll, pre_scroll - 1)
 
     def test_reroll_multiple_targets(self):
         """Test rerolling multiple dungeon dice."""
@@ -69,7 +69,7 @@ class TestGame(unittest.TestCase):
             dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
         )
         g.reroll("goblin", "skeleton")
-        assert g._world.party.scroll == 0
+        self.assertEqual(g._world.party.scroll, 0)
 
     def test_apply_portal_directly_fails(self):
         """Test that using portal directly gives helpful error."""

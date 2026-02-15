@@ -34,9 +34,9 @@ class TestEnchantress(unittest.TestCase):
         result = _enchantress_ability(
             world, state.randrange, "ability", "goblin"
         )
-        assert result.dungeon.goblin == 1
-        assert result.dungeon.potion == 1
-        assert result.ability is False
+        self.assertEqual(result.dungeon.goblin, 1)
+        self.assertEqual(result.dungeon.potion, 1)
+        self.assertFalse(result.ability)
 
     def test_beguiler_transforms_two_monsters(self):
         """Beguiler transforms 2 monsters into 1 potion when available."""
@@ -54,9 +54,9 @@ class TestEnchantress(unittest.TestCase):
         result = _beguiler_ability(
             world, state.randrange, "ability", "goblin", "skeleton"
         )
-        assert result.dungeon.goblin == 1
-        assert result.dungeon.skeleton == 0
-        assert result.dungeon.potion == 1
+        self.assertEqual(result.dungeon.goblin, 1)
+        self.assertEqual(result.dungeon.skeleton, 0)
+        self.assertEqual(result.dungeon.potion, 1)
 
     def test_beguiler_requires_two_when_available(self):
         """Beguiler must transform 2 monsters when 2+ available."""
@@ -96,5 +96,5 @@ class TestEnchantress(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        assert Enchantress.advance(low_xp) == Enchantress
-        assert Enchantress.advance(high_xp) == Beguiler
+        self.assertEqual(Enchantress.advance(low_xp), Enchantress)
+        self.assertEqual(Enchantress.advance(high_xp), Beguiler)

@@ -28,9 +28,9 @@ class TestMinstrel(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         result = _minstrel_ability(world, state.randrange, "ability")
-        assert result.dungeon.dragon == 0
-        assert result.dungeon.goblin == 1
-        assert result.ability is False
+        self.assertEqual(result.dungeon.dragon, 0)
+        self.assertEqual(result.dungeon.goblin, 1)
+        self.assertFalse(result.ability)
 
     def test_minstrel_ability_rejects_non_dragon(self):
         """Minstrel/Bard ability only works on dragons."""
@@ -70,8 +70,8 @@ class TestMinstrel(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        assert Minstrel.advance(low_xp) == Minstrel
-        assert Minstrel.advance(high_xp) == Bard
+        self.assertEqual(Minstrel.advance(low_xp), Minstrel)
+        self.assertEqual(Minstrel.advance(high_xp), Bard)
 
     def test_bard_champion_defeats_plus_one(self):
         """Bard's champion defeats all of one type plus one additional."""
@@ -89,9 +89,9 @@ class TestMinstrel(unittest.TestCase):
         result = droll.action.defeat_all_plus_additional(
             world, state.randrange, "champion", "goblin", "skeleton"
         )
-        assert result.dungeon.goblin == 0
-        assert result.dungeon.skeleton == 0
-        assert result.party.champion == 0
+        self.assertEqual(result.dungeon.goblin, 0)
+        self.assertEqual(result.dungeon.skeleton, 0)
+        self.assertEqual(result.party.champion, 0)
 
     def test_bard_champion_no_additional_when_cleared(self):
         """Bard's champion needs no additional when monsters cleared."""
@@ -109,7 +109,7 @@ class TestMinstrel(unittest.TestCase):
         result = droll.action.defeat_all_plus_additional(
             world, state.randrange, "champion", "goblin"
         )
-        assert result.dungeon.goblin == 0
+        self.assertEqual(result.dungeon.goblin, 0)
 
     def test_bard_champion_rejects_extra_additional(self):
         """Bard's champion rejects more than one additional target."""

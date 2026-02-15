@@ -34,8 +34,8 @@ class TestSpellsword(unittest.TestCase):
         result = _spellsword_ability(
             world, state.randrange, "ability", "fighter"
         )
-        assert result.party.fighter == 2
-        assert result.ability is False
+        self.assertEqual(result.party.fighter, 2)
+        self.assertFalse(result.ability)
 
     def test_spellsword_ability_adds_mage(self):
         """Spellsword ability adds a mage to party."""
@@ -51,7 +51,7 @@ class TestSpellsword(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         result = _spellsword_ability(world, state.randrange, "ability", "mage")
-        assert result.party.mage == 2
+        self.assertEqual(result.party.mage, 2)
 
     def test_spellsword_ability_rejects_invalid_target(self):
         """Spellsword ability rejects invalid targets like cleric."""
@@ -85,8 +85,8 @@ class TestSpellsword(unittest.TestCase):
             reserve=droll.struct.Treasure(),
         )
         result = _battlemage_ability(world, state.randrange, "ability")
-        assert sum(droll.struct.field_values(result.dungeon)) == 0
-        assert result.ability is False
+        self.assertEqual(sum(droll.struct.field_values(result.dungeon)), 0)
+        self.assertFalse(result.ability)
 
     def test_spellsword_advances_to_battlemage(self):
         """Spellsword advances to Battlemage at 5+ experience."""
@@ -110,5 +110,5 @@ class TestSpellsword(unittest.TestCase):
             treasure=droll.struct.Treasure(),
             reserve=droll.struct.Treasure(),
         )
-        assert Spellsword.advance(low_xp) == Spellsword
-        assert Spellsword.advance(high_xp) == Battlemage
+        self.assertEqual(Spellsword.advance(low_xp), Spellsword)
+        self.assertEqual(Spellsword.advance(high_xp), Battlemage)

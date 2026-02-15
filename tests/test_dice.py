@@ -19,14 +19,14 @@ class TestDice(unittest.TestCase):
     def test_roll_zero_dice(self):
         """Rolling zero dice should return empty results."""
         party = droll.dice.roll_party(dice=0, randrange=self.state.randrange)
-        assert sum(droll.struct.field_values(party)) == 0
+        self.assertEqual(sum(droll.struct.field_values(party)), 0)
 
     def test_roll_dungeon_minimum(self):
         """Roll dungeon with minimum (1) dice."""
         dungeon = droll.dice.roll_dungeon(
             dice=1, randrange=self.state.randrange
         )
-        assert sum(droll.struct.field_values(dungeon)) == 1
+        self.assertEqual(sum(droll.struct.field_values(dungeon)), 1)
 
     def test_roll_dungeon_zero_fails(self):
         """Rolling dungeon with zero dice should fail."""
@@ -36,4 +36,4 @@ class TestDice(unittest.TestCase):
     def test_roll_party_many_dice(self):
         """Roll party with many dice to ensure no overflow issues."""
         party = droll.dice.roll_party(dice=100, randrange=self.state.randrange)
-        assert sum(droll.struct.field_values(party)) == 100
+        self.assertEqual(sum(droll.struct.field_values(party)), 100)
