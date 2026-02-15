@@ -31,7 +31,7 @@ def _occultist_ability(
     # Discarding if unused at the next regroup phase
     regroup = world.regroup
     discard = regroup.discard
-    discard = replace(discard, fighter=getattr(discard, "fighter", 0) + 1)
+    discard = replace(discard, fighter=discard.fighter + 1)
     regroup = replace(regroup, discard=discard)
 
     world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
@@ -65,11 +65,11 @@ def _necromancer_ability(
         dungeon = action.decrement_dungeon(dungeon, "skeleton")
         party = action.increment_party(party, "fighter")
         party = action.increment_party(party, "fighter")
-        discard = replace(discard, fighter=getattr(discard, "fighter", 0) + 2)
+        discard = replace(discard, fighter=discard.fighter + 2)
     else:
         dungeon = action.decrement_dungeon(dungeon, "skeleton")
         party = action.increment_party(party, "fighter")
-        discard = replace(discard, fighter=getattr(discard, "fighter", 0) + 1)
+        discard = replace(discard, fighter=discard.fighter + 1)
 
     regroup = replace(regroup, discard=discard)
     world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
