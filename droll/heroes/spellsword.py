@@ -14,7 +14,7 @@ from ..player import Default
 
 
 def _spellsword_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -33,7 +33,7 @@ def _spellsword_ability(
             "Target {} not one of {}".format(target, _acceptable_targets)
         )
     return action.consume_ability(
-        replace(game, party=action.increment_party(game.party, target))
+        replace(world, party=action.increment_party(world.party, target))
     )
 
 
@@ -48,7 +48,7 @@ _spellsword_defeat_dragon = functools.partial(
 
 
 def _battlemage_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -60,7 +60,7 @@ def _battlemage_ability(
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:
         raise error.DrollError("No targets accepted for {}".format(noun))
-    return action.consume_ability(replace(game, dungeon=struct.Dungeon()))
+    return action.consume_ability(replace(world, dungeon=struct.Dungeon()))
 
 
 # Defined in terms of Default, not Spellsword, to permit advance(...) closure

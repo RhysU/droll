@@ -10,12 +10,12 @@ from .. import action
 from .. import dice
 from .. import error
 from .. import struct
-from .. import world
+from ..world import replace_treasure, draw_treasure
 from ..player import Default
 
 
 def _crusader_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -34,12 +34,12 @@ def _crusader_ability(
             "Target {} not one of {}".format(target, _acceptable_targets)
         )
     return action.consume_ability(
-        replace(game, party=action.increment_party(game.party, target))
+        replace(world, party=action.increment_party(world.party, target))
     )
 
 
 def _paladin_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -59,11 +59,11 @@ def _paladin_ability(
         )
 
     # Consume the specified treasure (will error if not possessed)
-    game = world.replace_treasure(game, target)
+    world = replace_treasure(world, target)
 
     # Validate potion/revivable count before making changes
-    if game.dungeon is not None:
-        potion_count = game.dungeon.potion
+    if world.dungeon is not None:
+        potion_count = world.dungeon.potion
         if len(revivable) != potion_count:
             raise error.DrollError(
                 "Require exactly {} heroes to revive for {} potions.".format(
@@ -72,19 +72,19 @@ def _paladin_ability(
             )
 
         # Draw treasure for each chest
-        for _ in range(game.dungeon.chest):
-            game = world.draw_treasure(game, randrange)
+        for _ in range(world.dungeon.chest):
+            world = draw_treasure(world, randrange)
 
         # Revive heroes for each potion
-        party = game.party
+        party = world.party
         for revived in revivable:
             party = action.increment_party(party, revived)
-        game = replace(game, party=party)
+        world = replace(world, party=party)
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
-    game = replace(game, dungeon=struct.Dungeon())
+    world = replace(world, dungeon=struct.Dungeon())
 
-    return action.consume_ability(game)
+    return action.consume_ability(world)
 
 
 # Fighter/cleric are interchangeable for dragon defeats

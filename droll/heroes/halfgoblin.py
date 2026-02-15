@@ -15,7 +15,7 @@ from ..player import Default
 
 
 def _halfgoblin_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -26,21 +26,21 @@ def _halfgoblin_ability(
         raise error.DrollError("Ability can only target 1 goblin")
 
     # Change 1 goblin into 1 thief
-    dungeon = action.decrement_dungeon(game.dungeon, "goblin")
-    party = action.increment_party(game.party, "thief")
+    dungeon = action.decrement_dungeon(world.dungeon, "goblin")
+    party = action.increment_party(world.party, "thief")
 
     # Discarding if unused at the next regroup phase
-    regroup = game.regroup
+    regroup = world.regroup
     discard = regroup.discard
     discard = replace(discard, thief=getattr(discard, "thief", 0) + 1)
     regroup = replace(regroup, discard=discard)
 
-    game = replace(game, dungeon=dungeon, party=party, regroup=regroup)
-    return action.consume_ability(game)
+    world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
+    return action.consume_ability(world)
 
 
 def _chieftain_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -55,9 +55,9 @@ def _chieftain_ability(
     if len(extra_targets) > 1:
         raise error.DrollError("At most 2 targets can be changed.")
 
-    dungeon = game.dungeon
-    party = game.party
-    regroup = game.regroup
+    dungeon = world.dungeon
+    party = world.party
+    regroup = world.regroup
     discard = regroup.discard
 
     # Always transform 2 when 2 are available
@@ -73,8 +73,8 @@ def _chieftain_ability(
         discard = replace(discard, thief=getattr(discard, "thief", 0) + 1)
 
     regroup = replace(regroup, discard=discard)
-    game = replace(game, dungeon=dungeon, party=party, regroup=regroup)
-    return action.consume_ability(game)
+    world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
+    return action.consume_ability(world)
 
 
 # You may open chests and quaff potions at any time during the monster phase

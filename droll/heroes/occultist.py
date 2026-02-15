@@ -14,7 +14,7 @@ from ..player import Default
 
 
 def _occultist_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -25,21 +25,21 @@ def _occultist_ability(
         raise error.DrollError("Ability can only target 1 skeleton")
 
     # Change 1 skeleton into 1 fighter
-    dungeon = action.decrement_dungeon(game.dungeon, "skeleton")
-    party = action.increment_party(game.party, "fighter")
+    dungeon = action.decrement_dungeon(world.dungeon, "skeleton")
+    party = action.increment_party(world.party, "fighter")
 
     # Discarding if unused at the next regroup phase
-    regroup = game.regroup
+    regroup = world.regroup
     discard = regroup.discard
     discard = replace(discard, fighter=getattr(discard, "fighter", 0) + 1)
     regroup = replace(regroup, discard=discard)
 
-    game = replace(game, dungeon=dungeon, party=party, regroup=regroup)
-    return action.consume_ability(game)
+    world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
+    return action.consume_ability(world)
 
 
 def _necromancer_ability(
-    game: struct.World,
+    world: struct.World,
     randrange: dice.RandRange,
     noun: str,
     target: typing.Optional[str] = None,
@@ -54,9 +54,9 @@ def _necromancer_ability(
     if len(extra_targets) > 1:
         raise error.DrollError("At most 2 targets can be changed.")
 
-    dungeon = game.dungeon
-    party = game.party
-    regroup = game.regroup
+    dungeon = world.dungeon
+    party = world.party
+    regroup = world.regroup
     discard = regroup.discard
 
     # Always transform 2 when 2 are available
@@ -72,8 +72,8 @@ def _necromancer_ability(
         discard = replace(discard, fighter=getattr(discard, "fighter", 0) + 1)
 
     regroup = replace(regroup, discard=discard)
-    game = replace(game, dungeon=dungeon, party=party, regroup=regroup)
-    return action.consume_ability(game)
+    world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
+    return action.consume_ability(world)
 
 
 # Cleric/mage are interchangeable for dragon defeats

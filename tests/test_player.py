@@ -10,10 +10,10 @@ import unittest
 from droll import error, player, struct, world
 
 
-def _remove_monsters(game: struct.World) -> struct.World:
+def _remove_monsters(world: struct.World) -> struct.World:
     """Remove all monsters from dungeon for testing treasure interactions."""
     return replace(
-        game, dungeon=replace(game.dungeon, goblin=0, skeleton=0, ooze=0)
+        world, dungeon=replace(world.dungeon, goblin=0, skeleton=0, ooze=0)
     )
 
 
