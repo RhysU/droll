@@ -97,9 +97,10 @@ class World:
     reserve: Treasure = Treasure()
 
 
-# TODO Remove regroup from the omitted set
+# Strictly speaking, "reserve" is genuine world state and tricky to deduce.
+# Only for historical reasons is it omitted below.
 def brief(
-    o: typing.Any, *, omitted: typing.AbstractSet[str] = frozenset({"reserve", "regroup"})
+    o: typing.Any, *, omitted: typing.AbstractSet[str] = frozenset({"reserve"})
 ) -> str:
     """A __str__(...) variant suppressing False fields within dataclasses."""
     try:
