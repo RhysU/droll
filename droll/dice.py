@@ -16,6 +16,7 @@ RollParty = typing.Callable[[int, RandRange], struct.Party]
 def _roll(
     dice: int, start: int, stop: int, randrange: RandRange
 ) -> typing.List[int]:
+    """Roll dice and return counts for each outcome in the range [start, stop)."""
     assert dice >= 0, "At least one die must be requested"
     result = [0] * (stop - start)
     for _ in range(dice):

@@ -16,11 +16,13 @@ import droll.struct
 class TestGame(unittest.TestCase):
 
     def test_game_construction(self):
+        """Test that Game can be constructed with various parameter combinations."""
         Game()
         Game(player=Default)
         Game(random=random.Random(4))
 
     def test_gamestate_truthiness(self):
+        """Test that GameState values coerce to boolean correctly for control flow."""
         assert GameState.STOP, "STOP must coerce to True."
         assert not GameState.PLAY, "PLAY must coerce to False."
 
