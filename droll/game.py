@@ -167,7 +167,10 @@ class Game:
     ) -> typing.Sequence[str]:
         """Complete loosely based upon available heroes/treasures/dungeon."""
         return player.complete(
-            game=self._world, tokens=head + tail, text=text, position=len(head)
+            world=self._world,
+            tokens=head + tail,
+            text=text,
+            position=len(head)
         )
 
 
