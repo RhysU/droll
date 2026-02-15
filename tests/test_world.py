@@ -365,6 +365,72 @@ class TestWorld(unittest.TestCase):
         )
         self.assertEqual(descended.party.thief, 1)
 
+    def test_regroup_discard_after_elixir1(self):
+        """Accounting of revived vs force-discard thieves via elixirs."""
+        # Setup: thief from ability (marked for discard), 1 ooze present
+        pre = droll.struct.World(
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=False,
+            dungeon=droll.struct.Dungeon(ooze=1),
+            party=droll.struct.Party(thief=1),
+            regroup=droll.struct.Regroup(
+                discard=droll.struct.Party(thief=1)
+            ),
+            treasure=droll.struct.Treasure(elixir=1),
+            reserve=droll.struct.Treasure(),
+        )
+
+        # Force-discard thief kills the ooze
+        post1 = droll.action.defeat_one(pre, None, "thief", "ooze")
+        self.assertEqual(post1.regroup.discard.thief, 0)
+        self.assertEqual(post1.party.thief, 0)
+
+        # Elixir revives a new thief
+        post2 = droll.action.elixir(post1, None, "elixir", "thief")
+        self.assertEqual(post2.regroup.discard.thief, 0)
+        self.assertEqual(post2.party.thief, 1)
+
+        # After descending the revived thief must survive regroup
+        descended = droll.world.descend(
+            post2, droll.dice.roll_dungeon, random.Random(4).randrange,
+        )
+        self.assertEqual(descended.party.thief, 1)
+
+    def test_regroup_discard_after_elixir2(self):
+        """Accounting of revived vs force-discard thieves via elixirs."""
+        # Setup: thief from ability (marked for discard), 1 ooze present
+        pre = droll.struct.World(
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=False,
+            dungeon=droll.struct.Dungeon(ooze=1),
+            party=droll.struct.Party(thief=1),
+            regroup=droll.struct.Regroup(
+                discard=droll.struct.Party(thief=1)
+            ),
+            treasure=droll.struct.Treasure(elixir=1),
+            reserve=droll.struct.Treasure(),
+        )
+
+        # Elixir revives a new thief
+        post1 = droll.action.elixir(pre, None, "elixir", "thief")
+        self.assertEqual(post1.regroup.discard.thief, 1)
+        self.assertEqual(post1.party.thief, 2)
+
+        # Force-discard thief kills the ooze
+        post2 = droll.action.defeat_one(post1, None, "thief", "ooze")
+        self.assertEqual(post2.regroup.discard.thief, 0)
+        self.assertEqual(post2.party.thief, 1)
+
+        # After descending the revived thief must survive regroup
+        descended = droll.world.descend(
+            post2, droll.dice.roll_dungeon, random.Random(4).randrange,
+        )
+        self.assertEqual(descended.party.thief, 1)
+
     def test_exhausted_dungeon(self):
         """Test exhausted_dungeon detects when no actions remain."""
         # None dungeon is exhausted
