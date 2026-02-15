@@ -22,6 +22,7 @@ def defeat_one(
         game,
         party=decrement_hero(game.party, hero),
         dungeon=decrement_target(game.dungeon, target),
+        regroup=decrement_regroup(game.regroup, hero),
     )
 
 
@@ -40,6 +41,14 @@ def increment_hero(party: struct.Party, hero: str) -> struct.Party:
     if party is None:
         raise error.DrollError("No party currently active.")
     return replace(party, **{hero: getattr(party, hero) + 1})
+
+
+def decrement_regroup(regroup: struct.Regroup, hero: str) -> struct.Regroup:
+    """Decrement the regroup discard counter for hero, if positive."""
+    prior = getattr(regroup.discard, hero, 0)
+    return replace(
+        regroup, discard=replace(regroup.discard, **{hero: max(0, prior - 1)})
+    )
 
 
 def decrement_target(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
@@ -68,6 +77,7 @@ def defeat_all(
         game,
         party=decrement_hero(game.party, hero),
         dungeon=eliminate_targets(game.dungeon, target),
+        regroup=decrement_regroup(game.regroup, hero),
     )
 
 
@@ -136,6 +146,7 @@ def open_one(
         world.draw_treasure(game, randrange),
         party=decrement_hero(game.party, hero),
         dungeon=decrement_target(game.dungeon, target),
+        regroup=decrement_regroup(game.regroup, hero),
     )
 
 
@@ -159,6 +170,7 @@ def open_all(
         game,
         party=decrement_hero(game.party, hero),
         dungeon=eliminate_targets(game.dungeon, target),
+        regroup=decrement_regroup(game.regroup, hero),
     )
 
 
@@ -181,10 +193,12 @@ def quaff(
     if _after_monsters and not world.defeated_monsters(game.dungeon):
         raise error.DrollError("Monsters must be defeated before quaffing.")
     party = decrement_hero(game.party, hero)
+    regroup = decrement_regroup(game.regroup, hero)
     for revived in revivable:
         party = increment_hero(party, revived)
     return replace(
-        game, party=party, dungeon=eliminate_targets(game.dungeon, target)
+        game, party=party, dungeon=eliminate_targets(game.dungeon, target),
+        regroup=regroup,
     )
 
 
@@ -207,6 +221,7 @@ def reroll(
     return replace(
         game,
         party=decrement_hero(game.party, hero),
+        regroup=decrement_regroup(game.regroup, hero),
         dungeon=struct.Dungeon(
             *tuple(
                 map(
@@ -339,9 +354,11 @@ def defeat_dragon(
 
     # Confirm required number of distinct heroes available
     party = decrement_hero(game.party, hero)
+    regroup = decrement_regroup(game.regroup, hero)
     heroes = [hero]
     for other in others:
         party = decrement_hero(party, other)
+        regroup = decrement_regroup(regroup, other)
         heroes.append(other)
     if not _defeat_dragon_heroes(*heroes):
         raise RuntimeError("Unexpected result from _defeat_dragon_heroes")
@@ -352,6 +369,7 @@ def defeat_dragon(
         experience=game.experience + 1,
         party=party,
         dungeon=eliminate_targets(game.dungeon, target),
+        regroup=regroup,
     )
 
 

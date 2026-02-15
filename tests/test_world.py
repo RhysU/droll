@@ -7,6 +7,7 @@ from dataclasses import replace
 import random
 import unittest
 
+import droll.action
 import droll.dice
 import droll.error
 import droll.struct
@@ -330,6 +331,41 @@ class TestWorld(unittest.TestCase):
                 fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
             ),
         )
+
+    def test_regroup_discard_after_quaff(self):
+        """Quaffing with a force-discard thief should clear its discard counter.
+
+        A thief gained via Half-Goblin ability (marked for discard) quaffs a
+        potion to revive another thief.  The revived thief should survive
+        regroup."""
+        # Setup: thief from ability (marked for discard), 1 potion available
+        pre = droll.struct.World(
+            delve=1,
+            depth=1,
+            experience=0,
+            ability=False,
+            dungeon=droll.struct.Dungeon(potion=1),
+            party=droll.struct.Party(thief=1),
+            regroup=droll.struct.Regroup(
+                discard=droll.struct.Party(thief=1)
+            ),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(),
+        )
+        # Thief quaffs potion, reviving another thief
+        post = droll.action.quaff(
+            pre, None, "thief", "potion", "thief",
+            _after_monsters=False,
+        )
+        # The marked thief was consumed so the discard counter must drop
+        self.assertEqual(post.regroup.discard.thief, 0)
+        self.assertEqual(post.party.thief, 1)
+
+        # After descending the revived thief must survive regroup
+        descended = droll.world.descend(
+            post, droll.dice.roll_dungeon, random.Random(4).randrange,
+        )
+        self.assertEqual(descended.party.thief, 1)
 
     def test_exhausted_dungeon(self):
         """Test exhausted_dungeon detects when no actions remain."""
