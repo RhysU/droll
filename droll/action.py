@@ -92,7 +92,9 @@ def defeat_all_plus_additional(
 ) -> struct.World:
     """Update world after hero handles all of one target type plus one more."""
     # First, defeat all of the specified target
-    world = defeat_all(world=world, randrange=randrange, hero=hero, target=target)
+    world = defeat_all(
+        world=world, randrange=randrange, hero=hero, target=target
+    )
 
     # Second, determine if additional should not have been supplied
     if defeated_monsters(world.dungeon):
