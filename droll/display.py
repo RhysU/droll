@@ -19,19 +19,28 @@ class DisplayMode(enum.Enum):
 _ALWAYS_COUNT = frozenset({"dragon"})
 
 
-def _format_item(name: str, count: int) -> typing.Optional[str]:
+def _format_item(
+    name: str, count: int, discard: int = 0
+) -> typing.Optional[str]:
     """Format a single item, returning None if count is zero."""
     if not count:
         return None
-    if count > 1 or name in _ALWAYS_COUNT:
-        return f"{name}×{count}"
-    return name
+    counted = count > 1 or name in _ALWAYS_COUNT
+    if discard:
+        return f"{name}×{count}-{discard}" if counted else f"{name}-{discard}"
+    return f"{name}×{count}" if counted else name
 
 
-def _format_items(instance: typing.Any) -> str:
-    """Format dataclass fields as 'name' or 'name×N', in field order."""
-    parts = (_format_item(n, c) for n, c in struct.field_items(instance))
-    return " ".join(filter(None, parts)) or "none"
+def _format_items(counts: typing.Any, discards: typing.Any = None) -> str:
+    """Format dataclass fields as 'name' or 'name×N' or 'name×N-M'."""
+    if discards is None:
+        parts = (_format_item(n, c) for n, c in struct.field_items(counts))
+    else:
+        parts = (
+            _format_item(n, getattr(counts, n), getattr(discards, n))
+            for n in struct.field_names(counts)
+        )
+    return " ".join(filter(None, parts)) or "None"
 
 
 def _format_treasure(treasure: struct.Treasure) -> str:
@@ -39,12 +48,22 @@ def _format_treasure(treasure: struct.Treasure) -> str:
     parts = (
         _format_item(n, c) for n, c in sorted(struct.field_items(treasure))
     )
-    return " ".join(filter(None, parts)) or "none"
+    return " ".join(filter(None, parts)) or "None"
 
 
 def _format_available(available: typing.Sequence[str]) -> str:
     """Format available commands alphabetically."""
     return " ".join(sorted(available)) or "None"
+
+
+def _format_party(
+    party: typing.Optional[struct.Party],
+    discard: typing.Optional[struct.Party],
+) -> typing.Optional[str]:
+    """Format party contents, returning None if empty."""
+    if party is None or not any(struct.field_values(party)):
+        return None
+    return _format_items(counts=party, discards=discard)
 
 
 def _format_dungeon(
@@ -75,7 +94,7 @@ def compact_summary(
 
     # Format each component
     treasure_str = _format_treasure(w.treasure)
-    party_str = _format_items(w.party) if w.party else "none"
+    party_str = _format_party(w.party, w.regroup.discard)
     available_str = _format_available(available)
     dungeon_str = _format_dungeon(w.dungeon)
 

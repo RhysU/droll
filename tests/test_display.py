@@ -13,7 +13,7 @@ class TestFormatItems(unittest.TestCase):
     def test_empty_party(self):
         """Test formatting an empty party returns 'none'."""
         party = struct.Party()
-        self.assertEqual(display._format_items(party), "none")
+        self.assertEqual(display._format_items(party), "None")
 
     def test_single_items(self):
         """Test formatting party with single quantities of each item."""
@@ -43,7 +43,7 @@ class TestFormatTreasure(unittest.TestCase):
     def test_empty_treasure(self):
         """Test formatting empty treasure returns 'none'."""
         treasure = struct.Treasure()
-        self.assertEqual(display._format_treasure(treasure), "none")
+        self.assertEqual(display._format_treasure(treasure), "None")
 
     def test_single_items_alphabetized(self):
         """Test treasure items are displayed in alphabetical order."""
@@ -117,7 +117,7 @@ class TestCompactSummary(unittest.TestCase):
         self.assertEqual(len(lines), 4)
         self.assertIn("delve 1 with experience 0", lines[0])
         self.assertIn("Treasure:", lines[1])
-        self.assertIn("none", lines[1])
+        self.assertIn("None", lines[1])
         self.assertIn("Available:", lines[2])
         self.assertIn("ability descend", lines[2])
         self.assertIn("Party:", lines[3])
