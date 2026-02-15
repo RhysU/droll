@@ -6,7 +6,9 @@
 import random
 import typing
 import unittest
+from dataclasses import replace
 
+from droll import struct
 from droll.display import DisplayMode
 from droll.error import DrollError
 from droll.game import Game
@@ -54,8 +56,6 @@ class TestShell(unittest.TestCase):
         s.preloop()
         s.onecmd("descend")
         # Need a monster present so retreat is valid
-        from dataclasses import replace
-        from droll import struct
         s._game._world = replace(
             s._game._world, dungeon=struct.Dungeon(goblin=1)
         )
