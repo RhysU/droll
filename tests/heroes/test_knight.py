@@ -19,9 +19,10 @@ class TestKnight(unittest.TestCase):
     def test_knight_roll_party_converts_scrolls(self):
         """Knight converts scrolls to champions when rolling party."""
         randrange = random.Random(4).randrange
-        party = _knight_roll_party(7, randrange)
+        party, regroup = _knight_roll_party(7, randrange)
         self.assertEqual(party.scroll, 0)
         self.assertEqual(sum(droll.struct.field_values(party)), 7)
+        self.assertEqual(regroup, droll.struct.Regroup())
 
     def test_knight_ability_baits_dragon(self):
         """Knight ability converts monsters to dragons without treasure."""

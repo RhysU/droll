@@ -91,14 +91,15 @@ def delve(
     Argument roll_party can be dice.roll_party but other choices okay."""
     if world.delve >= 3:
         raise error.DrollError("At most three delves are permitted.")
+    party, regroup = roll_party(_party_dice, randrange)
     return replace(
         world,
         delve=(world.delve if world.delve else 0) + 1,
         depth=0,
         ability=True,
-        regroup=struct.Regroup(),
+        regroup=regroup,
         dungeon=None,
-        party=roll_party(_party_dice, randrange),
+        party=party,
     )
 
 

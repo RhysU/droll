@@ -18,7 +18,7 @@ __all__ = (
 
 RandRange = typing.Callable[[int, int], int]
 RollDungeon = typing.Callable[[int, RandRange], struct.Dungeon]
-RollParty = typing.Callable[[int, RandRange], struct.Party]
+RollParty = typing.Callable[[int, RandRange], typing.Tuple[struct.Party, struct.Regroup]]
 
 
 def _roll(
@@ -43,8 +43,13 @@ def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
     )
 
 
-def roll_party(dice: int, randrange: RandRange) -> struct.Party:
+def roll_party(
+    dice: int, randrange: RandRange
+) -> typing.Tuple[struct.Party, struct.Regroup]:
     """Roll a new Party using given number of dice.
 
     Any implementation must follow type signature of RollParty."""
-    return struct.Party(*_roll(dice, 0, len(fields(struct.Party)), randrange))
+    return (
+        struct.Party(*_roll(dice, 0, len(fields(struct.Party)), randrange)),
+        struct.Regroup(),
+    )
