@@ -233,32 +233,65 @@ def reroll(
     world: struct.World,
     randrange: dice.RandRange,
     hero: str,
-    *targets,
+    *dungeon_or_party,
     allow_dragon: bool = False,
 ) -> struct.World:
-    """Update world after hero re-rolls some number of targets."""
-    if not targets:
+    """Update world after hero re-rolls some number of dungeon or party dice."""
+    if not dungeon_or_party:
         raise error.DrollError("At least one target must be re-rolled.")
 
-    # Remove requested target from the dungeon
-    reduced = world.dungeon
-    for target in targets:
+    # Classify each target as either a dungeon or party die
+    dungeon_names = frozenset(struct.field_names(struct.Dungeon))
+    party_names = frozenset(struct.field_names(struct.Party))
+    dungeon_targets = []
+    party_targets = []
+    for target in dungeon_or_party:
         if not allow_dragon and target == "dragon":
             raise error.DrollError("{} cannot be re-rolled".format(target))
-        reduced = decrement_dungeon(reduced, target)
+        if target in dungeon_names:
+            dungeon_targets.append(target)
+        elif target in party_names:
+            party_targets.append(target)
+        else:
+            raise error.DrollError("{} cannot be re-rolled".format(target))
 
-    # Re-roll the necessary number of dice then add to anything left fixed
-    increased = dice.roll_dungeon(dice=len(targets), randrange=randrange)
-    return replace(
-        world,
-        dungeon=struct.Dungeon(
+    # Remove requested targets from the dungeon
+    dungeon = world.dungeon
+    for target in dungeon_targets:
+        dungeon = decrement_dungeon(dungeon, target)
+
+    # Re-roll dungeon dice and add to anything left fixed
+    if dungeon_targets:
+        increased = dice.roll_dungeon(dice=len(dungeon_targets), randrange=randrange)
+        dungeon = struct.Dungeon(
             *map(
                 operator.add,
-                struct.field_values(reduced),
+                struct.field_values(dungeon),
                 struct.field_values(increased),
             )
-        ),
-        party=_decrement_party(world.party, hero),
+        )
+
+    # Remove requested targets from the party
+    party = world.party
+    for target in party_targets:
+        party = _decrement_party(party, target)
+
+    # Re-roll party dice and add to anything left fixed
+    if party_targets:
+        increased = dice.roll_party(dice=len(party_targets), randrange=randrange)
+        party = struct.Party(
+            *map(
+                operator.add,
+                struct.field_values(party),
+                struct.field_values(increased),
+            )
+        )
+
+    # Consume the hero and update regroup
+    return replace(
+        world,
+        dungeon=dungeon,
+        party=_decrement_party(party, hero),
         regroup=_decrement_regroup(world.regroup, hero),
     )
 
