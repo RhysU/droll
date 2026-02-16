@@ -230,7 +230,11 @@ def quaff(
 
 
 def reroll(
-    world: struct.World, randrange: dice.RandRange, hero: str, *targets
+    world: struct.World,
+    randrange: dice.RandRange,
+    hero: str,
+    *targets,
+    allow_dragon: bool = False,
 ) -> struct.World:
     """Update world after hero re-rolls some number of targets."""
     if not targets:
@@ -239,7 +243,7 @@ def reroll(
     # Remove requested target from the dungeon
     reduced = world.dungeon
     for target in targets:
-        if target == "dragon":
+        if not allow_dragon and target == "dragon":
             raise error.DrollError("{} cannot be re-rolled".format(target))
         reduced = decrement_dungeon(reduced, target)
 
