@@ -10,6 +10,7 @@ from . import error
 from . import struct
 
 __all__ = (
+    "defeated_dungeon",
     "defeated_monsters",
     "delve",
     "descend",
@@ -30,7 +31,7 @@ def defeated_monsters(dungeon: struct.Dungeon) -> bool:
     )
 
 
-def _defeated_dungeon(dungeon: struct.Dungeon) -> bool:
+def defeated_dungeon(dungeon: struct.Dungeon) -> bool:
     """Are all monsters and any dragon on this dungeon defected?"""
     return (dungeon is None) or (
         defeated_monsters(dungeon) and dungeon.dragon < 3
@@ -39,13 +40,13 @@ def _defeated_dungeon(dungeon: struct.Dungeon) -> bool:
 
 def _blocking_dragon(dungeon: struct.Dungeon) -> bool:
     """Is a dragon blocking progress to the next level?"""
-    return defeated_monsters(dungeon) and not _defeated_dungeon(dungeon)
+    return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
 
 
 def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
     """Has the player exhausted all possible actions for this dungeon?
 
-    In contrast to _defeated_dungeon(...), returns True if chests/etc remain."""
+    In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
     return (dungeon is None) or (
         (0 == sum(struct.field_values(dungeon)) - dungeon.dragon)
         and not _blocking_dragon(dungeon)
@@ -132,7 +133,7 @@ def descend(
     if not defeated_monsters(world.dungeon):
         raise error.DrollError("Must defeat foes to proceed to next dungeon.")
 
-    if not _defeated_dungeon(world.dungeon):
+    if not defeated_dungeon(world.dungeon):
         try:
             world = _apply_ring(world)
         except error.DrollError:
@@ -196,7 +197,7 @@ def retreat(world: struct.World) -> struct.World:
     """Retreat to the tavern without completing the present dungeon."""
     if world.depth < 1:
         raise error.DrollError("Descend at least once prior to retreating.")
-    if _defeated_dungeon(world.dungeon):
+    if defeated_dungeon(world.dungeon):
         raise error.DrollError("Why retreat when you could instead retire?")
 
     # Regroup just prior to retreating
@@ -271,7 +272,7 @@ def _apply_portal(
 ) -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
-    if _defeated_dungeon(world.dungeon):
+    if defeated_dungeon(world.dungeon):
         raise error.DrollError(
             "No need to apply {} when dungeon clear".format(noun)
         )
