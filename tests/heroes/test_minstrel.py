@@ -98,3 +98,79 @@ class TestMinstrel(unittest.TestCase):
                 "champion",
                 "goblin",
             )
+
+    def test_defeat_one_plus_one_additional(self):
+        """Defeats one of primary target plus one additional."""
+        world = droll.struct.World(
+            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+            party=droll.struct.Party(champion=1),
+        )
+        result = droll.action.defeat_one_plus_additional(
+            world, _UNUSED, "champion", "goblin", "skeleton"
+        )
+        self.assertEqual(result.dungeon.goblin, 1)
+        self.assertEqual(result.dungeon.skeleton, 0)
+        self.assertEqual(result.party.champion, 0)
+
+    def test_defeat_one_no_additional_when_cleared(self):
+        """No additional needed when all monsters cleared after defeating one."""
+        world = droll.struct.World(
+            dungeon=droll.struct.Dungeon(goblin=1),
+            party=droll.struct.Party(fighter=1),
+        )
+        result = droll.action.defeat_one_plus_additional(
+            world, _UNUSED, "fighter", "goblin"
+        )
+        self.assertEqual(result.dungeon.goblin, 0)
+        self.assertEqual(result.party.fighter, 0)
+
+    def test_defeat_one_rejects_additional_when_cleared(self):
+        """Rejects additional target when all monsters already cleared."""
+        world = droll.struct.World(
+            dungeon=droll.struct.Dungeon(goblin=1),
+            party=droll.struct.Party(fighter=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            droll.action.defeat_one_plus_additional(
+                world, _UNUSED, "fighter", "goblin", "skeleton"
+            )
+
+    def test_defeat_one_requires_additional_when_monsters_remain(self):
+        """Requires additional target when monsters remain after defeating one."""
+        world = droll.struct.World(
+            dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
+            party=droll.struct.Party(fighter=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            droll.action.defeat_one_plus_additional(
+                world, _UNUSED, "fighter", "goblin"
+            )
+
+    def test_defeat_one_rejects_extra_additional(self):
+        """Rejects more than one additional target."""
+        world = droll.struct.World(
+            dungeon=droll.struct.Dungeon(goblin=1, skeleton=1, ooze=1),
+            party=droll.struct.Party(champion=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            droll.action.defeat_one_plus_additional(
+                world,
+                _UNUSED,
+                "champion",
+                "goblin",
+                "skeleton",
+                "ooze",
+            )
+
+    def test_defeat_one_only_decrements_one_of_primary(self):
+        """Defeats only one of the primary target, not all."""
+        world = droll.struct.World(
+            dungeon=droll.struct.Dungeon(goblin=3, skeleton=1),
+            party=droll.struct.Party(champion=1),
+        )
+        result = droll.action.defeat_one_plus_additional(
+            world, _UNUSED, "champion", "goblin", "skeleton"
+        )
+        self.assertEqual(result.dungeon.goblin, 2)
+        self.assertEqual(result.dungeon.skeleton, 0)
+        self.assertEqual(result.party.champion, 0)
