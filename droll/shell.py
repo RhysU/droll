@@ -45,7 +45,7 @@ class Shell(cmd.Cmd):
     def precmd(self, line: str) -> str:
         """Reset terminal color after user input."""
         if self._color:
-            sys.stdout.write(_RESET)
+            print(_RESET, end="")
         return line
 
     def preloop(self) -> None:
