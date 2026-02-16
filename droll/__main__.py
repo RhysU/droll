@@ -7,7 +7,7 @@ import collections
 import random
 import sys
 
-from .shell import Game
+from .game import Game
 from .display import DisplayMode
 from .heroes import (
     Crusader,
@@ -47,7 +47,6 @@ def main(args=None) -> None:
         "--seed",
         metavar="N",
         type=int,
-        nargs=1,
         default=None,
         help="An integer to seed random number generation.",
     )
@@ -57,9 +56,9 @@ def main(args=None) -> None:
         help="Use mechanical verbose display format.",
     )
     arguments = parser.parse_args(args)
-    randseed = arguments.seed if arguments.seed else ()
+    randseed = (arguments.seed,) if arguments.seed is not None else ()
     g = Game(
-        player=AVAILABLE_HEROES.get(arguments.hero),
+        player=AVAILABLE_HEROES[arguments.hero],
         random=random.Random(*randseed),
     )
     display_mode = (
