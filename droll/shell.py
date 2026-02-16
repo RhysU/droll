@@ -31,7 +31,7 @@ class Shell(cmd.Cmd):
         self,
         game: Game,
         *,
-        display_mode: DisplayMode,
+        display_mode: DisplayMode = DisplayMode.CURRENT,
         color: typing.Optional[bool] = None,
     ) -> None:
         """Initialize the shell with a game instance and display mode."""
