@@ -56,10 +56,9 @@ def main(args=None) -> None:
         help="Use mechanical verbose display format.",
     )
     arguments = parser.parse_args(args)
-    rng = random.Random() if arguments.seed is None else random.Random(arguments.seed)
     g = Game(
         player=AVAILABLE_HEROES[arguments.hero],
-        random=rng,
+        random=random.Random(arguments.seed),
     )
     display_mode = (
         DisplayMode.MECHANICAL if arguments.mechanical else DisplayMode.CURRENT
