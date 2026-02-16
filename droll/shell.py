@@ -32,7 +32,6 @@ class Shell(cmd.Cmd):
         game: Game,
         *,
         display_mode: DisplayMode = DisplayMode.CURRENT,
-        color: typing.Optional[bool] = None,
     ) -> None:
         """Initialize the shell with a game instance and display mode."""
         super(Shell, self).__init__()
@@ -40,7 +39,9 @@ class Shell(cmd.Cmd):
         self._game = game
         self._undo = None
         self._display_mode = display_mode
-        self._color = sys.stdout.isatty() if color is None else color
+        self._color = (
+            sys.stdout.isatty() if display_mode == DisplayMode.CURRENT else False
+        )
 
     def precmd(self, line: str) -> str:
         """Reset terminal color after user input."""
