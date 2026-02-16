@@ -18,7 +18,7 @@ from droll.player import Default
 from droll.shell import Shell, _RESET
 
 
-def _fresh_shell(game: Game) -> Shell:
+def _mechanical_bw_shell(game: Game) -> Shell:
     return Shell(game, display_mode=DisplayMode.MECHANICAL, color=False)
 
 
@@ -33,7 +33,7 @@ class TestPrecmd(unittest.TestCase):
         self.assertEqual(fake_out.getvalue(), _RESET)
 
     def test_precmd_emits_nothing_when_color_disabled(self):
-        s = _fresh_shell(Game())
+        s = _mechanical_bw_shell(Game())
         s.preloop()
         with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
             result = s.precmd("fighter goblin")
@@ -45,7 +45,7 @@ class TestShell(unittest.TestCase):
 
     def test_EOF(self):
         """Confirm providing EOF exits cmdloop(...)."""
-        s = _fresh_shell(Game())
+        s = _mechanical_bw_shell(Game())
         self.assertFalse(s.cmdqueue)
         s.cmdqueue.append("EOF")
         s.cmdloop()
@@ -54,7 +54,7 @@ class TestShell(unittest.TestCase):
 
     def test_reroll(self):
         """Confirm reroll command forwards to game."""
-        s = _fresh_shell(Game(random=random.Random(4), player=Default))
+        s = _mechanical_bw_shell(Game(random=random.Random(4), player=Default))
         s.preloop()
         s.onecmd("descend")
         # Depth 1 with seed 4 has a single goblin; reroll it
@@ -62,7 +62,7 @@ class TestShell(unittest.TestCase):
 
     def test_retreat(self):
         """Confirm retreat command forwards to game."""
-        s = _fresh_shell(Game(random=random.Random(4), player=Default))
+        s = _mechanical_bw_shell(Game(random=random.Random(4), player=Default))
         s.preloop()
         s.onecmd("descend")
         # Need a monster present so retreat is valid
@@ -73,7 +73,7 @@ class TestShell(unittest.TestCase):
 
     def test_help(self):
         """Confirm help invocations do not throw exceptions."""
-        s = _fresh_shell(Game())
+        s = _mechanical_bw_shell(Game())
         s.help_ability()
         s.help_bait()
         s.help_champion()
@@ -114,7 +114,7 @@ class TestUndo(unittest.TestCase):
 
     def test_undo(self):
         """Based upon test_simple(...), verify undo behaving as expected."""
-        s = _fresh_shell(Game(random=random.Random(4), player=Default))
+        s = _mechanical_bw_shell(Game(random=random.Random(4), player=Default))
 
         # Supplies a private flag so that DrollErrors percolate to this level
         def onecmd(line):
@@ -175,7 +175,7 @@ class TestUndo(unittest.TestCase):
 
     def test_undo_in_available_commands(self):
         """Verify undo appears in available commands only when undo stack is not empty."""
-        s = _fresh_shell(Game(random=random.Random(42), player=Default))
+        s = _mechanical_bw_shell(Game(random=random.Random(42), player=Default))
         s.preloop()
 
         # Initially, undo stack is empty, so "undo" should not be available
@@ -201,7 +201,7 @@ class TestRetireAndQuaffError(unittest.TestCase):
 
     def test_retire(self):
         """Shell.do_retire exercises the retire command path."""
-        s = _fresh_shell(Game(random=random.Random(4), player=Default))
+        s = _mechanical_bw_shell(Game(random=random.Random(4), player=Default))
         s.preloop()
         s.onecmd("descend")
         # Seed 4 at depth 1 produces goblin=1; defeat it
@@ -211,7 +211,7 @@ class TestRetireAndQuaffError(unittest.TestCase):
 
     def test_quaff_wrong_revive_count_prints_error(self):
         """Quaffing with wrong revive count prints DrollError via onecmd."""
-        s = _fresh_shell(Game(random=random.Random(4), player=Default))
+        s = _mechanical_bw_shell(Game(random=random.Random(4), player=Default))
         s.preloop()
         s.onecmd("descend")
         # Replace dungeon with a single potion and no monsters
