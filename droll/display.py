@@ -69,8 +69,8 @@ def _format_party(
 def _format_dungeon(
     dungeon: typing.Optional[struct.Dungeon],
 ) -> typing.Optional[str]:
-    """Format dungeon contents, returning None if empty."""
-    if dungeon is None or not any(struct.field_values(dungeon)):
+    """Format dungeon contents, returning None only if no dungeon exists."""
+    if dungeon is None:
         return None
     return _format_items(dungeon)
 

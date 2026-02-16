@@ -80,9 +80,9 @@ class TestFormatDungeon(unittest.TestCase):
         self.assertIsNone(display._format_dungeon(None))
 
     def test_empty_dungeon(self):
-        """Test formatting empty dungeon returns None."""
+        """Test formatting empty dungeon returns 'None' string."""
         dungeon = struct.Dungeon()
-        self.assertIsNone(display._format_dungeon(dungeon))
+        self.assertEqual(display._format_dungeon(dungeon), "None")
 
     def test_with_monsters(self):
         """Test formatting dungeon with monsters."""
@@ -169,8 +169,8 @@ class TestCompactSummary(unittest.TestCase):
             # Content should start at same column for all lines
             self.assertGreaterEqual(content_start, 13)
 
-    def test_dungeon_not_shown_when_empty(self):
-        """Test that empty dungeons are not displayed in the summary."""
+    def test_dungeon_shown_when_empty(self):
+        """Test that empty dungeons display 'Dungeon: None' in the summary."""
         world = struct.World(
             delve=1,
             depth=1,
@@ -183,7 +183,10 @@ class TestCompactSummary(unittest.TestCase):
         result = display.compact_summary(
             world, "Knight", 0, ["ability", "descend", "retire"]
         )
-        self.assertNotIn("Dungeon:", result)
+        lines = result.split("\n")
+        self.assertEqual(len(lines), 5)
+        self.assertIn("Dungeon:", lines[4])
+        self.assertIn("None", lines[4])
 
     def test_cleared_level_10(self):
         """Test compact summary after clearing dungeon level 10."""
@@ -202,7 +205,9 @@ class TestCompactSummary(unittest.TestCase):
         self.assertIn("scale×4 sceptre talisman tools", lines[1])
         self.assertIn("retire", lines[2])
         self.assertIn("champion scroll×2", lines[3])
-        self.assertEqual(len(lines), 4)  # No Dungeon line
+        self.assertIn("Dungeon:", lines[4])
+        self.assertIn("None", lines[4])
+        self.assertEqual(len(lines), 5)
 
     def test_ending_state(self):
         """After final delve, Available should show 'None'."""
