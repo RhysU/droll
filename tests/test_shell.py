@@ -3,24 +3,45 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of the shell (at least driving with basic commands)."""
 
+import io
 import random
 import typing
 import unittest
 from dataclasses import replace
+from unittest.mock import patch
 
 from droll import struct
 from droll.display import DisplayMode
 from droll.error import DrollError
 from droll.game import Game
 from droll.player import Default
-from droll.shell import Shell
+from droll.shell import Shell, _RESET
+
+
+class TestPrecmd(unittest.TestCase):
+
+    def test_precmd_emits_reset_when_color_enabled(self):
+        s = Shell(Game(), display_mode=DisplayMode.MECHANICAL, color=True)
+        s.preloop()
+        with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
+            result = s.precmd("fighter goblin")
+        self.assertEqual(result, "fighter goblin")
+        self.assertEqual(fake_out.getvalue(), _RESET)
+
+    def test_precmd_emits_nothing_when_color_disabled(self):
+        s = Shell(Game(), display_mode=DisplayMode.MECHANICAL, color=False)
+        s.preloop()
+        with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
+            result = s.precmd("fighter goblin")
+        self.assertEqual(result, "fighter goblin")
+        self.assertEqual(fake_out.getvalue(), "")
 
 
 class TestShell(unittest.TestCase):
 
     def test_EOF(self):
         """Confirm providing EOF exits cmdloop(...)."""
-        s = Shell(Game(), display_mode=DisplayMode.MECHANICAL)
+        s = Shell(Game(), display_mode=DisplayMode.MECHANICAL, color=False)
         self.assertFalse(s.cmdqueue)
         s.cmdqueue.append("EOF")
         s.cmdloop()
@@ -32,6 +53,7 @@ class TestShell(unittest.TestCase):
         s = Shell(
             Game(random=random.Random(4), player=Default),
             display_mode=DisplayMode.MECHANICAL,
+            color=False,
         )
         s.preloop()
         s.onecmd("descend")
@@ -43,6 +65,7 @@ class TestShell(unittest.TestCase):
         s = Shell(
             Game(random=random.Random(4), player=Default),
             display_mode=DisplayMode.MECHANICAL,
+            color=False,
         )
         s.preloop()
         s.onecmd("descend")
@@ -54,7 +77,7 @@ class TestShell(unittest.TestCase):
 
     def test_help(self):
         """Confirm help invocations do not throw exceptions."""
-        s = Shell(Game(), display_mode=DisplayMode.MECHANICAL)
+        s = Shell(Game(), display_mode=DisplayMode.MECHANICAL, color=False)
         s.help_ability()
         s.help_bait()
         s.help_champion()
@@ -98,6 +121,7 @@ class TestUndo(unittest.TestCase):
         s = Shell(
             Game(random=random.Random(4), player=Default),
             display_mode=DisplayMode.MECHANICAL,
+            color=False,
         )
 
         # Supplies a private flag so that DrollErrors percolate to this level
@@ -162,6 +186,7 @@ class TestUndo(unittest.TestCase):
         s = Shell(
             Game(random=random.Random(42), player=Default),
             display_mode=DisplayMode.MECHANICAL,
+            color=False,
         )
         s.preloop()
 
@@ -191,6 +216,7 @@ class TestRetireAndQuaffError(unittest.TestCase):
         s = Shell(
             Game(random=random.Random(4), player=Default),
             display_mode=DisplayMode.MECHANICAL,
+            color=False,
         )
         s.preloop()
         s.onecmd("descend")
@@ -204,6 +230,7 @@ class TestRetireAndQuaffError(unittest.TestCase):
         s = Shell(
             Game(random=random.Random(4), player=Default),
             display_mode=DisplayMode.MECHANICAL,
+            color=False,
         )
         s.preloop()
         s.onecmd("descend")
