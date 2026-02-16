@@ -15,27 +15,36 @@ from .display import DisplayMode
 from .error import DrollError
 from .game import Game, GameState
 
+_RESET = '\033[0m'
+_GREEN_LIGHT = '\033[92m'
+_RED_LIGHT = '\033[91m'
+
 
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
 
-    _RESET = '\033[0m'
-    _LIGHT_GREEN = '\033[92m'
-    _LIGHT_RED = '\033[91m'
-
-    def __init__(self, game: Game, *, display_mode: DisplayMode) -> None:
+    def __init__(
+        self,
+        game: Game,
+        *,
+        display_mode: DisplayMode,
+        color: typing.Optional[bool] = None,
+    ) -> None:
         """Initialize the shell with a game instance and display mode."""
         super(Shell, self).__init__()
         assert game is not None
         self._game = game
         self._undo = None
         self._display_mode = display_mode
-        self._color = sys.stdout.isatty()
+        if color is None:
+            self._color = sys.stdout.isatty()
+        else:
+            self._color = color
 
     def precmd(self, line: str) -> str:
         """Reset terminal color after user input."""
         if self._color:
-            sys.stdout.write(self._RESET)
+            sys.stdout.write(_RESET)
         return line
 
     def preloop(self) -> None:
@@ -69,7 +78,7 @@ class Shell(cmd.Cmd):
                 if stop:
                     print(self.prompt)
         if not stop and self._color:
-            self.prompt += "\001" + self._LIGHT_GREEN + "\002"
+            self.prompt += "\001" + _GREEN_LIGHT + "\002"
         return stop
 
     def _available_commands(self) -> typing.List[str]:
@@ -102,9 +111,9 @@ class Shell(cmd.Cmd):
             if _raises:
                 raise
             if self._color:
-                print(self._LIGHT_RED, end="")
+                print(_RED_LIGHT, end="")
                 print(*e.args)
-                print(self._RESET, end="")
+                print(_RESET, end="")
             else:
                 print(*e.args)
             return result
