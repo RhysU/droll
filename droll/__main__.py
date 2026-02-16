@@ -3,38 +3,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Command-line version of droll."""
 import argparse
-import collections
 import random
 import sys
 
 from .game import Game
 from .display import DisplayMode
-from .heroes import (
-    Crusader,
-    Enchantress,
-    HalfGoblin,
-    Knight,
-    Minstrel,
-    Occultist,
-    Spellsword,
-)
-from .player import Default
+from .heroes import AVAILABLE
 from .shell import Shell
 
 __all__ = ("main",)
-
-_AVAILABLE_HEROES = collections.OrderedDict(
-    [
-        ("Default", Default),
-        ("Crusader", Crusader),
-        ("Enchantress", Enchantress),
-        ("HalfGoblin", HalfGoblin),
-        ("Knight", Knight),
-        ("Minstrel", Minstrel),
-        ("Occultist", Occultist),
-        ("Spellsword", Spellsword),
-    ]
-)
 
 
 def main(args=None) -> None:
@@ -42,7 +19,7 @@ def main(args=None) -> None:
     parser = argparse.ArgumentParser(prog="droll", description=__doc__)
     parser.add_argument(
         "hero",
-        choices=_AVAILABLE_HEROES.keys(),
+        choices=AVAILABLE.keys(),
         help="Select the hero for this game.",
     )
     parser.add_argument(
@@ -59,7 +36,7 @@ def main(args=None) -> None:
     )
     arguments = parser.parse_args(args)
     g = Game(
-        player=_AVAILABLE_HEROES[arguments.hero],
+        player=AVAILABLE[arguments.hero],
         random=random.Random(arguments.seed),
     )
     display_mode = (
