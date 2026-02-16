@@ -194,3 +194,11 @@ class TestRerollParty(unittest.TestCase):
             action.reroll(
                 self.world, randrange, "scroll", "mage"
             )
+
+    def test_reroll_unknown_target_raises(self):
+        """Rerolling a target that is neither dungeon nor party raises DrollError."""
+        randrange = self._canned_randrange([])
+        with self.assertRaises(DrollError):
+            action.reroll(
+                self.world, randrange, "scroll", "nonexistent"
+            )
