@@ -82,7 +82,9 @@ class Shell(cmd.Cmd):
                 if stop:
                     print(self.prompt)
         if not stop and self._color:
+            self.prompt += _RL_PROMPT_START_IGNORE
             self.prompt += _GREEN_LIGHT
+            self.prompt += _RL_PROMPT_END_IGNORE
         return stop
 
     def _available_commands(self) -> typing.List[str]:
