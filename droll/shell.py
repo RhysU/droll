@@ -5,6 +5,7 @@
 import cmd
 import copy
 import functools
+import sys
 import textwrap
 import typing
 
@@ -16,17 +17,39 @@ from .game import Game, GameState
 
 __all__ = ("Shell",)
 
+_RESET = '\033[0m'
+_GREEN_LIGHT = '\033[92m'
+_RED_LIGHT = '\033[91m'
+
+# Required for Readline to ignore non-printing characters in prompts.
+_RL_PROMPT_START_IGNORE = '\001'
+_RL_PROMPT_END_IGNORE = '\002'
+
 
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
 
-    def __init__(self, game: Game, *, display_mode: DisplayMode) -> None:
+    def __init__(
+        self,
+        game: Game,
+        *,
+        display_mode: DisplayMode = DisplayMode.CURRENT,
+    ) -> None:
         """Initialize the shell with a game instance and display mode."""
         super(Shell, self).__init__()
         assert game is not None
         self._game = game
         self._undo = None
         self._display_mode = display_mode
+        self._color = (
+            sys.stdout.isatty() if display_mode == DisplayMode.CURRENT else False
+        )
+
+    def precmd(self, line: str) -> str:
+        """Reset terminal color after user input."""
+        if self._color:
+            print(_RESET, end="")
+        return line
 
     def preloop(self) -> None:
         """Prepare a new game and start the first delve."""
@@ -58,6 +81,10 @@ class Shell(cmd.Cmd):
                 print(self._game.summary())
                 if stop:
                     print(self.prompt)
+        if not stop and self._color:
+            self.prompt += _RL_PROMPT_START_IGNORE
+            self.prompt += _GREEN_LIGHT
+            self.prompt += _RL_PROMPT_END_IGNORE
         return stop
 
     def _available_commands(self) -> typing.List[str]:
@@ -89,7 +116,12 @@ class Shell(cmd.Cmd):
         except DrollError as e:
             if _raises:
                 raise
-            print(*e.args)
+            if self._color:
+                print(_RED_LIGHT, end="")
+                print(*e.args)
+                print(_RESET, end="")
+            else:
+                print(*e.args)
             return result
 
         # Retain only undo candidates that disallow cheating.
