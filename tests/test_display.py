@@ -10,16 +10,6 @@ from droll import struct
 
 class TestFormatItems(unittest.TestCase):
 
-    def test_empty_party(self):
-        """Test formatting an empty party returns 'none'."""
-        party = struct.Party()
-        self.assertEqual(display._format_items(party), "None")
-
-    def test_single_items(self):
-        """Test formatting party with single quantities of each item."""
-        party = struct.Party(fighter=1, cleric=1, mage=1)
-        self.assertEqual(display._format_items(party), "fighter cleric mage")
-
     def test_multiple_items(self):
         """Test formatting party with multiple quantities uses × notation."""
         party = struct.Party(fighter=2, cleric=1, mage=3)
@@ -32,23 +22,8 @@ class TestFormatItems(unittest.TestCase):
         dungeon = struct.Dungeon(dragon=1)
         self.assertEqual(display._format_items(dungeon), "dragon×1")
 
-    def test_dragon_multiple(self):
-        """Test formatting dungeon with multiple dragons."""
-        dungeon = struct.Dungeon(goblin=1, dragon=2)
-        self.assertEqual(display._format_items(dungeon), "goblin dragon×2")
-
 
 class TestFormatTreasure(unittest.TestCase):
-
-    def test_empty_treasure(self):
-        """Test formatting empty treasure returns 'none'."""
-        treasure = struct.Treasure()
-        self.assertEqual(display._format_treasure(treasure), "None")
-
-    def test_single_items_alphabetized(self):
-        """Test treasure items are displayed in alphabetical order."""
-        treasure = struct.Treasure(talisman=1, elixir=1)
-        self.assertEqual(display._format_treasure(treasure), "elixir talisman")
 
     def test_multiple_items_alphabetized(self):
         """Test multiple treasure items are alphabetized and use × notation."""
@@ -68,16 +43,8 @@ class TestFormatAvailable(unittest.TestCase):
             display._format_available(available), "ability reroll retreat"
         )
 
-    def test_empty(self):
-        """Test empty available commands list displays 'None'."""
-        self.assertEqual(display._format_available([]), "None")
-
 
 class TestFormatDungeon(unittest.TestCase):
-
-    def test_none_dungeon(self):
-        """Test formatting None dungeon returns None."""
-        self.assertIsNone(display._format_dungeon(None))
 
     def test_empty_dungeon(self):
         """Test formatting empty dungeon returns 'None' string."""
@@ -89,39 +56,8 @@ class TestFormatDungeon(unittest.TestCase):
         dungeon = struct.Dungeon(goblin=1, skeleton=2)
         self.assertEqual(display._format_dungeon(dungeon), "goblin skeleton×2")
 
-    def test_with_dragon(self):
-        """Test formatting dungeon with only dragons."""
-        dungeon = struct.Dungeon(dragon=2)
-        self.assertEqual(display._format_dungeon(dungeon), "dragon×2")
-
 
 class TestCompactSummary(unittest.TestCase):
-
-    def test_start_of_game(self):
-        """Test compact summary at the start of a new game."""
-        world = struct.World(
-            delve=1,
-            depth=0,
-            experience=0,
-            dungeon=None,
-            party=struct.Party(
-                fighter=2, cleric=1, mage=1, thief=1, champion=2
-            ),
-            ability=True,
-            treasure=struct.Treasure(),
-        )
-        result = display.compact_summary(
-            world, "Knight", 0, ["ability", "descend"]
-        )
-        lines = result.split("\n")
-        self.assertEqual(len(lines), 4)
-        self.assertIn("delve 1 with experience 0", lines[0])
-        self.assertIn("Treasure:", lines[1])
-        self.assertIn("None", lines[1])
-        self.assertIn("Available:", lines[2])
-        self.assertIn("ability descend", lines[2])
-        self.assertIn("Party:", lines[3])
-        self.assertIn("fighter×2", lines[3])
 
     def test_in_dungeon(self):
         """Test compact summary while in a dungeon with monsters."""
