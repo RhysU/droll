@@ -19,6 +19,10 @@ _RESET = '\033[0m'
 _GREEN_LIGHT = '\033[92m'
 _RED_LIGHT = '\033[91m'
 
+# Required for Readline to ignore non-printing characters in prompts.
+_RL_PROMPT_START_IGNORE = '\001'
+_RL_PROMPT_END_IGNORE = '\002'
+
 
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
@@ -75,7 +79,9 @@ class Shell(cmd.Cmd):
                 if stop:
                     print(self.prompt)
         if not stop and self._color:
-            self.prompt += "\001" + _GREEN_LIGHT + "\002"
+            self.prompt += _RL_PROMPT_START_IGNORE
+            self.prompt += _GREEN_LIGHT
+            self.prompt += _RL_PROMPT_END_IGNORE
         return stop
 
     def _available_commands(self) -> typing.List[str]:
