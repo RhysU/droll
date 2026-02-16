@@ -19,6 +19,7 @@ __all__ = (
     "decrement_dungeon",
     "defeat_all",
     "defeat_all_plus_additional",
+    "defeat_one_plus_additional",
     "defeat_dragon",
     "defeat_dragon_heroes",
     "defeat_dragon_heroes_interchangeable",
@@ -115,6 +116,48 @@ def defeat_all_plus_additional(
     """Update world after hero handles all of one target type plus one more."""
     # First, defeat all of the specified target
     world = defeat_all(
+        world=world, randrange=randrange, hero=hero, target=target
+    )
+
+    # Second, determine if additional should not have been supplied
+    if defeated_monsters(world.dungeon):
+        if additional:
+            raise error.DrollError(
+                "Additional {} given but no monsters left.".format(additional)
+            )
+        return world
+
+    # Third, confirm exactly one additional provided
+    if len(additional) == 0:
+        raise error.DrollError(
+            "Monsters remain so one additional target required."
+        )
+    if len(additional) > 1:
+        raise error.DrollError(
+            "Only one additional target allowed but {} provided.".format(
+                len(additional)
+            )
+        )
+
+    # Last, attempt to defeat the additional monster using the same hero
+    return defeat_one(
+        world=replace(world, party=increment_party(world.party, hero)),
+        randrange=randrange,
+        hero=hero,
+        target=additional[0],
+    )
+
+
+def defeat_one_plus_additional(
+    world: struct.World,
+    randrange: dice.RandRange,
+    hero: str,
+    target: str,
+    *additional,
+) -> struct.World:
+    """Update world after hero handles one target plus one more."""
+    # First, defeat one of the specified target
+    world = defeat_one(
         world=world, randrange=randrange, hero=hero, target=target
     )
 
