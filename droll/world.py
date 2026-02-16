@@ -9,6 +9,20 @@ from . import dice
 from . import error
 from . import struct
 
+__all__ = (
+    "defeated_dungeon",
+    "defeated_monsters",
+    "delve",
+    "descend",
+    "draw_treasure",
+    "exhausted_dungeon",
+    "new_world",
+    "replace_treasure",
+    "retire",
+    "retreat",
+    "score",
+)
+
 
 def defeated_monsters(dungeon: struct.Dungeon) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""

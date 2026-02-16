@@ -47,9 +47,9 @@ class TestFormatAvailable(unittest.TestCase):
 class TestFormatDungeon(unittest.TestCase):
 
     def test_empty_dungeon(self):
-        """Test formatting empty dungeon returns None."""
+        """Test formatting empty dungeon returns 'None' string."""
         dungeon = struct.Dungeon()
-        self.assertIsNone(display._format_dungeon(dungeon))
+        self.assertEqual(display._format_dungeon(dungeon), "None")
 
     def test_with_monsters(self):
         """Test formatting dungeon with monsters."""
@@ -81,6 +81,49 @@ class TestCompactSummary(unittest.TestCase):
         self.assertIn("fighter champion", lines[3])
         self.assertIn("goblin skeleton×2 ooze×2", lines[4])
 
+    def test_long_player_name_alignment(self):
+        """Test that long player names maintain proper column alignment."""
+        world = struct.World(
+            delve=2,
+            depth=0,
+            experience=5,
+            dungeon=None,
+            party=struct.Party(fighter=1, cleric=2, mage=3, champion=1),
+            ability=True,
+            treasure=struct.Treasure(talisman=1),
+        )
+        result = display.compact_summary(
+            world, "DragonSlayer", 6, ["ability", "descend"]
+        )
+        lines = result.split("\n")
+        # Check that alignment matches DragonSlayer> width (13 chars)
+        for line in lines:
+            colon_pos = line.index(":")
+            content_start = colon_pos + 1
+            while content_start < len(line) and line[content_start] == " ":
+                content_start += 1
+            # Content should start at same column for all lines
+            self.assertGreaterEqual(content_start, 13)
+
+    def test_dungeon_shown_when_empty(self):
+        """Test that empty dungeons display 'Dungeon: None' in the summary."""
+        world = struct.World(
+            delve=1,
+            depth=1,
+            experience=0,
+            dungeon=struct.Dungeon(),
+            party=struct.Party(fighter=1, cleric=1),
+            ability=True,
+            treasure=struct.Treasure(),
+        )
+        result = display.compact_summary(
+            world, "Knight", 0, ["ability", "descend", "retire"]
+        )
+        lines = result.split("\n")
+        self.assertEqual(len(lines), 5)
+        self.assertIn("Dungeon:", lines[4])
+        self.assertIn("None", lines[4])
+
     def test_cleared_level_10(self):
         """Test compact summary after clearing dungeon level 10."""
         world = struct.World(
@@ -98,7 +141,9 @@ class TestCompactSummary(unittest.TestCase):
         self.assertIn("scale×4 sceptre talisman tools", lines[1])
         self.assertIn("retire", lines[2])
         self.assertIn("champion scroll×2", lines[3])
-        self.assertEqual(len(lines), 4)  # No Dungeon line
+        self.assertIn("Dungeon:", lines[4])
+        self.assertIn("None", lines[4])
+        self.assertEqual(len(lines), 5)
 
     def test_ending_state(self):
         """After final delve, Available should show 'None'."""

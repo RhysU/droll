@@ -12,3 +12,4 @@ docs/_build
 mutants/
 .virtualenv
 .coverage
+.hypothesis/

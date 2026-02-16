@@ -14,6 +14,8 @@ from .display import DisplayMode
 from .error import DrollError
 from .game import Game, GameState
 
+__all__ = ("Shell",)
+
 
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""

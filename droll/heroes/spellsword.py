@@ -12,6 +12,11 @@ from .. import error
 from .. import struct
 from ..player import Default
 
+__all__ = (
+    "Battlemage",
+    "Spellsword",
+)
+
 
 def _spellsword_ability(
     world: struct.World,
