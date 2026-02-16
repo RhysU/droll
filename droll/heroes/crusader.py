@@ -13,6 +13,11 @@ from .. import struct
 from ..world import replace_treasure, draw_treasure
 from ..player import Default
 
+__all__ = (
+    "Crusader",
+    "Paladin",
+)
+
 
 def _crusader_ability(
     world: struct.World,

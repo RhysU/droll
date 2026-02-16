@@ -13,6 +13,11 @@ from .. import struct
 from .. import world
 from ..player import Default
 
+__all__ = (
+    "Chieftain",
+    "HalfGoblin",
+)
+
 
 def _halfgoblin_ability(
     world: struct.World,

@@ -12,6 +12,11 @@ from .. import error
 from .. import struct
 from ..player import Default
 
+__all__ = (
+    "Necromancer",
+    "Occultist",
+)
+
 
 def _occultist_ability(
     world: struct.World,

@@ -8,6 +8,14 @@ import typing
 
 from . import struct
 
+__all__ = (
+    "RandRange",
+    "RollDungeon",
+    "RollParty",
+    "roll_dungeon",
+    "roll_party",
+)
+
 RandRange = typing.Callable[[int, int], int]
 RollDungeon = typing.Callable[[int, RandRange], struct.Dungeon]
 RollParty = typing.Callable[[int, RandRange], struct.Party]

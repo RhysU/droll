@@ -13,6 +13,28 @@ from . import error
 from . import struct
 from .world import defeated_monsters, draw_treasure, replace_treasure
 
+__all__ = (
+    "bait_dragon",
+    "consume_ability",
+    "decrement_dungeon",
+    "defeat_all",
+    "defeat_all_plus_additional",
+    "defeat_dragon",
+    "defeat_dragon_heroes",
+    "defeat_dragon_heroes_interchangeable",
+    "defeat_dragon_heroes_wildcard",
+    "defeat_one",
+    "elixir",
+    "eliminate_dungeon",
+    "increment_dungeon",
+    "increment_party",
+    "nop_ability",
+    "open_all",
+    "open_one",
+    "quaff",
+    "reroll",
+)
+
 
 def defeat_one(
     world: struct.World, randrange: dice.RandRange, hero: str, target: str
