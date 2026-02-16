@@ -300,11 +300,9 @@ def defeat_dragon_heroes_wildcard(
         )
 
     # Account for wildcards by having each wildcard reduce the distinct count
-    heroes = list(heroes)
-    for hero in heroes:
-        if hero in _wildcard:
-            heroes.remove(hero)
-            distinct_heroes -= 1
+    non_wildcards = [hero for hero in heroes if hero not in _wildcard]
+    distinct_heroes -= len(heroes) - len(non_wildcards)
+    heroes = non_wildcards
 
     if len({*heroes}) != distinct_heroes:
         raise error.DrollError(  # Error message uses original count
@@ -349,7 +347,7 @@ def defeat_dragon_heroes_interchangeable(
     # Sum the number of distinct heroes observed after these coercions.
     distinct_heroes = sum(v for k, v in counter.items())
     if distinct_heroes != _required_heroes:
-        raise error.DrollError("Heroes {} not sufficiently distinct.", heroes)
+        raise error.DrollError("Heroes {} not sufficiently distinct.".format(heroes))
 
     return True
 

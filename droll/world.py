@@ -32,7 +32,7 @@ def defeated_monsters(dungeon: struct.Dungeon) -> bool:
 
 
 def defeated_dungeon(dungeon: struct.Dungeon) -> bool:
-    """Are all monsters and any dragon on this dungeon defected?"""
+    """Are all monsters and any dragon on this dungeon defeated?"""
     return (dungeon is None) or (
         defeated_monsters(dungeon) and dungeon.dragon < 3
     )
