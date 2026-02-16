@@ -34,12 +34,12 @@ said, I've done such things in neither 2018 nor 2026.
 ```
 $ droll --help
 usage: droll [-h] [--seed N]
-             {Default,Crusader,Enchantress,Knight,Minstrel,Occultist,Spellsword}
+             {Default,Crusader,Enchantress,Knight,Mercenary,Minstrel,Occultist,Spellsword}
 
 Command-line version of droll.
 
 positional arguments:
-  {Default,Crusader,Enchantress,HalfGoblin,Knight,Minstrel,Occultist,Spellsword}
+  {Default,Crusader,Enchantress,HalfGoblin,Knight,Mercenary,Minstrel,Occultist,Spellsword}
                         Select the hero for this game.
 
 options:

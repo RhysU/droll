@@ -291,6 +291,16 @@ class Shell(cmd.Cmd):
             reroll skeleton goblin      # ...but 'reroll' forces re-rolling"""
         )
 
+    def help_reroll(self):
+        """Display help for the reroll command."""
+        print(self.do_reroll.__doc__)
+        print(
+            """
+            reroll goblin skeleton      # Re-roll a goblin and a skeleton
+            reroll fighter              # Re-roll one fighter into new party die
+            """
+        )
+
     def help_scale(self):
         """Display help for scale treasures."""
         print("""Scales are treasures that score 2 points per pair.""")
