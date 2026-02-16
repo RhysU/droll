@@ -36,14 +36,14 @@ __all__ = (
 AVAILABLE = MappingProxyType(
     collections.OrderedDict(
         [
-            ("Default", Default),
-            ("Crusader", Crusader),
-            ("Enchantress", Enchantress),
-            ("HalfGoblin", HalfGoblin),
-            ("Knight", Knight),
-            ("Minstrel", Minstrel),
-            ("Occultist", Occultist),
-            ("Spellsword", Spellsword),
+            (Default.name, Default),
+            (Crusader.name, Crusader),
+            (Enchantress.name, Enchantress),
+            (HalfGoblin.name, HalfGoblin),
+            (Knight.name, Knight),
+            (Minstrel.name, Minstrel),
+            (Occultist.name, Occultist),
+            (Spellsword.name, Spellsword),
         ]
     )
 )
