@@ -5,6 +5,7 @@
 import cmd
 import copy
 import functools
+import sys
 import textwrap
 import typing
 
@@ -18,6 +19,10 @@ from .game import Game, GameState
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
 
+    _RESET = '\033[0m'
+    _LIGHT_GREEN = '\033[92m'
+    _LIGHT_RED = '\033[91m'
+
     def __init__(self, game: Game, *, display_mode: DisplayMode) -> None:
         """Initialize the shell with a game instance and display mode."""
         super(Shell, self).__init__()
@@ -25,6 +30,13 @@ class Shell(cmd.Cmd):
         self._game = game
         self._undo = None
         self._display_mode = display_mode
+        self._color = sys.stdout.isatty()
+
+    def precmd(self, line: str) -> str:
+        """Reset terminal color after user input."""
+        if self._color:
+            sys.stdout.write(self._RESET)
+        return line
 
     def preloop(self) -> None:
         """Prepare a new game and start the first delve."""
@@ -56,6 +68,8 @@ class Shell(cmd.Cmd):
                 print(self._game.summary())
                 if stop:
                     print(self.prompt)
+        if not stop and self._color:
+            self.prompt += "\001" + self._LIGHT_GREEN + "\002"
         return stop
 
     def _available_commands(self) -> typing.List[str]:
@@ -87,7 +101,12 @@ class Shell(cmd.Cmd):
         except DrollError as e:
             if _raises:
                 raise
-            print(*e.args)
+            if self._color:
+                print(self._LIGHT_RED, end="")
+                print(*e.args)
+                print(self._RESET, end="")
+            else:
+                print(*e.args)
             return result
 
         # Retain only undo candidates that disallow cheating.
