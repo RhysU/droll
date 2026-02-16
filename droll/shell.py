@@ -36,10 +36,7 @@ class Shell(cmd.Cmd):
         self._game = game
         self._undo = None
         self._display_mode = display_mode
-        if color is None:
-            self._color = sys.stdout.isatty()
-        else:
-            self._color = color
+        self._color = sys.stdout.isatty() if color is None else color
 
     def precmd(self, line: str) -> str:
         """Reset terminal color after user input."""
