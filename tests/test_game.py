@@ -21,6 +21,11 @@ class TestGame(unittest.TestCase):
         Game(player=Default)
         Game(random=random.Random(4))
 
+    def test_gamestate_truthiness(self):
+        """GameState values coerce to boolean correctly for control flow."""
+        self.assertTrue(GameState.STOP, "STOP must coerce to True.")
+        self.assertFalse(GameState.PLAY, "PLAY must coerce to False.")
+
     def test_reroll_dungeon_dice(self):
         """Test rerolling dungeon dice using a scroll."""
         g = Game(random=random.Random(4), player=Default)
