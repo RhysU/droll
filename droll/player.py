@@ -154,7 +154,7 @@ def apply(
                 )
             action_ = getattr(action_, target)
             world = action_(world, randrange, noun, target, *additional)
-        except AttributeError as cause:
+        except (AttributeError, TypeError) as cause:
             raise error.DrollError(str(cause)) from cause
 
     # Undo the prior transformation by subtracting prior_treasure.

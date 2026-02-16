@@ -52,7 +52,7 @@ def decrement_dungeon(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise ValueError("Require at least one target {}.".format(target))
+        raise error.DrollError("Require at least one target {}.".format(target))
     return replace(dungeon, **{target: prior_targets - 1})
 
 
