@@ -18,12 +18,9 @@ from .game import Game, GameState
 __all__ = ("Shell",)
 
 _RESET = '\033[0m'
-_GREEN_LIGHT = '\033[92m'
-_RED_LIGHT = '\033[91m'
-
-# Required for Readline to ignore non-printing characters in prompts.
-_RL_PROMPT_START_IGNORE = '\001'
-_RL_PROMPT_END_IGNORE = '\002'
+_GREEN = '\033[92m'
+_RED = '\033[91m'
+_ORANGE = '\033[93m'  # TODO Make output between commands, e.g. help, orange
 
 
 class Shell(cmd.Cmd):
@@ -61,6 +58,8 @@ class Shell(cmd.Cmd):
         """Print game state after each command and final details on exit."""
         if self._display_mode == DisplayMode.CURRENT:
             self.prompt = self._game._player.name + "> "
+            if self._color:
+                self.prompt = _GREEN + self.prompt + _RESET
             print()
             if line != "EOF":
                 available = [] if stop else self._available_commands()
@@ -81,10 +80,6 @@ class Shell(cmd.Cmd):
                 print(self._game.summary())
                 if stop:
                     print(self.prompt)
-        if not stop and self._color:
-            self.prompt += _RL_PROMPT_START_IGNORE
-            self.prompt += _GREEN_LIGHT
-            self.prompt += _RL_PROMPT_END_IGNORE
         return stop
 
     def _available_commands(self) -> typing.List[str]:
@@ -117,9 +112,7 @@ class Shell(cmd.Cmd):
             if _raises:
                 raise
             if self._color:
-                print(_RED_LIGHT, end="")
-                print(*e.args)
-                print(_RESET, end="")
+                print(_RED, " ".join(e.args), _RESET, sep="")
             else:
                 print(*e.args)
             return result
