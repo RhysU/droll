@@ -25,7 +25,7 @@ def _roll(
     dice: int, start: int, stop: int, randrange: RandRange
 ) -> typing.List[int]:
     """Roll dice and return counts for each outcome in the range [start, stop)."""
-    assert dice >= 0, "At least one die must be requested"
+    assert dice >= 0, "Dice count must be non-negative"
     result = [0] * (stop - start)
     for _ in range(dice):
         result[randrange(start, stop)] += 1

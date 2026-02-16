@@ -25,7 +25,12 @@ class GameState(enum.Enum):
     PLAY = 1
 
     def __bool__(self):
-        """All non-STOP states coerce to False."""
+        """All non-STOP states coerce to False.
+
+        Inverted so STOP is truthy and PLAY is falsy because cmd.Cmd.cmdloop
+        stops its loop when postcmd returns a truthy value.  Shell.postcmd
+        passes through the GameState returned by each do_XXX handler, so
+        STOP must be truthy to signal loop termination."""
         return self.value == self.STOP.value
 
 
@@ -84,7 +89,7 @@ class Game:
         """The current score for the world."""
         return world.score(self._world)
 
-    def prompt(self) -> int:
+    def prompt(self) -> str:
         """A prompt-like string including the player name and score."""
         return "({} {:-2d})".format(self._player.name, self.score())
 
@@ -119,7 +124,7 @@ class Game:
         return GameState.PLAY
 
     def retire(self) -> GameState:
-        """Retire to the tavern after successfully clearing a dungeon depth..
+        """Retire to the tavern after successfully clearing a dungeon depth.
 
         Automatically uses a 'ring' or 'portal' treasure if so required.
         Automatically starts a new delve or ends game, as suitable."""
