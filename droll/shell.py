@@ -21,6 +21,10 @@ _RESET = '\033[0m'
 _GREEN_LIGHT = '\033[92m'
 _RED_LIGHT = '\033[91m'
 
+# Required for Readline to ignore non-printing characters in prompts.
+_RL_PROMPT_START_IGNORE = '\001'
+_RL_PROMPT_END_IGNORE = '\002'
+
 
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
