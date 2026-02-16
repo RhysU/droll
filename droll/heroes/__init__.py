@@ -11,6 +11,7 @@ from .crusader import Crusader, Paladin
 from .enchantress import Beguiler, Enchantress
 from .halfgoblin import Chieftain, HalfGoblin
 from .knight import Knight, DragonSlayer
+from .mercenary import Mercenary, Commander
 from .minstrel import Minstrel, Bard
 from .occultist import Occultist, Necromancer
 from .spellsword import Spellsword, Battlemage
@@ -21,11 +22,13 @@ __all__ = (
     Battlemage.name,
     Beguiler.name,
     Chieftain.name,
+    Commander.name,
     Crusader.name,
     DragonSlayer.name,
     Enchantress.name,
     HalfGoblin.name,
     Knight.name,
+    Mercenary.name,
     Minstrel.name,
     Necromancer.name,
     Occultist.name,
@@ -41,6 +44,7 @@ AVAILABLE = MappingProxyType(
             (Enchantress.name, Enchantress),
             (HalfGoblin.name, HalfGoblin),
             (Knight.name, Knight),
+            (Mercenary.name, Mercenary),
             (Minstrel.name, Minstrel),
             (Occultist.name, Occultist),
             (Spellsword.name, Spellsword),
