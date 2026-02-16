@@ -10,6 +10,11 @@ from .. import dice
 from .. import struct
 from ..player import Default
 
+__all__ = (
+    "DragonSlayer",
+    "Knight",
+)
+
 
 def _knight_roll_party(count: int, randrange: dice.RandRange) -> struct.Party:
     """Roll a new Party, changing all Scrolls into Champions."""

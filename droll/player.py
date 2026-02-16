@@ -12,6 +12,12 @@ from . import error
 from . import struct
 from .world import replace_treasure
 
+__all__ = (
+    "Default",
+    "apply",
+    "complete",
+)
+
 # Rules governing a default player lacking any special abilities.
 # Effectively, this data is one large, dense dispatch table.
 # Other players will generally be defined in terms of this one.
@@ -201,7 +207,7 @@ def _partify(token: str, artifacts: struct.Party):
 
 # Treasures excluded from completion because they lack associated commands.
 # Portal and ring are auto-used; scale is for scoring only.
-TREASURE_NO_COMMAND = frozenset({"portal", "ring", "scale"})
+_TREASURE_NO_COMMAND = frozenset({"portal", "ring", "scale"})
 
 
 def complete(
@@ -215,7 +221,7 @@ def complete(
             for source in (world.party, world.treasure)
             if source is not None
             for key, value in struct.field_items(source)
-            if value and key not in TREASURE_NO_COMMAND
+            if value and key not in _TREASURE_NO_COMMAND
         }
         # Special command "reroll" is available iff "scroll" is available
         if "scroll" in candidates:

@@ -7,6 +7,11 @@ import typing
 
 from . import struct
 
+__all__ = (
+    "DisplayMode",
+    "compact_summary",
+)
+
 
 class DisplayMode(enum.Enum):
     """Display mode for the droll CLI."""
