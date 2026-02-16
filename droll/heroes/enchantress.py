@@ -13,6 +13,11 @@ from .. import struct
 from ..world import defeated_monsters
 from ..player import Default
 
+__all__ = (
+    "Beguiler",
+    "Enchantress",
+)
+
 
 def _enchantress_ability(
     world: struct.World,

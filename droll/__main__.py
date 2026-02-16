@@ -7,7 +7,7 @@ import collections
 import random
 import sys
 
-from .shell import Game
+from .game import Game
 from .display import DisplayMode
 from .heroes import (
     Crusader,
@@ -21,7 +21,9 @@ from .heroes import (
 from .player import Default
 from .shell import Shell
 
-AVAILABLE_HEROES = collections.OrderedDict(
+__all__ = ("main",)
+
+_AVAILABLE_HEROES = collections.OrderedDict(
     [
         ("Default", Default),
         ("Crusader", Crusader),
@@ -40,14 +42,13 @@ def main(args=None) -> None:
     parser = argparse.ArgumentParser(prog="droll", description=__doc__)
     parser.add_argument(
         "hero",
-        choices=AVAILABLE_HEROES.keys(),
+        choices=_AVAILABLE_HEROES.keys(),
         help="Select the hero for this game.",
     )
     parser.add_argument(
         "--seed",
         metavar="N",
         type=int,
-        nargs=1,
         default=None,
         help="An integer to seed random number generation.",
     )
@@ -57,10 +58,9 @@ def main(args=None) -> None:
         help="Use mechanical verbose display format.",
     )
     arguments = parser.parse_args(args)
-    randseed = arguments.seed if arguments.seed else ()
     g = Game(
-        player=AVAILABLE_HEROES.get(arguments.hero),
-        random=random.Random(*randseed),
+        player=_AVAILABLE_HEROES[arguments.hero],
+        random=random.Random(arguments.seed),
     )
     display_mode = (
         DisplayMode.MECHANICAL if arguments.mechanical else DisplayMode.CURRENT

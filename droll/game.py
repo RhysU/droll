@@ -12,6 +12,11 @@ from . import player
 from . import struct
 from . import world
 
+__all__ = (
+    "Game",
+    "GameState",
+)
+
 
 class GameState(enum.Enum):
     """Game should STOP or one can still PLAY?"""

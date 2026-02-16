@@ -15,6 +15,8 @@ from .display import DisplayMode
 from .error import DrollError
 from .game import Game, GameState
 
+__all__ = ("Shell",)
+
 _RESET = '\033[0m'
 _GREEN_LIGHT = '\033[92m'
 _RED_LIGHT = '\033[91m'
