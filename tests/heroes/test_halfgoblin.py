@@ -67,6 +67,34 @@ class TestHalfGoblin(unittest.TestCase):
         self.assertEqual(result.dungeon.skeleton, 1)
         self.assertEqual(result.party.thief, 1)
 
+    def test_halfgoblin_rejects_non_goblin(self):
+        """HalfGoblin ability rejects non-goblin targets."""
+        world = droll.struct.World(
+            ability=True,
+            dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
+            party=droll.struct.Party(fighter=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            _halfgoblin_ability(world, _UNUSED, "ability", "skeleton")
+
+    def test_chieftain_rejects_non_goblin_targets(self):
+        """Chieftain rejects non-goblin target, extra target, and excess targets."""
+        world = droll.struct.World(
+            ability=True,
+            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+            party=droll.struct.Party(fighter=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            _chieftain_ability(world, _UNUSED, "ability", "skeleton")
+        with self.assertRaises(droll.error.DrollError):
+            _chieftain_ability(
+                world, _UNUSED, "ability", "goblin", "skeleton"
+            )
+        with self.assertRaises(droll.error.DrollError):
+            _chieftain_ability(
+                world, _UNUSED, "ability", "goblin", "goblin", "goblin"
+            )
+
     def test_halfgoblin_advances_to_chieftain(self):
         """HalfGoblin advances to Chieftain at 5+ experience."""
         low_xp = droll.struct.World(experience=4)

@@ -120,6 +120,18 @@ class TestOccultist(unittest.TestCase):
                 world, _UNUSED, "ability", "skeleton", "goblin"
             )
 
+    def test_necromancer_rejects_too_many_targets(self):
+        """Necromancer rejects more than 2 targets."""
+        world = droll.struct.World(
+            ability=True,
+            dungeon=droll.struct.Dungeon(skeleton=3),
+            party=droll.struct.Party(cleric=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            _necromancer_ability(
+                world, _UNUSED, "ability", "skeleton", "skeleton", "skeleton"
+            )
+
     def test_occultist_advances_to_necromancer(self):
         """Occultist advances to Necromancer at 5+ experience."""
         low_xp = droll.struct.World(experience=4)

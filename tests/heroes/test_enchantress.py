@@ -56,6 +56,18 @@ class TestEnchantress(unittest.TestCase):
         with self.assertRaises(droll.error.DrollError):
             _beguiler_ability(world, _UNUSED, "ability", "goblin")
 
+    def test_beguiler_rejects_too_many_targets(self):
+        """Beguiler rejects more than 2 targets."""
+        world = droll.struct.World(
+            ability=True,
+            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+            party=droll.struct.Party(fighter=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            _beguiler_ability(
+                world, _UNUSED, "ability", "goblin", "skeleton", "goblin"
+            )
+
     def test_enchantress_advances_to_beguiler(self):
         """Enchantress advances to Beguiler at 5+ experience."""
         low_xp = droll.struct.World(experience=4)

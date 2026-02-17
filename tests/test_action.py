@@ -385,6 +385,97 @@ class TestRerollParty(unittest.TestCase):
             )
 
 
+class TestActionErrorPaths(unittest.TestCase):
+    """Tests for game-rule error paths in the action module."""
+
+    def test_decrement_dungeon_zero_target(self):
+        """Cannot decrement a dungeon target that is already zero."""
+        dungeon = struct.Dungeon(goblin=0, skeleton=1)
+        with self.assertRaises(DrollError):
+            action.decrement_dungeon(dungeon, "goblin")
+
+    def test_eliminate_dungeon_zero_target(self):
+        """Cannot eliminate a dungeon target that is already zero."""
+        dungeon = struct.Dungeon(goblin=0, skeleton=1)
+        with self.assertRaises(DrollError):
+            action.eliminate_dungeon(dungeon, "goblin")
+
+    def test_open_one_before_monsters_defeated(self):
+        """Cannot open chests while monsters remain."""
+        w = struct.World(
+            dungeon=struct.Dungeon(goblin=1, chest=1),
+            party=struct.Party(thief=1),
+        )
+        with self.assertRaises(DrollError):
+            action.open_one(w, _UNUSED, "thief", "chest")
+
+    def test_open_all_before_monsters_defeated(self):
+        """Cannot open all chests while monsters remain."""
+        w = struct.World(
+            dungeon=struct.Dungeon(goblin=1, chest=2),
+            party=struct.Party(thief=1),
+        )
+        with self.assertRaises(DrollError):
+            action.open_all(w, _UNUSED, "thief", "chest")
+
+    def test_quaff_no_potions(self):
+        """Cannot quaff when no potions are available."""
+        w = struct.World(
+            dungeon=struct.Dungeon(potion=0),
+            party=struct.Party(fighter=1),
+        )
+        with self.assertRaises(DrollError):
+            action.quaff(w, _UNUSED, "fighter", "potion")
+
+    def test_reroll_no_targets(self):
+        """Reroll requires at least one target."""
+        w = struct.World(
+            dungeon=struct.Dungeon(goblin=1),
+            party=struct.Party(scroll=1),
+        )
+        with self.assertRaises(DrollError):
+            action.reroll(w, _UNUSED, "scroll")
+
+    def test_reroll_dragon_disallowed(self):
+        """Cannot reroll dragon dice by default."""
+        w = struct.World(
+            dungeon=struct.Dungeon(dragon=3),
+            party=struct.Party(scroll=1),
+        )
+        with self.assertRaises(DrollError):
+            action.reroll(w, _UNUSED, "scroll", "dragon")
+
+    def test_interchangeable_disallowed_hero(self):
+        """Scrolls cannot defeat a dragon via interchangeable heroes."""
+        with self.assertRaises(DrollError):
+            action.defeat_dragon_heroes_interchangeable(
+                "scroll", "fighter", "thief",
+                _interchangeable={"fighter", "mage"},
+            )
+
+    def test_bait_non_dragon_target(self):
+        """Bait can only target dragons."""
+        w = struct.World(
+            dungeon=struct.Dungeon(goblin=1),
+            party=struct.Party(fighter=1),
+            treasure=struct.Treasure(bait=1),
+        )
+        with self.assertRaises(DrollError):
+            action.bait_dragon(w, _UNUSED, "bait", "goblin")
+
+    def test_consume_ability_when_unavailable(self):
+        """Cannot consume ability that is already used."""
+        w = struct.World(ability=False)
+        with self.assertRaises(DrollError):
+            action.consume_ability(w)
+
+    def test_nop_ability_rejects_target(self):
+        """Default nop ability rejects any target."""
+        w = struct.World(ability=True)
+        with self.assertRaises(DrollError):
+            action.nop_ability(w, _UNUSED, "ability", "fighter")
+
+
 class TestRegroupDiscard(unittest.TestCase):
 
     def test_regroup_discard_after_quaff(self):

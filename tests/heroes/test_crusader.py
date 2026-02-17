@@ -101,6 +101,26 @@ class TestCrusader(unittest.TestCase):
         self.assertEqual(result.party.mage, 1)
         self.assertEqual(result.party.thief, 1)
 
+    def test_crusader_ability_default_target(self):
+        """Crusader ability defaults to 'cleric' (first sorted) when no target."""
+        world = droll.struct.World(
+            ability=True,
+            party=droll.struct.Party(fighter=1, cleric=1),
+        )
+        result = _crusader_ability(world, _UNUSED, "ability")
+        self.assertEqual(result.party.cleric, 2)
+
+    def test_paladin_ability_wrong_revivable_count(self):
+        """Paladin ability rejects wrong number of heroes for potions."""
+        world = droll.struct.World(
+            ability=True,
+            dungeon=droll.struct.Dungeon(potion=2),
+            party=droll.struct.Party(fighter=1),
+            treasure=droll.struct.Treasure(elixir=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            _paladin_ability(world, _UNUSED, "ability", "elixir", "mage")
+
     def test_paladin_ability_requires_treasure(self):
         """Paladin ability fails without specifying treasure."""
         world = droll.struct.World(
