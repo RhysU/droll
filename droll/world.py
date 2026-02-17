@@ -109,13 +109,16 @@ def _regroup(world: struct.World) -> struct.World:
     # Suppose the player must use, say, 2 fighter dice or lose during regroup
     # Then, we decrement the fighters in the party by the discard count
     # where decrementing never takes the allotted result below 0 fighters
-    party = struct.Party(
-        **{
-            name: max(0, getattr(world.party, name, 0) - count)
-            for name, count in struct.field_items(world.regroup.discard)
-        }
+    return replace(
+        world,
+        party=struct.Party(
+            **{
+                name: max(0, getattr(world.party, name, 0) - count)
+                for name, count in struct.field_items(world.regroup.discard)
+            }
+        ),
+        regroup=struct.Regroup(),
     )
-    return replace(world, party=party, regroup=struct.Regroup())
 
 
 def descend(
@@ -151,9 +154,12 @@ def descend(
         raise error.DrollError(f"The maximum depth is {_max_depth}")
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
     new_dice = max(1, min(_dungeon_dice - prior_dragons, next_depth))
-    dungeon = roll_dungeon(new_dice, randrange)
-    dungeon = replace(dungeon, dragon=dungeon.dragon + prior_dragons)
-    return replace(world, depth=next_depth, dungeon=dungeon)
+    rolled = roll_dungeon(new_dice, randrange)
+    return replace(
+        world,
+        depth=next_depth,
+        dungeon=replace(rolled, dragon=rolled.dragon + prior_dragons),
+    )
 
 
 def retire(world: struct.World) -> struct.World:
@@ -234,13 +240,15 @@ def draw_treasure(
 ) -> struct.World:
     """Draw a single item from the reserve into the player's treasures."""
     drawn = _draw(reserve=world.reserve, randrange=randrange)
-    treasure = replace(
-        world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}
+    return replace(
+        world,
+        treasure=replace(
+            world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}
+        ),
+        reserve=replace(
+            world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}
+        ),
     )
-    reserve = replace(
-        world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}
-    )
-    return replace(world, treasure=treasure, reserve=reserve)
 
 
 def replace_treasure(world: struct.World, item: str) -> struct.World:

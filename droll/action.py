@@ -470,22 +470,24 @@ def bait_dragon(
         world = replace_treasure(world, noun)
 
     # Compute how many new dragons will be produced and remove sources
-    new_targets = 0
     dungeon = world.dungeon
-    if dungeon is not None:
-        for enemy in _enemies:
-            new_targets += getattr(world.dungeon, enemy)
-            dungeon = replace(dungeon, **{enemy: 0})
+    new_targets = (
+        sum(getattr(dungeon, enemy) for enemy in _enemies)
+        if dungeon is not None
+        else 0
+    )
     if not new_targets:
         raise error.DrollError(
             f"At least one of {_enemies} required for '{noun}'."
         )
 
-    # Increment the number of targets (i.e. dragons)
+    # Zero all enemy sources and increment the number of dragons
     return replace(
         world,
         dungeon=replace(
-            dungeon, **{target: getattr(dungeon, target) + new_targets}
+            dungeon,
+            **{enemy: 0 for enemy in _enemies},
+            **{target: getattr(dungeon, target) + new_targets},
         ),
     )
 
@@ -509,22 +511,24 @@ def convert_dungeon_to_party(
     """Convert up to max_count dungeon dice into party dice with regroup discard.
 
     Converts min(available, max_count) of source into destination."""
-    dungeon = world.dungeon
-    party = world.party
-    discard = world.regroup.discard
-    available = getattr(dungeon, source)
-    count = min(available, max_count)
-    for _ in range(count):
-        dungeon = decrement_dungeon(dungeon, source)
-        party = increment_party(party, destination)
-    discard = replace(
-        discard, **{destination: getattr(discard, destination) + count}
-    )
+    count = min(getattr(world.dungeon, source), max_count)
     return replace(
         world,
-        dungeon=dungeon,
-        party=party,
-        regroup=replace(world.regroup, discard=discard),
+        dungeon=replace(
+            world.dungeon,
+            **{source: getattr(world.dungeon, source) - count},
+        ),
+        party=replace(
+            world.party,
+            **{destination: getattr(world.party, destination) + count},
+        ),
+        regroup=replace(
+            world.regroup,
+            discard=replace(
+                world.regroup.discard,
+                **{destination: getattr(world.regroup.discard, destination) + count},
+            ),
+        ),
     )
 
 
