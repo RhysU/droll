@@ -65,20 +65,20 @@ class Party:
 
 @dataclasses.dataclass(frozen=True)
 class Roll:
-    dungeon: typing.Optional[typing.Callable] = None
-    party: typing.Optional[typing.Callable] = None
+    dungeon: collections.abc.Callable | None = None
+    party: collections.abc.Callable | None = None
 
 
 @dataclasses.dataclass(frozen=True)
 class Player:
-    name: typing.Optional[str] = None
-    ability: typing.Optional[typing.Callable] = None
-    advance: typing.Optional[typing.Callable] = None
-    bait: typing.Optional[typing.Callable] = None
-    elixir: typing.Optional[typing.Callable] = None
-    roll: typing.Optional[Roll] = None
-    artifacts: typing.Optional[Party] = None
-    party: typing.Optional[Party] = None
+    name: str | None = None
+    ability: collections.abc.Callable | None = None
+    advance: collections.abc.Callable | None = None
+    bait: collections.abc.Callable | None = None
+    elixir: collections.abc.Callable | None = None
+    roll: Roll | None = None
+    artifacts: Party | None = None
+    party: Party | None = None
 
 
 @dataclasses.dataclass(frozen=True)
