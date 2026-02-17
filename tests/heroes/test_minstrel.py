@@ -37,6 +37,20 @@ class TestMinstrel(unittest.TestCase):
         with self.assertRaises(droll.error.DrollError):
             _minstrel_ability(world, _UNUSED, "ability", "goblin")
 
+    def test_bard_champion_defeats_all_plus_additional(self):
+        """Bard champion defeats all of one type plus one additional."""
+        world = droll.struct.World(
+            ability=True,
+            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+            party=droll.struct.Party(champion=1),
+        )
+        result = Bard.party.champion.goblin(
+            world, _UNUSED, "champion", "goblin", "skeleton"
+        )
+        self.assertEqual(result.dungeon.goblin, 0)
+        self.assertEqual(result.dungeon.skeleton, 0)
+        self.assertEqual(result.party.champion, 0)
+
     def test_minstrel_advances_to_bard(self):
         """Minstrel advances to Bard at 5+ experience."""
         low_xp = droll.struct.World(experience=4)
