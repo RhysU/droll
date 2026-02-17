@@ -49,9 +49,6 @@ def _paladin_ability(
     noun: str,
     target: typing.Optional[str] = None,
     *revivable: str,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset(
-        {"fighter", "cleric"}
-    ),
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
 

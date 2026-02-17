@@ -94,7 +94,7 @@ def delve(
     party, regroup = roll_party(_party_dice, randrange)
     return replace(
         world,
-        delve=(world.delve if world.delve else 0) + 1,
+        delve=world.delve + 1,
         depth=0,
         ability=True,
         regroup=regroup,
@@ -139,7 +139,7 @@ def descend(
             world = _apply_ring(world)
         except error.DrollError:
             raise error.DrollError(
-                "Dragon remains but a ring of" " invisibility is not in hand."
+                "Dragon remains but a ring of invisibility is not in hand."
             )
 
     # Success above, so regroup just prior to descending
@@ -150,9 +150,8 @@ def descend(
     if next_depth > _max_depth:
         raise error.DrollError("The maximum depth is {}".format(_max_depth))
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
-    dungeon = roll_dungeon(
-        min(_dungeon_dice - prior_dragons, next_depth), randrange
-    )
+    new_dice = max(1, min(_dungeon_dice - prior_dragons, next_depth))
+    dungeon = roll_dungeon(new_dice, randrange)
     dungeon = replace(dungeon, dragon=dungeon.dragon + prior_dragons)
     return replace(world, depth=next_depth, dungeon=dungeon)
 
@@ -179,8 +178,7 @@ def retire(world: struct.World) -> struct.World:
                 world = _apply_portal(world)
             except error.DrollError:
                 raise error.DrollError(
-                    "Dragon remains but neither a ring of"
-                    " invisibility nor a portal in hand."
+                    "Dragon remains but neither a ring of invisibility nor a portal in hand."
                 )
 
     # Regroup just prior to retiring
@@ -226,7 +224,8 @@ def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
         for name, count in struct.field_items(reserve)
         for _ in range(count)
     ]
-    assert items, "No items remaining in the reserve"
+    if not items:
+        raise RuntimeError("No items remaining in the reserve")
     return items[randrange(0, len(items))]
 
 

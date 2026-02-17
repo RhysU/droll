@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """All known hero definitions."""
 
-import collections
 from types import MappingProxyType
 
 from ..player import Default
@@ -36,18 +35,14 @@ __all__ = (
     Spellsword.name,
 )
 
-AVAILABLE = MappingProxyType(
-    collections.OrderedDict(
-        [
-            (Default.name, Default),
-            (Crusader.name, Crusader),
-            (Enchantress.name, Enchantress),
-            (HalfGoblin.name, HalfGoblin),
-            (Knight.name, Knight),
-            (Mercenary.name, Mercenary),
-            (Minstrel.name, Minstrel),
-            (Occultist.name, Occultist),
-            (Spellsword.name, Spellsword),
-        ]
-    )
-)
+AVAILABLE = MappingProxyType({
+    Default.name: Default,
+    Crusader.name: Crusader,
+    Enchantress.name: Enchantress,
+    HalfGoblin.name: HalfGoblin,
+    Knight.name: Knight,
+    Mercenary.name: Mercenary,
+    Minstrel.name: Minstrel,
+    Occultist.name: Occultist,
+    Spellsword.name: Spellsword,
+})

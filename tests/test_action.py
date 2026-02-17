@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Tests for defeat_all_plus_additional and defeat_one_plus_additional."""
+"""Tests for action module helpers."""
 
 import unittest
 
@@ -147,3 +147,32 @@ class TestDefeatOnePlusAdditional(unittest.TestCase):
         self.assertEqual(result.dungeon.goblin, 2)
         self.assertEqual(result.dungeon.skeleton, 0)
         self.assertEqual(result.party.champion, 0)
+
+
+class TestConvertDungeonToParty(unittest.TestCase):
+
+    def test_converts_up_to_max_count(self):
+        """Converts min(available, max_count) dungeon dice to party dice."""
+        world = droll.struct.World(
+            dungeon=droll.struct.Dungeon(goblin=3),
+            party=droll.struct.Party(fighter=1),
+        )
+        result = droll.action.convert_dungeon_to_party(
+            world, source="goblin", destination="thief", max_count=2
+        )
+        self.assertEqual(result.dungeon.goblin, 1)
+        self.assertEqual(result.party.thief, 2)
+        self.assertEqual(result.regroup.discard.thief, 2)
+
+    def test_converts_fewer_when_limited(self):
+        """Converts only available count when fewer than max_count."""
+        world = droll.struct.World(
+            dungeon=droll.struct.Dungeon(skeleton=1),
+            party=droll.struct.Party(),
+        )
+        result = droll.action.convert_dungeon_to_party(
+            world, source="skeleton", destination="fighter", max_count=2
+        )
+        self.assertEqual(result.dungeon.skeleton, 0)
+        self.assertEqual(result.party.fighter, 1)
+        self.assertEqual(result.regroup.discard.fighter, 1)

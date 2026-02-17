@@ -81,6 +81,21 @@ class Game:
         except error.DrollError:
             return GameState.STOP
 
+    @property
+    def player_name(self) -> str:
+        """The name of the current player/hero."""
+        return self._player.name
+
+    @property
+    def ability_doc(self) -> str:
+        """The docstring of the current player's ability."""
+        return self._player.ability.__doc__
+
+    @property
+    def current_world(self) -> struct.World:
+        """The current world state (read-only frozen dataclass)."""
+        return self._world
+
     def summary(self) -> str:
         """Brief, string description of the world."""
         return struct.brief(self._world)
