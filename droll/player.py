@@ -251,38 +251,51 @@ def _partify(token: str, reverse: typing.Dict[str, str]):
 _TREASURE_NO_COMMAND = frozenset({"portal", "ring", "scale"})
 
 
+def _available_nouns(world: struct.World) -> set[str]:
+    """Candidate nouns (position 0): available party members and treasures."""
+    candidates = {
+        key
+        for source in (world.party, world.treasure)
+        if source is not None
+        for key, value in struct.field_items(source)
+        if value and key not in _TREASURE_NO_COMMAND
+    }
+    if "scroll" in candidates:
+        candidates.add("reroll")
+    return candidates
+
+
+def _available_targets(world: struct.World) -> set[str]:
+    """Candidate targets (position 1): available party and dungeon dice."""
+    return {
+        key
+        for source in (world.party, world.dungeon)
+        if source is not None
+        for key, value in struct.field_items(source)
+        if value
+    }
+
+
+def _all_dice_names() -> set[str]:
+    """All possible party and dungeon field names (position 2+)."""
+    return {
+        key
+        for source in (struct.Party, struct.Dungeon)
+        for key in struct.field_names(source)
+    }
+
+
 def complete(
     world: struct.World, tokens: collections.abc.Sequence[str], text: str, position: int
 ) -> collections.abc.Sequence[str]:
     """Possible completions for text with position among (partial) tokens."""
-    # First compute candidate completions independent of observed text
     if position == 0:
-        candidates = {
-            key
-            for source in (world.party, world.treasure)
-            if source is not None
-            for key, value in struct.field_items(source)
-            if value and key not in _TREASURE_NO_COMMAND
-        }
-        # Special command "reroll" is available iff "scroll" is available
-        if "scroll" in candidates:
-            candidates.add("reroll")
+        candidates = _available_nouns(world)
     elif position == 1 and tokens[0] == "elixir":
-        candidates = {key for key in struct.field_names(struct.Party)}
+        candidates = set(struct.field_names(struct.Party))
     elif position == 1:
-        candidates = {
-            key
-            for source in (world.party, world.dungeon)
-            if source is not None
-            for key, value in struct.field_items(source)
-            if value
-        }
+        candidates = _available_targets(world)
     else:
-        candidates = {
-            key
-            for source in (struct.Party, struct.Dungeon)
-            for key in struct.field_names(source)
-        }
+        candidates = _all_dice_names()
 
-    # Then filter to retain only those matching requested text prefix
     return sorted(key for key in candidates if key.startswith(text))
