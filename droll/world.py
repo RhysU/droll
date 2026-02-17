@@ -162,6 +162,27 @@ def descend(
     )
 
 
+def _escape_monsters(world: struct.World) -> struct.World:
+    """Attempt to escape remaining monsters using a portal."""
+    try:
+        return _apply_portal(world)
+    except error.DrollError:
+        raise error.DrollError("Monsters remain but no portal in hand.")
+
+
+def _escape_dragon(world: struct.World) -> struct.World:
+    """Attempt to escape a blocking dragon using a ring first, then a portal."""
+    try:
+        return _apply_ring(world)
+    except error.DrollError:
+        try:
+            return _apply_portal(world)
+        except error.DrollError:
+            raise error.DrollError(
+                "Dragon remains but neither a ring of invisibility nor a portal in hand."
+            )
+
+
 def retire(world: struct.World) -> struct.World:
     """Retire to the tavern after completing the present dungeon.
 
@@ -171,28 +192,14 @@ def retire(world: struct.World) -> struct.World:
         raise error.DrollError("Descend at least once prior to retiring.")
 
     if not defeated_monsters(world.dungeon):
-        try:
-            world = _apply_portal(world)
-        except error.DrollError:
-            raise error.DrollError("Monsters remain but no portal in hand.")
+        world = _escape_monsters(world)
     elif _blocking_dragon(world.dungeon):
-        # First attempt to use a ring then a portal (because portals are +2)
-        try:
-            world = _apply_ring(world)
-        except error.DrollError:
-            try:
-                world = _apply_portal(world)
-            except error.DrollError:
-                raise error.DrollError(
-                    "Dragon remains but neither a ring of invisibility nor a portal in hand."
-                )
+        world = _escape_dragon(world)
 
     # Regroup just prior to retiring
     world = _regroup(world)
 
     # Update the world in anticipation of the next delve
-    # (Upgrading a hero's ability after 5 experience points is done elsewhere
-    # because it requires struct.Player information not available in World)
     return replace(
         world, depth=0, experience=world.experience + world.depth, dungeon=None
     )
