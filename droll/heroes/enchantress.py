@@ -51,8 +51,6 @@ def _beguiler_ability(
     elif not defeated_monsters(dungeon):
         assert len(extra_targets) == 0
         raise error.DrollError("Require 2 targets when 2+ available.")
-    else:
-        pass
     dungeon = action.increment_dungeon(dungeon, "potion")
     return action.consume_ability(replace(world, dungeon=dungeon))
 
