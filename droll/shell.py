@@ -53,32 +53,40 @@ class Shell(cmd.Cmd):
         self._undo = []
         self.postcmd(stop=False, line="")  # Prints initial world state
 
+    def _postcmd_current(self, stop, line) -> None:
+        """Display state using the compact summary format."""
+        self.prompt = self._game.player_name + "> "
+        if self._color:
+            self.prompt = _GREEN + self.prompt + _RESET
+        print()
+        if line != "EOF":
+            available = [] if stop else self._available_commands()
+            print(
+                display.compact_summary(
+                    self._game.current_world,
+                    self._game.player_name,
+                    self._game.score(),
+                    available,
+                )
+            )
+            if stop:
+                print(self.prompt)
+
+    def _postcmd_legacy(self, stop, line) -> None:
+        """Display state using the brief summary format."""
+        self.prompt = self._game.prompt() + " "
+        print()
+        if line != "EOF":
+            print(self._game.summary())
+            if stop:
+                print(self.prompt)
+
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
         if self._display_mode == DisplayMode.CURRENT:
-            self.prompt = self._game.player_name + "> "
-            if self._color:
-                self.prompt = _GREEN + self.prompt + _RESET
-            print()
-            if line != "EOF":
-                available = [] if stop else self._available_commands()
-                print(
-                    display.compact_summary(
-                        self._game.current_world,
-                        self._game.player_name,
-                        self._game.score(),
-                        available,
-                    )
-                )
-                if stop:
-                    print(self.prompt)
+            self._postcmd_current(stop, line)
         else:
-            self.prompt = self._game.prompt() + " "
-            print()
-            if line != "EOF":
-                print(self._game.summary())
-                if stop:
-                    print(self.prompt)
+            self._postcmd_legacy(stop, line)
         return stop
 
     def _available_commands(self) -> list[str]:

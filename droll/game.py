@@ -155,38 +155,34 @@ class Game:
         self._world = world.retreat(self._world)
         return self._next_delve()
 
+    def _possible_world_actions(self) -> list[str]:
+        """Determine which world-level actions can currently succeed."""
+        possible = []
+        if self._world.ability:
+            possible.append("ability")
+        for name, action in (
+            ("descend", lambda: world.descend(
+                self._world, self._player.roll.dungeon, _dummy_randrange
+            )),
+            ("retire", lambda: world.retire(self._world)),
+            ("retreat", lambda: world.retreat(self._world)),
+        ):
+            try:
+                action()
+                possible.append(name)
+            except error.DrollError:
+                pass
+        return possible
+
     def completenames(
         self, text: str, head: collections.abc.Sequence[str], tail: collections.abc.Sequence[str]
     ) -> collections.abc.Sequence[str]:
         """Complete possible command names based upon context."""
-        # Which world actions might be taken successfully given game state?
-        possible = []
-        if self._world.ability:
-            possible.append("ability")
-        try:
-            world.descend(
-                self._world, self._player.roll.dungeon, _dummy_randrange
-            )
-            possible.append("descend")
-        except error.DrollError:
-            pass
-        try:
-            world.retire(self._world)
-            possible.append("retire")
-        except error.DrollError:
-            pass
-        try:
-            world.retreat(self._world)
-            possible.append("retreat")
-        except error.DrollError:
-            pass
-
-        results = [x for x in possible if x.startswith(text)]
-
-        # Add any hero-related possibilities
+        results = [
+            x for x in self._possible_world_actions() if x.startswith(text)
+        ]
         if not world.exhausted_dungeon(self._world.dungeon):
             results += self.completedefault(text, head, tail)
-
         return results
 
     def completedefault(
