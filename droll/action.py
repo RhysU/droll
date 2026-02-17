@@ -16,6 +16,7 @@ from .world import defeated_monsters, draw_treasure, replace_treasure
 __all__ = (
     "bait_dragon",
     "consume_ability",
+    "convert_dungeon_to_party",
     "decrement_dungeon",
     "defeat_all",
     "defeat_all_plus_additional",
@@ -499,6 +500,34 @@ def elixir(
     return replace(
         replace_treasure(world, noun),
         party=increment_party(world.party, target),
+    )
+
+
+def convert_dungeon_to_party(
+    world: struct.World,
+    source: str,
+    destination: str,
+    max_count: int,
+) -> struct.World:
+    """Convert up to max_count dungeon dice into party dice with regroup discard.
+
+    Converts min(available, max_count) of source into destination."""
+    dungeon = world.dungeon
+    party = world.party
+    discard = world.regroup.discard
+    available = getattr(dungeon, source)
+    count = min(available, max_count)
+    for _ in range(count):
+        dungeon = decrement_dungeon(dungeon, source)
+        party = increment_party(party, destination)
+    discard = replace(
+        discard, **{destination: getattr(discard, destination) + count}
+    )
+    return replace(
+        world,
+        dungeon=dungeon,
+        party=party,
+        regroup=replace(world.regroup, discard=discard),
     )
 
 

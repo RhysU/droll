@@ -25,21 +25,11 @@ def _occultist_ability(
     target: typing.Optional[str] = None,
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it at next regroup."""
-    # Assume target is skeleton when not provided
     if target and target != "skeleton":
         raise error.DrollError("Ability can only target 1 skeleton")
-
-    # Change 1 skeleton into 1 fighter
-    dungeon = action.decrement_dungeon(world.dungeon, "skeleton")
-    party = action.increment_party(world.party, "fighter")
-
-    # Discarding if unused at the next regroup phase
-    regroup = world.regroup
-    discard = regroup.discard
-    discard = replace(discard, fighter=discard.fighter + 1)
-    regroup = replace(regroup, discard=discard)
-
-    world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
+    world = action.convert_dungeon_to_party(
+        world, source="skeleton", destination="fighter", max_count=1
+    )
     return action.consume_ability(world)
 
 
@@ -51,33 +41,15 @@ def _necromancer_ability(
     *extra_targets: str,
 ) -> struct.World:
     """Transform 2 skeletons into fighters, discarding them at next regroup."""
-    # Assume targets are skeletons when not provided
     if target and target != "skeleton":
         raise error.DrollError("Ability can only target skeletons")
     if extra_targets and extra_targets[0] != "skeleton":
         raise error.DrollError("Ability can only target skeletons")
     if len(extra_targets) > 1:
         raise error.DrollError("At most 2 targets can be changed.")
-
-    dungeon = world.dungeon
-    party = world.party
-    regroup = world.regroup
-    discard = regroup.discard
-
-    # Always transform 2 when 2 are available
-    if dungeon.skeleton >= 2:
-        dungeon = action.decrement_dungeon(dungeon, "skeleton")
-        dungeon = action.decrement_dungeon(dungeon, "skeleton")
-        party = action.increment_party(party, "fighter")
-        party = action.increment_party(party, "fighter")
-        discard = replace(discard, fighter=discard.fighter + 2)
-    else:
-        dungeon = action.decrement_dungeon(dungeon, "skeleton")
-        party = action.increment_party(party, "fighter")
-        discard = replace(discard, fighter=discard.fighter + 1)
-
-    regroup = replace(regroup, discard=discard)
-    world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
+    world = action.convert_dungeon_to_party(
+        world, source="skeleton", destination="fighter", max_count=2
+    )
     return action.consume_ability(world)
 
 

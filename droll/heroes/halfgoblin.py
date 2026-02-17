@@ -26,21 +26,11 @@ def _halfgoblin_ability(
     target: typing.Optional[str] = None,
 ) -> struct.World:
     """Transform 1 goblin into 1 thief, discarding it at next regroup."""
-    # Assume target is goblin when not provided
     if target and target != "goblin":
         raise error.DrollError("Ability can only target 1 goblin")
-
-    # Change 1 goblin into 1 thief
-    dungeon = action.decrement_dungeon(world.dungeon, "goblin")
-    party = action.increment_party(world.party, "thief")
-
-    # Discarding if unused at the next regroup phase
-    regroup = world.regroup
-    discard = regroup.discard
-    discard = replace(discard, thief=discard.thief + 1)
-    regroup = replace(regroup, discard=discard)
-
-    world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
+    world = action.convert_dungeon_to_party(
+        world, source="goblin", destination="thief", max_count=1
+    )
     return action.consume_ability(world)
 
 
@@ -52,33 +42,15 @@ def _chieftain_ability(
     *extra_targets: str,
 ) -> struct.World:
     """Transform 2 goblins into thieves, discarding them at next regroup."""
-    # Assume targets are goblins when not provided
     if target and target != "goblin":
         raise error.DrollError("Ability can only target goblins")
     if extra_targets and extra_targets[0] != "goblin":
         raise error.DrollError("Ability can only target goblins")
     if len(extra_targets) > 1:
         raise error.DrollError("At most 2 targets can be changed.")
-
-    dungeon = world.dungeon
-    party = world.party
-    regroup = world.regroup
-    discard = regroup.discard
-
-    # Always transform 2 when 2 are available
-    if dungeon.goblin >= 2:
-        dungeon = action.decrement_dungeon(dungeon, "goblin")
-        dungeon = action.decrement_dungeon(dungeon, "goblin")
-        party = action.increment_party(party, "thief")
-        party = action.increment_party(party, "thief")
-        discard = replace(discard, thief=discard.thief + 2)
-    else:
-        dungeon = action.decrement_dungeon(dungeon, "goblin")
-        party = action.increment_party(party, "thief")
-        discard = replace(discard, thief=discard.thief + 1)
-
-    regroup = replace(regroup, discard=discard)
-    world = replace(world, dungeon=dungeon, party=party, regroup=regroup)
+    world = action.convert_dungeon_to_party(
+        world, source="goblin", destination="thief", max_count=2
+    )
     return action.consume_ability(world)
 
 
