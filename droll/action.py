@@ -252,18 +252,11 @@ def quaff(
     )
 
 
-def reroll(
-    world: struct.World,
-    randrange: dice.RandRange,
-    hero: str,
-    *dungeon_or_party,
-    allow_dragon: bool = False,
-) -> struct.World:
-    """Update world after hero re-rolls some number of dungeon or party dice."""
-    if not dungeon_or_party:
-        raise error.DrollError("At least one target must be re-rolled.")
-
-    # Classify each target as either a dungeon or party die
+def _classify_reroll_targets(
+    dungeon_or_party: tuple[str, ...],
+    allow_dragon: bool,
+) -> tuple[list[str], list[str]]:
+    """Classify reroll targets into dungeon and party lists."""
     dungeon_targets = []
     party_targets = []
     for target in dungeon_or_party:
@@ -275,40 +268,68 @@ def reroll(
             party_targets.append(target)
         else:
             raise error.DrollError(f"{target} cannot be re-rolled")
+    return dungeon_targets, party_targets
 
-    # Remove requested targets from the dungeon
-    dungeon = world.dungeon
-    for target in dungeon_targets:
+
+def _reroll_dungeon(
+    dungeon: struct.Dungeon,
+    targets: list[str],
+    randrange: dice.RandRange,
+) -> struct.Dungeon:
+    """Remove targets from dungeon, re-roll that many dice, and merge back."""
+    for target in targets:
         dungeon = decrement_dungeon(dungeon, target)
-
-    # Re-roll dungeon dice and add to anything left fixed
-    if dungeon_targets:
-        increased = dice.roll_dungeon(dice=len(dungeon_targets), randrange=randrange)
-        dungeon = struct.Dungeon(
-            *map(
-                operator.add,
-                struct.field_values(dungeon),
-                struct.field_values(increased),
-            )
+    increased = dice.roll_dungeon(dice=len(targets), randrange=randrange)
+    return struct.Dungeon(
+        *map(
+            operator.add,
+            struct.field_values(dungeon),
+            struct.field_values(increased),
         )
+    )
 
-    # Remove requested targets from the party
-    party = world.party
-    for target in party_targets:
+
+def _reroll_party(
+    party: struct.Party,
+    targets: list[str],
+    randrange: dice.RandRange,
+) -> struct.Party:
+    """Remove targets from party, re-roll that many dice, and merge back."""
+    for target in targets:
         party = _decrement_party(party, target)
-
-    # Re-roll party dice and add to anything left fixed
-    if party_targets:
-        increased, _ = dice.roll_party(dice=len(party_targets), randrange=randrange)
-        party = struct.Party(
-            *map(
-                operator.add,
-                struct.field_values(party),
-                struct.field_values(increased),
-            )
+    increased, _ = dice.roll_party(dice=len(targets), randrange=randrange)
+    return struct.Party(
+        *map(
+            operator.add,
+            struct.field_values(party),
+            struct.field_values(increased),
         )
+    )
 
-    # Consume the hero and update regroup
+
+def reroll(
+    world: struct.World,
+    randrange: dice.RandRange,
+    hero: str,
+    *dungeon_or_party,
+    allow_dragon: bool = False,
+) -> struct.World:
+    """Update world after hero re-rolls some number of dungeon or party dice."""
+    if not dungeon_or_party:
+        raise error.DrollError("At least one target must be re-rolled.")
+
+    dungeon_targets, party_targets = _classify_reroll_targets(
+        dungeon_or_party, allow_dragon
+    )
+
+    dungeon = world.dungeon
+    if dungeon_targets:
+        dungeon = _reroll_dungeon(dungeon, dungeon_targets, randrange)
+
+    party = world.party
+    if party_targets:
+        party = _reroll_party(party, party_targets, randrange)
+
     return replace(
         world,
         dungeon=dungeon,
