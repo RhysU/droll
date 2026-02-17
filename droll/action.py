@@ -122,7 +122,7 @@ def _defeat_plus_additional(
             )
         return world
 
-    if len(additional) == 0:
+    if not additional:
         raise error.DrollError(
             "Monsters remain so one additional target required."
         )
