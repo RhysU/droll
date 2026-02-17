@@ -26,9 +26,9 @@ __all__ = (
 
 def defeated_monsters(dungeon: struct.Dungeon) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""
-    return (dungeon is None) or 0 == (
+    return (dungeon is None) or (
         dungeon.goblin + dungeon.skeleton + dungeon.ooze
-    )
+    ) == 0
 
 
 def defeated_dungeon(dungeon: struct.Dungeon) -> bool:
@@ -48,7 +48,7 @@ def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
 
     In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
     return (dungeon is None) or (
-        (0 == sum(struct.field_values(dungeon)) - dungeon.dragon)
+        (sum(struct.field_values(dungeon)) - dungeon.dragon == 0)
         and not _blocking_dragon(dungeon)
     )
 
