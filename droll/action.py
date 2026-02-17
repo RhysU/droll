@@ -321,7 +321,7 @@ def reroll(
 
     # Re-roll party dice and add to anything left fixed
     if party_targets:
-        increased = dice.roll_party(dice=len(party_targets), randrange=randrange)
+        increased, _ = dice.roll_party(dice=len(party_targets), randrange=randrange)
         party = struct.Party(
             *map(
                 operator.add,
