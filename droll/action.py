@@ -470,22 +470,24 @@ def bait_dragon(
         world = replace_treasure(world, noun)
 
     # Compute how many new dragons will be produced and remove sources
-    new_targets = 0
     dungeon = world.dungeon
-    if dungeon is not None:
-        for enemy in _enemies:
-            new_targets += getattr(world.dungeon, enemy)
-            dungeon = replace(dungeon, **{enemy: 0})
+    new_targets = (
+        sum(getattr(dungeon, enemy) for enemy in _enemies)
+        if dungeon is not None
+        else 0
+    )
     if not new_targets:
         raise error.DrollError(
             f"At least one of {_enemies} required for '{noun}'."
         )
 
-    # Increment the number of targets (i.e. dragons)
+    # Zero all enemy sources and increment the number of dragons
     return replace(
         world,
         dungeon=replace(
-            dungeon, **{target: getattr(dungeon, target) + new_targets}
+            dungeon,
+            **{enemy: 0 for enemy in _enemies},
+            **{target: getattr(dungeon, target) + new_targets},
         ),
     )
 
