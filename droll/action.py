@@ -38,6 +38,9 @@ __all__ = (
     "reroll",
 )
 
+_DUNGEON_NAMES = frozenset(struct.field_names(struct.Dungeon))
+_PARTY_NAMES = frozenset(struct.field_names(struct.Party))
+
 
 def defeat_one(
     world: struct.World, randrange: dice.RandRange, hero: str, target: str
@@ -261,16 +264,14 @@ def reroll(
         raise error.DrollError("At least one target must be re-rolled.")
 
     # Classify each target as either a dungeon or party die
-    dungeon_names = frozenset(struct.field_names(struct.Dungeon))
-    party_names = frozenset(struct.field_names(struct.Party))
     dungeon_targets = []
     party_targets = []
     for target in dungeon_or_party:
         if not allow_dragon and target == "dragon":
             raise error.DrollError(f"{target} cannot be re-rolled")
-        if target in dungeon_names:
+        if target in _DUNGEON_NAMES:
             dungeon_targets.append(target)
-        elif target in party_names:
+        elif target in _PARTY_NAMES:
             party_targets.append(target)
         else:
             raise error.DrollError(f"{target} cannot be re-rolled")

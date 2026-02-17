@@ -112,9 +112,10 @@ def apply(
     Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
     # Convert any artifacts in the command into any corresponding hero types
-    noun = _partify(noun, player.artifacts)
-    target = _partify(target, player.artifacts)
-    additional = tuple(_partify(i, player.artifacts) for i in additional)
+    reverse = _artifact_to_hero(player.artifacts)
+    noun = _partify(noun, reverse)
+    target = _partify(target, reverse)
+    additional = tuple(_partify(i, reverse) for i in additional)
 
     # One-off handling of some treasures, with error wrapping to aid usability
     if noun == "portal":
@@ -191,14 +192,20 @@ def apply(
     return world
 
 
-def _partify(token: str, artifacts: struct.Party):
+def _artifact_to_hero(artifacts: struct.Party) -> typing.Dict[str, str]:
+    """Build a reverse mapping from artifact name to hero name."""
+    return {
+        artifact: hero
+        for hero, artifact in struct.field_items(artifacts)
+        if artifact is not None
+    }
+
+
+def _partify(token: str, reverse: typing.Dict[str, str]):
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None
-    for party, artifact in struct.field_items(artifacts):
-        if token == artifact:
-            return party
-    return token
+    return reverse.get(token, token)
 
 
 # Early tokens dominated by items/dice that can be applied/attacked.
