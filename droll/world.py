@@ -94,7 +94,7 @@ def delve(
     party, regroup = roll_party(_party_dice, randrange)
     return replace(
         world,
-        delve=(world.delve if world.delve else 0) + 1,
+        delve=world.delve + 1,
         depth=0,
         ability=True,
         regroup=regroup,
