@@ -98,6 +98,92 @@ Default = struct.Player(
 )
 
 
+def _apply_special_noun(
+    player: struct.Player,
+    world: struct.World,
+    randrange: dice.RandRange,
+    noun: str,
+    target: str | None,
+    additional: tuple,
+) -> struct.World:
+    """Handle special nouns (ability, bait, elixir) via player attributes."""
+    try:
+        action_ = getattr(player, noun)
+        return action_(world, randrange, noun, target, *additional)
+    except AttributeError as cause:
+        raise error.DrollError(str(cause)) from cause
+
+
+def _add_phantom_treasures(
+    world: struct.World, artifacts: struct.Party
+) -> struct.World:
+    """Temporarily add treasure counts to party for artifact-as-hero dispatch."""
+    return replace(
+        world,
+        party=replace(
+            world.party,
+            **{
+                hero: getattr(world.party, hero)
+                + getattr(world.treasure, artifact)
+                for hero, artifact in struct.field_items(artifacts)
+                if artifact is not None
+            },
+        ),
+    )
+
+
+def _remove_phantom_treasures(
+    world: struct.World, artifacts: struct.Party, prior_treasure: struct.Treasure
+) -> struct.World:
+    """Undo the phantom treasure addition using the saved prior treasure."""
+    return replace(
+        world,
+        party=replace(
+            world.party,
+            **{
+                hero: getattr(world.party, hero)
+                - getattr(prior_treasure, artifact)
+                for hero, artifact in struct.field_items(artifacts)
+                if artifact is not None
+            },
+        ),
+    )
+
+
+def _consume_negative_heroes(
+    world: struct.World, artifacts: struct.Party
+) -> struct.World:
+    """Consume treasure for any hero that went negative (artifact was spent)."""
+    for hero, quantity in struct.field_items(world.party):
+        if quantity >= 0:
+            continue
+        for _ in range(-quantity):
+            world = replace_treasure(world, getattr(artifacts, hero))
+        world = replace(world, party=replace(world.party, **{hero: 0}))
+    return world
+
+
+def _dispatch_hero_action(
+    player: struct.Player,
+    world: struct.World,
+    randrange: dice.RandRange,
+    noun: str,
+    target: str | None,
+    additional: tuple,
+) -> struct.World:
+    """Dispatch a hero or reroll action against dungeon targets."""
+    if noun == "reroll":
+        return action.reroll(world, randrange, "scroll", target, *additional)
+    try:
+        action_ = getattr(player.party, noun)
+        if target is None:
+            raise error.DrollError(f'"{noun}" requires some target')
+        action_ = getattr(action_, target)
+        return action_(world, randrange, noun, target, *additional)
+    except (AttributeError, TypeError) as cause:
+        raise error.DrollError(str(cause)) from cause
+
+
 def apply(
     player: struct.Player,
     world: struct.World,
@@ -125,71 +211,18 @@ def apply(
             'To use a ring, directly "descend" or "retire".'
         )
     if noun in {"ability", "bait", "elixir"}:
-        try:
-            action_ = getattr(player, noun)  # Else name collision w/ import
-            return action_(world, randrange, noun, target, *additional)
-        except AttributeError as cause:
-            raise error.DrollError(str(cause)) from cause
+        return _apply_special_noun(
+            player, world, randrange, noun, target, additional
+        )
 
-    # Many treasures behave exactly like party members, so
-    # convert into party members prior to action invocation.
+    # Add phantom treasures, dispatch, remove phantoms, consume negatives
     prior_treasure = world.treasure
-    world = replace(
-        world,
-        party=replace(
-            world.party,
-            **{
-                hero: getattr(world.party, hero)
-                + getattr(prior_treasure, artifact)
-                for hero, artifact in struct.field_items(player.artifacts)
-                if artifact is not None
-            },
-        ),
+    world = _add_phantom_treasures(world, player.artifacts)
+    world = _dispatch_hero_action(
+        player, world, randrange, noun, target, additional
     )
-
-    if noun == "reroll":
-        # Re-roll is a special verb that always overrides scroll settings
-        # found within struct.Player so, e.g., Beguiler can re-roll dice
-        # with "reroll skeleton" because "scroll skeleton" kills a skeleton.
-        world = action.reroll(world, randrange, "scroll", target, *additional)
-    else:
-        # Apply a hero (possibly phantom per above) to some targets.
-        try:
-            action_ = getattr(player.party, noun)
-            if target is None:
-                raise error.DrollError(
-                    f'"{noun}" requires some target'
-                )
-            action_ = getattr(action_, target)
-            world = action_(world, randrange, noun, target, *additional)
-        except (AttributeError, TypeError) as cause:
-            raise error.DrollError(str(cause)) from cause
-
-    # Undo the prior transformation by subtracting prior_treasure.
-    world = replace(
-        world,
-        party=replace(
-            world.party,
-            **{
-                hero: getattr(world.party, hero)
-                - getattr(prior_treasure, artifact)
-                for hero, artifact in struct.field_items(player.artifacts)
-                if artifact is not None
-            },
-        ),
-    )
-
-    # Consume treasure equivalent to any hero which has gone negative.
-    for hero, quantity in struct.field_items(world.party):
-        if quantity >= 0:
-            continue
-        for _ in range(-quantity):
-            world = replace_treasure(
-                world, getattr(player.artifacts, hero)
-            )
-        world = replace(world, party=replace(world.party, **{hero: 0}))
-
-    return world
+    world = _remove_phantom_treasures(world, player.artifacts, prior_treasure)
+    return _consume_negative_heroes(world, player.artifacts)
 
 
 def _artifact_to_hero(artifacts: struct.Party) -> typing.Dict[str, str]:
