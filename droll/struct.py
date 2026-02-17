@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Type definitions, generally of the struct-like variety."""
+from __future__ import annotations
+
 import collections.abc
 import dataclasses
 import typing
@@ -102,11 +104,11 @@ class Regroup:
 @dataclasses.dataclass(frozen=True)
 class World:
     delve: int = 0
-    depth: typing.Optional[int] = None
+    depth: int | None = None
     experience: int = 0
-    dungeon: typing.Optional[Dungeon] = None
-    party: typing.Optional[Party] = None
-    ability: typing.Optional[bool] = None
+    dungeon: Dungeon | None = None
+    party: Party | None = None
+    ability: bool | None = None
     regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
     reserve: Treasure = Treasure()

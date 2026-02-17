@@ -2,12 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
+from __future__ import annotations
 
 import collections
 import collections.abc
 from dataclasses import replace
 import operator
-import typing
 
 from . import dice
 from . import error
@@ -456,7 +456,7 @@ def bait_dragon(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: str | None = None,
     *,
     _enemies: collections.abc.Sequence[str] = ("goblin", "skeleton", "ooze"),
     _require_treasure: bool = True,
@@ -539,7 +539,7 @@ def nop_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: str | None = None,
 ) -> struct.World:
     """No special ability available (though its consumption is tracked)"""
     if target is not None:

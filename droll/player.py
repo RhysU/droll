@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
+from __future__ import annotations
 
 import collections.abc
 from dataclasses import replace
-import typing
 
 from . import action
 from . import dice
@@ -103,7 +103,7 @@ def apply(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: str | None = None,
     *additional,
 ) -> struct.World:
     """Apply noun to target within world, returning a new version.
