@@ -234,13 +234,15 @@ def draw_treasure(
 ) -> struct.World:
     """Draw a single item from the reserve into the player's treasures."""
     drawn = _draw(reserve=world.reserve, randrange=randrange)
-    treasure = replace(
-        world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}
+    return replace(
+        world,
+        treasure=replace(
+            world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}
+        ),
+        reserve=replace(
+            world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}
+        ),
     )
-    reserve = replace(
-        world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}
-    )
-    return replace(world, treasure=treasure, reserve=reserve)
 
 
 def replace_treasure(world: struct.World, item: str) -> struct.World:
