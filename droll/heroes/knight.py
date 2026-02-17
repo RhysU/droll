@@ -4,7 +4,6 @@
 """Hero definitions for Knight advancing to DragonSlayer."""
 from dataclasses import replace
 import functools
-import typing
 
 from .. import action
 from .. import dice
@@ -19,7 +18,7 @@ __all__ = (
 
 def _knight_roll_party(
     count: int, randrange: dice.RandRange
-) -> typing.Tuple[struct.Party, struct.Regroup]:
+) -> tuple[struct.Party, struct.Regroup]:
     """Roll a new Party, changing all Scrolls into Champions."""
     default, regroup = dice.roll_party(dice=count, randrange=randrange)
     return (

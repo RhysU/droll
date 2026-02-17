@@ -2,9 +2,11 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Tracks details associated with a playable game."""
+from __future__ import annotations
+
+import collections.abc
 import copy
 import enum
-import typing
 from random import Random
 
 from . import error
@@ -38,7 +40,7 @@ class Game:
     """Tracks all state associated with a programmatically driven game."""
 
     def __init__(
-        self, player: struct.Player = player.Default, random: Random = None
+        self, player: struct.Player = player.Default, random: Random | None = None
     ) -> None:
         """Initialize a new game with the specified player and random number generator."""
         self._player = player
@@ -106,7 +108,7 @@ class Game:
 
     def prompt(self) -> str:
         """A prompt-like string including the player name and score."""
-        return "({} {:-2d})".format(self._player.name, self.score())
+        return f"({self._player.name} {self.score():-2d})"
 
     def ability(self, *args: str) -> GameState:
         """Invoke the player's ability."""
@@ -154,8 +156,8 @@ class Game:
         return self._next_delve()
 
     def completenames(
-        self, text: str, head: typing.Sequence[str], tail: typing.Sequence[str]
-    ) -> typing.Sequence[str]:
+        self, text: str, head: collections.abc.Sequence[str], tail: collections.abc.Sequence[str]
+    ) -> collections.abc.Sequence[str]:
         """Complete possible command names based upon context."""
         # Which world actions might be taken successfully given game state?
         possible = []
@@ -188,8 +190,8 @@ class Game:
         return results
 
     def completedefault(
-        self, text: str, head: typing.Sequence[str], tail: typing.Sequence[str]
-    ) -> typing.Sequence[str]:
+        self, text: str, head: collections.abc.Sequence[str], tail: collections.abc.Sequence[str]
+    ) -> collections.abc.Sequence[str]:
         """Complete loosely based upon available heroes/treasures/dungeon."""
         return player.complete(
             world=self._world,

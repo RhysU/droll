@@ -2,9 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Spellsword advancing to Battlemage."""
+from __future__ import annotations
+
 from dataclasses import replace
 import functools
-import typing
 
 from .. import action
 from .. import dice
@@ -22,9 +23,9 @@ def _spellsword_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: str | None = None,
     *,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+    _acceptable_targets: frozenset[str] = frozenset(
         {"fighter", "mage"}
     ),
 ) -> struct.World:
@@ -35,7 +36,7 @@ def _spellsword_ability(
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
         raise error.DrollError(
-            "Target {} not one of {}".format(target, _acceptable_targets)
+            f"Target {target} not one of {_acceptable_targets}"
         )
     return action.consume_ability(
         replace(world, party=action.increment_party(world.party, target))
@@ -56,15 +57,15 @@ def _battlemage_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: str | None = None,
     *,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+    _acceptable_targets: frozenset[str] = frozenset(
         {"fighter", "mage"}
     ),
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:
-        raise error.DrollError("No targets accepted for {}".format(noun))
+        raise error.DrollError(f"No targets accepted for {noun}")
     return action.consume_ability(replace(world, dungeon=struct.Dungeon()))
 
 

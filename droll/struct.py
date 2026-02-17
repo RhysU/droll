@@ -2,6 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Type definitions, generally of the struct-like variety."""
+from __future__ import annotations
+
+import collections.abc
 import dataclasses
 import typing
 
@@ -20,19 +23,19 @@ __all__ = (
 )
 
 
-def field_names(cls_or_instance: typing.Any) -> typing.Iterator[str]:
+def field_names(cls_or_instance: typing.Any) -> collections.abc.Iterator[str]:
     """Yield field names for a dataclass or instance thereof."""
     return (f.name for f in dataclasses.fields(cls_or_instance))
 
 
-def field_values(instance: typing.Any) -> typing.Iterator[typing.Any]:
+def field_values(instance: typing.Any) -> collections.abc.Iterator[typing.Any]:
     """Yield field values for a dataclass instance."""
     return (getattr(instance, f.name) for f in dataclasses.fields(instance))
 
 
 def field_items(
     instance: typing.Any,
-) -> typing.Iterator[typing.Tuple[str, typing.Any]]:
+) -> collections.abc.Iterator[tuple[str, typing.Any]]:
     """Yield (name, value) pairs for a dataclass instance."""
     return (
         (f.name, getattr(instance, f.name))
@@ -62,20 +65,20 @@ class Party:
 
 @dataclasses.dataclass(frozen=True)
 class Roll:
-    dungeon: typing.Optional[typing.Callable] = None
-    party: typing.Optional[typing.Callable] = None
+    dungeon: collections.abc.Callable | None = None
+    party: collections.abc.Callable | None = None
 
 
 @dataclasses.dataclass(frozen=True)
 class Player:
-    name: typing.Optional[str] = None
-    ability: typing.Optional[typing.Callable] = None
-    advance: typing.Optional[typing.Callable] = None
-    bait: typing.Optional[typing.Callable] = None
-    elixir: typing.Optional[typing.Callable] = None
-    roll: typing.Optional[Roll] = None
-    artifacts: typing.Optional[Party] = None
-    party: typing.Optional[Party] = None
+    name: str | None = None
+    ability: collections.abc.Callable | None = None
+    advance: collections.abc.Callable | None = None
+    bait: collections.abc.Callable | None = None
+    elixir: collections.abc.Callable | None = None
+    roll: Roll | None = None
+    artifacts: Party | None = None
+    party: Party | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -101,11 +104,11 @@ class Regroup:
 @dataclasses.dataclass(frozen=True)
 class World:
     delve: int = 0
-    depth: typing.Optional[int] = None
+    depth: int | None = None
     experience: int = 0
-    dungeon: typing.Optional[Dungeon] = None
-    party: typing.Optional[Party] = None
-    ability: typing.Optional[bool] = None
+    dungeon: Dungeon | None = None
+    party: Party | None = None
+    ability: bool | None = None
     regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
     reserve: Treasure = Treasure()
@@ -114,7 +117,7 @@ class World:
 # Strictly speaking, "reserve" is genuine world state and tricky to deduce.
 # Only for historical reasons is it omitted below.
 def brief(
-    o: typing.Any, *, omitted: typing.AbstractSet[str] = frozenset({"reserve"})
+    o: typing.Any, *, omitted: collections.abc.Set[str] = frozenset({"reserve"})
 ) -> str:
     """A __str__(...) variant suppressing False fields within dataclasses."""
     try:
@@ -126,5 +129,5 @@ def brief(
     keyvalues = []
     for field, value in zip(names, values):
         if value and field not in omitted:
-            keyvalues.append("{}={}".format(field, brief(value)))
-    return "({})".format(", ".join(keyvalues))
+            keyvalues.append(f"{field}={brief(value)}")
+    return f"({', '.join(keyvalues)})"

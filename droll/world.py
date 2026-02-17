@@ -26,9 +26,9 @@ __all__ = (
 
 def defeated_monsters(dungeon: struct.Dungeon) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""
-    return (dungeon is None) or 0 == (
+    return (dungeon is None) or (
         dungeon.goblin + dungeon.skeleton + dungeon.ooze
-    )
+    ) == 0
 
 
 def defeated_dungeon(dungeon: struct.Dungeon) -> bool:
@@ -48,7 +48,7 @@ def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
 
     In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
     return (dungeon is None) or (
-        (0 == sum(struct.field_values(dungeon)) - dungeon.dragon)
+        (sum(struct.field_values(dungeon)) - dungeon.dragon == 0)
         and not _blocking_dragon(dungeon)
     )
 
@@ -148,7 +148,7 @@ def descend(
     # Update the world in anticipation of the next dungeon
     next_depth = (world.depth if world.depth else 0) + 1
     if next_depth > _max_depth:
-        raise error.DrollError("The maximum depth is {}".format(_max_depth))
+        raise error.DrollError(f"The maximum depth is {_max_depth}")
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
     new_dice = max(1, min(_dungeon_dice - prior_dragons, next_depth))
     dungeon = roll_dungeon(new_dice, randrange)
@@ -247,7 +247,7 @@ def replace_treasure(world: struct.World, item: str) -> struct.World:
     """Replace a single item from the player's treasures into the reserve."""
     prior_count = getattr(world.treasure, item)
     if not prior_count:
-        raise error.DrollError("'{}' not in player's treasure".format(item))
+        raise error.DrollError(f"'{item}' not in player's treasure")
     return replace(
         world,
         treasure=replace(world.treasure, **{item: prior_count - 1}),
@@ -261,7 +261,7 @@ def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     if not _blocking_dragon(world.dungeon):
         raise error.DrollError(
-            "A dragon must be present to use a {}".format(noun)
+            f"A dragon must be present to use a {noun}"
         )
     world = replace_treasure(world, noun)
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
@@ -274,6 +274,6 @@ def _apply_portal(
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):
         raise error.DrollError(
-            "No need to apply {} when dungeon clear".format(noun)
+            f"No need to apply {noun} when dungeon clear"
         )
     return replace(replace_treasure(world, "portal"), dungeon=struct.Dungeon())

@@ -2,6 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Compact display formatting for the experimental CLI mode."""
+from __future__ import annotations
+
+import collections.abc
 import enum
 import typing
 
@@ -26,7 +29,7 @@ _ALWAYS_COUNT = frozenset({"dragon"})
 
 def _format_item(
     name: str, count: int, discard: int = 0
-) -> typing.Optional[str]:
+) -> str | None:
     """Format a single item, returning None if count is zero."""
     if not count:
         return None
@@ -56,15 +59,15 @@ def _format_treasure(treasure: struct.Treasure) -> str:
     return " ".join(filter(None, parts)) or "None"
 
 
-def _format_available(available: typing.Sequence[str]) -> str:
+def _format_available(available: collections.abc.Sequence[str]) -> str:
     """Format available commands alphabetically."""
     return " ".join(sorted(available)) or "None"
 
 
 def _format_party(
-    party: typing.Optional[struct.Party],
-    discard: typing.Optional[struct.Party],
-) -> typing.Optional[str]:
+    party: struct.Party | None,
+    discard: struct.Party | None,
+) -> str | None:
     """Format party contents, returning None if empty."""
     if party is None or not any(struct.field_values(party)):
         return None
@@ -72,8 +75,8 @@ def _format_party(
 
 
 def _format_dungeon(
-    dungeon: typing.Optional[struct.Dungeon],
-) -> typing.Optional[str]:
+    dungeon: struct.Dungeon | None,
+) -> str | None:
     """Format dungeon contents, returning None only if no dungeon exists."""
     if dungeon is None:
         return None
@@ -84,7 +87,7 @@ def compact_summary(
     w: struct.World,
     player_name: str,
     score: int,
-    available: typing.Sequence[str],
+    available: collections.abc.Sequence[str],
 ) -> str:
     """Format the world state in compact multi-line format."""
     # Compute the width for alignment (prompt width)

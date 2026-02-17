@@ -2,9 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Mercenary advancing to Commander."""
+from __future__ import annotations
+
 from dataclasses import replace
 import functools
-import typing
 
 from .. import action
 from .. import dice
@@ -20,7 +21,7 @@ __all__ = (
 
 def _mercenary_roll_party(
     count: int, randrange: dice.RandRange
-) -> typing.Tuple[struct.Party, struct.Regroup]:
+) -> tuple[struct.Party, struct.Regroup]:
     """Roll a new Party, adding one bonus scroll discarded at next regroup."""
     party, regroup = dice.roll_party(dice=count, randrange=randrange)
     return (
@@ -33,12 +34,12 @@ def _mercenary_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: str | None = None,
     *additional,
 ) -> struct.World:
     """Defeat any 2 monsters."""
     if target is None:
-        raise error.DrollError("Must specify target for {}.".format(noun))
+        raise error.DrollError(f"Must specify target for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
     world = replace(
         world, party=action.increment_party(world.party, "champion")
@@ -53,13 +54,13 @@ def _commander_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: str | None = None,
     *additional,
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice."""
     if target is None:
         raise error.DrollError(
-            "Must specify at least one target to reroll for {}.".format(noun)
+            f"Must specify at least one target to reroll for {noun}."
         )
     # Temporarily add a scroll to be consumed by reroll
     world = replace(world, party=action.increment_party(world.party, "scroll"))
