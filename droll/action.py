@@ -511,22 +511,24 @@ def convert_dungeon_to_party(
     """Convert up to max_count dungeon dice into party dice with regroup discard.
 
     Converts min(available, max_count) of source into destination."""
-    dungeon = world.dungeon
-    party = world.party
-    discard = world.regroup.discard
-    available = getattr(dungeon, source)
-    count = min(available, max_count)
-    for _ in range(count):
-        dungeon = decrement_dungeon(dungeon, source)
-        party = increment_party(party, destination)
-    discard = replace(
-        discard, **{destination: getattr(discard, destination) + count}
-    )
+    count = min(getattr(world.dungeon, source), max_count)
     return replace(
         world,
-        dungeon=dungeon,
-        party=party,
-        regroup=replace(world.regroup, discard=discard),
+        dungeon=replace(
+            world.dungeon,
+            **{source: getattr(world.dungeon, source) - count},
+        ),
+        party=replace(
+            world.party,
+            **{destination: getattr(world.party, destination) + count},
+        ),
+        regroup=replace(
+            world.regroup,
+            discard=replace(
+                world.regroup.discard,
+                **{destination: getattr(world.regroup.discard, destination) + count},
+            ),
+        ),
     )
 
 
