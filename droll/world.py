@@ -109,13 +109,16 @@ def _regroup(world: struct.World) -> struct.World:
     # Suppose the player must use, say, 2 fighter dice or lose during regroup
     # Then, we decrement the fighters in the party by the discard count
     # where decrementing never takes the allotted result below 0 fighters
-    party = struct.Party(
-        **{
-            name: max(0, getattr(world.party, name, 0) - count)
-            for name, count in struct.field_items(world.regroup.discard)
-        }
+    return replace(
+        world,
+        party=struct.Party(
+            **{
+                name: max(0, getattr(world.party, name, 0) - count)
+                for name, count in struct.field_items(world.regroup.discard)
+            }
+        ),
+        regroup=struct.Regroup(),
     )
-    return replace(world, party=party, regroup=struct.Regroup())
 
 
 def descend(
