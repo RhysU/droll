@@ -49,8 +49,8 @@ class TestHalfGoblin(unittest.TestCase):
         self.assertEqual(result.dungeon.skeleton, 1)
         self.assertEqual(result.party.thief, 2)
 
-    def test_chieftain_transforms_two_monsters(self):
-        """Chieftain transforms 1 goblin into 1 thieves when 1 available."""
+    def test_chieftain_transforms_one_monster(self):
+        """Chieftain transforms 1 goblin into 1 thief when 1 available."""
         world = droll.struct.World(
             ability=True,
             dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
