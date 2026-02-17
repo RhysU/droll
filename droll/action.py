@@ -4,6 +4,7 @@
 """Functionality associated with player action mechanics."""
 
 import collections
+import collections.abc
 from dataclasses import replace
 import operator
 import typing
@@ -319,7 +320,7 @@ def reroll(
 
 def defeat_dragon_heroes(
     *heroes,
-    _disallowed_heroes: typing.Sequence[str] = ("scroll",),
+    _disallowed_heroes: collections.abc.Sequence[str] = ("scroll",),
     _distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
@@ -344,7 +345,7 @@ def defeat_dragon_heroes(
 
 def defeat_dragon_heroes_wildcard(
     *heroes,
-    _wildcard: typing.Sequence[str] = ("scroll",),
+    _wildcard: collections.abc.Sequence[str] = ("scroll",),
     _distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
@@ -371,8 +372,8 @@ def defeat_dragon_heroes_wildcard(
 
 def defeat_dragon_heroes_interchangeable(
     *heroes,
-    _interchangeable: typing.Set[str],
-    _disallowed_heroes: typing.Sequence[str] = ("scroll",),
+    _interchangeable: set[str],
+    _disallowed_heroes: collections.abc.Sequence[str] = ("scroll",),
     _required_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many heroes been provided to slay dragon?
@@ -461,7 +462,7 @@ def bait_dragon(
     noun: str,
     target: typing.Optional[str] = None,
     *,
-    _enemies: typing.Sequence[str] = ("goblin", "skeleton", "ooze"),
+    _enemies: collections.abc.Sequence[str] = ("goblin", "skeleton", "ooze"),
     _require_treasure: bool = True,
 ) -> struct.World:
     """Convert all monster faces into dragon dice."""

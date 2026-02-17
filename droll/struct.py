@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Type definitions, generally of the struct-like variety."""
+import collections.abc
 import dataclasses
 import typing
 
@@ -20,19 +21,19 @@ __all__ = (
 )
 
 
-def field_names(cls_or_instance: typing.Any) -> typing.Iterator[str]:
+def field_names(cls_or_instance: typing.Any) -> collections.abc.Iterator[str]:
     """Yield field names for a dataclass or instance thereof."""
     return (f.name for f in dataclasses.fields(cls_or_instance))
 
 
-def field_values(instance: typing.Any) -> typing.Iterator[typing.Any]:
+def field_values(instance: typing.Any) -> collections.abc.Iterator[typing.Any]:
     """Yield field values for a dataclass instance."""
     return (getattr(instance, f.name) for f in dataclasses.fields(instance))
 
 
 def field_items(
     instance: typing.Any,
-) -> typing.Iterator[typing.Tuple[str, typing.Any]]:
+) -> collections.abc.Iterator[tuple[str, typing.Any]]:
     """Yield (name, value) pairs for a dataclass instance."""
     return (
         (f.name, getattr(instance, f.name))

@@ -25,7 +25,7 @@ def _crusader_ability(
     noun: str,
     target: typing.Optional[str] = None,
     *,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+    _acceptable_targets: frozenset[str] = frozenset(
         {"fighter", "cleric"}
     ),
 ) -> struct.World:

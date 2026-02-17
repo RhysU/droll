@@ -2,9 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Tracks details associated with a playable game."""
+import collections.abc
 import copy
 import enum
-import typing
 from random import Random
 
 from . import error
@@ -154,8 +154,8 @@ class Game:
         return self._next_delve()
 
     def completenames(
-        self, text: str, head: typing.Sequence[str], tail: typing.Sequence[str]
-    ) -> typing.Sequence[str]:
+        self, text: str, head: collections.abc.Sequence[str], tail: collections.abc.Sequence[str]
+    ) -> collections.abc.Sequence[str]:
         """Complete possible command names based upon context."""
         # Which world actions might be taken successfully given game state?
         possible = []
@@ -188,8 +188,8 @@ class Game:
         return results
 
     def completedefault(
-        self, text: str, head: typing.Sequence[str], tail: typing.Sequence[str]
-    ) -> typing.Sequence[str]:
+        self, text: str, head: collections.abc.Sequence[str], tail: collections.abc.Sequence[str]
+    ) -> collections.abc.Sequence[str]:
         """Complete loosely based upon available heroes/treasures/dungeon."""
         return player.complete(
             world=self._world,

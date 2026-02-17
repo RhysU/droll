@@ -20,7 +20,7 @@ __all__ = (
 
 def _mercenary_roll_party(
     count: int, randrange: dice.RandRange
-) -> typing.Tuple[struct.Party, struct.Regroup]:
+) -> tuple[struct.Party, struct.Regroup]:
     """Roll a new Party, adding one bonus scroll discarded at next regroup."""
     party, regroup = dice.roll_party(dice=count, randrange=randrange)
     return (

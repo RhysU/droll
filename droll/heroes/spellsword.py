@@ -24,7 +24,7 @@ def _spellsword_ability(
     noun: str,
     target: typing.Optional[str] = None,
     *,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+    _acceptable_targets: frozenset[str] = frozenset(
         {"fighter", "mage"}
     ),
 ) -> struct.World:
@@ -58,7 +58,7 @@ def _battlemage_ability(
     noun: str,
     target: typing.Optional[str] = None,
     *,
-    _acceptable_targets: typing.FrozenSet[str] = frozenset(
+    _acceptable_targets: frozenset[str] = frozenset(
         {"fighter", "mage"}
     ),
 ) -> struct.World:

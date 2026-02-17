@@ -3,8 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with rolling dungeon and party dice."""
 
+import collections.abc
+
 from dataclasses import fields
-import typing
 
 from . import struct
 
@@ -16,14 +17,14 @@ __all__ = (
     "roll_party",
 )
 
-RandRange = typing.Callable[[int, int], int]
-RollDungeon = typing.Callable[[int, RandRange], struct.Dungeon]
-RollParty = typing.Callable[[int, RandRange], typing.Tuple[struct.Party, struct.Regroup]]
+RandRange = collections.abc.Callable[[int, int], int]
+RollDungeon = collections.abc.Callable[[int, RandRange], struct.Dungeon]
+RollParty = collections.abc.Callable[[int, RandRange], tuple[struct.Party, struct.Regroup]]
 
 
 def _roll(
     dice: int, start: int, stop: int, randrange: RandRange
-) -> typing.List[int]:
+) -> list[int]:
     """Roll dice and return counts for each outcome in the range [start, stop)."""
     assert dice >= 0, "Dice count must be non-negative"
     result = [0] * (stop - start)
@@ -45,7 +46,7 @@ def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
 
 def roll_party(
     dice: int, randrange: RandRange
-) -> typing.Tuple[struct.Party, struct.Regroup]:
+) -> tuple[struct.Party, struct.Regroup]:
     """Roll a new Party using given number of dice.
 
     Any implementation must follow type signature of RollParty."""

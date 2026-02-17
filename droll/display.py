@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Compact display formatting for the experimental CLI mode."""
+import collections.abc
 import enum
 import typing
 
@@ -56,7 +57,7 @@ def _format_treasure(treasure: struct.Treasure) -> str:
     return " ".join(filter(None, parts)) or "None"
 
 
-def _format_available(available: typing.Sequence[str]) -> str:
+def _format_available(available: collections.abc.Sequence[str]) -> str:
     """Format available commands alphabetically."""
     return " ".join(sorted(available)) or "None"
 
@@ -84,7 +85,7 @@ def compact_summary(
     w: struct.World,
     player_name: str,
     score: int,
-    available: typing.Sequence[str],
+    available: collections.abc.Sequence[str],
 ) -> str:
     """Format the world state in compact multi-line format."""
     # Compute the width for alignment (prompt width)

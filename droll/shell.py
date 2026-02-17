@@ -7,7 +7,6 @@ import copy
 import functools
 import sys
 import textwrap
-import typing
 
 from . import action
 from . import display
@@ -82,7 +81,7 @@ class Shell(cmd.Cmd):
                     print(self.prompt)
         return stop
 
-    def _available_commands(self) -> typing.List[str]:
+    def _available_commands(self) -> list[str]:
         """Get available non-hero/non-treasure commands from help system."""
         names = self.get_names()
         commands = set()
@@ -321,7 +320,7 @@ class Shell(cmd.Cmd):
         print("""Tools behave identically to a thief.""")
 
 
-def _parse(line: str) -> typing.Tuple[str]:
+def _parse(line: str) -> tuple[str, ...]:
     """Split a line into a tuple of whitespace-delimited tokens."""
     return tuple(line.split())
 
