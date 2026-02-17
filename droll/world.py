@@ -225,14 +225,16 @@ def score(world: struct.World) -> int:
 
 def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
     """Draw a random treasure from the reserve, weighted by counts."""
-    items = [
-        name
-        for name, count in struct.field_items(reserve)
-        for _ in range(count)
-    ]
-    if not items:
+    total = sum(struct.field_values(reserve))
+    if not total:
         raise RuntimeError("No items remaining in the reserve")
-    return items[randrange(0, len(items))]
+    choice = randrange(0, total)
+    cumulative = 0
+    for name, count in struct.field_items(reserve):
+        cumulative += count
+        if choice < cumulative:
+            return name
+    raise RuntimeError("Unreachable")
 
 
 def draw_treasure(
