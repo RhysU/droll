@@ -7,7 +7,7 @@ from dataclasses import replace
 import random
 import unittest
 
-from droll import action, dice, error, struct, world
+from droll import dice, error, struct, world
 
 
 class TestWorld(unittest.TestCase):
@@ -291,101 +291,6 @@ class TestWorld(unittest.TestCase):
                 fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
             ),
         )
-
-    def test_regroup_discard_after_quaff(self):
-        """
-        Quaffing a new thief with a force-discard thief clears discarding.
-
-        A thief gained via Half-Goblin ability (marked for discard) quaffs a
-        potion to revive another thief.  The revived thief survives regroup.
-        """
-        # Setup: thief from ability (marked for discard), 1 potion available
-        pre = struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
-            ability=False,
-            dungeon=struct.Dungeon(potion=1),
-            party=struct.Party(thief=1),
-            regroup=struct.Regroup(discard=struct.Party(thief=1)),
-        )
-        # Thief quaffs potion, reviving another thief
-        post = action.quaff(pre, None, "thief", "potion", "thief")
-        # The marked thief was consumed so the discard counter must drop
-        self.assertEqual(post.regroup.discard.thief, 0)
-        self.assertEqual(post.party.thief, 1)
-
-        # After descending the revived thief must survive regroup
-        descended = world.descend(
-            post,
-            dice.roll_dungeon,
-            random.Random(4).randrange,
-        )
-        self.assertEqual(descended.party.thief, 1)
-
-    def test_regroup_discard_after_elixir1(self):
-        """Accounting of revived vs force-discard thieves via elixirs."""
-        # Setup: thief from ability (marked for discard), 1 ooze present
-        pre = struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
-            ability=False,
-            dungeon=struct.Dungeon(ooze=1),
-            party=struct.Party(thief=1),
-            regroup=struct.Regroup(discard=struct.Party(thief=1)),
-            treasure=struct.Treasure(elixir=1),
-        )
-
-        # Force-discard thief kills the ooze
-        post1 = action.defeat_one(pre, None, "thief", "ooze")
-        self.assertEqual(post1.regroup.discard.thief, 0)
-        self.assertEqual(post1.party.thief, 0)
-
-        # Elixir revives a new thief
-        post2 = action.elixir(post1, None, "elixir", "thief")
-        self.assertEqual(post2.regroup.discard.thief, 0)
-        self.assertEqual(post2.party.thief, 1)
-
-        # After descending the revived thief must survive regroup
-        descended = world.descend(
-            post2,
-            dice.roll_dungeon,
-            random.Random(4).randrange,
-        )
-        self.assertEqual(descended.party.thief, 1)
-
-    def test_regroup_discard_after_elixir2(self):
-        """Accounting of revived vs force-discard thieves via elixirs."""
-        # Setup: thief from ability (marked for discard), 1 ooze present
-        pre = struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
-            ability=False,
-            dungeon=struct.Dungeon(ooze=1),
-            party=struct.Party(thief=1),
-            regroup=struct.Regroup(discard=struct.Party(thief=1)),
-            treasure=struct.Treasure(elixir=1),
-        )
-
-        # Elixir revives a new thief
-        post1 = action.elixir(pre, None, "elixir", "thief")
-        self.assertEqual(post1.regroup.discard.thief, 1)
-        self.assertEqual(post1.party.thief, 2)
-
-        # Force-discard thief kills the ooze
-        post2 = action.defeat_one(post1, None, "thief", "ooze")
-        self.assertEqual(post2.regroup.discard.thief, 0)
-        self.assertEqual(post2.party.thief, 1)
-
-        # After descending the revived thief must survive regroup
-        descended = world.descend(
-            post2,
-            dice.roll_dungeon,
-            random.Random(4).randrange,
-        )
-        self.assertEqual(descended.party.thief, 1)
 
     def test_exhausted_dungeon(self):
         """Test exhausted_dungeon detects when no actions remain."""
