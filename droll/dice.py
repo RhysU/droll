@@ -38,7 +38,7 @@ def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
 
     Any implementation must follow type signature of RollDungeon.
     On Dungeon N one should account for the number of extant dragons."""
-    assert dice >= 1, "At least one dice required (requested {})".format(dice)
+    assert dice >= 1, f"At least one dice required (requested {dice})"
     return struct.Dungeon(
         *_roll(dice, 0, len(fields(struct.Dungeon)), randrange)
     )

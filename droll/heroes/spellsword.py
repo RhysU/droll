@@ -35,7 +35,7 @@ def _spellsword_ability(
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
         raise error.DrollError(
-            "Target {} not one of {}".format(target, _acceptable_targets)
+            f"Target {target} not one of {_acceptable_targets}"
         )
     return action.consume_ability(
         replace(world, party=action.increment_party(world.party, target))
@@ -64,7 +64,7 @@ def _battlemage_ability(
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:
-        raise error.DrollError("No targets accepted for {}".format(noun))
+        raise error.DrollError(f"No targets accepted for {noun}")
     return action.consume_ability(replace(world, dungeon=struct.Dungeon()))
 
 

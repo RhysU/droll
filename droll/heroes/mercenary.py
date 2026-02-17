@@ -38,7 +38,7 @@ def _mercenary_ability(
 ) -> struct.World:
     """Defeat any 2 monsters."""
     if target is None:
-        raise error.DrollError("Must specify target for {}.".format(noun))
+        raise error.DrollError(f"Must specify target for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
     world = replace(
         world, party=action.increment_party(world.party, "champion")
@@ -59,7 +59,7 @@ def _commander_ability(
     """Rerolls any number of Party and Dungeon dice."""
     if target is None:
         raise error.DrollError(
-            "Must specify at least one target to reroll for {}.".format(noun)
+            f"Must specify at least one target to reroll for {noun}."
         )
     # Temporarily add a scroll to be consumed by reroll
     world = replace(world, party=action.increment_party(world.party, "scroll"))

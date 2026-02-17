@@ -27,7 +27,7 @@ def _minstrel_ability(
     """Discard all dragon dice."""
     target = "dragon" if target is None else target
     if target != "dragon":
-        raise error.DrollError("Can only discard dragon dice, not {}".format(target))
+        raise error.DrollError(f"Can only discard dragon dice, not {target}")
     return action.consume_ability(
         replace(world, dungeon=action.eliminate_dungeon(world.dungeon, target))
     )

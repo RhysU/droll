@@ -58,7 +58,7 @@ def _decrement_party(party: struct.Party, hero: str) -> struct.Party:
         raise error.DrollError("No party currently active.")
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
-        raise error.DrollError("Require at least one hero {}.".format(hero))
+        raise error.DrollError(f"Require at least one hero {hero}.")
     return replace(party, **{hero: prior_heroes - 1})
 
 
@@ -77,7 +77,7 @@ def decrement_dungeon(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise error.DrollError("Require at least one target {}.".format(target))
+        raise error.DrollError(f"Require at least one target {target}.")
     return replace(dungeon, **{target: prior_targets - 1})
 
 
@@ -118,7 +118,7 @@ def _defeat_plus_additional(
     if defeated_monsters(world.dungeon):
         if additional:
             raise error.DrollError(
-                "Additional {} given but no monsters left.".format(additional)
+                f"Additional {additional} given but no monsters left."
             )
         return world
 
@@ -128,9 +128,7 @@ def _defeat_plus_additional(
         )
     if len(additional) > 1:
         raise error.DrollError(
-            "Only one additional target allowed but {} provided.".format(
-                len(additional)
-            )
+            f"Only one additional target allowed but {len(additional)} provided."
         )
 
     return defeat_one(
@@ -175,7 +173,7 @@ def eliminate_dungeon(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise error.DrollError("Require at least 1 target {}.".format(target))
+        raise error.DrollError(f"Require at least 1 target {target}.")
     return replace(dungeon, **{target: 0})
 
 
@@ -211,7 +209,7 @@ def open_all(
         raise error.DrollError("Monsters must be defeated before opening.")
     howmany = getattr(world.dungeon, target)
     if not howmany:
-        raise error.DrollError("At least 1 {} required.".format(target))
+        raise error.DrollError(f"At least 1 {target} required.")
     for _ in range(howmany):
         world = draw_treasure(world, randrange)
     return replace(
@@ -235,9 +233,9 @@ def quaff(
     Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
     howmany = getattr(world.dungeon, target)
     if not howmany:
-        raise error.DrollError("At least 1 {} required.".format(target))
+        raise error.DrollError(f"At least 1 {target} required.")
     if len(revivable) != howmany:
-        raise error.DrollError("Require exactly {} to revive.".format(howmany))
+        raise error.DrollError(f"Require exactly {howmany} to revive.")
     if _after_monsters and not defeated_monsters(world.dungeon):
         raise error.DrollError("Monsters must be defeated before quaffing.")
     party = _decrement_party(world.party, hero)
@@ -269,13 +267,13 @@ def reroll(
     party_targets = []
     for target in dungeon_or_party:
         if not allow_dragon and target == "dragon":
-            raise error.DrollError("{} cannot be re-rolled".format(target))
+            raise error.DrollError(f"{target} cannot be re-rolled")
         if target in dungeon_names:
             dungeon_targets.append(target)
         elif target in party_names:
             party_targets.append(target)
         else:
-            raise error.DrollError("{} cannot be re-rolled".format(target))
+            raise error.DrollError(f"{target} cannot be re-rolled")
 
     # Remove requested targets from the dungeon
     dungeon = world.dungeon
@@ -330,15 +328,15 @@ def defeat_dragon_heroes(
     hero_set = {*heroes}
     if hero_set & {*_disallowed_heroes}:
         raise error.DrollError(
-            "Heroes {} cannot defeat a dragon.".format(_disallowed_heroes)
+            f"Heroes {_disallowed_heroes} cannot defeat a dragon."
         )
     if len(heroes) != _distinct_heroes:
         raise error.DrollError(
-            "Exactly {} heroes must be specified.".format(_distinct_heroes)
+            f"Exactly {_distinct_heroes} heroes must be specified."
         )
     if len(hero_set) != _distinct_heroes:
         raise error.DrollError(
-            "The {} heroes must all be distinct.".format(_distinct_heroes)
+            f"The {_distinct_heroes} heroes must all be distinct."
         )
     return True
 
@@ -355,7 +353,7 @@ def defeat_dragon_heroes_wildcard(
     distinct_heroes = _distinct_heroes  # Allow mutation saving original
     if len(heroes) != distinct_heroes:
         raise error.DrollError(
-            "Exactly {} heroes must be specified.".format(distinct_heroes)
+            f"Exactly {distinct_heroes} heroes must be specified."
         )
 
     # Account for wildcards by having each wildcard reduce the distinct count
@@ -365,7 +363,7 @@ def defeat_dragon_heroes_wildcard(
 
     if len({*heroes}) != distinct_heroes:
         raise error.DrollError(  # Error message uses original count
-            "The {} heroes must all be distinct.".format(_distinct_heroes)
+            f"The {_distinct_heroes} heroes must all be distinct."
         )
     return True
 
@@ -382,11 +380,11 @@ def defeat_dragon_heroes_interchangeable(
     """
     if {*heroes} & {*_disallowed_heroes}:
         raise error.DrollError(
-            "Heroes {} cannot defeat a dragon.".format(_disallowed_heroes)
+            f"Heroes {_disallowed_heroes} cannot defeat a dragon."
         )
     if len(heroes) != _required_heroes:
         raise error.DrollError(
-            "Exactly {} heroes must be specified.".format(_required_heroes)
+            f"Exactly {_required_heroes} heroes must be specified."
         )
 
     # Count all heroes, accumulating all _interchangable into just one hero
@@ -406,7 +404,7 @@ def defeat_dragon_heroes_interchangeable(
     # Sum the number of distinct heroes observed after these coercions.
     distinct_heroes = sum(v for k, v in counter.items())
     if distinct_heroes != _required_heroes:
-        raise error.DrollError("Heroes {} not sufficiently distinct.".format(heroes))
+        raise error.DrollError(f"Heroes {heroes} not sufficiently distinct.")
 
     return True
 
@@ -426,13 +424,11 @@ def defeat_dragon(
     # Simple prerequisites for attempting to defeat the dragon
     if world.dungeon.dragon < _min_dragon_length:
         raise error.DrollError(
-            "Enemy {} only comes at length {}.".format(
-                target, _min_dragon_length
-            )
+            f"Enemy {target} only comes at length {_min_dragon_length}."
         )
     if not defeated_monsters(world.dungeon):
         raise error.DrollError(
-            "Enemy {} only comes after all others defeated.".format(target)
+            f"Enemy {target} only comes after all others defeated."
         )
 
     # Confirm required number of distinct heroes available
@@ -469,7 +465,7 @@ def bait_dragon(
     # Confirm well-formed request optionally containing a target
     target = "dragon" if target is None else target
     if target != "dragon":
-        raise error.DrollError("Cannot {} a {}.".format(noun, target))
+        raise error.DrollError(f"Cannot {noun} a {target}.")
     if _require_treasure:
         world = replace_treasure(world, noun)
 
@@ -482,7 +478,7 @@ def bait_dragon(
             dungeon = replace(dungeon, **{enemy: 0})
     if not new_targets:
         raise error.DrollError(
-            "At least one of {} required for '{}'.".format(_enemies, noun)
+            f"At least one of {_enemies} required for '{noun}'."
         )
 
     # Increment the number of targets (i.e. dragons)
@@ -547,5 +543,5 @@ def nop_ability(
 ) -> struct.World:
     """No special ability available (though its consumption is tracked)"""
     if target is not None:
-        raise error.DrollError("No targets accepted for {}.".format(noun))
+        raise error.DrollError(f"No targets accepted for {noun}.")
     return consume_ability(world)

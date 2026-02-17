@@ -127,5 +127,5 @@ def brief(
     keyvalues = []
     for field, value in zip(names, values):
         if value and field not in omitted:
-            keyvalues.append("{}={}".format(field, brief(value)))
-    return "({})".format(", ".join(keyvalues))
+            keyvalues.append(f"{field}={brief(value)}")
+    return f"({', '.join(keyvalues)})"

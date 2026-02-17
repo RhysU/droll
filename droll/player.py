@@ -156,7 +156,7 @@ def apply(
             action_ = getattr(player.party, noun)
             if target is None:
                 raise error.DrollError(
-                    '"{}" requires some target'.format(noun)
+                    f'"{noun}" requires some target'
                 )
             action_ = getattr(action_, target)
             world = action_(world, randrange, noun, target, *additional)

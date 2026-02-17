@@ -106,7 +106,7 @@ class Game:
 
     def prompt(self) -> str:
         """A prompt-like string including the player name and score."""
-        return "({} {:-2d})".format(self._player.name, self.score())
+        return f"({self._player.name} {self.score():-2d})"
 
     def ability(self, *args: str) -> GameState:
         """Invoke the player's ability."""
