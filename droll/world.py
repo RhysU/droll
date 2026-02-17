@@ -150,9 +150,8 @@ def descend(
     if next_depth > _max_depth:
         raise error.DrollError("The maximum depth is {}".format(_max_depth))
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
-    dungeon = roll_dungeon(
-        min(_dungeon_dice - prior_dragons, next_depth), randrange
-    )
+    new_dice = max(1, min(_dungeon_dice - prior_dragons, next_depth))
+    dungeon = roll_dungeon(new_dice, randrange)
     dungeon = replace(dungeon, dragon=dungeon.dragon + prior_dragons)
     return replace(world, depth=next_depth, dungeon=dungeon)
 
