@@ -102,7 +102,7 @@ def apply(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str = None,
+    target: typing.Optional[str] = None,
     *additional,
 ) -> struct.World:
     """Apply noun to target within world, returning a new version.
