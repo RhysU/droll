@@ -32,7 +32,7 @@ class Shell(cmd.Cmd):
         display_mode: DisplayMode = DisplayMode.CURRENT,
     ) -> None:
         """Initialize the shell with a game instance and display mode."""
-        super(Shell, self).__init__()
+        super().__init__()
         assert game is not None
         self._game = game
         self._undo = None
@@ -106,7 +106,7 @@ class Shell(cmd.Cmd):
         before = copy.copy(self._game)
         try:
             result = GameState.PLAY
-            result = super(Shell, self).onecmd(line)
+            result = super().onecmd(line)
         except DrollError as e:
             if _raises:
                 raise
