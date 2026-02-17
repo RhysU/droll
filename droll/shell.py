@@ -57,7 +57,7 @@ class Shell(cmd.Cmd):
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
         if self._display_mode == DisplayMode.CURRENT:
-            self.prompt = self._game._player.name + "> "
+            self.prompt = self._game.player_name + "> "
             if self._color:
                 self.prompt = _GREEN + self.prompt + _RESET
             print()
@@ -65,8 +65,8 @@ class Shell(cmd.Cmd):
                 available = [] if stop else self._available_commands()
                 print(
                     display.compact_summary(
-                        self._game._world,
-                        self._game._player.name,
+                        self._game.current_world,
+                        self._game.player_name,
                         self._game.score(),
                         available,
                     )
@@ -236,7 +236,7 @@ class Shell(cmd.Cmd):
         """Display help for the ability command."""
         print(self.do_ability.__doc__)
         print()
-        print(textwrap.indent(self._game._player.ability.__doc__, "    "))
+        print(textwrap.indent(self._game.ability_doc, "    "))
 
     def help_bait(self):
         """Display help for using bait against dragons."""
