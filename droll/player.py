@@ -5,6 +5,7 @@
 
 import collections.abc
 from dataclasses import replace
+import typing
 
 from . import action
 from . import dice

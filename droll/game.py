@@ -5,6 +5,7 @@
 import collections.abc
 import copy
 import enum
+import typing
 from random import Random
 
 from . import error
@@ -38,7 +39,7 @@ class Game:
     """Tracks all state associated with a programmatically driven game."""
 
     def __init__(
-        self, player: struct.Player = player.Default, random: Random = None
+        self, player: struct.Player = player.Default, random: typing.Optional[Random] = None
     ) -> None:
         """Initialize a new game with the specified player and random number generator."""
         self._player = player
