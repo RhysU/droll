@@ -9,4 +9,3 @@ __all__ = ("DrollError",)
 class DrollError(RuntimeError):
     """Indicates attempts to take impossible actions."""
 
-    pass
