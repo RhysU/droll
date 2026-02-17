@@ -134,6 +134,11 @@ class TestPlayer(unittest.TestCase):
         self.assertEqual(game.dungeon.potion, 0)
         self.assertEqual(game.party.fighter, 4)
 
+    def test_apply_hero_without_target(self):
+        """Applying a hero without a target raises DrollError."""
+        with self.assertRaises(error.DrollError):
+            player.apply(player.Default, self.game, None, "fighter")
+
     def test_scroll_reroll(self):
         """Test scroll used to reroll dungeon dice."""
         # Consumed by canned_sequence just below

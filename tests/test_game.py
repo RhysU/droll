@@ -107,6 +107,39 @@ class TestGame(unittest.TestCase):
         self.assertEqual(g._world.depth, 0)
         self.assertIsNotNone(g._world.party)
 
+    def test_completenames(self):
+        """completenames returns contextual completions including retire/retreat."""
+        g = Game(random=random.Random(4), player=Default)
+        g.descend()
+
+        # With monsters: retreat is possible, retire is not
+        g._world = replace(g._world, dungeon=struct.Dungeon(goblin=1))
+        names = g.completenames(text="", head=[], tail=[])
+        self.assertIn("ability", names)
+        self.assertIn("retreat", names)
+        self.assertNotIn("retire", names)
+        # Hero-related completions appear (dungeon not exhausted)
+        self.assertTrue(
+            any(n not in ("ability", "descend", "retire", "retreat") for n in names)
+        )
+
+        # With cleared dungeon: retire is possible
+        g._world = replace(g._world, dungeon=struct.Dungeon())
+        names = g.completenames(text="", head=[], tail=[])
+        self.assertIn("retire", names)
+
+    def test_completedefault(self):
+        """completedefault delegates to player.complete."""
+        g = Game(random=random.Random(4), player=Default)
+        g.descend()
+        g._world = replace(
+            g._world,
+            dungeon=struct.Dungeon(goblin=1),
+            party=struct.Party(fighter=1),
+        )
+        results = g.completedefault(text="fi", head=[], tail=[])
+        self.assertIn("fighter", results)
+
     def test_next_delve_returns_stop_after_three(self):
         """Game returns STOP when no more delves remain."""
         g = Game(random=random.Random(4), player=Default)

@@ -62,6 +62,25 @@ class TestSpellsword(unittest.TestCase):
         self.assertEqual(sum(droll.struct.field_values(result.dungeon)), 0)
         self.assertFalse(result.ability)
 
+    def test_spellsword_ability_default_target(self):
+        """Spellsword ability defaults to 'fighter' (first sorted) when no target."""
+        world = droll.struct.World(
+            ability=True,
+            party=droll.struct.Party(fighter=1, mage=1),
+        )
+        result = _spellsword_ability(world, _UNUSED, "ability")
+        self.assertEqual(result.party.fighter, 2)
+
+    def test_battlemage_ability_rejects_target(self):
+        """Battlemage ability rejects any target argument."""
+        world = droll.struct.World(
+            ability=True,
+            dungeon=droll.struct.Dungeon(goblin=1),
+            party=droll.struct.Party(fighter=1, mage=1),
+        )
+        with self.assertRaises(droll.error.DrollError):
+            _battlemage_ability(world, _UNUSED, "ability", "goblin")
+
     def test_spellsword_advances_to_battlemage(self):
         """Spellsword advances to Battlemage at 5+ experience."""
         low_xp = droll.struct.World(experience=4)
