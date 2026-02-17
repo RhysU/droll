@@ -139,7 +139,7 @@ def descend(
             world = _apply_ring(world)
         except error.DrollError:
             raise error.DrollError(
-                "Dragon remains but a ring of" " invisibility is not in hand."
+                "Dragon remains but a ring of invisibility is not in hand."
             )
 
     # Success above, so regroup just prior to descending
@@ -178,8 +178,7 @@ def retire(world: struct.World) -> struct.World:
                 world = _apply_portal(world)
             except error.DrollError:
                 raise error.DrollError(
-                    "Dragon remains but neither a ring of"
-                    " invisibility nor a portal in hand."
+                    "Dragon remains but neither a ring of invisibility nor a portal in hand."
                 )
 
     # Regroup just prior to retiring

@@ -222,9 +222,7 @@ class Shell(cmd.Cmd):
     #################
 
     doc_header = "Feasible commands (help <command>):"
-    doc_hero_template = (
-        "Attack monsters, quaff potions, and open chests" " with a {} like so:"
-    )
+    doc_hero_template = "Attack monsters, quaff potions, and open chests with a {} like so:"
     doc_hero_example = """
         champion skeleton            # Attack skeleton(s)
         thief chest                  # Open chest(s)
