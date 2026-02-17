@@ -151,9 +151,12 @@ def descend(
         raise error.DrollError(f"The maximum depth is {_max_depth}")
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
     new_dice = max(1, min(_dungeon_dice - prior_dragons, next_depth))
-    dungeon = roll_dungeon(new_dice, randrange)
-    dungeon = replace(dungeon, dragon=dungeon.dragon + prior_dragons)
-    return replace(world, depth=next_depth, dungeon=dungeon)
+    rolled = roll_dungeon(new_dice, randrange)
+    return replace(
+        world,
+        depth=next_depth,
+        dungeon=replace(rolled, dragon=rolled.dragon + prior_dragons),
+    )
 
 
 def retire(world: struct.World) -> struct.World:
