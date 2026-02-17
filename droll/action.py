@@ -402,7 +402,7 @@ def defeat_dragon_heroes_interchangeable(
     )
 
     # Sum the number of distinct heroes observed after these coercions.
-    distinct_heroes = sum(v for k, v in counter.items())
+    distinct_heroes = sum(counter.values())
     if distinct_heroes != _required_heroes:
         raise error.DrollError(f"Heroes {heroes} not sufficiently distinct.")
 
