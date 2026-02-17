@@ -271,42 +271,6 @@ def _classify_reroll_targets(
     return dungeon_targets, party_targets
 
 
-def _reroll_dungeon(
-    dungeon: struct.Dungeon,
-    targets: list[str],
-    randrange: dice.RandRange,
-) -> struct.Dungeon:
-    """Remove targets from dungeon, re-roll that many dice, and merge back."""
-    for target in targets:
-        dungeon = decrement_dungeon(dungeon, target)
-    increased = dice.roll_dungeon(dice=len(targets), randrange=randrange)
-    return struct.Dungeon(
-        *map(
-            operator.add,
-            struct.field_values(dungeon),
-            struct.field_values(increased),
-        )
-    )
-
-
-def _reroll_party(
-    party: struct.Party,
-    targets: list[str],
-    randrange: dice.RandRange,
-) -> struct.Party:
-    """Remove targets from party, re-roll that many dice, and merge back."""
-    for target in targets:
-        party = _decrement_party(party, target)
-    increased, _ = dice.roll_party(dice=len(targets), randrange=randrange)
-    return struct.Party(
-        *map(
-            operator.add,
-            struct.field_values(party),
-            struct.field_values(increased),
-        )
-    )
-
-
 def reroll(
     world: struct.World,
     randrange: dice.RandRange,
@@ -324,11 +288,23 @@ def reroll(
 
     dungeon = world.dungeon
     if dungeon_targets:
-        dungeon = _reroll_dungeon(dungeon, dungeon_targets, randrange)
+        for target in dungeon_targets:
+            dungeon = decrement_dungeon(dungeon, target)
+        increased = dice.roll_dungeon(dice=len(dungeon_targets), randrange=randrange)
+        dungeon = struct.Dungeon(
+            *map(operator.add, struct.field_values(dungeon),
+                 struct.field_values(increased))
+        )
 
     party = world.party
     if party_targets:
-        party = _reroll_party(party, party_targets, randrange)
+        for target in party_targets:
+            party = _decrement_party(party, target)
+        increased, _ = dice.roll_party(dice=len(party_targets), randrange=randrange)
+        party = struct.Party(
+            *map(operator.add, struct.field_values(party),
+                 struct.field_values(increased))
+        )
 
     return replace(
         world,

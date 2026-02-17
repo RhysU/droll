@@ -162,14 +162,6 @@ def descend(
     )
 
 
-def _escape_monsters(world: struct.World) -> struct.World:
-    """Attempt to escape remaining monsters using a portal."""
-    try:
-        return _apply_portal(world)
-    except error.DrollError:
-        raise error.DrollError("Monsters remain but no portal in hand.")
-
-
 def _escape_dragon(world: struct.World) -> struct.World:
     """Attempt to escape a blocking dragon using a ring first, then a portal."""
     try:
@@ -192,7 +184,10 @@ def retire(world: struct.World) -> struct.World:
         raise error.DrollError("Descend at least once prior to retiring.")
 
     if not defeated_monsters(world.dungeon):
-        world = _escape_monsters(world)
+        try:
+            world = _apply_portal(world)
+        except error.DrollError:
+            raise error.DrollError("Monsters remain but no portal in hand.")
     elif _blocking_dragon(world.dungeon):
         world = _escape_dragon(world)
 
