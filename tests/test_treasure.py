@@ -52,28 +52,46 @@ class TestTreasure(unittest.TestCase):
         with self.assertRaises(error.DrollError):
             player.apply(player.Default, game, self.randrange, "bait")
 
-    def _helper_sword(self, identifier):
-        """Sword when referred to via identifier (e.g. 'sword', 'fighter')."""
+    def _helper_artifact(self, artifact, hero, specialty, other):
+        """Artifact defeats its specialty and one of another type."""
         game = replace(
-            self.game, treasure=replace(self.game.treasure, sword=2)
+            self.game, treasure=replace(self.game.treasure, **{artifact: 2})
         )
-        game = player.apply(player.Default, game, None, identifier, "goblin")
-        self.assertEqual(game.treasure.sword, 1)
-        self.assertEqual(game.party.fighter, 0)
-        self.assertEqual(game.dungeon.goblin, 0)
+        game = player.apply(player.Default, game, None, artifact, specialty)
+        self.assertEqual(getattr(game.treasure, artifact), 1)
+        self.assertEqual(getattr(game.party, hero), 0)
+        self.assertEqual(getattr(game.dungeon, specialty), 0)
 
-        game = player.apply(player.Default, game, None, identifier, "ooze")
-        self.assertEqual(game.treasure.sword, 0)
-        self.assertEqual(game.party.fighter, 0)
-        self.assertEqual(game.dungeon.ooze, 1)
+        game = player.apply(player.Default, game, None, artifact, other)
+        self.assertEqual(getattr(game.treasure, artifact), 0)
+        self.assertEqual(getattr(game.party, hero), 0)
+        self.assertEqual(getattr(game.dungeon, other), 1)
 
         with self.assertRaises(error.DrollError):
-            player.apply(player.Default, game, None, identifier, "ooze")
+            player.apply(player.Default, game, None, artifact, other)
 
     def test_sword_via_fighter(self):
         """Test sword treasure referred to as 'fighter'."""
-        self._helper_sword("fighter")
+        self._helper_artifact("sword", "fighter", "goblin", "ooze")
 
     def test_sword_via_itself(self):
         """Test sword treasure referred to as 'sword'."""
-        self._helper_sword("sword")
+        self._helper_artifact("sword", "fighter", "goblin", "ooze")
+
+    def test_talisman(self):
+        """Test talisman treasure behaves as cleric."""
+        self._helper_artifact("talisman", "cleric", "skeleton", "ooze")
+
+    def test_sceptre(self):
+        """Test sceptre treasure behaves as mage."""
+        self._helper_artifact("sceptre", "mage", "ooze", "goblin")
+
+    def test_tools(self):
+        """Test tools treasure behaves as thief (defeats one monster)."""
+        game = replace(
+            self.game, treasure=replace(self.game.treasure, tools=1)
+        )
+        game = player.apply(player.Default, game, None, "tools", "goblin")
+        self.assertEqual(game.treasure.tools, 0)
+        self.assertEqual(game.party.thief, 0)
+        self.assertEqual(game.dungeon.goblin, 1)
