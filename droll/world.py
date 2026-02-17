@@ -225,7 +225,8 @@ def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
         for name, count in struct.field_items(reserve)
         for _ in range(count)
     ]
-    assert items, "No items remaining in the reserve"
+    if not items:
+        raise RuntimeError("No items remaining in the reserve")
     return items[randrange(0, len(items))]
 
 
