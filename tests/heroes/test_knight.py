@@ -37,6 +37,23 @@ class TestKnight(unittest.TestCase):
         self.assertEqual(result.dungeon.skeleton, 0)
         self.assertFalse(result.ability)
 
+    def test_dragonslayer_defeats_dragon_with_two_heroes(self):
+        """DragonSlayer defeats a dragon with only 2 distinct heroes."""
+        randrange = random.Random(4).randrange
+        world = droll.struct.World(
+            delve=1,
+            depth=1,
+            dungeon=droll.struct.Dungeon(dragon=3),
+            party=droll.struct.Party(fighter=1, mage=1),
+            treasure=droll.struct.Treasure(),
+            reserve=droll.struct.Treasure(scale=6),
+        )
+        result = DragonSlayer.party.fighter.dragon(
+            world, randrange, "fighter", "dragon", "mage"
+        )
+        self.assertEqual(result.dungeon.dragon, 0)
+        self.assertEqual(result.experience, 1)
+
     def test_dragonslayer_advance(self):
         """Knight advances to DragonSlayer advances to DragonSlayer."""
         low_xp = droll.struct.World(experience=2)
