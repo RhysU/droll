@@ -61,7 +61,7 @@ def _decrement_party(party: struct.Party, hero: str) -> struct.Party:
         raise error.DrollError("No party currently active.")
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
-        raise error.DrollError(f"Require at least one hero {hero}.")
+        raise error.DrollError(f"At least 1 {hero} required.")
     return replace(party, **{hero: prior_heroes - 1})
 
 
@@ -80,7 +80,7 @@ def decrement_dungeon(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise error.DrollError(f"Require at least one target {target}.")
+        raise error.DrollError(f"At least 1 {target} required.")
     return replace(dungeon, **{target: prior_targets - 1})
 
 
@@ -176,7 +176,7 @@ def eliminate_dungeon(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
         raise error.DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise error.DrollError(f"Require at least 1 target {target}.")
+        raise error.DrollError(f"At least 1 {target} required.")
     return replace(dungeon, **{target: 0})
 
 
@@ -238,7 +238,7 @@ def quaff(
     if not howmany:
         raise error.DrollError(f"At least 1 {target} required.")
     if len(revivable) != howmany:
-        raise error.DrollError(f"Require exactly {howmany} to revive.")
+        raise error.DrollError(f"Exactly {howmany} heroes to revive required.")
     if _after_monsters and not defeated_monsters(world.dungeon):
         raise error.DrollError("Monsters must be defeated before quaffing.")
     party = _decrement_party(world.party, hero)
@@ -261,13 +261,13 @@ def _classify_reroll_targets(
     party_targets = []
     for target in dungeon_or_party:
         if not allow_dragon and target == "dragon":
-            raise error.DrollError(f"{target} cannot be re-rolled")
+            raise error.DrollError(f"{target} cannot be re-rolled.")
         if target in _DUNGEON_NAMES:
             dungeon_targets.append(target)
         elif target in _PARTY_NAMES:
             party_targets.append(target)
         else:
-            raise error.DrollError(f"{target} cannot be re-rolled")
+            raise error.DrollError(f"{target} cannot be re-rolled.")
     return dungeon_targets, party_targets
 
 
@@ -280,7 +280,7 @@ def reroll(
 ) -> struct.World:
     """Update world after hero re-rolls some number of dungeon or party dice."""
     if not dungeon_or_party:
-        raise error.DrollError("At least one target must be re-rolled.")
+        raise error.DrollError("At least 1 reroll target required.")
 
     dungeon_targets, party_targets = _classify_reroll_targets(
         dungeon_or_party, allow_dragon
@@ -330,7 +330,7 @@ def defeat_dragon_heroes(
         )
     if len(heroes) != _distinct_heroes:
         raise error.DrollError(
-            f"Exactly {_distinct_heroes} heroes must be specified."
+            f"Exactly {_distinct_heroes} heroes required."
         )
     if len(hero_set) != _distinct_heroes:
         raise error.DrollError(
@@ -351,7 +351,7 @@ def defeat_dragon_heroes_wildcard(
     distinct_heroes = _distinct_heroes  # Allow mutation saving original
     if len(heroes) != distinct_heroes:
         raise error.DrollError(
-            f"Exactly {distinct_heroes} heroes must be specified."
+            f"Exactly {distinct_heroes} heroes required."
         )
 
     # Account for wildcards by having each wildcard reduce the distinct count
@@ -382,7 +382,7 @@ def defeat_dragon_heroes_interchangeable(
         )
     if len(heroes) != _required_heroes:
         raise error.DrollError(
-            f"Exactly {_required_heroes} heroes must be specified."
+            f"Exactly {_required_heroes} heroes required."
         )
 
     # Count all heroes, accumulating all _interchangable into just one hero
@@ -476,7 +476,7 @@ def bait_dragon(
     )
     if not new_targets:
         raise error.DrollError(
-            f"At least one of {_enemies} required for '{noun}'."
+            f"At least 1 of {_enemies} required for '{noun}'."
         )
 
     # Zero all enemy sources and increment the number of dragons

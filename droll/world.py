@@ -90,7 +90,7 @@ def delve(
 
     Argument roll_party can be dice.roll_party but other choices okay."""
     if world.delve >= 3:
-        raise error.DrollError("At most three delves are permitted.")
+        raise error.DrollError("At most 3 delves are permitted.")
     party, regroup = roll_party(_party_dice, randrange)
     return replace(
         world,
@@ -151,7 +151,7 @@ def descend(
     # Update the world in anticipation of the next dungeon
     next_depth = (world.depth if world.depth else 0) + 1
     if next_depth > _max_depth:
-        raise error.DrollError(f"The maximum depth is {_max_depth}")
+        raise error.DrollError(f"The maximum depth is {_max_depth}.")
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
     new_dice = max(1, min(_dungeon_dice - prior_dragons, next_depth))
     rolled = roll_dungeon(new_dice, randrange)
@@ -205,7 +205,7 @@ def retreat(world: struct.World) -> struct.World:
     if world.depth < 1:
         raise error.DrollError("Descend at least once prior to retreating.")
     if defeated_dungeon(world.dungeon):
-        raise error.DrollError("Why retreat when you could instead retire?")
+        raise error.DrollError("Dungeon is clear; retire instead of retreating.")
 
     # Regroup just prior to retreating
     world = _regroup(world)
@@ -259,7 +259,7 @@ def replace_treasure(world: struct.World, item: str) -> struct.World:
     """Replace a single item from the player's treasures into the reserve."""
     prior_count = getattr(world.treasure, item)
     if not prior_count:
-        raise error.DrollError(f"'{item}' not in player's treasure")
+        raise error.DrollError(f"'{item}' not in player's treasure.")
     return replace(
         world,
         treasure=replace(world.treasure, **{item: prior_count - 1}),
@@ -273,7 +273,7 @@ def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     if not _blocking_dragon(world.dungeon):
         raise error.DrollError(
-            f"A dragon must be present to use a {noun}"
+            f"A dragon must be present to use a {noun}."
         )
     world = replace_treasure(world, noun)
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
@@ -286,6 +286,6 @@ def _apply_portal(
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):
         raise error.DrollError(
-            f"No need to apply {noun} when dungeon clear"
+            f"No need to apply {noun} when dungeon clear."
         )
     return replace(replace_treasure(world, "portal"), dungeon=struct.Dungeon())

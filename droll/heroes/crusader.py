@@ -37,7 +37,7 @@ def _crusader_ability(
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
         raise error.DrollError(
-            f"Target {target} not one of {_acceptable_targets}"
+            f"Target {target} not one of {_acceptable_targets}."
         )
     return action.consume_ability(
         replace(world, party=action.increment_party(world.party, target))
@@ -58,7 +58,7 @@ def _paladin_ability(
     # Validate that a treasure was specified
     if target is None:
         raise error.DrollError(
-            f"Must specify which treasure to consume for {noun}"
+            f"Treasure to consume required for {noun}."
         )
 
     # Consume the specified treasure (will error if not possessed)
@@ -69,7 +69,7 @@ def _paladin_ability(
         potion_count = world.dungeon.potion
         if len(revivable) != potion_count:
             raise error.DrollError(
-                f"Require exactly {potion_count} heroes to revive for {potion_count} potions."
+                f"Exactly {potion_count} heroes to revive required."
             )
 
         # Draw treasure for each chest

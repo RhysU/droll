@@ -27,7 +27,7 @@ def _occultist_ability(
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it at next regroup."""
     if target and target != "skeleton":
-        raise error.DrollError("Ability can only target 1 skeleton")
+        raise error.DrollError("Ability can only target 1 skeleton.")
     world = action.convert_dungeon_to_party(
         world, source="skeleton", destination="fighter", max_count=1
     )
@@ -43,9 +43,9 @@ def _necromancer_ability(
 ) -> struct.World:
     """Transform 2 skeletons into fighters, discarding them at next regroup."""
     if target and target != "skeleton":
-        raise error.DrollError("Ability can only target skeletons")
+        raise error.DrollError("Ability can only target skeletons.")
     if extra_targets and extra_targets[0] != "skeleton":
-        raise error.DrollError("Ability can only target skeletons")
+        raise error.DrollError("Ability can only target skeletons.")
     if len(extra_targets) > 1:
         raise error.DrollError("At most 2 targets can be changed.")
     world = action.convert_dungeon_to_party(
