@@ -13,47 +13,48 @@ from droll.heroes.minstrel import Minstrel, Bard, _minstrel_ability
 _UNUSED = object()
 
 
-class TestMinstrel:
+def test_minstrel_ability_discards_dragons():
+    """Minstrel/Bard ability discards all dragon dice."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
+        party=droll.struct.Party(fighter=1),
+    )
+    result = _minstrel_ability(world, _UNUSED, "ability")
+    assert result.dungeon.dragon == 0
+    assert result.dungeon.goblin == 1
+    assert not result.ability
 
-    def test_minstrel_ability_discards_dragons(self):
-        """Minstrel/Bard ability discards all dragon dice."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
-            party=droll.struct.Party(fighter=1),
-        )
-        result = _minstrel_ability(world, _UNUSED, "ability")
-        assert result.dungeon.dragon == 0
-        assert result.dungeon.goblin == 1
-        assert not result.ability
 
-    def test_minstrel_ability_rejects_non_dragon(self):
-        """Minstrel/Bard ability only works on dragons."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
-            party=droll.struct.Party(fighter=1),
-        )
-        with pytest.raises(droll.error.DrollError):
-            _minstrel_ability(world, _UNUSED, "ability", "goblin")
+def test_minstrel_ability_rejects_non_dragon():
+    """Minstrel/Bard ability only works on dragons."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
+        party=droll.struct.Party(fighter=1),
+    )
+    with pytest.raises(droll.error.DrollError):
+        _minstrel_ability(world, _UNUSED, "ability", "goblin")
 
-    def test_bard_champion_defeats_all_plus_additional(self):
-        """Bard champion defeats all of one type plus one additional."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-            party=droll.struct.Party(champion=1),
-        )
-        result = Bard.party.champion.goblin(
-            world, _UNUSED, "champion", "goblin", "skeleton"
-        )
-        assert result.dungeon.goblin == 0
-        assert result.dungeon.skeleton == 0
-        assert result.party.champion == 0
 
-    def test_minstrel_advances_to_bard(self):
-        """Minstrel advances to Bard at 5+ experience."""
-        low_xp = droll.struct.World(experience=4)
-        high_xp = droll.struct.World(experience=5)
-        assert Minstrel.advance(low_xp) == Minstrel
-        assert Minstrel.advance(high_xp) == Bard
+def test_bard_champion_defeats_all_plus_additional():
+    """Bard champion defeats all of one type plus one additional."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+        party=droll.struct.Party(champion=1),
+    )
+    result = Bard.party.champion.goblin(
+        world, _UNUSED, "champion", "goblin", "skeleton"
+    )
+    assert result.dungeon.goblin == 0
+    assert result.dungeon.skeleton == 0
+    assert result.party.champion == 0
+
+
+def test_minstrel_advances_to_bard():
+    """Minstrel advances to Bard at 5+ experience."""
+    low_xp = droll.struct.World(experience=4)
+    high_xp = droll.struct.World(experience=5)
+    assert Minstrel.advance(low_xp) == Minstrel
+    assert Minstrel.advance(high_xp) == Bard

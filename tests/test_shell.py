@@ -22,73 +22,71 @@ def _mechanical_shell(game: Game) -> Shell:
     return Shell(game, display_mode=DisplayMode.MECHANICAL)
 
 
-class TestPrecmd:
-
-    def test_precmd_emits_reset_when_color_enabled(self):
-        with patch("sys.stdout.isatty", return_value=True):
-            s = Shell(Game(), display_mode=DisplayMode.CURRENT)
-        s.preloop()
-        with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
-            result = s.precmd("fighter goblin")
-        assert result == "fighter goblin"
-        assert fake_out.getvalue() == _RESET
-
-    def test_precmd_emits_nothing_when_color_disabled(self):
-        s = _mechanical_shell(Game())
-        s.preloop()
-        with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
-            result = s.precmd("fighter goblin")
-        assert result == "fighter goblin"
-        assert fake_out.getvalue() == ""
+def test_precmd_emits_reset_when_color_enabled():
+    with patch("sys.stdout.isatty", return_value=True):
+        s = Shell(Game(), display_mode=DisplayMode.CURRENT)
+    s.preloop()
+    with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
+        result = s.precmd("fighter goblin")
+    assert result == "fighter goblin"
+    assert fake_out.getvalue() == _RESET
 
 
-class TestShell:
+def test_precmd_emits_nothing_when_color_disabled():
+    s = _mechanical_shell(Game())
+    s.preloop()
+    with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
+        result = s.precmd("fighter goblin")
+    assert result == "fighter goblin"
+    assert fake_out.getvalue() == ""
 
-    def test_EOF(self):
-        """Confirm providing EOF exits cmdloop(...)."""
-        s = _mechanical_shell(Game())
-        assert not s.cmdqueue
-        s.cmdqueue.append("EOF")
-        s.cmdloop()
-        assert s.prompt == "(Default  0) "
-        assert s.lastcmd == ""
 
-    def test_reroll(self):
-        """Confirm reroll command forwards to game."""
-        s = _mechanical_shell(Game(random=random.Random(4), player=Default))
-        s.preloop()
-        s.onecmd("descend")
-        # Depth 1 with seed 4 has a single goblin; reroll it
-        s.onecmd("reroll goblin")
+def test_shell_EOF():
+    """Confirm providing EOF exits cmdloop(...)."""
+    s = _mechanical_shell(Game())
+    assert not s.cmdqueue
+    s.cmdqueue.append("EOF")
+    s.cmdloop()
+    assert s.prompt == "(Default  0) "
+    assert s.lastcmd == ""
 
-    def test_retreat(self):
-        """Confirm retreat command forwards to game."""
-        s = _mechanical_shell(Game(random=random.Random(4), player=Default))
-        s.preloop()
-        s.onecmd("descend")
-        # Need a monster present so retreat is valid
-        s._game._world = replace(
-            s._game._world, dungeon=struct.Dungeon(goblin=1)
-        )
-        s.onecmd("retreat")
 
-    def test_help(self):
-        """Confirm help invocations do not throw exceptions."""
-        s = _mechanical_shell(Game())
-        s.help_ability()
-        s.help_bait()
-        s.help_champion()
-        s.help_cleric()
-        s.help_elixir()
-        s.help_fighter()
-        s.help_mage()
-        s.help_ring()
-        s.help_sceptre()
-        s.help_scroll()
-        s.help_sword()
-        s.help_talisman()
-        s.help_thief()
-        s.help_tools()
+def test_shell_reroll():
+    """Confirm reroll command forwards to game."""
+    s = _mechanical_shell(Game(random=random.Random(4), player=Default))
+    s.preloop()
+    s.onecmd("descend")
+    # Depth 1 with seed 4 has a single goblin; reroll it
+    s.onecmd("reroll goblin")
+
+
+def test_shell_retreat():
+    """Confirm retreat command forwards to game."""
+    s = _mechanical_shell(Game(random=random.Random(4), player=Default))
+    s.preloop()
+    s.onecmd("descend")
+    # Need a monster present so retreat is valid
+    s._game._world = replace(s._game._world, dungeon=struct.Dungeon(goblin=1))
+    s.onecmd("retreat")
+
+
+def test_shell_help():
+    """Confirm help invocations do not throw exceptions."""
+    s = _mechanical_shell(Game())
+    s.help_ability()
+    s.help_bait()
+    s.help_champion()
+    s.help_cleric()
+    s.help_elixir()
+    s.help_fighter()
+    s.help_mage()
+    s.help_ring()
+    s.help_sceptre()
+    s.help_scroll()
+    s.help_sword()
+    s.help_talisman()
+    s.help_thief()
+    s.help_tools()
 
 
 # Strategy for testing, further below, will turn docstrings into assertions
@@ -111,116 +109,114 @@ def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     return zip(summaries, commands)
 
 
-class TestUndo:
+def test_undo():
+    """Based upon test_simple(...), verify undo behaving as expected."""
+    s = _mechanical_shell(Game(random=random.Random(4), player=Default))
 
-    def test_undo(self):
-        """Based upon test_simple(...), verify undo behaving as expected."""
-        s = _mechanical_shell(Game(random=random.Random(4), player=Default))
+    # Supplies a private flag so that DrollErrors percolate to this level
+    def onecmd(line):
+        """Execute shell command with errors raised instead of printed."""
+        s.onecmd(line, _raises=True)
 
-        # Supplies a private flag so that DrollErrors percolate to this level
-        def onecmd(line):
-            """Execute shell command with errors raised instead of printed."""
-            s.onecmd(line, _raises=True)
+    s.preloop()
 
-        s.preloop()
-
-        # (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
-        with pytest.raises(DrollError):
-            onecmd("undo")
-        with pytest.raises(DrollError):
-            onecmd("undo")
-        onecmd("descend")
-
-        # (delve=1, depth=1, dungeon=(goblin=1),
-        #  party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
-        with pytest.raises(DrollError):
-            onecmd("undo")
-        onecmd("fighter goblin")
+    # (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
+    with pytest.raises(DrollError):
         onecmd("undo")
-        with pytest.raises(DrollError):
-            onecmd("undo")
-        onecmd("cleric goblin")
+    with pytest.raises(DrollError):
         onecmd("undo")
-        with pytest.raises(DrollError):
-            onecmd("undo")
-        onecmd("mage goblin")
-        onecmd("descend")
+    onecmd("descend")
 
-        # (delve=1, depth=2, dungeon=(goblin=2), ...)
-        assert s._game._world.dungeon.goblin == 2
-        with pytest.raises(DrollError):
-            onecmd("undo")
-        onecmd("thief goblin")
-        onecmd("fighter goblin")
+    # (delve=1, depth=1, dungeon=(goblin=1),
+    #  party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
+    with pytest.raises(DrollError):
         onecmd("undo")
+    onecmd("fighter goblin")
+    onecmd("undo")
+    with pytest.raises(DrollError):
         onecmd("undo")
-        onecmd("fighter goblin")
-        onecmd("descend")
-
-        # (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), ...)
-        assert s._game._world.dungeon.ooze == 1
-        assert s._game._world.dungeon.chest == 1
-        assert s._game._world.dungeon.potion == 1
-        with pytest.raises(DrollError):
-            onecmd("undo")
-        onecmd("cleric ooze")
+    onecmd("cleric goblin")
+    onecmd("undo")
+    with pytest.raises(DrollError):
         onecmd("undo")
-        onecmd("cleric ooze")
-        onecmd("thief chest")
-        with pytest.raises(DrollError):
-            onecmd("undo")
-        onecmd("scroll potion champion")
+    onecmd("mage goblin")
+    onecmd("descend")
+
+    # (delve=1, depth=2, dungeon=(goblin=2), ...)
+    assert s._game._world.dungeon.goblin == 2
+    with pytest.raises(DrollError):
         onecmd("undo")
-        onecmd("scroll potion thief")
-        onecmd("descend")
+    onecmd("thief goblin")
+    onecmd("fighter goblin")
+    onecmd("undo")
+    onecmd("undo")
+    onecmd("fighter goblin")
+    onecmd("descend")
 
-    def test_undo_in_available_commands(self):
-        """Verify undo appears in available commands only when undo stack is not empty."""
-        s = _mechanical_shell(Game(random=random.Random(42), player=Default))
-        s.preloop()
-
-        # Initially, undo stack is empty, so "undo" should not be available
-        available = s._available_commands()
-        assert "undo" not in available
-
-        # Execute a command that can be undone (ability doesn't change random state)
-        s.onecmd("ability")
-
-        # Now undo stack has one item, so "undo" should be available
-        available = s._available_commands()
-        assert "undo" in available
-
-        # Execute undo to restore previous state
-        s.onecmd("undo")
-
-        # Undo stack is empty again, so "undo" should not be available
-        available = s._available_commands()
-        assert "undo" not in available
+    # (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), ...)
+    assert s._game._world.dungeon.ooze == 1
+    assert s._game._world.dungeon.chest == 1
+    assert s._game._world.dungeon.potion == 1
+    with pytest.raises(DrollError):
+        onecmd("undo")
+    onecmd("cleric ooze")
+    onecmd("undo")
+    onecmd("cleric ooze")
+    onecmd("thief chest")
+    with pytest.raises(DrollError):
+        onecmd("undo")
+    onecmd("scroll potion champion")
+    onecmd("undo")
+    onecmd("scroll potion thief")
+    onecmd("descend")
 
 
-class TestRetireAndQuaffError:
+def test_undo_in_available_commands():
+    """Verify undo appears in available commands only when undo stack is not empty."""
+    s = _mechanical_shell(Game(random=random.Random(42), player=Default))
+    s.preloop()
 
-    def test_retire(self):
-        """Shell.do_retire exercises the retire command path."""
-        s = _mechanical_shell(Game(random=random.Random(4), player=Default))
-        s.preloop()
-        s.onecmd("descend")
-        # Seed 4 at depth 1 produces goblin=1; defeat it
-        s.onecmd("fighter goblin")
-        # Dungeon cleared: retire covers shell.py do_retire
-        s.onecmd("retire")
+    # Initially, undo stack is empty, so "undo" should not be available
+    available = s._available_commands()
+    assert "undo" not in available
 
-    def test_quaff_wrong_revive_count_prints_error(self):
-        """Quaffing with wrong revive count prints DrollError via onecmd."""
-        s = _mechanical_shell(Game(random=random.Random(4), player=Default))
-        s.preloop()
-        s.onecmd("descend")
-        # Replace dungeon with a single potion and no monsters
-        s._game._world = replace(
-            s._game._world,
-            dungeon=struct.Dungeon(potion=1),
-        )
-        # Quaff 1 potion providing 0 revive targets:
-        # - action.py quaff raises "Exactly 1 heroes to revive required."
-        # - onecmd catches and prints the DrollError
-        s.onecmd("fighter potion")
+    # Execute a command that can be undone (ability doesn't change random state)
+    s.onecmd("ability")
+
+    # Now undo stack has one item, so "undo" should be available
+    available = s._available_commands()
+    assert "undo" in available
+
+    # Execute undo to restore previous state
+    s.onecmd("undo")
+
+    # Undo stack is empty again, so "undo" should not be available
+    available = s._available_commands()
+    assert "undo" not in available
+
+
+def test_retire():
+    """Shell.do_retire exercises the retire command path."""
+    s = _mechanical_shell(Game(random=random.Random(4), player=Default))
+    s.preloop()
+    s.onecmd("descend")
+    # Seed 4 at depth 1 produces goblin=1; defeat it
+    s.onecmd("fighter goblin")
+    # Dungeon cleared: retire covers shell.py do_retire
+    s.onecmd("retire")
+
+
+def test_quaff_wrong_revive_count_prints_error():
+    """Quaffing with wrong revive count prints DrollError via onecmd."""
+    s = _mechanical_shell(Game(random=random.Random(4), player=Default))
+    s.preloop()
+    s.onecmd("descend")
+    # Replace dungeon with a single potion and no monsters
+    s._game._world = replace(
+        s._game._world,
+        dungeon=struct.Dungeon(potion=1),
+    )
+    # Quaff 1 potion providing 0 revive targets:
+    # - action.py quaff raises "Exactly 1 heroes to revive required."
+    # - onecmd catches and prints the DrollError
+    s.onecmd("fighter potion")

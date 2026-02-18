@@ -14,140 +14,140 @@ from droll.error import DrollError
 _UNUSED = object()
 
 
-class TestDefeatAllPlusAdditional:
-
-    def test_defeats_all_plus_one_additional(self):
-        """Defeats all of one type plus one additional."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=2, skeleton=1),
-            party=struct.Party(champion=1),
-        )
-        result = action.defeat_all_plus_additional(
-            w, _UNUSED, "champion", "goblin", "skeleton"
-        )
-        assert result.dungeon.goblin == 0
-        assert result.dungeon.skeleton == 0
-        assert result.party.champion == 0
-
-    def test_no_additional_when_cleared(self):
-        """No additional needed when monsters cleared."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=2),
-            party=struct.Party(champion=1),
-        )
-        result = action.defeat_all_plus_additional(
-            w, _UNUSED, "champion", "goblin"
-        )
-        assert result.dungeon.goblin == 0
-
-    def test_rejects_extra_additional(self):
-        """Rejects more than one additional target."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1, skeleton=2),
-            party=struct.Party(champion=1),
-        )
-        with pytest.raises(DrollError):
-            action.defeat_all_plus_additional(
-                w,
-                _UNUSED,
-                "champion",
-                "goblin",
-                "skeleton",
-                "skeleton",
-            )
-
-    def test_requires_additional_when_monsters_remain(self):
-        """Requires additional target when monsters remain."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1, skeleton=1),
-            party=struct.Party(champion=1),
-        )
-        with pytest.raises(DrollError):
-            action.defeat_all_plus_additional(
-                w,
-                _UNUSED,
-                "champion",
-                "goblin",
-            )
+def test_defeats_all_plus_one_additional():
+    """Defeats all of one type plus one additional."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(champion=1),
+    )
+    result = action.defeat_all_plus_additional(
+        w, _UNUSED, "champion", "goblin", "skeleton"
+    )
+    assert result.dungeon.goblin == 0
+    assert result.dungeon.skeleton == 0
+    assert result.party.champion == 0
 
 
-class TestDefeatOnePlusAdditional:
+def test_defeat_all_no_additional_when_cleared():
+    """No additional needed when monsters cleared."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=2),
+        party=struct.Party(champion=1),
+    )
+    result = action.defeat_all_plus_additional(
+        w, _UNUSED, "champion", "goblin"
+    )
+    assert result.dungeon.goblin == 0
 
-    def test_defeats_one_plus_one_additional(self):
-        """Defeats one of primary target plus one additional."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=2, skeleton=1),
-            party=struct.Party(champion=1),
-        )
-        result = action.defeat_one_plus_additional(
-            w, _UNUSED, "champion", "goblin", "skeleton"
-        )
-        assert result.dungeon.goblin == 1
-        assert result.dungeon.skeleton == 0
-        assert result.party.champion == 0
 
-    def test_no_additional_when_cleared(self):
-        """No additional needed when all monsters cleared after defeating one."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1),
-            party=struct.Party(fighter=1),
+def test_defeat_all_rejects_extra_additional():
+    """Rejects more than one additional target."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1, skeleton=2),
+        party=struct.Party(champion=1),
+    )
+    with pytest.raises(DrollError):
+        action.defeat_all_plus_additional(
+            w,
+            _UNUSED,
+            "champion",
+            "goblin",
+            "skeleton",
+            "skeleton",
         )
-        result = action.defeat_one_plus_additional(
-            w, _UNUSED, "fighter", "goblin"
-        )
-        assert result.dungeon.goblin == 0
-        assert result.party.fighter == 0
 
-    def test_rejects_additional_when_cleared(self):
-        """Rejects additional target when all monsters already cleared."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1),
-            party=struct.Party(fighter=1),
-        )
-        with pytest.raises(DrollError):
-            action.defeat_one_plus_additional(
-                w, _UNUSED, "fighter", "goblin", "skeleton"
-            )
 
-    def test_requires_additional_when_monsters_remain(self):
-        """Requires additional target when monsters remain after defeating one."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1, skeleton=1),
-            party=struct.Party(fighter=1),
+def test_defeat_all_requires_additional_when_monsters_remain():
+    """Requires additional target when monsters remain."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1, skeleton=1),
+        party=struct.Party(champion=1),
+    )
+    with pytest.raises(DrollError):
+        action.defeat_all_plus_additional(
+            w,
+            _UNUSED,
+            "champion",
+            "goblin",
         )
-        with pytest.raises(DrollError):
-            action.defeat_one_plus_additional(
-                w, _UNUSED, "fighter", "goblin"
-            )
 
-    def test_rejects_extra_additional(self):
-        """Rejects more than one additional target."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1, skeleton=1, ooze=1),
-            party=struct.Party(champion=1),
-        )
-        with pytest.raises(DrollError):
-            action.defeat_one_plus_additional(
-                w,
-                _UNUSED,
-                "champion",
-                "goblin",
-                "skeleton",
-                "ooze",
-            )
 
-    def test_only_decrements_one_of_primary(self):
-        """Defeats only one of the primary target, not all."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=3, skeleton=1),
-            party=struct.Party(champion=1),
+def test_defeats_one_plus_one_additional():
+    """Defeats one of primary target plus one additional."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(champion=1),
+    )
+    result = action.defeat_one_plus_additional(
+        w, _UNUSED, "champion", "goblin", "skeleton"
+    )
+    assert result.dungeon.goblin == 1
+    assert result.dungeon.skeleton == 0
+    assert result.party.champion == 0
+
+
+def test_defeat_one_no_additional_when_cleared():
+    """No additional needed when all monsters cleared after defeating one."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1),
+        party=struct.Party(fighter=1),
+    )
+    result = action.defeat_one_plus_additional(w, _UNUSED, "fighter", "goblin")
+    assert result.dungeon.goblin == 0
+    assert result.party.fighter == 0
+
+
+def test_defeat_one_rejects_additional_when_cleared():
+    """Rejects additional target when all monsters already cleared."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1),
+        party=struct.Party(fighter=1),
+    )
+    with pytest.raises(DrollError):
+        action.defeat_one_plus_additional(
+            w, _UNUSED, "fighter", "goblin", "skeleton"
         )
-        result = action.defeat_one_plus_additional(
-            w, _UNUSED, "champion", "goblin", "skeleton"
+
+
+def test_defeat_one_requires_additional_when_monsters_remain():
+    """Requires additional target when monsters remain after defeating one."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1, skeleton=1),
+        party=struct.Party(fighter=1),
+    )
+    with pytest.raises(DrollError):
+        action.defeat_one_plus_additional(w, _UNUSED, "fighter", "goblin")
+
+
+def test_defeat_one_rejects_extra_additional():
+    """Rejects more than one additional target."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1, skeleton=1, ooze=1),
+        party=struct.Party(champion=1),
+    )
+    with pytest.raises(DrollError):
+        action.defeat_one_plus_additional(
+            w,
+            _UNUSED,
+            "champion",
+            "goblin",
+            "skeleton",
+            "ooze",
         )
-        assert result.dungeon.goblin == 2
-        assert result.dungeon.skeleton == 0
-        assert result.party.champion == 0
+
+
+def test_defeat_one_only_decrements_one_of_primary():
+    """Defeats only one of the primary target, not all."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=3, skeleton=1),
+        party=struct.Party(champion=1),
+    )
+    result = action.defeat_one_plus_additional(
+        w, _UNUSED, "champion", "goblin", "skeleton"
+    )
+    assert result.dungeon.goblin == 2
+    assert result.dungeon.skeleton == 0
+    assert result.party.champion == 0
 
 
 class TestRerollParty:
@@ -174,9 +174,7 @@ class TestRerollParty:
         """Rerolling a single party die removes it and re-rolls one party die."""
         # Roll value 0 => fighter
         randrange = self._canned_randrange([0])
-        result = action.reroll(
-            self.world, randrange, "scroll", "fighter"
-        )
+        result = action.reroll(self.world, randrange, "scroll", "fighter")
         # One scroll consumed for the hero cost
         assert result.party.scroll == 1
         # Fighter was removed (2-1=1) then re-rolled as fighter (+1=2)
@@ -218,134 +216,130 @@ class TestRerollParty:
         """Rerolling a party die that is not present raises DrollError."""
         randrange = self._canned_randrange([])
         with pytest.raises(DrollError):
-            action.reroll(
-                self.world, randrange, "scroll", "mage"
-            )
+            action.reroll(self.world, randrange, "scroll", "mage")
 
     def test_reroll_unknown_target_raises(self):
         """Rerolling a target that is neither dungeon nor party raises DrollError."""
         randrange = self._canned_randrange([])
         with pytest.raises(DrollError):
-            action.reroll(
-                self.world, randrange, "scroll", "nonexistent"
-            )
+            action.reroll(self.world, randrange, "scroll", "nonexistent")
 
 
-class TestDefeatDragonHeroesWildcard:
+def test_dragon_wildcard_less_interesting_successful_cases():
+    """Test valid dragon defeats with wildcard heroes."""
+    assert action.defeat_dragon_heroes_wildcard(
+        "cleric",
+        "thief",
+        "mage",
+    )
+    assert action.defeat_dragon_heroes_wildcard(
+        "cleric", "thief", "fighter", _wildcard={"scroll"}
+    )
 
-    def test_less_interesting_successful_cases(self):
-        """Test valid dragon defeats with wildcard heroes."""
-        assert action.defeat_dragon_heroes_wildcard(
+
+def test_dragon_wildcard_less_interesting_failure_cases():
+    """Test invalid dragon defeats with wildcard heroes."""
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "cleric", "thief", _wildcard={"scroll"}
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "cleric", "fighter", _wildcard={"fighter"}
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "cleric", "thief", "champion", "mage", _wildcard={"fighter"}
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_wildcard(
             "cleric",
             "thief",
+            "champion",
+            "fighter",
+            _wildcard={"fighter"},
+        )
+
+
+def test_dragon_wildcard_more_interesting_failure_cases():
+    """Test invalid dragon defeats with multiple wildcard heroes."""
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_wildcard(
             "mage",
+            "mage",
+            "scroll",
         )
-        assert action.defeat_dragon_heroes_wildcard(
-            "cleric", "thief", "fighter", _wildcard={"scroll"}
-        )
-
-    def test_less_interesting_failure_cases(self):
-        """Test invalid dragon defeats with wildcard heroes."""
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_wildcard(
-                "cleric", "thief", _wildcard={"scroll"}
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_wildcard(
-                "cleric", "fighter", _wildcard={"fighter"}
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_wildcard(
-                "cleric", "thief", "champion", "mage", _wildcard={"fighter"}
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_wildcard(
-                "cleric",
-                "thief",
-                "champion",
-                "fighter",
-                _wildcard={"fighter"},
-            )
-
-    def test_more_interesting_failure_cases(self):
-        """Test invalid dragon defeats with multiple wildcard heroes."""
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_wildcard(
-                "mage",
-                "mage",
-                "scroll",
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_wildcard(
-                "fighter",
-                "fighter",
-                "fighter",
-                _wildcard={"mage"},
-            )
-
-
-class TestDefeatDragonHeroesInterchangeable:
-
-    def test_less_interesting_successful_cases(self):
-        """Test valid dragon defeats with interchangeable heroes."""
-        assert action.defeat_dragon_heroes_interchangeable(
-            "cleric", "thief", "mage", _interchangeable={"fighter"}
-        )
-        assert action.defeat_dragon_heroes_interchangeable(
-            "cleric", "thief", "fighter", _interchangeable={"fighter"}
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_wildcard(
+            "fighter",
+            "fighter",
+            "fighter",
+            _wildcard={"mage"},
         )
 
-    def test_less_interesting_failure_cases(self):
-        """Test invalid dragon defeats with interchangeable heroes."""
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "cleric", "thief", _interchangeable={"fighter"}
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "cleric", "fighter", _interchangeable={"fighter"}
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "cleric",
-                "thief",
-                "champion",
-                "mage",
-                _interchangeable={"fighter"},
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "cleric",
-                "thief",
-                "champion",
-                "fighter",
-                _interchangeable={"fighter"},
-            )
 
-    def test_more_interesting_failure_cases(self):
-        """Invalid dragon defeats with multiple interchangeable hero types."""
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "mage", "mage", "mage", _interchangeable={"mage", "fighter"}
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "fighter",
-                "fighter",
-                "fighter",
-                _interchangeable={"mage", "fighter"},
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "fighter", "mage", "mage", _interchangeable={"mage", "fighter"}
-            )
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "mage",
-                "fighter",
-                "fighter",
-                _interchangeable={"mage", "fighter"},
-            )
+def test_dragon_interchangeable_less_interesting_successful_cases():
+    """Test valid dragon defeats with interchangeable heroes."""
+    assert action.defeat_dragon_heroes_interchangeable(
+        "cleric", "thief", "mage", _interchangeable={"fighter"}
+    )
+    assert action.defeat_dragon_heroes_interchangeable(
+        "cleric", "thief", "fighter", _interchangeable={"fighter"}
+    )
+
+
+def test_dragon_interchangeable_less_interesting_failure_cases():
+    """Test invalid dragon defeats with interchangeable heroes."""
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "cleric", "thief", _interchangeable={"fighter"}
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "cleric", "fighter", _interchangeable={"fighter"}
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "cleric",
+            "thief",
+            "champion",
+            "mage",
+            _interchangeable={"fighter"},
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "cleric",
+            "thief",
+            "champion",
+            "fighter",
+            _interchangeable={"fighter"},
+        )
+
+
+def test_dragon_interchangeable_more_interesting_failure_cases():
+    """Invalid dragon defeats with multiple interchangeable hero types."""
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "mage", "mage", "mage", _interchangeable={"mage", "fighter"}
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "fighter",
+            "fighter",
+            "fighter",
+            _interchangeable={"mage", "fighter"},
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "fighter", "mage", "mage", _interchangeable={"mage", "fighter"}
+        )
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "mage",
+            "fighter",
+            "fighter",
+            _interchangeable={"mage", "fighter"},
+        )
 
 
 class TestDragon:
@@ -430,7 +424,11 @@ class TestDragon:
 
         with pytest.raises(error.DrollError):
             player.apply(
-                player.Default, self.game, self.randrange, "fighter", "dragon"
+                player.Default,
+                self.game,
+                self.randrange,
+                "fighter",
+                "dragon",
             )
 
         # Dragon Slayer requires only two
@@ -494,219 +492,227 @@ class TestDragon:
             )
 
 
-class TestConvertDungeonToParty:
-
-    def test_converts_up_to_max_count(self):
-        """Converts min(available, max_count) dungeon dice to party dice."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=3),
-            party=struct.Party(fighter=1),
-        )
-        result = action.convert_dungeon_to_party(
-            w, source="goblin", destination="thief", max_count=2
-        )
-        assert result.dungeon.goblin == 1
-        assert result.party.thief == 2
-        assert result.regroup.discard.thief == 2
-
-    def test_converts_fewer_when_limited(self):
-        """Converts only available count when fewer than max_count."""
-        w = struct.World(
-            dungeon=struct.Dungeon(skeleton=1),
-            party=struct.Party(),
-        )
-        result = action.convert_dungeon_to_party(
-            w, source="skeleton", destination="fighter", max_count=2
-        )
-        assert result.dungeon.skeleton == 0
-        assert result.party.fighter == 1
-        assert result.regroup.discard.fighter == 1
+def test_convert_dungeon_to_party_up_to_max_count():
+    """Converts min(available, max_count) dungeon dice to party dice."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=3),
+        party=struct.Party(fighter=1),
+    )
+    result = action.convert_dungeon_to_party(
+        w, source="goblin", destination="thief", max_count=2
+    )
+    assert result.dungeon.goblin == 1
+    assert result.party.thief == 2
+    assert result.regroup.discard.thief == 2
 
 
-class TestActionErrorPaths:
-    """Tests for game-rule error paths in the action module."""
-
-    def test_decrement_dungeon_zero_target(self):
-        """Cannot decrement a dungeon target that is already zero."""
-        dungeon = struct.Dungeon(goblin=0, skeleton=1)
-        with pytest.raises(DrollError):
-            action.decrement_dungeon(dungeon, "goblin")
-
-    def test_eliminate_dungeon_zero_target(self):
-        """Cannot eliminate a dungeon target that is already zero."""
-        dungeon = struct.Dungeon(goblin=0, skeleton=1)
-        with pytest.raises(DrollError):
-            action.eliminate_dungeon(dungeon, "goblin")
-
-    def test_open_one_before_monsters_defeated(self):
-        """Cannot open chests while monsters remain."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1, chest=1),
-            party=struct.Party(thief=1),
-        )
-        with pytest.raises(DrollError):
-            action.open_one(w, _UNUSED, "thief", "chest")
-
-    def test_open_all_before_monsters_defeated(self):
-        """Cannot open all chests while monsters remain."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1, chest=2),
-            party=struct.Party(thief=1),
-        )
-        with pytest.raises(DrollError):
-            action.open_all(w, _UNUSED, "thief", "chest")
-
-    def test_quaff_no_potions(self):
-        """Cannot quaff when no potions are available."""
-        w = struct.World(
-            dungeon=struct.Dungeon(potion=0),
-            party=struct.Party(fighter=1),
-        )
-        with pytest.raises(DrollError):
-            action.quaff(w, _UNUSED, "fighter", "potion")
-
-    def test_reroll_no_targets(self):
-        """Reroll requires at least one target."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1),
-            party=struct.Party(scroll=1),
-        )
-        with pytest.raises(DrollError):
-            action.reroll(w, _UNUSED, "scroll")
-
-    def test_reroll_dragon_disallowed(self):
-        """Cannot reroll dragon dice by default."""
-        w = struct.World(
-            dungeon=struct.Dungeon(dragon=3),
-            party=struct.Party(scroll=1),
-        )
-        with pytest.raises(DrollError):
-            action.reroll(w, _UNUSED, "scroll", "dragon")
-
-    def test_interchangeable_disallowed_hero(self):
-        """Scrolls cannot defeat a dragon via interchangeable heroes."""
-        with pytest.raises(DrollError):
-            action.defeat_dragon_heroes_interchangeable(
-                "scroll", "fighter", "thief",
-                _interchangeable={"fighter", "mage"},
-            )
-
-    def test_bait_non_dragon_target(self):
-        """Bait can only target dragons."""
-        w = struct.World(
-            dungeon=struct.Dungeon(goblin=1),
-            party=struct.Party(fighter=1),
-            treasure=struct.Treasure(bait=1),
-        )
-        with pytest.raises(DrollError):
-            action.bait_dragon(w, _UNUSED, "bait", "goblin")
-
-    def test_consume_ability_when_unavailable(self):
-        """Cannot consume ability that is already used."""
-        w = struct.World(ability=False)
-        with pytest.raises(DrollError):
-            action.consume_ability(w)
-
-    def test_nop_ability_rejects_target(self):
-        """Default nop ability rejects any target."""
-        w = struct.World(ability=True)
-        with pytest.raises(DrollError):
-            action.nop_ability(w, _UNUSED, "ability", "fighter")
+def test_convert_dungeon_to_party_fewer_when_limited():
+    """Converts only available count when fewer than max_count."""
+    w = struct.World(
+        dungeon=struct.Dungeon(skeleton=1),
+        party=struct.Party(),
+    )
+    result = action.convert_dungeon_to_party(
+        w, source="skeleton", destination="fighter", max_count=2
+    )
+    assert result.dungeon.skeleton == 0
+    assert result.party.fighter == 1
+    assert result.regroup.discard.fighter == 1
 
 
-class TestRegroupDiscard:
+def test_decrement_dungeon_zero_target():
+    """Cannot decrement a dungeon target that is already zero."""
+    dungeon = struct.Dungeon(goblin=0, skeleton=1)
+    with pytest.raises(DrollError):
+        action.decrement_dungeon(dungeon, "goblin")
 
-    def test_regroup_discard_after_quaff(self):
-        """
-        Quaffing a new thief with a force-discard thief clears discarding.
 
-        A thief gained via Half-Goblin ability (marked for discard) quaffs a
-        potion to revive another thief.  The revived thief survives regroup.
-        """
-        # Setup: thief from ability (marked for discard), 1 potion available
-        pre = struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
-            ability=False,
-            dungeon=struct.Dungeon(potion=1),
-            party=struct.Party(thief=1),
-            regroup=struct.Regroup(discard=struct.Party(thief=1)),
-        )
-        # Thief quaffs potion, reviving another thief
-        post = action.quaff(pre, None, "thief", "potion", "thief")
-        # The marked thief was consumed so the discard counter must drop
-        assert post.regroup.discard.thief == 0
-        assert post.party.thief == 1
+def test_eliminate_dungeon_zero_target():
+    """Cannot eliminate a dungeon target that is already zero."""
+    dungeon = struct.Dungeon(goblin=0, skeleton=1)
+    with pytest.raises(DrollError):
+        action.eliminate_dungeon(dungeon, "goblin")
 
-        # After descending the revived thief must survive regroup
-        descended = world.descend(
-            post,
-            dice.roll_dungeon,
-            random.Random(4).randrange,
-        )
-        assert descended.party.thief == 1
 
-    def test_regroup_discard_after_elixir1(self):
-        """Accounting of revived vs force-discard thieves via elixirs."""
-        # Setup: thief from ability (marked for discard), 1 ooze present
-        pre = struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
-            ability=False,
-            dungeon=struct.Dungeon(ooze=1),
-            party=struct.Party(thief=1),
-            regroup=struct.Regroup(discard=struct.Party(thief=1)),
-            treasure=struct.Treasure(elixir=1),
+def test_open_one_before_monsters_defeated():
+    """Cannot open chests while monsters remain."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1, chest=1),
+        party=struct.Party(thief=1),
+    )
+    with pytest.raises(DrollError):
+        action.open_one(w, _UNUSED, "thief", "chest")
+
+
+def test_open_all_before_monsters_defeated():
+    """Cannot open all chests while monsters remain."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1, chest=2),
+        party=struct.Party(thief=1),
+    )
+    with pytest.raises(DrollError):
+        action.open_all(w, _UNUSED, "thief", "chest")
+
+
+def test_quaff_no_potions():
+    """Cannot quaff when no potions are available."""
+    w = struct.World(
+        dungeon=struct.Dungeon(potion=0),
+        party=struct.Party(fighter=1),
+    )
+    with pytest.raises(DrollError):
+        action.quaff(w, _UNUSED, "fighter", "potion")
+
+
+def test_reroll_no_targets():
+    """Reroll requires at least one target."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1),
+        party=struct.Party(scroll=1),
+    )
+    with pytest.raises(DrollError):
+        action.reroll(w, _UNUSED, "scroll")
+
+
+def test_reroll_dragon_disallowed():
+    """Cannot reroll dragon dice by default."""
+    w = struct.World(
+        dungeon=struct.Dungeon(dragon=3),
+        party=struct.Party(scroll=1),
+    )
+    with pytest.raises(DrollError):
+        action.reroll(w, _UNUSED, "scroll", "dragon")
+
+
+def test_interchangeable_disallowed_hero():
+    """Scrolls cannot defeat a dragon via interchangeable heroes."""
+    with pytest.raises(DrollError):
+        action.defeat_dragon_heroes_interchangeable(
+            "scroll",
+            "fighter",
+            "thief",
+            _interchangeable={"fighter", "mage"},
         )
 
-        # Force-discard thief kills the ooze
-        post1 = action.defeat_one(pre, None, "thief", "ooze")
-        assert post1.regroup.discard.thief == 0
-        assert post1.party.thief == 0
 
-        # Elixir revives a new thief
-        post2 = action.elixir(post1, None, "elixir", "thief")
-        assert post2.regroup.discard.thief == 0
-        assert post2.party.thief == 1
+def test_bait_non_dragon_target():
+    """Bait can only target dragons."""
+    w = struct.World(
+        dungeon=struct.Dungeon(goblin=1),
+        party=struct.Party(fighter=1),
+        treasure=struct.Treasure(bait=1),
+    )
+    with pytest.raises(DrollError):
+        action.bait_dragon(w, _UNUSED, "bait", "goblin")
 
-        # After descending the revived thief must survive regroup
-        descended = world.descend(
-            post2,
-            dice.roll_dungeon,
-            random.Random(4).randrange,
-        )
-        assert descended.party.thief == 1
 
-    def test_regroup_discard_after_elixir2(self):
-        """Accounting of revived vs force-discard thieves via elixirs."""
-        # Setup: thief from ability (marked for discard), 1 ooze present
-        pre = struct.World(
-            delve=1,
-            depth=1,
-            experience=0,
-            ability=False,
-            dungeon=struct.Dungeon(ooze=1),
-            party=struct.Party(thief=1),
-            regroup=struct.Regroup(discard=struct.Party(thief=1)),
-            treasure=struct.Treasure(elixir=1),
-        )
+def test_consume_ability_when_unavailable():
+    """Cannot consume ability that is already used."""
+    w = struct.World(ability=False)
+    with pytest.raises(DrollError):
+        action.consume_ability(w)
 
-        # Elixir revives a new thief
-        post1 = action.elixir(pre, None, "elixir", "thief")
-        assert post1.regroup.discard.thief == 1
-        assert post1.party.thief == 2
 
-        # Force-discard thief kills the ooze
-        post2 = action.defeat_one(post1, None, "thief", "ooze")
-        assert post2.regroup.discard.thief == 0
-        assert post2.party.thief == 1
+def test_nop_ability_rejects_target():
+    """Default nop ability rejects any target."""
+    w = struct.World(ability=True)
+    with pytest.raises(DrollError):
+        action.nop_ability(w, _UNUSED, "ability", "fighter")
 
-        # After descending the revived thief must survive regroup
-        descended = world.descend(
-            post2,
-            dice.roll_dungeon,
-            random.Random(4).randrange,
-        )
-        assert descended.party.thief == 1
+
+def test_regroup_discard_after_quaff():
+    """
+    Quaffing a new thief with a force-discard thief clears discarding.
+
+    A thief gained via Half-Goblin ability (marked for discard) quaffs a
+    potion to revive another thief.  The revived thief survives regroup.
+    """
+    # Setup: thief from ability (marked for discard), 1 potion available
+    pre = struct.World(
+        delve=1,
+        depth=1,
+        experience=0,
+        ability=False,
+        dungeon=struct.Dungeon(potion=1),
+        party=struct.Party(thief=1),
+        regroup=struct.Regroup(discard=struct.Party(thief=1)),
+    )
+    # Thief quaffs potion, reviving another thief
+    post = action.quaff(pre, None, "thief", "potion", "thief")
+    # The marked thief was consumed so the discard counter must drop
+    assert post.regroup.discard.thief == 0
+    assert post.party.thief == 1
+
+    # After descending the revived thief must survive regroup
+    descended = world.descend(
+        post,
+        dice.roll_dungeon,
+        random.Random(4).randrange,
+    )
+    assert descended.party.thief == 1
+
+
+def test_regroup_discard_after_elixir1():
+    """Accounting of revived vs force-discard thieves via elixirs."""
+    # Setup: thief from ability (marked for discard), 1 ooze present
+    pre = struct.World(
+        delve=1,
+        depth=1,
+        experience=0,
+        ability=False,
+        dungeon=struct.Dungeon(ooze=1),
+        party=struct.Party(thief=1),
+        regroup=struct.Regroup(discard=struct.Party(thief=1)),
+        treasure=struct.Treasure(elixir=1),
+    )
+
+    # Force-discard thief kills the ooze
+    post1 = action.defeat_one(pre, None, "thief", "ooze")
+    assert post1.regroup.discard.thief == 0
+    assert post1.party.thief == 0
+
+    # Elixir revives a new thief
+    post2 = action.elixir(post1, None, "elixir", "thief")
+    assert post2.regroup.discard.thief == 0
+    assert post2.party.thief == 1
+
+    # After descending the revived thief must survive regroup
+    descended = world.descend(
+        post2,
+        dice.roll_dungeon,
+        random.Random(4).randrange,
+    )
+    assert descended.party.thief == 1
+
+
+def test_regroup_discard_after_elixir2():
+    """Accounting of revived vs force-discard thieves via elixirs."""
+    # Setup: thief from ability (marked for discard), 1 ooze present
+    pre = struct.World(
+        delve=1,
+        depth=1,
+        experience=0,
+        ability=False,
+        dungeon=struct.Dungeon(ooze=1),
+        party=struct.Party(thief=1),
+        regroup=struct.Regroup(discard=struct.Party(thief=1)),
+        treasure=struct.Treasure(elixir=1),
+    )
+
+    # Elixir revives a new thief
+    post1 = action.elixir(pre, None, "elixir", "thief")
+    assert post1.regroup.discard.thief == 1
+    assert post1.party.thief == 2
+
+    # Force-discard thief kills the ooze
+    post2 = action.defeat_one(post1, None, "thief", "ooze")
+    assert post2.regroup.discard.thief == 0
+    assert post2.party.thief == 1
+
+    # After descending the revived thief must survive regroup
+    descended = world.descend(
+        post2,
+        dice.roll_dungeon,
+        random.Random(4).randrange,
+    )
+    assert descended.party.thief == 1
