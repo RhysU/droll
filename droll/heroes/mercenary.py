@@ -9,7 +9,7 @@ import functools
 
 from .. import action
 from .. import dice
-from .. import error
+from ..error import DrollError
 from .. import struct
 from ..player import Default
 
@@ -39,7 +39,7 @@ def _mercenary_ability(
 ) -> struct.World:
     """Defeat any 2 monsters."""
     if target is None:
-        raise error.DrollError(f"At least 1 target required for {noun}.")
+        raise DrollError(f"At least 1 target required for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
     world = replace(
         world, party=action.increment_party(world.party, "champion")
@@ -59,7 +59,7 @@ def _commander_ability(
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice."""
     if target is None:
-        raise error.DrollError(
+        raise DrollError(
             f"At least 1 reroll target required for {noun}."
         )
     # Temporarily add a scroll to be consumed by reroll

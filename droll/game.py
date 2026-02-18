@@ -9,7 +9,7 @@ import copy
 import enum
 from random import Random
 
-from . import error
+from .error import DrollError
 from . import player
 from . import struct
 from . import world
@@ -80,7 +80,7 @@ class Game:
             # Permit the player to advance to higher abilities
             self._player = self._player.advance(self._world)
             return GameState.PLAY
-        except error.DrollError:
+        except DrollError:
             return GameState.STOP
 
     @property
@@ -170,7 +170,7 @@ class Game:
             try:
                 action()
                 possible.append(name)
-            except error.DrollError:
+            except DrollError:
                 pass
         return possible
 

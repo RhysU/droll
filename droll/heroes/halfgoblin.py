@@ -9,7 +9,7 @@ import functools
 
 from .. import action
 from .. import dice
-from .. import error
+from ..error import DrollError
 from .. import struct
 from .. import world
 from ..player import Default
@@ -28,7 +28,7 @@ def _halfgoblin_ability(
 ) -> struct.World:
     """Transform 1 goblin into 1 thief, discarding it at next regroup."""
     if target and target != "goblin":
-        raise error.DrollError("Ability can only target 1 goblin.")
+        raise DrollError("Ability can only target 1 goblin.")
     world = action.convert_dungeon_to_party(
         world, source="goblin", destination="thief", max_count=1
     )
@@ -44,11 +44,11 @@ def _chieftain_ability(
 ) -> struct.World:
     """Transform 2 goblins into thieves, discarding them at next regroup."""
     if target and target != "goblin":
-        raise error.DrollError("Ability can only target goblins.")
+        raise DrollError("Ability can only target goblins.")
     if extra_targets and extra_targets[0] != "goblin":
-        raise error.DrollError("Ability can only target goblins.")
+        raise DrollError("Ability can only target goblins.")
     if len(extra_targets) > 1:
-        raise error.DrollError("At most 2 targets can be changed.")
+        raise DrollError("At most 2 targets can be changed.")
     world = action.convert_dungeon_to_party(
         world, source="goblin", destination="thief", max_count=2
     )
