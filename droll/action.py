@@ -533,7 +533,7 @@ def convert_dungeon_to_party(
 def consume_ability(world: struct.World):
     """Mark the hero's special ability as used."""
     if not world.ability:
-        raise error.DrollError("Ability not available for use.")
+        raise error.DrollError("Ability not available.")
     return replace(world, ability=False)
 
 

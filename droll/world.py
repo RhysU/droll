@@ -90,7 +90,7 @@ def delve(
 
     Argument roll_party can be dice.roll_party but other choices okay."""
     if world.delve >= 3:
-        raise error.DrollError("At most 3 delves are permitted.")
+        raise error.DrollError("At most 3 delves permitted.")
     party, regroup = roll_party(_party_dice, randrange)
     return replace(
         world,
@@ -135,14 +135,14 @@ def descend(
     Argument roll_dungeon can be dice.roll_dungeon but other choices okay
     Adheres to the specified number of dice available in the world."""
     if not defeated_monsters(world.dungeon):
-        raise error.DrollError("Must defeat foes to proceed to next dungeon.")
+        raise error.DrollError("Monsters must be defeated before descending.")
 
     if not defeated_dungeon(world.dungeon):
         try:
             world = _apply_ring(world)
         except error.DrollError:
             raise error.DrollError(
-                "Dragon remains but a ring of invisibility is not in hand."
+                "Dragon remains but no ring in hand."
             )
 
     # Success above, so regroup just prior to descending
@@ -151,7 +151,7 @@ def descend(
     # Update the world in anticipation of the next dungeon
     next_depth = (world.depth if world.depth else 0) + 1
     if next_depth > _max_depth:
-        raise error.DrollError(f"The maximum depth is {_max_depth}.")
+        raise error.DrollError(f"Maximum depth is {_max_depth}.")
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
     new_dice = max(1, min(_dungeon_dice - prior_dragons, next_depth))
     rolled = roll_dungeon(new_dice, randrange)
@@ -171,7 +171,7 @@ def _escape_dragon(world: struct.World) -> struct.World:
             return _apply_portal(world)
         except error.DrollError:
             raise error.DrollError(
-                "Dragon remains but neither a ring of invisibility nor a portal in hand."
+                "Dragon remains but no ring or portal in hand."
             )
 
 
