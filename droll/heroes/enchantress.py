@@ -46,12 +46,12 @@ def _beguiler_ability(
     dungeon = world.dungeon
     dungeon = action.decrement_dungeon(dungeon, target)
     if len(extra_targets) > 1:
-        raise error.DrollError("At most 2 targets can be transformed.")
+        raise error.DrollError("At most 2 targets can be changed.")
     elif len(extra_targets) == 1:
         dungeon = action.decrement_dungeon(dungeon, extra_targets[0])
     elif not defeated_monsters(dungeon):
         assert len(extra_targets) == 0
-        raise error.DrollError("Require 2 targets when 2+ available.")
+        raise error.DrollError("2 targets required when 2+ available.")
     dungeon = action.increment_dungeon(dungeon, "potion")
     return action.consume_ability(replace(world, dungeon=dungeon))
 

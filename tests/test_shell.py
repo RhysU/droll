@@ -221,6 +221,6 @@ class TestRetireAndQuaffError(unittest.TestCase):
             dungeon=struct.Dungeon(potion=1),
         )
         # Quaff 1 potion providing 0 revive targets:
-        # - action.py quaff raises "Require exactly 1 to revive."
+        # - action.py quaff raises "Exactly 1 heroes to revive required."
         # - onecmd catches and prints the DrollError
         s.onecmd("fighter potion")
