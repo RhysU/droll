@@ -223,9 +223,8 @@ class TestComplete:
         # Special case associated with 'elixir'
         game = replace(game, party=struct.Party())
         game = replace(game, treasure=struct.Treasure())
-        assert (
-            complete(game, ("elixir", ""), "", 1)
-            == list(sorted(struct.field_names(struct.Party)))
+        assert complete(game, ("elixir", ""), "", 1) == list(
+            sorted(struct.field_names(struct.Party))
         )
 
     def test_complete2(self):
@@ -235,5 +234,6 @@ class TestComplete:
         assert complete(game, ("X", "Y", "fig"), "fig", 2) == ["fighter"]
         assert complete(game, ("X", "Y", "gob"), "gob", 2) == ["goblin"]
         assert complete(game, ("X", "Y", "ch"), "ch", 2) == [
-            "champion", "chest"
+            "champion",
+            "chest",
         ]

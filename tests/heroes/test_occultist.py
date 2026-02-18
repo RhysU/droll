@@ -18,128 +18,134 @@ from droll.heroes.occultist import (
 _UNUSED = object()
 
 
-class TestOccultist:
+def test_occultist_transforms_skeleton_to_fighter():
+    """Occultist transforms 1 skeleton into 1 fighter."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
+        party=droll.struct.Party(cleric=1),
+    )
+    result = _occultist_ability(world, _UNUSED, "ability", "skeleton")
+    # Discard during subsequent regroup phase tested elsewhere
+    assert result.dungeon.skeleton == 1
+    assert result.party.fighter == 1
+    assert not result.ability
 
-    def test_occultist_transforms_skeleton_to_fighter(self):
-        """Occultist transforms 1 skeleton into 1 fighter."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
-            party=droll.struct.Party(cleric=1),
-        )
-        result = _occultist_ability(world, _UNUSED, "ability", "skeleton")
-        # Discard during subsequent regroup phase tested elsewhere
-        assert result.dungeon.skeleton == 1
-        assert result.party.fighter == 1
-        assert not result.ability
 
-    def test_occultist_rejects_non_skeleton_target(self):
-        """Occultist ability rejects non-skeleton targets."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
-            party=droll.struct.Party(cleric=1),
-        )
-        with pytest.raises(droll.error.DrollError):
-            _occultist_ability(world, _UNUSED, "ability", "goblin")
+def test_occultist_rejects_non_skeleton_target():
+    """Occultist ability rejects non-skeleton targets."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
+        party=droll.struct.Party(cleric=1),
+    )
+    with pytest.raises(droll.error.DrollError):
+        _occultist_ability(world, _UNUSED, "ability", "goblin")
 
-    def test_occultist_sets_regroup_discard(self):
-        """Occultist marks the created fighter for regroup discard."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(skeleton=1),
-            party=droll.struct.Party(cleric=1),
-        )
-        result = _occultist_ability(world, _UNUSED, "ability", "skeleton")
-        assert result.regroup.discard.fighter == 1
 
-    def test_necromancer_transforms_two_skeletons(self):
-        """Necromancer transforms 2 skeletons into 2 fighters when available."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
-            party=droll.struct.Party(cleric=1),
-        )
-        result = _necromancer_ability(
-            world, _UNUSED, "ability", "skeleton", "skeleton"
-        )
-        # Discard during subsequent regroup phase tested elsewhere
-        assert result.dungeon.skeleton == 0
-        assert result.dungeon.goblin == 1
-        assert result.party.fighter == 2
+def test_occultist_sets_regroup_discard():
+    """Occultist marks the created fighter for regroup discard."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(skeleton=1),
+        party=droll.struct.Party(cleric=1),
+    )
+    result = _occultist_ability(world, _UNUSED, "ability", "skeleton")
+    assert result.regroup.discard.fighter == 1
 
-    def test_necromancer_transforms_one_skeleton(self):
-        """Necromancer transforms 1 skeleton into 1 fighter when 1 available."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
-            party=droll.struct.Party(cleric=1),
-        )
-        result = _necromancer_ability(
-            world,
-            _UNUSED,
-            "ability",
-            "skeleton",
-        )
-        # Discard during subsequent regroup phase tested elsewhere
-        assert result.dungeon.skeleton == 0
-        assert result.dungeon.goblin == 1
-        assert result.party.fighter == 1
 
-    def test_necromancer_sets_regroup_discard(self):
-        """Necromancer marks created fighters for regroup discard."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(skeleton=2),
-            party=droll.struct.Party(cleric=1),
-        )
-        result = _necromancer_ability(
-            world, _UNUSED, "ability", "skeleton", "skeleton"
-        )
-        assert result.regroup.discard.fighter == 2
+def test_necromancer_transforms_two_skeletons():
+    """Necromancer transforms 2 skeletons into 2 fighters when available."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
+        party=droll.struct.Party(cleric=1),
+    )
+    result = _necromancer_ability(
+        world, _UNUSED, "ability", "skeleton", "skeleton"
+    )
+    # Discard during subsequent regroup phase tested elsewhere
+    assert result.dungeon.skeleton == 0
+    assert result.dungeon.goblin == 1
+    assert result.party.fighter == 2
 
-    def test_necromancer_rejects_non_skeleton_target(self):
-        """Necromancer ability rejects non-skeleton targets."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
-            party=droll.struct.Party(cleric=1),
+
+def test_necromancer_transforms_one_skeleton():
+    """Necromancer transforms 1 skeleton into 1 fighter when 1 available."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
+        party=droll.struct.Party(cleric=1),
+    )
+    result = _necromancer_ability(
+        world,
+        _UNUSED,
+        "ability",
+        "skeleton",
+    )
+    # Discard during subsequent regroup phase tested elsewhere
+    assert result.dungeon.skeleton == 0
+    assert result.dungeon.goblin == 1
+    assert result.party.fighter == 1
+
+
+def test_necromancer_sets_regroup_discard():
+    """Necromancer marks created fighters for regroup discard."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(skeleton=2),
+        party=droll.struct.Party(cleric=1),
+    )
+    result = _necromancer_ability(
+        world, _UNUSED, "ability", "skeleton", "skeleton"
+    )
+    assert result.regroup.discard.fighter == 2
+
+
+def test_necromancer_rejects_non_skeleton_target():
+    """Necromancer ability rejects non-skeleton targets."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
+        party=droll.struct.Party(cleric=1),
+    )
+    with pytest.raises(droll.error.DrollError):
+        _necromancer_ability(world, _UNUSED, "ability", "goblin")
+
+
+def test_necromancer_rejects_non_skeleton_extra_target():
+    """Necromancer ability rejects non-skeleton extra targets."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
+        party=droll.struct.Party(cleric=1),
+    )
+    with pytest.raises(droll.error.DrollError):
+        _necromancer_ability(world, _UNUSED, "ability", "skeleton", "goblin")
+
+
+def test_necromancer_rejects_too_many_targets():
+    """Necromancer rejects more than 2 targets."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(skeleton=3),
+        party=droll.struct.Party(cleric=1),
+    )
+    with pytest.raises(droll.error.DrollError):
+        _necromancer_ability(
+            world, _UNUSED, "ability", "skeleton", "skeleton", "skeleton"
         )
-        with pytest.raises(droll.error.DrollError):
-            _necromancer_ability(world, _UNUSED, "ability", "goblin")
 
-    def test_necromancer_rejects_non_skeleton_extra_target(self):
-        """Necromancer ability rejects non-skeleton extra targets."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
-            party=droll.struct.Party(cleric=1),
-        )
-        with pytest.raises(droll.error.DrollError):
-            _necromancer_ability(
-                world, _UNUSED, "ability", "skeleton", "goblin"
-            )
 
-    def test_necromancer_rejects_too_many_targets(self):
-        """Necromancer rejects more than 2 targets."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(skeleton=3),
-            party=droll.struct.Party(cleric=1),
-        )
-        with pytest.raises(droll.error.DrollError):
-            _necromancer_ability(
-                world, _UNUSED, "ability", "skeleton", "skeleton", "skeleton"
-            )
+def test_occultist_advances_to_necromancer():
+    """Occultist advances to Necromancer at 5+ experience."""
+    low_xp = droll.struct.World(experience=4)
+    high_xp = droll.struct.World(experience=5)
+    assert Occultist.advance(low_xp) == Occultist
+    assert Occultist.advance(high_xp) == Necromancer
 
-    def test_occultist_advances_to_necromancer(self):
-        """Occultist advances to Necromancer at 5+ experience."""
-        low_xp = droll.struct.World(experience=4)
-        high_xp = droll.struct.World(experience=5)
-        assert Occultist.advance(low_xp) == Occultist
-        assert Occultist.advance(high_xp) == Necromancer
 
-    def test_necromancer_does_not_advance(self):
-        """Necromancer does not advance further."""
-        high_xp = droll.struct.World(experience=10)
-        assert Necromancer.advance(high_xp) == Necromancer
+def test_necromancer_does_not_advance():
+    """Necromancer does not advance further."""
+    high_xp = droll.struct.World(experience=10)
+    assert Necromancer.advance(high_xp) == Necromancer

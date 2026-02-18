@@ -289,9 +289,7 @@ class TestWorld:
         assert not world.exhausted_dungeon(struct.Dungeon(ooze=1))
 
         # Dungeon with chests/potions still has actions (not exhausted)
-        assert not world.exhausted_dungeon(
-            struct.Dungeon(chest=2, potion=3)
-        )
+        assert not world.exhausted_dungeon(struct.Dungeon(chest=2, potion=3))
 
     def test_retreat_valid(self):
         """Test valid retreat scenarios."""

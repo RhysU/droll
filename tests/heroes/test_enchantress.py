@@ -18,59 +18,59 @@ from droll.heroes.enchantress import (
 _UNUSED = object()
 
 
-class TestEnchantress:
+def test_enchantress_transforms_monster_to_potion():
+    """Enchantress transforms 1 monster into 1 potion."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+        party=droll.struct.Party(fighter=1),
+    )
+    result = _enchantress_ability(world, _UNUSED, "ability", "goblin")
+    assert result.dungeon.goblin == 1
+    assert result.dungeon.potion == 1
+    assert not result.ability
 
-    def test_enchantress_transforms_monster_to_potion(self):
-        """Enchantress transforms 1 monster into 1 potion."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-            party=droll.struct.Party(fighter=1),
-        )
-        result = _enchantress_ability(world, _UNUSED, "ability", "goblin")
-        assert result.dungeon.goblin == 1
-        assert result.dungeon.potion == 1
-        assert not result.ability
 
-    def test_beguiler_transforms_two_monsters(self):
-        """Beguiler transforms 2 monsters into 1 potion when available."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-            party=droll.struct.Party(fighter=1),
-        )
-        result = _beguiler_ability(
-            world, _UNUSED, "ability", "goblin", "skeleton"
-        )
-        assert result.dungeon.goblin == 1
-        assert result.dungeon.skeleton == 0
-        assert result.dungeon.potion == 1
+def test_beguiler_transforms_two_monsters():
+    """Beguiler transforms 2 monsters into 1 potion when available."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+        party=droll.struct.Party(fighter=1),
+    )
+    result = _beguiler_ability(world, _UNUSED, "ability", "goblin", "skeleton")
+    assert result.dungeon.goblin == 1
+    assert result.dungeon.skeleton == 0
+    assert result.dungeon.potion == 1
 
-    def test_beguiler_requires_two_when_available(self):
-        """Beguiler must transform 2 monsters when 2+ available."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-            party=droll.struct.Party(fighter=1),
-        )
-        with pytest.raises(droll.error.DrollError):
-            _beguiler_ability(world, _UNUSED, "ability", "goblin")
 
-    def test_beguiler_rejects_too_many_targets(self):
-        """Beguiler rejects more than 2 targets."""
-        world = droll.struct.World(
-            ability=True,
-            dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-            party=droll.struct.Party(fighter=1),
-        )
-        with pytest.raises(droll.error.DrollError):
-            _beguiler_ability(
-                world, _UNUSED, "ability", "goblin", "skeleton", "goblin"
-            )
+def test_beguiler_requires_two_when_available():
+    """Beguiler must transform 2 monsters when 2+ available."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+        party=droll.struct.Party(fighter=1),
+    )
+    with pytest.raises(droll.error.DrollError):
+        _beguiler_ability(world, _UNUSED, "ability", "goblin")
 
-    def test_enchantress_advances_to_beguiler(self):
-        """Enchantress advances to Beguiler at 5+ experience."""
-        low_xp = droll.struct.World(experience=4)
-        high_xp = droll.struct.World(experience=5)
-        assert Enchantress.advance(low_xp) == Enchantress
-        assert Enchantress.advance(high_xp) == Beguiler
+
+def test_beguiler_rejects_too_many_targets():
+    """Beguiler rejects more than 2 targets."""
+    world = droll.struct.World(
+        ability=True,
+        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
+        party=droll.struct.Party(fighter=1),
+    )
+    with pytest.raises(droll.error.DrollError):
+        _beguiler_ability(
+            world, _UNUSED, "ability", "goblin", "skeleton", "goblin"
+        )
+
+
+def test_enchantress_advances_to_beguiler():
+    """Enchantress advances to Beguiler at 5+ experience."""
+    low_xp = droll.struct.World(experience=4)
+    high_xp = droll.struct.World(experience=5)
+    assert Enchantress.advance(low_xp) == Enchantress
+    assert Enchantress.advance(high_xp) == Beguiler
