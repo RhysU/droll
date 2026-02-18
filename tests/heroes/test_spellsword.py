@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Tests for Spellsword/Battlemage hero abilities."""
 
-import unittest
+import pytest
 
 import droll.error
 import droll.struct
@@ -18,7 +18,7 @@ from droll.heroes.spellsword import (
 _UNUSED = object()
 
 
-class TestSpellsword(unittest.TestCase):
+class TestSpellsword:
 
     def test_spellsword_ability_adds_fighter(self):
         """Spellsword ability adds a fighter to party."""
@@ -27,8 +27,8 @@ class TestSpellsword(unittest.TestCase):
             party=droll.struct.Party(fighter=1, mage=1),
         )
         result = _spellsword_ability(world, _UNUSED, "ability", "fighter")
-        self.assertEqual(result.party.fighter, 2)
-        self.assertFalse(result.ability)
+        assert result.party.fighter == 2
+        assert not result.ability
 
     def test_spellsword_ability_adds_mage(self):
         """Spellsword ability adds a mage to party."""
@@ -37,7 +37,7 @@ class TestSpellsword(unittest.TestCase):
             party=droll.struct.Party(fighter=1, mage=1),
         )
         result = _spellsword_ability(world, _UNUSED, "ability", "mage")
-        self.assertEqual(result.party.mage, 2)
+        assert result.party.mage == 2
 
     def test_spellsword_ability_rejects_invalid_target(self):
         """Spellsword ability rejects invalid targets like cleric."""
@@ -46,7 +46,7 @@ class TestSpellsword(unittest.TestCase):
             dungeon=droll.struct.Dungeon(),
             party=droll.struct.Party(fighter=1, mage=1),
         )
-        with self.assertRaises(droll.error.DrollError):
+        with pytest.raises(droll.error.DrollError):
             _spellsword_ability(world, _UNUSED, "ability", "cleric")
 
     def test_battlemage_ability_clears_dungeon(self):
@@ -59,8 +59,8 @@ class TestSpellsword(unittest.TestCase):
             party=droll.struct.Party(fighter=1, mage=1),
         )
         result = _battlemage_ability(world, _UNUSED, "ability")
-        self.assertEqual(sum(droll.struct.field_values(result.dungeon)), 0)
-        self.assertFalse(result.ability)
+        assert sum(droll.struct.field_values(result.dungeon)) == 0
+        assert not result.ability
 
     def test_spellsword_ability_default_target(self):
         """Spellsword ability defaults to 'fighter' (first sorted) when no target."""
@@ -69,7 +69,7 @@ class TestSpellsword(unittest.TestCase):
             party=droll.struct.Party(fighter=1, mage=1),
         )
         result = _spellsword_ability(world, _UNUSED, "ability")
-        self.assertEqual(result.party.fighter, 2)
+        assert result.party.fighter == 2
 
     def test_battlemage_ability_rejects_target(self):
         """Battlemage ability rejects any target argument."""
@@ -78,12 +78,12 @@ class TestSpellsword(unittest.TestCase):
             dungeon=droll.struct.Dungeon(goblin=1),
             party=droll.struct.Party(fighter=1, mage=1),
         )
-        with self.assertRaises(droll.error.DrollError):
+        with pytest.raises(droll.error.DrollError):
             _battlemage_ability(world, _UNUSED, "ability", "goblin")
 
     def test_spellsword_advances_to_battlemage(self):
         """Spellsword advances to Battlemage at 5+ experience."""
         low_xp = droll.struct.World(experience=4)
         high_xp = droll.struct.World(experience=5)
-        self.assertEqual(Spellsword.advance(low_xp), Spellsword)
-        self.assertEqual(Spellsword.advance(high_xp), Battlemage)
+        assert Spellsword.advance(low_xp) == Spellsword
+        assert Spellsword.advance(high_xp) == Battlemage

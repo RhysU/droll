@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 import random
-import unittest
+import pytest
 
 from droll import struct
 from droll.error import DrollError
@@ -13,7 +13,7 @@ from droll.game import Game, GameState
 from droll.player import Default
 
 
-class TestGame(unittest.TestCase):
+class TestGame:
 
     def test_game_construction(self):
         """Game can be constructed with various parameter combinations."""
@@ -23,8 +23,8 @@ class TestGame(unittest.TestCase):
 
     def test_gamestate_truthiness(self):
         """GameState values coerce to boolean correctly for control flow."""
-        self.assertTrue(GameState.STOP, "STOP must coerce to True.")
-        self.assertFalse(GameState.PLAY, "PLAY must coerce to False.")
+        assert GameState.STOP, "STOP must coerce to True."
+        assert not GameState.PLAY, "PLAY must coerce to False."
 
     def test_reroll_dungeon_dice(self):
         """Test rerolling dungeon dice using a scroll."""
@@ -40,7 +40,7 @@ class TestGame(unittest.TestCase):
         pre_scroll = g._world.party.scroll
         g.reroll("goblin")
         # Scroll consumed, dungeon rerolled
-        self.assertEqual(g._world.party.scroll, pre_scroll - 1)
+        assert g._world.party.scroll == pre_scroll - 1
 
     def test_reroll_portion(self):
         """Test rerolling potion using a scroll."""
@@ -56,7 +56,7 @@ class TestGame(unittest.TestCase):
         pre_scroll = g._world.party.scroll
         g.reroll("potion")
         # Scroll consumed, dungeon rerolled
-        self.assertEqual(g._world.party.scroll, pre_scroll - 1)
+        assert g._world.party.scroll == pre_scroll - 1
 
     def test_reroll_multiple_targets(self):
         """Test rerolling multiple dungeon dice."""
@@ -69,7 +69,7 @@ class TestGame(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1, skeleton=1),
         )
         g.reroll("goblin", "skeleton")
-        self.assertEqual(g._world.party.scroll, 0)
+        assert g._world.party.scroll == 0
 
     def test_apply_portal_directly_fails(self):
         """Test that using portal directly gives helpful error."""
@@ -79,7 +79,7 @@ class TestGame(unittest.TestCase):
             g._world,
             treasure=replace(g._world.treasure, portal=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             g.apply("portal")
 
     def test_apply_ring_directly_fails(self):
@@ -90,7 +90,7 @@ class TestGame(unittest.TestCase):
             g._world,
             treasure=replace(g._world.treasure, ring=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             g.apply("ring")
 
     def test_retreat(self):
@@ -102,10 +102,10 @@ class TestGame(unittest.TestCase):
             g._world, dungeon=struct.Dungeon(goblin=1)
         )
         result = g.retreat()
-        self.assertEqual(result, GameState.PLAY)
+        assert result == GameState.PLAY
         # After retreat, a new delve should have started
-        self.assertEqual(g._world.depth, 0)
-        self.assertIsNotNone(g._world.party)
+        assert g._world.depth == 0
+        assert g._world.party is not None
 
     def test_completenames(self):
         """completenames returns contextual completions including retire/retreat."""
@@ -115,18 +115,16 @@ class TestGame(unittest.TestCase):
         # With monsters: retreat is possible, retire is not
         g._world = replace(g._world, dungeon=struct.Dungeon(goblin=1))
         names = g.completenames(text="", head=[], tail=[])
-        self.assertIn("ability", names)
-        self.assertIn("retreat", names)
-        self.assertNotIn("retire", names)
+        assert "ability" in names
+        assert "retreat" in names
+        assert "retire" not in names
         # Hero-related completions appear (dungeon not exhausted)
-        self.assertTrue(
-            any(n not in ("ability", "descend", "retire", "retreat") for n in names)
-        )
+        assert any(n not in ("ability", "descend", "retire", "retreat") for n in names)
 
         # With cleared dungeon: retire is possible
         g._world = replace(g._world, dungeon=struct.Dungeon())
         names = g.completenames(text="", head=[], tail=[])
-        self.assertIn("retire", names)
+        assert "retire" in names
 
     def test_completedefault(self):
         """completedefault delegates to player.complete."""
@@ -138,7 +136,7 @@ class TestGame(unittest.TestCase):
             party=struct.Party(fighter=1),
         )
         results = g.completedefault(text="fi", head=[], tail=[])
-        self.assertIn("fighter", results)
+        assert "fighter" in results
 
     def test_next_delve_returns_stop_after_three(self):
         """Game returns STOP when no more delves remain."""
@@ -148,9 +146,9 @@ class TestGame(unittest.TestCase):
             g.descend()
             g._world = replace(g._world, dungeon=struct.Dungeon())
             result = g.retire()
-            self.assertEqual(result, GameState.PLAY)
+            assert result == GameState.PLAY
         # Third delve: retire should trigger STOP
         g.descend()
         g._world = replace(g._world, dungeon=struct.Dungeon())
         result = g.retire()
-        self.assertEqual(result, GameState.STOP)
+        assert result == GameState.STOP

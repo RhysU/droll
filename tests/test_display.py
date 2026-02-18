@@ -2,62 +2,57 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Tests for the compact display module."""
-import unittest
 
 from droll import display
 from droll import struct
 
 
-class TestFormatItems(unittest.TestCase):
+class TestFormatItems:
 
     def test_multiple_items(self):
         """Test formatting party with multiple quantities uses × notation."""
         party = struct.Party(fighter=2, cleric=1, mage=3)
-        self.assertEqual(
-            display._format_items(party), "fighter×2 cleric mage×3"
-        )
+        assert display._format_items(party) == "fighter×2 cleric mage×3"
 
     def test_dragon_always_shows_count(self):
         """Test that dragons always display with count, even when singular."""
         dungeon = struct.Dungeon(dragon=1)
-        self.assertEqual(display._format_items(dungeon), "dragon×1")
+        assert display._format_items(dungeon) == "dragon×1"
 
 
-class TestFormatTreasure(unittest.TestCase):
+class TestFormatTreasure:
 
     def test_multiple_items_alphabetized(self):
         """Test multiple treasure items are alphabetized and use × notation."""
         treasure = struct.Treasure(scale=4, sceptre=1, talisman=1, tools=1)
-        self.assertEqual(
-            display._format_treasure(treasure),
-            "scale×4 sceptre talisman tools",
+        assert (
+            display._format_treasure(treasure)
+            == "scale×4 sceptre talisman tools"
         )
 
 
-class TestFormatAvailable(unittest.TestCase):
+class TestFormatAvailable:
 
     def test_alphabetized(self):
         """Test available commands are displayed in alphabetical order."""
         available = ["retreat", "ability", "reroll"]
-        self.assertEqual(
-            display._format_available(available), "ability reroll retreat"
-        )
+        assert display._format_available(available) == "ability reroll retreat"
 
 
-class TestFormatDungeon(unittest.TestCase):
+class TestFormatDungeon:
 
     def test_empty_dungeon(self):
         """Test formatting empty dungeon returns 'None' string."""
         dungeon = struct.Dungeon()
-        self.assertEqual(display._format_dungeon(dungeon), "None")
+        assert display._format_dungeon(dungeon) == "None"
 
     def test_with_monsters(self):
         """Test formatting dungeon with monsters."""
         dungeon = struct.Dungeon(goblin=1, skeleton=2)
-        self.assertEqual(display._format_dungeon(dungeon), "goblin skeleton×2")
+        assert display._format_dungeon(dungeon) == "goblin skeleton×2"
 
 
-class TestCompactSummary(unittest.TestCase):
+class TestCompactSummary:
 
     def test_in_dungeon(self):
         """Test compact summary while in a dungeon with monsters."""
@@ -74,12 +69,12 @@ class TestCompactSummary(unittest.TestCase):
             world, "Default", 1, ["ability", "retreat"]
         )
         lines = result.split("\n")
-        self.assertEqual(len(lines), 5)
-        self.assertIn("depth 3 in delve 1 with experience 0", lines[0])
-        self.assertIn("talisman", lines[1])
-        self.assertIn("ability retreat", lines[2])
-        self.assertIn("fighter champion", lines[3])
-        self.assertIn("goblin skeleton×2 ooze×2", lines[4])
+        assert len(lines) == 5
+        assert "depth 3 in delve 1 with experience 0" in lines[0]
+        assert "talisman" in lines[1]
+        assert "ability retreat" in lines[2]
+        assert "fighter champion" in lines[3]
+        assert "goblin skeleton×2 ooze×2" in lines[4]
 
     def test_long_player_name_alignment(self):
         """Test that long player names maintain proper column alignment."""
@@ -103,7 +98,7 @@ class TestCompactSummary(unittest.TestCase):
             while content_start < len(line) and line[content_start] == " ":
                 content_start += 1
             # Content should start at same column for all lines
-            self.assertGreaterEqual(content_start, 13)
+            assert content_start >= 13
 
     def test_dungeon_shown_when_empty(self):
         """Test that empty dungeons display 'Dungeon: None' in the summary."""
@@ -120,9 +115,9 @@ class TestCompactSummary(unittest.TestCase):
             world, "Knight", 0, ["ability", "descend", "retire"]
         )
         lines = result.split("\n")
-        self.assertEqual(len(lines), 5)
-        self.assertIn("Dungeon:", lines[4])
-        self.assertIn("None", lines[4])
+        assert len(lines) == 5
+        assert "Dungeon:" in lines[4]
+        assert "None" in lines[4]
 
     def test_cleared_level_10(self):
         """Test compact summary after clearing dungeon level 10."""
@@ -137,13 +132,13 @@ class TestCompactSummary(unittest.TestCase):
         )
         result = display.compact_summary(world, "Beguiler", 24, ["retire"])
         lines = result.split("\n")
-        self.assertIn("depth 10 in delve 3 with experience 16", lines[0])
-        self.assertIn("scale×4 sceptre talisman tools", lines[1])
-        self.assertIn("retire", lines[2])
-        self.assertIn("champion scroll×2", lines[3])
-        self.assertIn("Dungeon:", lines[4])
-        self.assertIn("None", lines[4])
-        self.assertEqual(len(lines), 5)
+        assert "depth 10 in delve 3 with experience 16" in lines[0]
+        assert "scale×4 sceptre talisman tools" in lines[1]
+        assert "retire" in lines[2]
+        assert "champion scroll×2" in lines[3]
+        assert "Dungeon:" in lines[4]
+        assert "None" in lines[4]
+        assert len(lines) == 5
 
     def test_ending_state(self):
         """After final delve, Available should show 'None'."""
@@ -159,7 +154,7 @@ class TestCompactSummary(unittest.TestCase):
         )
         result = display.compact_summary(world, "DragonSlayer", 23, [])
         lines = result.split("\n")
-        self.assertIn("delve 3 with experience 16", lines[0])
-        self.assertIn("Available:", lines[2])
-        self.assertIn("None", lines[2])
-        self.assertEqual(len(lines), 4)  # No Dungeon line
+        assert "delve 3 with experience 16" in lines[0]
+        assert "Available:" in lines[2]
+        assert "None" in lines[2]
+        assert len(lines) == 4  # No Dungeon line

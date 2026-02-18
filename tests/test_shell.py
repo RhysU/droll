@@ -6,7 +6,7 @@
 import io
 import random
 import typing
-import unittest
+import pytest
 from dataclasses import replace
 from unittest.mock import patch
 
@@ -22,7 +22,7 @@ def _mechanical_shell(game: Game) -> Shell:
     return Shell(game, display_mode=DisplayMode.MECHANICAL)
 
 
-class TestPrecmd(unittest.TestCase):
+class TestPrecmd:
 
     def test_precmd_emits_reset_when_color_enabled(self):
         with patch("sys.stdout.isatty", return_value=True):
@@ -30,28 +30,28 @@ class TestPrecmd(unittest.TestCase):
         s.preloop()
         with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
             result = s.precmd("fighter goblin")
-        self.assertEqual(result, "fighter goblin")
-        self.assertEqual(fake_out.getvalue(), _RESET)
+        assert result == "fighter goblin"
+        assert fake_out.getvalue() == _RESET
 
     def test_precmd_emits_nothing_when_color_disabled(self):
         s = _mechanical_shell(Game())
         s.preloop()
         with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
             result = s.precmd("fighter goblin")
-        self.assertEqual(result, "fighter goblin")
-        self.assertEqual(fake_out.getvalue(), "")
+        assert result == "fighter goblin"
+        assert fake_out.getvalue() == ""
 
 
-class TestShell(unittest.TestCase):
+class TestShell:
 
     def test_EOF(self):
         """Confirm providing EOF exits cmdloop(...)."""
         s = _mechanical_shell(Game())
-        self.assertFalse(s.cmdqueue)
+        assert not s.cmdqueue
         s.cmdqueue.append("EOF")
         s.cmdloop()
-        self.assertEqual(s.prompt, "(Default  0) ")
-        self.assertEqual(s.lastcmd, "")
+        assert s.prompt == "(Default  0) "
+        assert s.lastcmd == ""
 
     def test_reroll(self):
         """Confirm reroll command forwards to game."""
@@ -111,7 +111,7 @@ def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
     return zip(summaries, commands)
 
 
-class TestUndo(unittest.TestCase):
+class TestUndo:
 
     def test_undo(self):
         """Based upon test_simple(...), verify undo behaving as expected."""
@@ -125,30 +125,30 @@ class TestUndo(unittest.TestCase):
         s.preloop()
 
         # (delve=1, party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             onecmd("undo")
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             onecmd("undo")
         onecmd("descend")
 
         # (delve=1, depth=1, dungeon=(goblin=1),
         #  party=(fighter=1, cleric=2, mage=1, thief=2, scroll=1), ...)
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             onecmd("undo")
         onecmd("fighter goblin")
         onecmd("undo")
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             onecmd("undo")
         onecmd("cleric goblin")
         onecmd("undo")
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             onecmd("undo")
         onecmd("mage goblin")
         onecmd("descend")
 
         # (delve=1, depth=2, dungeon=(goblin=2), ...)
-        self.assertEqual(s._game._world.dungeon.goblin, 2)
-        with self.assertRaises(DrollError):
+        assert s._game._world.dungeon.goblin == 2
+        with pytest.raises(DrollError):
             onecmd("undo")
         onecmd("thief goblin")
         onecmd("fighter goblin")
@@ -158,16 +158,16 @@ class TestUndo(unittest.TestCase):
         onecmd("descend")
 
         # (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), ...)
-        self.assertEqual(s._game._world.dungeon.ooze, 1)
-        self.assertEqual(s._game._world.dungeon.chest, 1)
-        self.assertEqual(s._game._world.dungeon.potion, 1)
-        with self.assertRaises(DrollError):
+        assert s._game._world.dungeon.ooze == 1
+        assert s._game._world.dungeon.chest == 1
+        assert s._game._world.dungeon.potion == 1
+        with pytest.raises(DrollError):
             onecmd("undo")
         onecmd("cleric ooze")
         onecmd("undo")
         onecmd("cleric ooze")
         onecmd("thief chest")
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             onecmd("undo")
         onecmd("scroll potion champion")
         onecmd("undo")
@@ -181,24 +181,24 @@ class TestUndo(unittest.TestCase):
 
         # Initially, undo stack is empty, so "undo" should not be available
         available = s._available_commands()
-        self.assertNotIn("undo", available)
+        assert "undo" not in available
 
         # Execute a command that can be undone (ability doesn't change random state)
         s.onecmd("ability")
 
         # Now undo stack has one item, so "undo" should be available
         available = s._available_commands()
-        self.assertIn("undo", available)
+        assert "undo" in available
 
         # Execute undo to restore previous state
         s.onecmd("undo")
 
         # Undo stack is empty again, so "undo" should not be available
         available = s._available_commands()
-        self.assertNotIn("undo", available)
+        assert "undo" not in available
 
 
-class TestRetireAndQuaffError(unittest.TestCase):
+class TestRetireAndQuaffError:
 
     def test_retire(self):
         """Shell.do_retire exercises the retire command path."""
