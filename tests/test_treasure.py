@@ -5,14 +5,14 @@
 
 from dataclasses import fields, replace
 import random
-import unittest
+import pytest
 
 from droll import error, player, struct, world
 
 
-class TestTreasure(unittest.TestCase):
+class TestTreasure:
 
-    def setUp(self):
+    def setup_method(self):
         """Fixture with a game containing dungeon items but no party."""
         self.game = replace(
             world.new_world(),
@@ -29,10 +29,10 @@ class TestTreasure(unittest.TestCase):
         game = player.apply(
             player.Default, game, self.randrange, "elixir", "cleric"
         )
-        self.assertEqual(game.party.cleric, 1)
-        self.assertEqual(game.treasure.elixir, 0)
+        assert game.party.cleric == 1
+        assert game.treasure.elixir == 0
 
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 player.Default, game, self.randrange, "elixir", "mage"
             )
@@ -43,13 +43,13 @@ class TestTreasure(unittest.TestCase):
         game = player.apply(
             player.Default, game, self.randrange, "bait", "dragon"
         )
-        self.assertEqual(game.treasure.bait, 1)
-        self.assertEqual(game.dungeon.goblin, 0)
-        self.assertEqual(game.dungeon.skeleton, 0)
-        self.assertEqual(game.dungeon.ooze, 0)
-        self.assertEqual(game.dungeon.dragon, 8)
+        assert game.treasure.bait == 1
+        assert game.dungeon.goblin == 0
+        assert game.dungeon.skeleton == 0
+        assert game.dungeon.ooze == 0
+        assert game.dungeon.dragon == 8
 
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(player.Default, game, self.randrange, "bait")
 
     def _helper_artifact(self, artifact, hero, specialty, other):
@@ -58,16 +58,16 @@ class TestTreasure(unittest.TestCase):
             self.game, treasure=replace(self.game.treasure, **{artifact: 2})
         )
         game = player.apply(player.Default, game, None, artifact, specialty)
-        self.assertEqual(getattr(game.treasure, artifact), 1)
-        self.assertEqual(getattr(game.party, hero), 0)
-        self.assertEqual(getattr(game.dungeon, specialty), 0)
+        assert getattr(game.treasure, artifact) == 1
+        assert getattr(game.party, hero) == 0
+        assert getattr(game.dungeon, specialty) == 0
 
         game = player.apply(player.Default, game, None, artifact, other)
-        self.assertEqual(getattr(game.treasure, artifact), 0)
-        self.assertEqual(getattr(game.party, hero), 0)
-        self.assertEqual(getattr(game.dungeon, other), 1)
+        assert getattr(game.treasure, artifact) == 0
+        assert getattr(game.party, hero) == 0
+        assert getattr(game.dungeon, other) == 1
 
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(player.Default, game, None, artifact, other)
 
     def test_sword_via_fighter(self):
@@ -92,6 +92,6 @@ class TestTreasure(unittest.TestCase):
             self.game, treasure=replace(self.game.treasure, tools=1)
         )
         game = player.apply(player.Default, game, None, "tools", "goblin")
-        self.assertEqual(game.treasure.tools, 0)
-        self.assertEqual(game.party.thief, 0)
-        self.assertEqual(game.dungeon.goblin, 1)
+        assert game.treasure.tools == 0
+        assert game.party.thief == 0
+        assert game.dungeon.goblin == 1

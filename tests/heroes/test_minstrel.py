@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Tests for Minstrel/Bard hero abilities."""
 
-import unittest
+import pytest
 
 import droll.error
 import droll.struct
@@ -13,7 +13,7 @@ from droll.heroes.minstrel import Minstrel, Bard, _minstrel_ability
 _UNUSED = object()
 
 
-class TestMinstrel(unittest.TestCase):
+class TestMinstrel:
 
     def test_minstrel_ability_discards_dragons(self):
         """Minstrel/Bard ability discards all dragon dice."""
@@ -23,9 +23,9 @@ class TestMinstrel(unittest.TestCase):
             party=droll.struct.Party(fighter=1),
         )
         result = _minstrel_ability(world, _UNUSED, "ability")
-        self.assertEqual(result.dungeon.dragon, 0)
-        self.assertEqual(result.dungeon.goblin, 1)
-        self.assertFalse(result.ability)
+        assert result.dungeon.dragon == 0
+        assert result.dungeon.goblin == 1
+        assert not result.ability
 
     def test_minstrel_ability_rejects_non_dragon(self):
         """Minstrel/Bard ability only works on dragons."""
@@ -34,7 +34,7 @@ class TestMinstrel(unittest.TestCase):
             dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
             party=droll.struct.Party(fighter=1),
         )
-        with self.assertRaises(droll.error.DrollError):
+        with pytest.raises(droll.error.DrollError):
             _minstrel_ability(world, _UNUSED, "ability", "goblin")
 
     def test_bard_champion_defeats_all_plus_additional(self):
@@ -47,14 +47,13 @@ class TestMinstrel(unittest.TestCase):
         result = Bard.party.champion.goblin(
             world, _UNUSED, "champion", "goblin", "skeleton"
         )
-        self.assertEqual(result.dungeon.goblin, 0)
-        self.assertEqual(result.dungeon.skeleton, 0)
-        self.assertEqual(result.party.champion, 0)
+        assert result.dungeon.goblin == 0
+        assert result.dungeon.skeleton == 0
+        assert result.party.champion == 0
 
     def test_minstrel_advances_to_bard(self):
         """Minstrel advances to Bard at 5+ experience."""
         low_xp = droll.struct.World(experience=4)
         high_xp = droll.struct.World(experience=5)
-        self.assertEqual(Minstrel.advance(low_xp), Minstrel)
-        self.assertEqual(Minstrel.advance(high_xp), Bard)
-
+        assert Minstrel.advance(low_xp) == Minstrel
+        assert Minstrel.advance(high_xp) == Bard

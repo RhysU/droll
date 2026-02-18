@@ -4,7 +4,6 @@
 """Tests for Knight/DragonSlayer hero abilities."""
 
 import random
-import unittest
 
 import droll.dice
 import droll.struct
@@ -14,15 +13,15 @@ from droll.heroes.knight import Knight, DragonSlayer, _knight_roll_party
 _UNUSED = object()
 
 
-class TestKnight(unittest.TestCase):
+class TestKnight:
 
     def test_knight_roll_party_converts_scrolls(self):
         """Knight converts scrolls to champions when rolling party."""
         randrange = random.Random(4).randrange
         party, regroup = _knight_roll_party(7, randrange)
-        self.assertEqual(party.scroll, 0)
-        self.assertEqual(sum(droll.struct.field_values(party)), 7)
-        self.assertEqual(regroup, droll.struct.Regroup())
+        assert party.scroll == 0
+        assert sum(droll.struct.field_values(party)) == 7
+        assert regroup == droll.struct.Regroup()
 
     def test_knight_ability_baits_dragon(self):
         """Knight ability converts monsters to dragons without treasure."""
@@ -32,10 +31,10 @@ class TestKnight(unittest.TestCase):
             party=droll.struct.Party(fighter=2, champion=1),
         )
         result = Knight.ability(world, _UNUSED, "ability")
-        self.assertEqual(result.dungeon.dragon, 3)
-        self.assertEqual(result.dungeon.goblin, 0)
-        self.assertEqual(result.dungeon.skeleton, 0)
-        self.assertFalse(result.ability)
+        assert result.dungeon.dragon == 3
+        assert result.dungeon.goblin == 0
+        assert result.dungeon.skeleton == 0
+        assert not result.ability
 
     def test_dragonslayer_defeats_dragon_with_two_heroes(self):
         """DragonSlayer defeats a dragon with only 2 distinct heroes."""
@@ -51,14 +50,14 @@ class TestKnight(unittest.TestCase):
         result = DragonSlayer.party.fighter.dragon(
             world, randrange, "fighter", "dragon", "mage"
         )
-        self.assertEqual(result.dungeon.dragon, 0)
-        self.assertEqual(result.experience, 1)
+        assert result.dungeon.dragon == 0
+        assert result.experience == 1
 
     def test_dragonslayer_advance(self):
         """Knight advances to DragonSlayer advances to DragonSlayer."""
         low_xp = droll.struct.World(experience=2)
         mid_xp = droll.struct.World(experience=7)
         high_xp = droll.struct.World(experience=15)
-        self.assertEqual(Knight.advance(low_xp), Knight)
-        self.assertEqual(Knight.advance(mid_xp), DragonSlayer)
-        self.assertEqual(DragonSlayer.advance(high_xp), DragonSlayer)
+        assert Knight.advance(low_xp) == Knight
+        assert Knight.advance(mid_xp) == DragonSlayer
+        assert DragonSlayer.advance(high_xp) == DragonSlayer

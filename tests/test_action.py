@@ -5,7 +5,7 @@
 
 from dataclasses import fields, replace
 import random
-import unittest
+import pytest
 
 from droll import action, dice, error, heroes, player, struct, world
 from droll.error import DrollError
@@ -14,7 +14,7 @@ from droll.error import DrollError
 _UNUSED = object()
 
 
-class TestDefeatAllPlusAdditional(unittest.TestCase):
+class TestDefeatAllPlusAdditional:
 
     def test_defeats_all_plus_one_additional(self):
         """Defeats all of one type plus one additional."""
@@ -25,9 +25,9 @@ class TestDefeatAllPlusAdditional(unittest.TestCase):
         result = action.defeat_all_plus_additional(
             w, _UNUSED, "champion", "goblin", "skeleton"
         )
-        self.assertEqual(result.dungeon.goblin, 0)
-        self.assertEqual(result.dungeon.skeleton, 0)
-        self.assertEqual(result.party.champion, 0)
+        assert result.dungeon.goblin == 0
+        assert result.dungeon.skeleton == 0
+        assert result.party.champion == 0
 
     def test_no_additional_when_cleared(self):
         """No additional needed when monsters cleared."""
@@ -38,7 +38,7 @@ class TestDefeatAllPlusAdditional(unittest.TestCase):
         result = action.defeat_all_plus_additional(
             w, _UNUSED, "champion", "goblin"
         )
-        self.assertEqual(result.dungeon.goblin, 0)
+        assert result.dungeon.goblin == 0
 
     def test_rejects_extra_additional(self):
         """Rejects more than one additional target."""
@@ -46,7 +46,7 @@ class TestDefeatAllPlusAdditional(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1, skeleton=2),
             party=struct.Party(champion=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_all_plus_additional(
                 w,
                 _UNUSED,
@@ -62,7 +62,7 @@ class TestDefeatAllPlusAdditional(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1, skeleton=1),
             party=struct.Party(champion=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_all_plus_additional(
                 w,
                 _UNUSED,
@@ -71,7 +71,7 @@ class TestDefeatAllPlusAdditional(unittest.TestCase):
             )
 
 
-class TestDefeatOnePlusAdditional(unittest.TestCase):
+class TestDefeatOnePlusAdditional:
 
     def test_defeats_one_plus_one_additional(self):
         """Defeats one of primary target plus one additional."""
@@ -82,9 +82,9 @@ class TestDefeatOnePlusAdditional(unittest.TestCase):
         result = action.defeat_one_plus_additional(
             w, _UNUSED, "champion", "goblin", "skeleton"
         )
-        self.assertEqual(result.dungeon.goblin, 1)
-        self.assertEqual(result.dungeon.skeleton, 0)
-        self.assertEqual(result.party.champion, 0)
+        assert result.dungeon.goblin == 1
+        assert result.dungeon.skeleton == 0
+        assert result.party.champion == 0
 
     def test_no_additional_when_cleared(self):
         """No additional needed when all monsters cleared after defeating one."""
@@ -95,8 +95,8 @@ class TestDefeatOnePlusAdditional(unittest.TestCase):
         result = action.defeat_one_plus_additional(
             w, _UNUSED, "fighter", "goblin"
         )
-        self.assertEqual(result.dungeon.goblin, 0)
-        self.assertEqual(result.party.fighter, 0)
+        assert result.dungeon.goblin == 0
+        assert result.party.fighter == 0
 
     def test_rejects_additional_when_cleared(self):
         """Rejects additional target when all monsters already cleared."""
@@ -104,7 +104,7 @@ class TestDefeatOnePlusAdditional(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1),
             party=struct.Party(fighter=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_one_plus_additional(
                 w, _UNUSED, "fighter", "goblin", "skeleton"
             )
@@ -115,7 +115,7 @@ class TestDefeatOnePlusAdditional(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1, skeleton=1),
             party=struct.Party(fighter=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_one_plus_additional(
                 w, _UNUSED, "fighter", "goblin"
             )
@@ -126,7 +126,7 @@ class TestDefeatOnePlusAdditional(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1, skeleton=1, ooze=1),
             party=struct.Party(champion=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_one_plus_additional(
                 w,
                 _UNUSED,
@@ -145,15 +145,15 @@ class TestDefeatOnePlusAdditional(unittest.TestCase):
         result = action.defeat_one_plus_additional(
             w, _UNUSED, "champion", "goblin", "skeleton"
         )
-        self.assertEqual(result.dungeon.goblin, 2)
-        self.assertEqual(result.dungeon.skeleton, 0)
-        self.assertEqual(result.party.champion, 0)
+        assert result.dungeon.goblin == 2
+        assert result.dungeon.skeleton == 0
+        assert result.party.champion == 0
 
 
-class TestRerollParty(unittest.TestCase):
+class TestRerollParty:
     """Tests for action.reroll supporting party dice (issue #82)."""
 
-    def setUp(self):
+    def setup_method(self):
         """Fixture with a world containing known dungeon and party dice."""
         self.world = replace(
             world.new_world(),
@@ -178,11 +178,11 @@ class TestRerollParty(unittest.TestCase):
             self.world, randrange, "scroll", "fighter"
         )
         # One scroll consumed for the hero cost
-        self.assertEqual(result.party.scroll, 1)
+        assert result.party.scroll == 1
         # Fighter was removed (2-1=1) then re-rolled as fighter (+1=2)
-        self.assertEqual(result.party.fighter, 2)
+        assert result.party.fighter == 2
         # Dungeon unchanged
-        self.assertEqual(result.dungeon, self.world.dungeon)
+        assert result.dungeon == self.world.dungeon
 
     def test_reroll_multiple_party_dice(self):
         """Rerolling multiple party dice removes and re-rolls each."""
@@ -192,12 +192,12 @@ class TestRerollParty(unittest.TestCase):
             self.world, randrange, "scroll", "fighter", "cleric"
         )
         # One scroll consumed
-        self.assertEqual(result.party.scroll, 1)
+        assert result.party.scroll == 1
         # fighter: 2 - 1 + 1(rolled) = 2; cleric: 1 - 1 + 1(rolled) = 1
-        self.assertEqual(result.party.fighter, 2)
-        self.assertEqual(result.party.cleric, 1)
+        assert result.party.fighter == 2
+        assert result.party.cleric == 1
         # Dungeon unchanged
-        self.assertEqual(result.dungeon, self.world.dungeon)
+        assert result.dungeon == self.world.dungeon
 
     def test_reroll_mix_dungeon_and_party(self):
         """Rerolling a mix of dungeon and party dice handles both."""
@@ -207,17 +207,17 @@ class TestRerollParty(unittest.TestCase):
             self.world, randrange, "scroll", "goblin", "fighter"
         )
         # One scroll consumed
-        self.assertEqual(result.party.scroll, 1)
+        assert result.party.scroll == 1
         # Dungeon: goblin was 2, removed 1, re-rolled as goblin (+1) => 2
-        self.assertEqual(result.dungeon.goblin, 2)
+        assert result.dungeon.goblin == 2
         # Party: fighter was 2, removed 1, re-rolled as mage (+1)
-        self.assertEqual(result.party.fighter, 1)
-        self.assertEqual(result.party.mage, 1)
+        assert result.party.fighter == 1
+        assert result.party.mage == 1
 
     def test_reroll_party_die_not_present_raises(self):
         """Rerolling a party die that is not present raises DrollError."""
         randrange = self._canned_randrange([])
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.reroll(
                 self.world, randrange, "scroll", "mage"
             )
@@ -225,44 +225,40 @@ class TestRerollParty(unittest.TestCase):
     def test_reroll_unknown_target_raises(self):
         """Rerolling a target that is neither dungeon nor party raises DrollError."""
         randrange = self._canned_randrange([])
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.reroll(
                 self.world, randrange, "scroll", "nonexistent"
             )
 
 
-class TestDefeatDragonHeroesWildcard(unittest.TestCase):
+class TestDefeatDragonHeroesWildcard:
 
     def test_less_interesting_successful_cases(self):
         """Test valid dragon defeats with wildcard heroes."""
-        self.assertTrue(
-            action.defeat_dragon_heroes_wildcard(
-                "cleric",
-                "thief",
-                "mage",
-            )
+        assert action.defeat_dragon_heroes_wildcard(
+            "cleric",
+            "thief",
+            "mage",
         )
-        self.assertTrue(
-            action.defeat_dragon_heroes_wildcard(
-                "cleric", "thief", "fighter", _wildcard={"scroll"}
-            )
+        assert action.defeat_dragon_heroes_wildcard(
+            "cleric", "thief", "fighter", _wildcard={"scroll"}
         )
 
     def test_less_interesting_failure_cases(self):
         """Test invalid dragon defeats with wildcard heroes."""
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_wildcard(
                 "cleric", "thief", _wildcard={"scroll"}
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_wildcard(
                 "cleric", "fighter", _wildcard={"fighter"}
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_wildcard(
                 "cleric", "thief", "champion", "mage", _wildcard={"fighter"}
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_wildcard(
                 "cleric",
                 "thief",
@@ -273,13 +269,13 @@ class TestDefeatDragonHeroesWildcard(unittest.TestCase):
 
     def test_more_interesting_failure_cases(self):
         """Test invalid dragon defeats with multiple wildcard heroes."""
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_wildcard(
                 "mage",
                 "mage",
                 "scroll",
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_wildcard(
                 "fighter",
                 "fighter",
@@ -288,32 +284,28 @@ class TestDefeatDragonHeroesWildcard(unittest.TestCase):
             )
 
 
-class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
+class TestDefeatDragonHeroesInterchangeable:
 
     def test_less_interesting_successful_cases(self):
         """Test valid dragon defeats with interchangeable heroes."""
-        self.assertTrue(
-            action.defeat_dragon_heroes_interchangeable(
-                "cleric", "thief", "mage", _interchangeable={"fighter"}
-            )
+        assert action.defeat_dragon_heroes_interchangeable(
+            "cleric", "thief", "mage", _interchangeable={"fighter"}
         )
-        self.assertTrue(
-            action.defeat_dragon_heroes_interchangeable(
-                "cleric", "thief", "fighter", _interchangeable={"fighter"}
-            )
+        assert action.defeat_dragon_heroes_interchangeable(
+            "cleric", "thief", "fighter", _interchangeable={"fighter"}
         )
 
     def test_less_interesting_failure_cases(self):
         """Test invalid dragon defeats with interchangeable heroes."""
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "cleric", "thief", _interchangeable={"fighter"}
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "cleric", "fighter", _interchangeable={"fighter"}
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "cleric",
                 "thief",
@@ -321,7 +313,7 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
                 "mage",
                 _interchangeable={"fighter"},
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "cleric",
                 "thief",
@@ -332,22 +324,22 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
 
     def test_more_interesting_failure_cases(self):
         """Invalid dragon defeats with multiple interchangeable hero types."""
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "mage", "mage", "mage", _interchangeable={"mage", "fighter"}
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "fighter",
                 "fighter",
                 "fighter",
                 _interchangeable={"mage", "fighter"},
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "fighter", "mage", "mage", _interchangeable={"mage", "fighter"}
             )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "mage",
                 "fighter",
@@ -356,9 +348,9 @@ class TestDefeatDragonHeroesInterchangeable(unittest.TestCase):
             )
 
 
-class TestDragon(unittest.TestCase):
+class TestDragon:
 
-    def setUp(self):
+    def setup_method(self):
         """Set up fixture for a game containing dragons and party members."""
         self.game = replace(
             world.new_world(),
@@ -380,12 +372,12 @@ class TestDragon(unittest.TestCase):
             "cleric",
             "mage",
         )
-        self.assertEqual(game.party.fighter, 1)
-        self.assertEqual(game.party.cleric, 1)
-        self.assertEqual(game.party.mage, 1)
-        self.assertEqual(game.dungeon.dragon, 0)
-        self.assertEqual(game.experience, 1)
-        self.assertEqual(sum(struct.field_values(game.treasure)), 1)
+        assert game.party.fighter == 1
+        assert game.party.cleric == 1
+        assert game.party.mage == 1
+        assert game.dungeon.dragon == 0
+        assert game.experience == 1
+        assert sum(struct.field_values(game.treasure)) == 1
 
     def test_treasure_slot1(self):
         """Sword treasure can substitute for fighter in dragon combat."""
@@ -402,18 +394,18 @@ class TestDragon(unittest.TestCase):
             "cleric",
             "mage",
         )
-        self.assertEqual(game.treasure.sword, 6)
-        self.assertEqual(game.party.fighter, 0)
-        self.assertEqual(game.party.cleric, 1)
-        self.assertEqual(game.party.mage, 1)
-        self.assertEqual(game.dungeon.dragon, 0)
-        self.assertEqual(game.experience, 1)
-        self.assertEqual(sum(struct.field_values(game.treasure)), 7)
+        assert game.treasure.sword == 6
+        assert game.party.fighter == 0
+        assert game.party.cleric == 1
+        assert game.party.mage == 1
+        assert game.dungeon.dragon == 0
+        assert game.experience == 1
+        assert sum(struct.field_values(game.treasure)) == 7
 
     def test_monsters_remain(self):
         """Dragon cannot be attacked while monsters remain in dungeon."""
         game = replace(self.game, dungeon=replace(self.game.dungeon, goblin=1))
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 player.Default,
                 game,
@@ -426,7 +418,7 @@ class TestDragon(unittest.TestCase):
 
     def test_too_few_specified(self):
         """Attacking dragon with too few heroes raises an error."""
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -436,13 +428,13 @@ class TestDragon(unittest.TestCase):
                 "cleric",
             )
 
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 player.Default, self.game, self.randrange, "fighter", "dragon"
             )
 
         # Dragon Slayer requires only two
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 heroes.DragonSlayer,
                 self.game,
@@ -453,7 +445,7 @@ class TestDragon(unittest.TestCase):
 
     def test_only_heroes_accepted(self):
         """Only valid heroes can be used against dragons."""
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -466,7 +458,7 @@ class TestDragon(unittest.TestCase):
 
     def test_one_scroll(self):
         """A single scroll cannot be used as a hero substitute."""
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -478,7 +470,7 @@ class TestDragon(unittest.TestCase):
             )
 
         # Dragon Slayer requires only two
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 heroes.DragonSlayer,
                 self.game,
@@ -490,7 +482,7 @@ class TestDragon(unittest.TestCase):
 
     def test_not_enough_distinct(self):
         """Duplicate heroes cannot defeat a dragon."""
-        with self.assertRaises(error.DrollError):
+        with pytest.raises(error.DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -502,7 +494,7 @@ class TestDragon(unittest.TestCase):
             )
 
 
-class TestConvertDungeonToParty(unittest.TestCase):
+class TestConvertDungeonToParty:
 
     def test_converts_up_to_max_count(self):
         """Converts min(available, max_count) dungeon dice to party dice."""
@@ -513,9 +505,9 @@ class TestConvertDungeonToParty(unittest.TestCase):
         result = action.convert_dungeon_to_party(
             w, source="goblin", destination="thief", max_count=2
         )
-        self.assertEqual(result.dungeon.goblin, 1)
-        self.assertEqual(result.party.thief, 2)
-        self.assertEqual(result.regroup.discard.thief, 2)
+        assert result.dungeon.goblin == 1
+        assert result.party.thief == 2
+        assert result.regroup.discard.thief == 2
 
     def test_converts_fewer_when_limited(self):
         """Converts only available count when fewer than max_count."""
@@ -526,24 +518,24 @@ class TestConvertDungeonToParty(unittest.TestCase):
         result = action.convert_dungeon_to_party(
             w, source="skeleton", destination="fighter", max_count=2
         )
-        self.assertEqual(result.dungeon.skeleton, 0)
-        self.assertEqual(result.party.fighter, 1)
-        self.assertEqual(result.regroup.discard.fighter, 1)
+        assert result.dungeon.skeleton == 0
+        assert result.party.fighter == 1
+        assert result.regroup.discard.fighter == 1
 
 
-class TestActionErrorPaths(unittest.TestCase):
+class TestActionErrorPaths:
     """Tests for game-rule error paths in the action module."""
 
     def test_decrement_dungeon_zero_target(self):
         """Cannot decrement a dungeon target that is already zero."""
         dungeon = struct.Dungeon(goblin=0, skeleton=1)
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.decrement_dungeon(dungeon, "goblin")
 
     def test_eliminate_dungeon_zero_target(self):
         """Cannot eliminate a dungeon target that is already zero."""
         dungeon = struct.Dungeon(goblin=0, skeleton=1)
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.eliminate_dungeon(dungeon, "goblin")
 
     def test_open_one_before_monsters_defeated(self):
@@ -552,7 +544,7 @@ class TestActionErrorPaths(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1, chest=1),
             party=struct.Party(thief=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.open_one(w, _UNUSED, "thief", "chest")
 
     def test_open_all_before_monsters_defeated(self):
@@ -561,7 +553,7 @@ class TestActionErrorPaths(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1, chest=2),
             party=struct.Party(thief=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.open_all(w, _UNUSED, "thief", "chest")
 
     def test_quaff_no_potions(self):
@@ -570,7 +562,7 @@ class TestActionErrorPaths(unittest.TestCase):
             dungeon=struct.Dungeon(potion=0),
             party=struct.Party(fighter=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.quaff(w, _UNUSED, "fighter", "potion")
 
     def test_reroll_no_targets(self):
@@ -579,7 +571,7 @@ class TestActionErrorPaths(unittest.TestCase):
             dungeon=struct.Dungeon(goblin=1),
             party=struct.Party(scroll=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.reroll(w, _UNUSED, "scroll")
 
     def test_reroll_dragon_disallowed(self):
@@ -588,12 +580,12 @@ class TestActionErrorPaths(unittest.TestCase):
             dungeon=struct.Dungeon(dragon=3),
             party=struct.Party(scroll=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.reroll(w, _UNUSED, "scroll", "dragon")
 
     def test_interchangeable_disallowed_hero(self):
         """Scrolls cannot defeat a dragon via interchangeable heroes."""
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.defeat_dragon_heroes_interchangeable(
                 "scroll", "fighter", "thief",
                 _interchangeable={"fighter", "mage"},
@@ -606,23 +598,23 @@ class TestActionErrorPaths(unittest.TestCase):
             party=struct.Party(fighter=1),
             treasure=struct.Treasure(bait=1),
         )
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.bait_dragon(w, _UNUSED, "bait", "goblin")
 
     def test_consume_ability_when_unavailable(self):
         """Cannot consume ability that is already used."""
         w = struct.World(ability=False)
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.consume_ability(w)
 
     def test_nop_ability_rejects_target(self):
         """Default nop ability rejects any target."""
         w = struct.World(ability=True)
-        with self.assertRaises(DrollError):
+        with pytest.raises(DrollError):
             action.nop_ability(w, _UNUSED, "ability", "fighter")
 
 
-class TestRegroupDiscard(unittest.TestCase):
+class TestRegroupDiscard:
 
     def test_regroup_discard_after_quaff(self):
         """
@@ -644,8 +636,8 @@ class TestRegroupDiscard(unittest.TestCase):
         # Thief quaffs potion, reviving another thief
         post = action.quaff(pre, None, "thief", "potion", "thief")
         # The marked thief was consumed so the discard counter must drop
-        self.assertEqual(post.regroup.discard.thief, 0)
-        self.assertEqual(post.party.thief, 1)
+        assert post.regroup.discard.thief == 0
+        assert post.party.thief == 1
 
         # After descending the revived thief must survive regroup
         descended = world.descend(
@@ -653,7 +645,7 @@ class TestRegroupDiscard(unittest.TestCase):
             dice.roll_dungeon,
             random.Random(4).randrange,
         )
-        self.assertEqual(descended.party.thief, 1)
+        assert descended.party.thief == 1
 
     def test_regroup_discard_after_elixir1(self):
         """Accounting of revived vs force-discard thieves via elixirs."""
@@ -671,13 +663,13 @@ class TestRegroupDiscard(unittest.TestCase):
 
         # Force-discard thief kills the ooze
         post1 = action.defeat_one(pre, None, "thief", "ooze")
-        self.assertEqual(post1.regroup.discard.thief, 0)
-        self.assertEqual(post1.party.thief, 0)
+        assert post1.regroup.discard.thief == 0
+        assert post1.party.thief == 0
 
         # Elixir revives a new thief
         post2 = action.elixir(post1, None, "elixir", "thief")
-        self.assertEqual(post2.regroup.discard.thief, 0)
-        self.assertEqual(post2.party.thief, 1)
+        assert post2.regroup.discard.thief == 0
+        assert post2.party.thief == 1
 
         # After descending the revived thief must survive regroup
         descended = world.descend(
@@ -685,7 +677,7 @@ class TestRegroupDiscard(unittest.TestCase):
             dice.roll_dungeon,
             random.Random(4).randrange,
         )
-        self.assertEqual(descended.party.thief, 1)
+        assert descended.party.thief == 1
 
     def test_regroup_discard_after_elixir2(self):
         """Accounting of revived vs force-discard thieves via elixirs."""
@@ -703,13 +695,13 @@ class TestRegroupDiscard(unittest.TestCase):
 
         # Elixir revives a new thief
         post1 = action.elixir(pre, None, "elixir", "thief")
-        self.assertEqual(post1.regroup.discard.thief, 1)
-        self.assertEqual(post1.party.thief, 2)
+        assert post1.regroup.discard.thief == 1
+        assert post1.party.thief == 2
 
         # Force-discard thief kills the ooze
         post2 = action.defeat_one(post1, None, "thief", "ooze")
-        self.assertEqual(post2.regroup.discard.thief, 0)
-        self.assertEqual(post2.party.thief, 1)
+        assert post2.regroup.discard.thief == 0
+        assert post2.party.thief == 1
 
         # After descending the revived thief must survive regroup
         descended = world.descend(
@@ -717,4 +709,4 @@ class TestRegroupDiscard(unittest.TestCase):
             dice.roll_dungeon,
             random.Random(4).randrange,
         )
-        self.assertEqual(descended.party.thief, 1)
+        assert descended.party.thief == 1
