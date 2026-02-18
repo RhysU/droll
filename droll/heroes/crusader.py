@@ -9,7 +9,7 @@ import functools
 
 from .. import action
 from .. import dice
-from .. import error
+from ..error import DrollError
 from .. import struct
 from ..world import replace_treasure, draw_treasure
 from ..player import Default
@@ -36,7 +36,7 @@ def _crusader_ability(
     if target is None:
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
-        raise error.DrollError(
+        raise DrollError(
             f"Target {target} not one of {_acceptable_targets}."
         )
     return action.consume_ability(
@@ -57,7 +57,7 @@ def _paladin_ability(
     For each potion, add one argument for the hero to review."""
     # Validate that a treasure was specified
     if target is None:
-        raise error.DrollError(
+        raise DrollError(
             f"Treasure to consume required for {noun}."
         )
 
@@ -68,7 +68,7 @@ def _paladin_ability(
     if world.dungeon is not None:
         potion_count = world.dungeon.potion
         if len(revivable) != potion_count:
-            raise error.DrollError(
+            raise DrollError(
                 f"Exactly {potion_count} heroes to revive required."
             )
 

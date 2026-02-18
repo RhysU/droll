@@ -9,7 +9,7 @@ import functools
 
 from .. import action
 from .. import dice
-from .. import error
+from ..error import DrollError
 from .. import struct
 from ..player import Default
 
@@ -35,7 +35,7 @@ def _spellsword_ability(
     if target is None:
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
-        raise error.DrollError(
+        raise DrollError(
             f"Target {target} not one of {_acceptable_targets}."
         )
     return action.consume_ability(
@@ -65,7 +65,7 @@ def _battlemage_ability(
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:
-        raise error.DrollError(f"No targets accepted for {noun}.")
+        raise DrollError(f"No targets accepted for {noun}.")
     return action.consume_ability(replace(world, dungeon=struct.Dungeon()))
 
 

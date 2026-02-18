@@ -9,7 +9,7 @@ from dataclasses import replace
 
 from . import action
 from . import dice
-from . import error
+from .error import DrollError
 from . import struct
 from .world import replace_treasure
 
@@ -135,9 +135,9 @@ def apply(
 
     # One-off handling of some treasures, with error wrapping to aid usability
     if noun == "portal":
-        raise error.DrollError('To use a portal, directly "retire".')
+        raise DrollError('To use a portal, directly "retire".')
     if noun == "ring":
-        raise error.DrollError(
+        raise DrollError(
             'To use a ring, directly "descend" or "retire".'
         )
     if noun in {"ability", "bait", "elixir"}:
@@ -145,7 +145,7 @@ def apply(
             action_ = getattr(player, noun)
             return action_(world, randrange, noun, target, *additional)
         except AttributeError as cause:
-            raise error.DrollError(str(cause)) from cause
+            raise DrollError(str(cause)) from cause
 
     # Temporarily inflate party with treasure-as-hero counts
     prior_treasure = world.treasure
@@ -158,11 +158,11 @@ def apply(
         try:
             action_ = getattr(player.party, noun)
             if target is None:
-                raise error.DrollError(f'"{noun}" requires a target.')
+                raise DrollError(f'"{noun}" requires a target.')
             action_ = getattr(action_, target)
             world = action_(world, randrange, noun, target, *additional)
         except (AttributeError, TypeError) as cause:
-            raise error.DrollError(str(cause)) from cause
+            raise DrollError(str(cause)) from cause
 
     # Undo phantom inflation, then consume treasure for any artifacts spent
     world = _adjust_phantom_treasures(world, player.artifacts, prior_treasure, -1)
