@@ -158,7 +158,7 @@ def apply(
         try:
             action_ = getattr(player.party, noun)
             if target is None:
-                raise error.DrollError(f'"{noun}" requires some target.')
+                raise error.DrollError(f'"{noun}" requires a target.')
             action_ = getattr(action_, target)
             world = action_(world, randrange, noun, target, *additional)
         except (AttributeError, TypeError) as cause:
