@@ -6,51 +6,19 @@
 from dataclasses import replace
 
 from . import dice
+from .dungeon import blocking_dragon, defeated_dungeon, defeated_monsters
 from .error import DrollError
 from . import struct
+from .treasure import replace_treasure
 
 __all__ = (
-    "defeated_dungeon",
-    "defeated_monsters",
     "delve",
     "descend",
-    "draw_treasure",
-    "exhausted_dungeon",
     "new_world",
-    "replace_treasure",
     "retire",
     "retreat",
     "score",
 )
-
-
-def defeated_monsters(dungeon: struct.Dungeon) -> bool:
-    """Are all non-dragon monsters on this dungeon defeated?"""
-    return (dungeon is None) or (
-        dungeon.goblin + dungeon.skeleton + dungeon.ooze
-    ) == 0
-
-
-def defeated_dungeon(dungeon: struct.Dungeon) -> bool:
-    """Are all monsters and any dragon on this dungeon defeated?"""
-    return (dungeon is None) or (
-        defeated_monsters(dungeon) and dungeon.dragon < 3
-    )
-
-
-def _blocking_dragon(dungeon: struct.Dungeon) -> bool:
-    """Is a dragon blocking progress to the next level?"""
-    return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
-
-
-def exhausted_dungeon(dungeon: struct.Dungeon) -> bool:
-    """Has the player exhausted all possible actions for this dungeon?
-
-    In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
-    return (dungeon is None) or (
-        (sum(struct.field_values(dungeon)) - dungeon.dragon == 0)
-        and not _blocking_dragon(dungeon)
-    )
 
 
 def new_world() -> struct.World:
@@ -184,7 +152,7 @@ def retire(world: struct.World) -> struct.World:
             world = _apply_portal(world)
         except DrollError:
             raise DrollError("Monsters remain but no portal in hand.")
-    elif _blocking_dragon(world.dungeon):
+    elif blocking_dragon(world.dungeon):
         world = _escape_dragon(world)
 
     # Regroup just prior to retiring
@@ -213,69 +181,21 @@ def score(world: struct.World) -> int:
     """Compute the present score for the world, including all treasure."""
     return (
         world.experience
-        + sum(
-            struct.field_values(world.treasure)
-        )  # Each piece of treasure is +1 point
+        + sum(struct.field_values(world.treasure))  # Each piece of treasure is +1 point
         + world.treasure.portal  # Portals are +1 extra (2 total each)
         + 2 * (world.treasure.scale // 2)  # Pairs of scales are +2 extra
     )
 
 
-def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
-    """Draw a random treasure from the reserve, weighted by counts."""
-    total = sum(struct.field_values(reserve))
-    if not total:
-        raise RuntimeError("No items remaining in the reserve")
-    choice = randrange(0, total)
-    cumulative = 0
-    for name, count in struct.field_items(reserve):
-        cumulative += count
-        if choice < cumulative:
-            return name
-    raise RuntimeError("Unreachable")
-
-
-def draw_treasure(
-    world: struct.World, randrange: dice.RandRange
-) -> struct.World:
-    """Draw a single item from the reserve into the player's treasures."""
-    drawn = _draw(reserve=world.reserve, randrange=randrange)
-    return replace(
-        world,
-        treasure=replace(
-            world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}
-        ),
-        reserve=replace(
-            world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}
-        ),
-    )
-
-
-def replace_treasure(world: struct.World, item: str) -> struct.World:
-    """Replace a single item from the player's treasures into the reserve."""
-    prior_count = getattr(world.treasure, item)
-    if not prior_count:
-        raise DrollError(f"'{item}' not in player's treasure.")
-    return replace(
-        world,
-        treasure=replace(world.treasure, **{item: prior_count - 1}),
-        reserve=replace(
-            world.reserve, **{item: getattr(world.reserve, item) + 1}
-        ),
-    )
-
-
 def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
-    if not _blocking_dragon(world.dungeon):
+    if not blocking_dragon(world.dungeon):
         raise DrollError(f"A dragon must be present to use a {noun}.")
     world = replace_treasure(world, noun)
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
 
 
-def _apply_portal(
-    world: struct.World, *, noun: str = "portal"
-) -> struct.World:
+def _apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):

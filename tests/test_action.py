@@ -8,6 +8,7 @@ import random
 import pytest
 
 from droll import action, dice, error, heroes, player, struct, world
+from droll.dungeon import decrement_dungeon, eliminate_dungeon
 from droll.error import DrollError
 
 # Known to be unused because it would raise NameErrors on any use
@@ -524,14 +525,14 @@ def test_decrement_dungeon_zero_target():
     """Cannot decrement a dungeon target that is already zero."""
     dungeon = struct.Dungeon(goblin=0, skeleton=1)
     with pytest.raises(DrollError):
-        action.decrement_dungeon(dungeon, "goblin")
+        decrement_dungeon(dungeon, "goblin")
 
 
 def test_eliminate_dungeon_zero_target():
     """Cannot eliminate a dungeon target that is already zero."""
     dungeon = struct.Dungeon(goblin=0, skeleton=1)
     with pytest.raises(DrollError):
-        action.eliminate_dungeon(dungeon, "goblin")
+        eliminate_dungeon(dungeon, "goblin")
 
 
 def test_open_one_before_monsters_defeated():

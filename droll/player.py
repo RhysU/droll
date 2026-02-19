@@ -11,7 +11,7 @@ from . import action
 from . import dice
 from .error import DrollError
 from . import struct
-from .world import replace_treasure
+from .treasure import replace_treasure
 
 __all__ = (
     "Default",

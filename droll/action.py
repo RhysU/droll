@@ -10,15 +10,20 @@ from dataclasses import replace
 import operator
 
 from . import dice
+from .dungeon import (
+    defeated_monsters,
+    decrement_dungeon,
+    eliminate_dungeon,
+    increment_dungeon,
+)
 from .error import DrollError
 from . import struct
-from .world import defeated_monsters, draw_treasure, replace_treasure
+from .treasure import draw_treasure, replace_treasure
 
 __all__ = (
     "bait_dragon",
     "consume_ability",
     "convert_dungeon_to_party",
-    "decrement_dungeon",
     "defeat_all",
     "defeat_all_plus_additional",
     "defeat_one_plus_additional",
@@ -28,8 +33,6 @@ __all__ = (
     "defeat_dragon_heroes_wildcard",
     "defeat_one",
     "elixir",
-    "eliminate_dungeon",
-    "increment_dungeon",
     "increment_party",
     "nop_ability",
     "open_all",
@@ -74,29 +77,11 @@ def _decrement_regroup(regroup: struct.Regroup, hero: str) -> struct.Regroup:
     )
 
 
-def decrement_dungeon(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
-    """Decrease the count of the specified target type by one."""
-    if dungeon is None:
-        raise DrollError("No dungeon currently active.")
-    prior_targets = getattr(dungeon, target)
-    if not prior_targets:
-        raise DrollError(f"At least 1 {target} required.")
-    return replace(dungeon, **{target: prior_targets - 1})
-
-
 def increment_party(party: struct.Party, hero: str) -> struct.Party:
     """Increase the count of the specified hero type by one."""
     if party is None:
         raise DrollError("No party currently active.")
     return replace(party, **{hero: getattr(party, hero) + 1})
-
-
-def increment_dungeon(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
-    """Increase the count of the specified target type by one."""
-    if dungeon is None:
-        raise DrollError("No dungeon currently active.")
-    prior_targets = getattr(dungeon, target, 0)
-    return replace(dungeon, **{target: prior_targets + 1})
 
 
 def defeat_all(
@@ -166,16 +151,6 @@ def defeat_one_plus_additional(
         world=world, randrange=randrange, hero=hero, target=target
     )
     return _defeat_plus_additional(world, randrange, hero, additional)
-
-
-def eliminate_dungeon(dungeon: struct.Dungeon, target: str) -> struct.Dungeon:
-    """Remove all targets of the specified type from the dungeon."""
-    if dungeon is None:
-        raise DrollError("No dungeon currently active.")
-    prior_targets = getattr(dungeon, target)
-    if not prior_targets:
-        raise DrollError(f"At least 1 {target} required.")
-    return replace(dungeon, **{target: 0})
 
 
 def open_one(

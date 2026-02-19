@@ -9,6 +9,7 @@ import copy
 import enum
 from random import Random
 
+from . import dungeon
 from .error import DrollError
 from . import player
 from . import struct
@@ -189,7 +190,7 @@ class Game:
         results = [
             x for x in self._possible_world_actions() if x.startswith(text)
         ]
-        if not world.exhausted_dungeon(self._world.dungeon):
+        if not dungeon.exhausted_dungeon(self._world.dungeon):
             results += self.completedefault(text, head, tail)
         return results
 
