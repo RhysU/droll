@@ -2,9 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
-from __future__ import annotations
 
 import collections.abc
+from typing import Dict, Optional
 from dataclasses import replace
 
 from . import action
@@ -119,7 +119,7 @@ def apply(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
     *additional,
 ) -> struct.World:
     """Apply noun to target within world, returning a new version.
@@ -183,7 +183,7 @@ def apply(
     return world
 
 
-def _artifact_to_hero(artifacts: struct.Party) -> typing.Dict[str, str]:
+def _artifact_to_hero(artifacts: struct.Party) -> Dict[str, str]:
     """Build a reverse mapping from artifact name to hero name."""
     return {
         artifact: hero
@@ -192,7 +192,7 @@ def _artifact_to_hero(artifacts: struct.Party) -> typing.Dict[str, str]:
     }
 
 
-def _partify(token: str, reverse: typing.Dict[str, str]):
+def _partify(token: str, reverse: Dict[str, str]):
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None

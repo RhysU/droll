@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Enchantress advancing to Beguiler."""
-from __future__ import annotations
 
 from dataclasses import replace
 import functools
+from typing import Optional
 
 from .. import action
 from .. import dice
@@ -24,7 +24,7 @@ def _enchantress_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion."""
     dungeon = world.dungeon
@@ -37,7 +37,7 @@ def _beguiler_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
     """Transform at most 2 monsters into 1 potion.

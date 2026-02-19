@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Minstrel advancing to Bard."""
-from __future__ import annotations
 
 from dataclasses import replace
 import functools
+from typing import Optional
 
 from .. import action
 from .. import dice
@@ -24,7 +24,7 @@ def _minstrel_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
 ) -> struct.World:
     """Discard all dragon dice."""
     target = "dragon" if target is None else target

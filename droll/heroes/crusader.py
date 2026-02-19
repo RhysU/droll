@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Crusader advancing to Paladin."""
-from __future__ import annotations
 
 from dataclasses import replace
 import functools
+from typing import Optional
 
 from .. import action
 from .. import dice
@@ -24,7 +24,7 @@ def _crusader_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
     *,
     _acceptable_targets: frozenset[str] = frozenset({"fighter", "cleric"}),
 ) -> struct.World:
@@ -44,7 +44,7 @@ def _paladin_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
     *revivable: str,
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.

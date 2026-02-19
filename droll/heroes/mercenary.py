@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Mercenary advancing to Commander."""
-from __future__ import annotations
 
 from dataclasses import replace
 import functools
+from typing import Optional
 
 from .. import action
 from .. import dice
@@ -34,7 +34,7 @@ def _mercenary_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
     *additional,
 ) -> struct.World:
     """Defeat any 2 monsters."""
@@ -54,7 +54,7 @@ def _commander_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
     *additional,
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice."""

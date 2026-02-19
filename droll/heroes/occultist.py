@@ -2,10 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Occultist advancing to Necromancer."""
-from __future__ import annotations
 
 from dataclasses import replace
 import functools
+from typing import Optional
 
 from .. import action
 from .. import dice
@@ -23,7 +23,7 @@ def _occultist_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it at next regroup."""
     if target and target != "skeleton":
@@ -38,7 +38,7 @@ def _necromancer_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
     """Transform 2 skeletons into fighters, discarding them at next regroup."""
