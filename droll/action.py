@@ -263,6 +263,11 @@ def reroll(
         dungeon_or_party, allow_dragon
     )
 
+    # Decrement hero and regroup BEFORE any dice are rolled to prevent
+    # stochastic exploitation: a rolled result cannot be immediately spent.
+    party = _decrement_party(world.party, hero)
+    regroup = _decrement_regroup(world.regroup, hero)
+
     dungeon = world.dungeon
     if dungeon_targets:
         for target in dungeon_targets:
@@ -278,7 +283,6 @@ def reroll(
             )
         )
 
-    party = world.party
     if party_targets:
         for target in party_targets:
             party = _decrement_party(party, target)
@@ -294,8 +298,8 @@ def reroll(
     return replace(
         world,
         dungeon=dungeon,
-        party=_decrement_party(party, hero),
-        regroup=_decrement_regroup(world.regroup, hero),
+        party=party,
+        regroup=regroup,
     )
 
 
