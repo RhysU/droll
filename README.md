@@ -242,6 +242,42 @@ Party:        fighter mage champion×4
 DragonSlayer> ^D
 ```
 
+## Kwargs-Only Arguments
+
+Several functions use keyword-only arguments (appearing after `*` or `*args` in the
+signature) to allow callers to customize behavior or inject dependencies in tests.
+
+### Injectable Defaults (underscore-prefixed)
+
+Arguments prefixed with `_` are implementation details that callers may override,
+primarily for testing.  They should not be passed in normal gameplay code.
+
+| Argument | Default | Where used |
+|---|---|---|
+| `_acceptable_targets` | `frozenset({"fighter","mage"})` / `frozenset({"fighter","cleric"})` | `heroes/spellsword.py` `_spellsword_ability`, `_battlemage_ability`; `heroes/crusader.py` `_crusader_ability` |
+| `_after_monsters` | `True` | `action.py` `open_one`, `open_all`, `quaff` |
+| `_defeat_dragon_heroes` | `defeat_dragon_heroes` | `action.py` `defeat_dragon` |
+| `_disallowed_heroes` | `("scroll",)` | `action.py` `defeat_dragon_heroes`, `defeat_dragon_heroes_interchangeable` |
+| `_distinct_heroes` | `3` | `action.py` `defeat_dragon_heroes`, `defeat_dragon_heroes_wildcard` |
+| `_dungeon_dice` | `7` | `world.py` `descend` |
+| `_enemies` | `("goblin","skeleton","ooze")` | `action.py` `bait_dragon` |
+| `_interchangeable` | *(required)* | `action.py` `defeat_dragon_heroes_interchangeable` |
+| `_max_depth` | `10` | `world.py` `descend` |
+| `_min_dragon_length` | `3` | `action.py` `defeat_dragon` |
+| `_party_dice` | `7` | `world.py` `delve` |
+| `_raises` | `False` | `shell.py` `onecmd` |
+| `_require_treasure` | `True` | `action.py` `bait_dragon` |
+| `_required_heroes` | `3` | `action.py` `defeat_dragon_heroes_interchangeable` |
+| `_wildcard` | `("scroll",)` | `action.py` `defeat_dragon_heroes_wildcard` |
+
+### Configuration Parameters (non-underscore)
+
+| Argument | Default | Where used |
+|---|---|---|
+| `display_mode` | `DisplayMode.CURRENT` | `shell.py` `Shell.__init__` |
+| `noun` | `"ring"` / `"portal"` | `world.py` `_apply_ring`, `_apply_portal` |
+| `omitted` | `frozenset({"reserve"})` | `struct.py` `brief` |
+
 ## Without Installation
 
 Clone this repository then run via:
