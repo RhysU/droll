@@ -20,8 +20,8 @@ class TestWorld:
         """Test initial game state has correct experience, treasure, and reserve."""
         game = world.new_world()
         assert game.experience == 0
-        assert sum(struct.field_values(game.treasure)) == 0
-        assert sum(struct.field_values(game.reserve)) == (6 * 3) + (4 * 3) + 6
+        assert sum(struct.field_values(game.treasure.own)) == 0
+        assert sum(struct.field_values(game.treasure.box)) == (6 * 3) + (4 * 3) + 6
 
     def test_delve_initial(self):
         """Test starting a new delve rolls party dice correctly."""
@@ -40,27 +40,29 @@ class TestWorld:
         assert sum(struct.field_values(game.dungeon)) == 1
 
     def test_draw_treasure(self):
-        """Test drawing treasure moves one item from reserve to treasure."""
+        """Test drawing treasure moves one item from box to own."""
         pre = world.new_world()
-        post = treasure.draw_treasure(pre, self.state.randrange)
-        assert sum(struct.field_values(pre.treasure)) == 0
-        assert sum(struct.field_values(post.treasure)) == 1
+        post_treasure = treasure.draw_treasure(pre.treasure, self.state.randrange)
+        post = replace(pre, treasure=post_treasure)
+        assert sum(struct.field_values(pre.treasure.own)) == 0
+        assert sum(struct.field_values(post.treasure.own)) == 1
         assert (
-            sum(struct.field_values(pre.reserve))
-            - sum(struct.field_values(post.reserve))
+            sum(struct.field_values(pre.treasure.box))
+            - sum(struct.field_values(post.treasure.box))
             == 1
         )
 
     def test_replace_treasure(self):
-        """Test replacing treasure moves one item from treasure to reserve."""
+        """Test replacing treasure moves one item from own to box."""
         pre = world.new_world()
-        pre = replace(pre, treasure=replace(pre.treasure, elixir=1))
-        post = treasure.replace_treasure(pre, "elixir")
-        assert sum(struct.field_values(pre.treasure)) == 1
-        assert sum(struct.field_values(post.treasure)) == 0
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, elixir=1)))
+        post_treasure = treasure.replace_treasure(pre.treasure, "elixir")
+        post = replace(pre, treasure=post_treasure)
+        assert sum(struct.field_values(pre.treasure.own)) == 1
+        assert sum(struct.field_values(post.treasure.own)) == 0
         assert (
-            sum(struct.field_values(post.reserve))
-            - sum(struct.field_values(pre.reserve))
+            sum(struct.field_values(post.treasure.box))
+            - sum(struct.field_values(pre.treasure.box))
             == 1
         )
 
@@ -97,15 +99,15 @@ class TestWorld:
             world.retire(pre)
 
         # Ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, ring=1))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1)))
         with pytest.raises(error.DrollError):
             world.retire(pre)
 
         # Town portal
-        pre = replace(pre, treasure=replace(pre.treasure, portal=1))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, portal=1)))
         post = world.retire(pre)
         assert post.experience == pre.depth + pre.experience
-        assert post.treasure.portal == 0
+        assert post.treasure.own.portal == 0
 
     def test_retire_dragon(self):
         """Test retiring with dragons can use ring or portal, ring preferred."""
@@ -125,25 +127,25 @@ class TestWorld:
             world.retire(pre)
 
         # Ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=0))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)))
         post1 = world.retire(pre)
         assert post1.experience == pre.depth + pre.experience
-        assert post1.treasure.ring == 0
-        assert post1.treasure.portal == 0
+        assert post1.treasure.own.ring == 0
+        assert post1.treasure.own.portal == 0
 
         # Town portal
-        pre = replace(pre, treasure=replace(pre.treasure, ring=0, portal=1))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=0, portal=1)))
         post2 = world.retire(pre)
         assert post2.experience == pre.depth + pre.experience
-        assert post2.treasure.ring == 0
-        assert post2.treasure.portal == 0
+        assert post2.treasure.own.ring == 0
+        assert post2.treasure.own.portal == 0
 
         # Both should consume the ring of invisibility first
-        pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=1))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=1)))
         post3 = world.retire(pre)
         assert post3.experience == pre.depth + pre.experience
-        assert post3.treasure.ring == 0
-        assert post3.treasure.portal == 1
+        assert post3.treasure.own.ring == 0
+        assert post3.treasure.own.portal == 1
 
     def test_descend_simple(self):
         """Test descending to next level with no obstacles increments depth."""
@@ -177,12 +179,12 @@ class TestWorld:
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=0))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)))
         with pytest.raises(error.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Town portal
-        pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=0))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)))
         with pytest.raises(error.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
@@ -204,23 +206,23 @@ class TestWorld:
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=0))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)))
         post1 = world.descend(pre, dice.roll_dungeon, self.state.randrange)
         assert post1.depth == pre.depth + 1
-        assert post1.treasure.ring == 0
-        assert post1.treasure.portal == 0
+        assert post1.treasure.own.ring == 0
+        assert post1.treasure.own.portal == 0
 
         # Town portal
-        pre = replace(pre, treasure=replace(pre.treasure, ring=0, portal=1))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=0, portal=1)))
         with pytest.raises(error.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Both should consume the ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, ring=1, portal=1))
+        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=1)))
         post3 = world.descend(pre, dice.roll_dungeon, self.state.randrange)
         assert post3.depth == pre.depth + 1
-        assert post3.treasure.ring == 0
-        assert post3.treasure.portal == 1
+        assert post3.treasure.own.ring == 0
+        assert post3.treasure.own.portal == 1
 
     def test_regroup_discard(self):
         """Temporary party dice must be discarded during next regroup phase."""
@@ -377,17 +379,18 @@ class TestWorld:
             dungeon=None,
             party=None,
             treasure=struct.Treasure(
-                sword=0,
-                talisman=0,
-                sceptre=0,
-                tools=0,
-                scroll=0,
-                elixir=0,
-                bait=1,
-                portal=0,
-                ring=0,
-                scale=2,
+                own=struct.Artifacts(
+                    sword=0,
+                    talisman=0,
+                    sceptre=0,
+                    tools=0,
+                    scroll=0,
+                    elixir=0,
+                    bait=1,
+                    portal=0,
+                    ring=0,
+                    scale=2,
+                ),
             ),
-            reserve=None,
         )
         assert world.score(game) == 20

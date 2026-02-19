@@ -165,7 +165,8 @@ def open_one(
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
     return replace(
-        draw_treasure(world, randrange),
+        world,
+        treasure=draw_treasure(world.treasure, randrange),
         dungeon=decrement_dungeon(world.dungeon, target),
         party=_decrement_party(world.party, hero),
         regroup=_decrement_regroup(world.regroup, hero),
@@ -186,10 +187,12 @@ def open_all(
     howmany = getattr(world.dungeon, target)
     if not howmany:
         raise DrollError(f"At least 1 {target} required.")
+    treasure = world.treasure
     for _ in range(howmany):
-        world = draw_treasure(world, randrange)
+        treasure = draw_treasure(treasure, randrange)
     return replace(
         world,
+        treasure=treasure,
         dungeon=eliminate_dungeon(world.dungeon, target),
         party=_decrement_party(world.party, hero),
         regroup=_decrement_regroup(world.regroup, hero),
@@ -417,7 +420,8 @@ def defeat_dragon(
 
     # Attempt was successful, so update experience and treasure
     return replace(
-        draw_treasure(world, randrange),
+        world,
+        treasure=draw_treasure(world.treasure, randrange),
         experience=world.experience + 1,
         party=party,
         dungeon=eliminate_dungeon(world.dungeon, target),
@@ -440,7 +444,7 @@ def bait_dragon(
     if target != "dragon":
         raise DrollError(f"Cannot {noun} a {target}.")
     if require_treasure:
-        world = replace_treasure(world, noun)
+        world = replace(world, treasure=replace_treasure(world.treasure, noun))
 
     # Compute how many new dragons will be produced and remove sources
     dungeon = world.dungeon
@@ -468,7 +472,8 @@ def elixir(
 ) -> World:
     """Add one hero die of any requested type."""
     return replace(
-        replace_treasure(world, noun),
+        world,
+        treasure=replace_treasure(world.treasure, noun),
         party=increment_party(world.party, target),
     )
 

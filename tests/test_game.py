@@ -80,7 +80,7 @@ def test_apply_portal_directly_fails():
     g.descend()
     g._world = replace(
         g._world,
-        treasure=replace(g._world.treasure, portal=1),
+        treasure=replace(g._world.treasure, own=replace(g._world.treasure.own, portal=1)),
     )
     with pytest.raises(DrollError):
         g.apply("portal")
@@ -92,7 +92,7 @@ def test_apply_ring_directly_fails():
     g.descend()
     g._world = replace(
         g._world,
-        treasure=replace(g._world.treasure, ring=1),
+        treasure=replace(g._world.treasure, own=replace(g._world.treasure.own, ring=1)),
     )
     with pytest.raises(DrollError):
         g.apply("ring")

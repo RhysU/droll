@@ -31,18 +31,20 @@ def new_world() -> struct.World:
         party=None,
         ability=None,
         regroup=struct.Regroup(),
-        treasure=struct.Treasure(),
-        reserve=struct.Treasure(
-            sword=3,
-            talisman=3,
-            sceptre=3,
-            tools=3,
-            scroll=3,
-            elixir=3,
-            bait=4,
-            portal=4,
-            ring=4,
-            scale=6,
+        treasure=struct.Treasure(
+            own=struct.Artifacts(),
+            box=struct.Artifacts(
+                sword=3,
+                talisman=3,
+                sceptre=3,
+                tools=3,
+                scroll=3,
+                elixir=3,
+                bait=4,
+                portal=4,
+                ring=4,
+                scale=6,
+            ),
         ),
     )
 
@@ -182,10 +184,10 @@ def score(world: struct.World) -> int:
     return (
         world.experience
         + sum(
-            struct.field_values(world.treasure)
+            struct.field_values(world.treasure.own)
         )  # Each piece of treasure is +1 point
-        + world.treasure.portal  # Portals are +1 extra (2 total each)
-        + 2 * (world.treasure.scale // 2)  # Pairs of scales are +2 extra
+        + world.treasure.own.portal  # Portals are +1 extra (2 total each)
+        + 2 * (world.treasure.own.scale // 2)  # Pairs of scales are +2 extra
     )
 
 
@@ -193,7 +195,7 @@ def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     if not blocking_dragon(world.dungeon):
         raise DrollError(f"A dragon must be present to use a {noun}.")
-    world = replace_treasure(world, noun)
+    world = replace(world, treasure=replace_treasure(world.treasure, noun))
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
 
 
@@ -204,4 +206,8 @@ def _apply_portal(
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):
         raise DrollError(f"No need to apply {noun} when dungeon clear.")
-    return replace(replace_treasure(world, "portal"), dungeon=struct.Dungeon())
+    return replace(
+        world,
+        treasure=replace_treasure(world.treasure, "portal"),
+        dungeon=struct.Dungeon(),
+    )

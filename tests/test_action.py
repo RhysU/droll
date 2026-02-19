@@ -372,12 +372,12 @@ class TestDragon:
         assert game.party.mage == 1
         assert game.dungeon.dragon == 0
         assert game.experience == 1
-        assert sum(struct.field_values(game.treasure)) == 1
+        assert sum(struct.field_values(game.treasure.own)) == 1
 
     def test_treasure_slot1(self):
         """Sword treasure can substitute for fighter in dragon combat."""
         game = replace(
-            self.game, treasure=replace(self.game.treasure, sword=7)
+            self.game, treasure=replace(self.game.treasure, own=replace(self.game.treasure.own, sword=7))
         )
         game = replace(game, party=replace(game.party, fighter=0))
         game = player.apply(
@@ -389,13 +389,13 @@ class TestDragon:
             "cleric",
             "mage",
         )
-        assert game.treasure.sword == 6
+        assert game.treasure.own.sword == 6
         assert game.party.fighter == 0
         assert game.party.cleric == 1
         assert game.party.mage == 1
         assert game.dungeon.dragon == 0
         assert game.experience == 1
-        assert sum(struct.field_values(game.treasure)) == 7
+        assert sum(struct.field_values(game.treasure.own)) == 7
 
     def test_monsters_remain(self):
         """Dragon cannot be attacked while monsters remain in dungeon."""
@@ -601,7 +601,7 @@ def test_bait_non_dragon_target():
     w = struct.World(
         dungeon=struct.Dungeon(goblin=1),
         party=struct.Party(fighter=1),
-        treasure=struct.Treasure(bait=1),
+        treasure=struct.Treasure(own=struct.Artifacts(bait=1)),
     )
     with pytest.raises(DrollError):
         action.bait_dragon(w, _UNUSED, "bait", "goblin")
@@ -664,7 +664,7 @@ def test_regroup_discard_after_elixir1():
         dungeon=struct.Dungeon(ooze=1),
         party=struct.Party(thief=1),
         regroup=struct.Regroup(discard=struct.Party(thief=1)),
-        treasure=struct.Treasure(elixir=1),
+        treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
     )
 
     # Force-discard thief kills the ooze
@@ -697,7 +697,7 @@ def test_regroup_discard_after_elixir2():
         dungeon=struct.Dungeon(ooze=1),
         party=struct.Party(thief=1),
         regroup=struct.Regroup(discard=struct.Party(thief=1)),
-        treasure=struct.Treasure(elixir=1),
+        treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
     )
 
     # Elixir revives a new thief

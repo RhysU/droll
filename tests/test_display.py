@@ -21,9 +21,9 @@ def test_format_items_dragon_always_shows_count():
 
 def test_format_treasure_multiple_items_alphabetized():
     """Test multiple treasure items are alphabetized and use × notation."""
-    treasure = struct.Treasure(scale=4, sceptre=1, talisman=1, tools=1)
+    artifacts = struct.Artifacts(scale=4, sceptre=1, talisman=1, tools=1)
     assert (
-        display._format_treasure(treasure) == "scale×4 sceptre talisman tools"
+        display._format_treasure(artifacts) == "scale×4 sceptre talisman tools"
     )
 
 
@@ -54,7 +54,7 @@ def test_compact_summary_in_dungeon():
         dungeon=struct.Dungeon(goblin=1, skeleton=2, ooze=2),
         party=struct.Party(fighter=1, champion=1),
         ability=True,
-        treasure=struct.Treasure(talisman=1),
+        treasure=struct.Treasure(own=struct.Artifacts(talisman=1)),
     )
     result = display.compact_summary(
         world, "Default", 1, ["ability", "retreat"]
@@ -77,7 +77,7 @@ def test_compact_summary_long_player_name_alignment():
         dungeon=None,
         party=struct.Party(fighter=1, cleric=2, mage=3, champion=1),
         ability=True,
-        treasure=struct.Treasure(talisman=1),
+        treasure=struct.Treasure(own=struct.Artifacts(talisman=1)),
     )
     result = display.compact_summary(
         world, "DragonSlayer", 6, ["ability", "descend"]
@@ -102,7 +102,7 @@ def test_compact_summary_dungeon_shown_when_empty():
         dungeon=struct.Dungeon(),
         party=struct.Party(fighter=1, cleric=1),
         ability=True,
-        treasure=struct.Treasure(),
+        treasure=struct.Treasure(own=struct.Artifacts()),
     )
     result = display.compact_summary(
         world, "Knight", 0, ["ability", "descend", "retire"]
@@ -122,7 +122,7 @@ def test_compact_summary_cleared_level_10():
         dungeon=struct.Dungeon(),
         party=struct.Party(champion=1, scroll=2),
         ability=False,
-        treasure=struct.Treasure(scale=4, sceptre=1, talisman=1, tools=1),
+        treasure=struct.Treasure(own=struct.Artifacts(scale=4, sceptre=1, talisman=1, tools=1)),
     )
     result = display.compact_summary(world, "Beguiler", 24, ["retire"])
     lines = result.split("\n")
@@ -144,7 +144,7 @@ def test_compact_summary_ending_state():
         party=struct.Party(champion=1),
         ability=False,
         treasure=struct.Treasure(
-            scroll=1, elixir=1, bait=2, portal=1, scale=1
+            own=struct.Artifacts(scroll=1, elixir=1, bait=2, portal=1, scale=1)
         ),
     )
     result = display.compact_summary(world, "DragonSlayer", 23, [])

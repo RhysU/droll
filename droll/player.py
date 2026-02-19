@@ -146,9 +146,9 @@ def apply(
             raise DrollError(str(cause)) from cause
 
     # Temporarily inflate party with treasure-as-hero counts
-    prior_treasure = world.treasure
+    prior_own = world.treasure.own
     world = _adjust_phantom_treasures(
-        world, player.artifacts, prior_treasure, +1
+        world, player.artifacts, prior_own, +1
     )
 
     # Dispatch: reroll always uses scroll mechanics; everything else is hero-target
@@ -166,13 +166,18 @@ def apply(
 
     # Undo phantom inflation, then consume treasure for any artifacts spent
     world = _adjust_phantom_treasures(
-        world, player.artifacts, prior_treasure, -1
+        world, player.artifacts, prior_own, -1
     )
     for hero, quantity in struct.field_items(world.party):
         if quantity >= 0:
             continue
         for _ in range(-quantity):
-            world = replace_treasure(world, getattr(player.artifacts, hero))
+            world = replace(
+                world,
+                treasure=replace_treasure(
+                    world.treasure, getattr(player.artifacts, hero)
+                ),
+            )
         world = replace(world, party=replace(world.party, **{hero: 0}))
 
     return world
@@ -208,7 +213,7 @@ def _available_nouns(world: struct.World) -> set[str]:
     """Candidate nouns (position 0): available party members and treasures."""
     candidates = {
         key
-        for source in (world.party, world.treasure)
+        for source in (world.party, world.treasure.own)
         if source is not None
         for key, value in struct.field_items(source)
         if value and key not in _TREASURE_NO_COMMAND

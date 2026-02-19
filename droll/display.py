@@ -49,7 +49,7 @@ def _format_items(counts: typing.Any, discards: typing.Any = None) -> str:
     return " ".join(filter(None, parts)) or "None"
 
 
-def _format_treasure(treasure: struct.Treasure) -> str:
+def _format_treasure(treasure: struct.Artifacts) -> str:
     """Format treasure alphabetically."""
     parts = (
         _format_item(n, c) for n, c in sorted(struct.field_items(treasure))
@@ -99,7 +99,7 @@ def compact_summary(
         location = f"delve {w.delve} with experience {w.experience}"
 
     # Format each component
-    treasure_str = _format_treasure(w.treasure)
+    treasure_str = _format_treasure(w.treasure.own)
     party_str = _format_party(w.party, w.regroup.discard)
     available_str = _format_available(available)
     dungeon_str = _format_dungeon(w.dungeon)

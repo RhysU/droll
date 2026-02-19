@@ -44,8 +44,10 @@ def test_dragonslayer_defeats_dragon_with_two_heroes():
         depth=1,
         dungeon=droll.struct.Dungeon(dragon=3),
         party=droll.struct.Party(fighter=1, mage=1),
-        treasure=droll.struct.Treasure(),
-        reserve=droll.struct.Treasure(scale=6),
+        treasure=droll.struct.Treasure(
+            own=droll.struct.Artifacts(),
+            box=droll.struct.Artifacts(scale=6),
+        ),
     )
     result = DragonSlayer.party.fighter.dragon(
         world, randrange, "fighter", "dragon", "mage"

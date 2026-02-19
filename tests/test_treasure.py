@@ -24,13 +24,13 @@ class TestTreasure:
     def test_elixir(self):
         """Test elixir treasure used to revive a party member."""
         game = replace(
-            self.game, treasure=replace(self.game.treasure, elixir=1)
+            self.game, treasure=replace(self.game.treasure, own=replace(self.game.treasure.own, elixir=1))
         )
         game = player.apply(
             player.Default, game, self.randrange, "elixir", "cleric"
         )
         assert game.party.cleric == 1
-        assert game.treasure.elixir == 0
+        assert game.treasure.own.elixir == 0
 
         with pytest.raises(error.DrollError):
             player.apply(
@@ -39,11 +39,11 @@ class TestTreasure:
 
     def test_bait(self):
         """Test bait treasure used to convert monsters to dragons."""
-        game = replace(self.game, treasure=replace(self.game.treasure, bait=2))
+        game = replace(self.game, treasure=replace(self.game.treasure, own=replace(self.game.treasure.own, bait=2)))
         game = player.apply(
             player.Default, game, self.randrange, "bait", "dragon"
         )
-        assert game.treasure.bait == 1
+        assert game.treasure.own.bait == 1
         assert game.dungeon.goblin == 0
         assert game.dungeon.skeleton == 0
         assert game.dungeon.ooze == 0
@@ -55,15 +55,15 @@ class TestTreasure:
     def _helper_artifact(self, artifact, hero, specialty, other):
         """Artifact defeats its specialty and one of another type."""
         game = replace(
-            self.game, treasure=replace(self.game.treasure, **{artifact: 2})
+            self.game, treasure=replace(self.game.treasure, own=replace(self.game.treasure.own, **{artifact: 2}))
         )
         game = player.apply(player.Default, game, None, artifact, specialty)
-        assert getattr(game.treasure, artifact) == 1
+        assert getattr(game.treasure.own, artifact) == 1
         assert getattr(game.party, hero) == 0
         assert getattr(game.dungeon, specialty) == 0
 
         game = player.apply(player.Default, game, None, artifact, other)
-        assert getattr(game.treasure, artifact) == 0
+        assert getattr(game.treasure.own, artifact) == 0
         assert getattr(game.party, hero) == 0
         assert getattr(game.dungeon, other) == 1
 
@@ -89,9 +89,9 @@ class TestTreasure:
     def test_tools(self):
         """Test tools treasure behaves as thief (defeats one monster)."""
         game = replace(
-            self.game, treasure=replace(self.game.treasure, tools=1)
+            self.game, treasure=replace(self.game.treasure, own=replace(self.game.treasure.own, tools=1))
         )
         game = player.apply(player.Default, game, None, "tools", "goblin")
-        assert game.treasure.tools == 0
+        assert game.treasure.own.tools == 0
         assert game.party.thief == 0
         assert game.dungeon.goblin == 1

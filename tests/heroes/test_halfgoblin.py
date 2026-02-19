@@ -111,8 +111,10 @@ def test_halfgoblin_fighter_chests_potions():
         ability=True,
         dungeon=droll.struct.Dungeon(goblin=1, chest=1, potion=1),
         party=droll.struct.Party(fighter=5),
-        treasure=droll.struct.Treasure(),
-        reserve=droll.struct.Treasure(scale=1),
+        treasure=droll.struct.Treasure(
+            own=droll.struct.Artifacts(),
+            box=droll.struct.Artifacts(scale=1),
+        ),
     )
 
     result1 = HalfGoblin.party.fighter.chest(
@@ -121,7 +123,7 @@ def test_halfgoblin_fighter_chests_potions():
     assert result1.dungeon.chest == 0
     assert result1.dungeon.goblin == 1
     assert result1.party.fighter == 4
-    assert result1.treasure.scale == 1
+    assert result1.treasure.own.scale == 1
 
     result2 = HalfGoblin.party.fighter.potion(
         world, randrange, "fighter", "potion", "mage"
