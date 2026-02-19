@@ -304,7 +304,7 @@ def reroll(
 
 def defeat_dragon_heroes(
     *heroes,
-    _disallowed_heroes: Sequence[str] = ("scroll",),
+    disallowed_heroes: Sequence[str] = ("scroll",),
     distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
@@ -312,9 +312,9 @@ def defeat_dragon_heroes(
     Specifically, in the case when all heroes must be distinct.
     """
     hero_set = {*heroes}
-    if hero_set & {*_disallowed_heroes}:
+    if hero_set & {*disallowed_heroes}:
         raise DrollError(
-            f"Heroes {_disallowed_heroes} cannot defeat a dragon."
+            f"Heroes {disallowed_heroes} cannot defeat a dragon."
         )
     if len(heroes) != distinct_heroes:
         raise DrollError(f"Exactly {distinct_heroes} heroes required.")
@@ -342,7 +342,7 @@ def defeat_dragon_heroes_wildcard(
     n_required = distinct_heroes - (len(heroes) - len(non_wildcards))
     return defeat_dragon_heroes(
         *non_wildcards,
-        _disallowed_heroes=(),
+        disallowed_heroes=(),
         distinct_heroes=n_required,
     )
 
@@ -350,32 +350,25 @@ def defeat_dragon_heroes_wildcard(
 def defeat_dragon_heroes_interchangeable(
     *heroes,
     interchangeable: set[str],
-    _disallowed_heroes: Sequence[str] = ("scroll",),
+    disallowed_heroes: Sequence[str] = ("scroll",),
     _required_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many heroes been provided to slay dragon?
 
     Specifically, in the case when 'A may be used as B and B may be used as A'.
     """
-    # Assign each interchangeable hero a distinct canonical name, up to
-    # len(interchangeable) slots.  Overflow keeps its original name so
-    # the base function's distinctness check naturally rejects it.
-    inter_names = sorted(interchangeable)
-    inter_idx = 0
-    new_heroes: list[str] = []
-    for h in heroes:
-        if h in interchangeable:
-            if inter_idx < len(interchangeable):
-                new_heroes.append(inter_names[inter_idx])
-                inter_idx += 1
-            else:
-                new_heroes.append(h)
-        else:
-            new_heroes.append(h)
+    if len(heroes) != _required_heroes:
+        raise DrollError(f"Exactly {_required_heroes} heroes required.")
+
+    # Strip interchangeable heroes and reduce the distinct requirement
+    # by their effective contribution (capped at len(interchangeable)).
+    non_inter = [h for h in heroes if h not in interchangeable]
+    n_inter = len(heroes) - len(non_inter)
+    n_required = _required_heroes - min(n_inter, len(interchangeable))
     return defeat_dragon_heroes(
-        *new_heroes,
-        _disallowed_heroes=_disallowed_heroes,
-        distinct_heroes=_required_heroes,
+        *non_inter,
+        disallowed_heroes=disallowed_heroes,
+        distinct_heroes=n_required,
     )
 
 
