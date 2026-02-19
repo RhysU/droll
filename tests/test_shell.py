@@ -243,6 +243,12 @@ def test_command_counter_increments_on_mutation():
     s.onecmd("fighter goblin")  # seed 4 depth 1 has a goblin
     assert s._command_count == 2
 
-    # Undo increments (it mutates state by restoring a prior world)
+    # Undo winds the counter backwards
     s.onecmd("undo")
-    assert s._command_count == 3
+    assert s._command_count == 1
+
+    # Multiple undos continue winding backwards
+    s.onecmd("fighter goblin")  # seed 4 depth 1 has a goblin; count -> 2
+    s.onecmd("undo")            # count -> 1
+    s.onecmd("undo")            # nothing left to undo; error, no change
+    assert s._command_count == 1

@@ -143,7 +143,10 @@ class Shell(cmd.Cmd):
             self._undo.clear()  # Random state mutated so no under permitted
 
         if self._game != before:
-            self._command_count += 1
+            if line == "undo":
+                self._command_count -= 1
+            else:
+                self._command_count += 1
 
         return result
 
