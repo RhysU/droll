@@ -38,9 +38,9 @@ def _minstrel_ability(
 # Mage/thief are interchangeable for dragon defeats
 _minstrel_defeat_dragon = functools.partial(
     action.defeat_dragon,
-    _defeat_dragon_heroes=functools.partial(
+    defeat_dragon_heroes=functools.partial(
         action.defeat_dragon_heroes_interchangeable,
-        _interchangeable=frozenset({"mage", "thief"}),
+        interchangeable=frozenset({"mage", "thief"}),
     ),
 )
 

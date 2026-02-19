@@ -110,7 +110,7 @@ class Shell(cmd.Cmd):
             commands.add("undo")
         return list(commands)
 
-    def onecmd(self, line, *, _raises=False) -> GameState:
+    def onecmd(self, line, *, raises=False) -> GameState:
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
         # Track observable state before and after command processing.
         before = copy.copy(self._game)
@@ -118,7 +118,7 @@ class Shell(cmd.Cmd):
             result = GameState.PLAY
             result = super().onecmd(line)
         except DrollError as e:
-            if _raises:
+            if raises:
                 raise
             if self._color:
                 print(_RED, " ".join(e.args), _RESET, sep="")

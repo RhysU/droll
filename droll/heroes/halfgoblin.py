@@ -58,15 +58,15 @@ def _chieftain_ability(
 # You may open chests and quaff potions at any time during the monster phase
 _halfgoblin_open_one = functools.partial(
     action.open_one,
-    _after_monsters=False,
+    after_monsters=False,
 )
 _halfgoblin_open_all = functools.partial(
     action.open_all,
-    _after_monsters=False,
+    after_monsters=False,
 )
 _halfgoblin_quaff = functools.partial(
     action.quaff,
-    _after_monsters=False,
+    after_monsters=False,
 )
 
 # Defined in terms of Default, not Half-Goblin, to permit advance(...) closure

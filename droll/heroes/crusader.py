@@ -85,9 +85,9 @@ def _paladin_ability(
 # Fighter/cleric are interchangeable for dragon defeats
 _crusader_defeat_dragon = functools.partial(
     action.defeat_dragon,
-    _defeat_dragon_heroes=functools.partial(
+    defeat_dragon_heroes=functools.partial(
         action.defeat_dragon_heroes_interchangeable,
-        _interchangeable=frozenset({"fighter", "cleric"}),
+        interchangeable=frozenset({"fighter", "cleric"}),
     ),
 )
 

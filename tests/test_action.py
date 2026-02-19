@@ -234,7 +234,7 @@ def test_dragon_wildcard_less_interesting_successful_cases():
         "mage",
     )
     assert action.defeat_dragon_heroes_wildcard(
-        "cleric", "thief", "fighter", _wildcard={"scroll"}
+        "cleric", "thief", "fighter", wildcard={"scroll"}
     )
 
 
@@ -242,15 +242,15 @@ def test_dragon_wildcard_less_interesting_failure_cases():
     """Test invalid dragon defeats with wildcard heroes."""
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_wildcard(
-            "cleric", "thief", _wildcard={"scroll"}
+            "cleric", "thief", wildcard={"scroll"}
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_wildcard(
-            "cleric", "fighter", _wildcard={"fighter"}
+            "cleric", "fighter", wildcard={"fighter"}
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_wildcard(
-            "cleric", "thief", "champion", "mage", _wildcard={"fighter"}
+            "cleric", "thief", "champion", "mage", wildcard={"fighter"}
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_wildcard(
@@ -258,7 +258,7 @@ def test_dragon_wildcard_less_interesting_failure_cases():
             "thief",
             "champion",
             "fighter",
-            _wildcard={"fighter"},
+            wildcard={"fighter"},
         )
 
 
@@ -275,17 +275,17 @@ def test_dragon_wildcard_more_interesting_failure_cases():
             "fighter",
             "fighter",
             "fighter",
-            _wildcard={"mage"},
+            wildcard={"mage"},
         )
 
 
 def test_dragon_interchangeable_less_interesting_successful_cases():
     """Test valid dragon defeats with interchangeable heroes."""
     assert action.defeat_dragon_heroes_interchangeable(
-        "cleric", "thief", "mage", _interchangeable={"fighter"}
+        "cleric", "thief", "mage", interchangeable={"fighter"}
     )
     assert action.defeat_dragon_heroes_interchangeable(
-        "cleric", "thief", "fighter", _interchangeable={"fighter"}
+        "cleric", "thief", "fighter", interchangeable={"fighter"}
     )
 
 
@@ -293,11 +293,11 @@ def test_dragon_interchangeable_less_interesting_failure_cases():
     """Test invalid dragon defeats with interchangeable heroes."""
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_interchangeable(
-            "cleric", "thief", _interchangeable={"fighter"}
+            "cleric", "thief", interchangeable={"fighter"}
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_interchangeable(
-            "cleric", "fighter", _interchangeable={"fighter"}
+            "cleric", "fighter", interchangeable={"fighter"}
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_interchangeable(
@@ -305,7 +305,7 @@ def test_dragon_interchangeable_less_interesting_failure_cases():
             "thief",
             "champion",
             "mage",
-            _interchangeable={"fighter"},
+            interchangeable={"fighter"},
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_interchangeable(
@@ -313,7 +313,7 @@ def test_dragon_interchangeable_less_interesting_failure_cases():
             "thief",
             "champion",
             "fighter",
-            _interchangeable={"fighter"},
+            interchangeable={"fighter"},
         )
 
 
@@ -321,25 +321,25 @@ def test_dragon_interchangeable_more_interesting_failure_cases():
     """Invalid dragon defeats with multiple interchangeable hero types."""
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_interchangeable(
-            "mage", "mage", "mage", _interchangeable={"mage", "fighter"}
+            "mage", "mage", "mage", interchangeable={"mage", "fighter"}
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_interchangeable(
             "fighter",
             "fighter",
             "fighter",
-            _interchangeable={"mage", "fighter"},
+            interchangeable={"mage", "fighter"},
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_interchangeable(
-            "fighter", "mage", "mage", _interchangeable={"mage", "fighter"}
+            "fighter", "mage", "mage", interchangeable={"mage", "fighter"}
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes_interchangeable(
             "mage",
             "fighter",
             "fighter",
-            _interchangeable={"mage", "fighter"},
+            interchangeable={"mage", "fighter"},
         )
 
 
@@ -592,7 +592,7 @@ def test_interchangeable_disallowed_hero():
             "scroll",
             "fighter",
             "thief",
-            _interchangeable={"fighter", "mage"},
+            interchangeable={"fighter", "mage"},
         )
 
 

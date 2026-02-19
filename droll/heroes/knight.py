@@ -30,15 +30,15 @@ def _knight_roll_party(
 def _knight_bait_dragon(*args, **kwargs):
     """Convert all monster faces into dragon dice."""
     return action.consume_ability(
-        action.bait_dragon(*args, _require_treasure=False, **kwargs)
+        action.bait_dragon(*args, require_treasure=False, **kwargs)
     )
 
 
 # DragonSlayer only needs 2 distinct heroes instead of 3
 _dragonslayer_defeat_dragon = functools.partial(
     action.defeat_dragon,
-    _defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes, _distinct_heroes=2
+    defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes, distinct_heroes=2
     ),
 )
 
