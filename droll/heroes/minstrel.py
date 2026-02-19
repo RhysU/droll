@@ -11,6 +11,7 @@ from .. import action
 from .. import dice
 from ..dungeon import eliminate_dungeon
 from ..error import DrollError
+from .. import special
 from .. import struct
 from ..player import Default
 
@@ -85,9 +86,9 @@ Bard = replace(
         champion=replace(
             _Minstrel_Party.champion,
             # Champions defeat one additional monster when attacking monsters
-            goblin=action.defeat_all_plus_additional,
-            skeleton=action.defeat_all_plus_additional,
-            ooze=action.defeat_all_plus_additional,
+            goblin=special.defeat_all_plus_additional,
+            skeleton=special.defeat_all_plus_additional,
+            ooze=special.defeat_all_plus_additional,
         ),
     ),
 )

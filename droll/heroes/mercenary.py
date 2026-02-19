@@ -10,6 +10,7 @@ from typing import Optional
 from .. import action
 from .. import dice
 from ..error import DrollError
+from .. import special
 from .. import struct
 from ..player import Default
 
@@ -44,7 +45,7 @@ def _mercenary_ability(
     world = replace(
         world, party=action.increment_party(world.party, "champion")
     )
-    world = action.defeat_one_plus_additional(
+    world = special.defeat_one_plus_additional(
         world, randrange, "champion", target, *additional
     )
     return action.consume_ability(world)
@@ -79,9 +80,9 @@ Commander = replace(
         Default.party,
         fighter=replace(
             Default.party.fighter,
-            goblin=action.defeat_all_plus_additional,
-            skeleton=action.defeat_one_plus_additional,
-            ooze=action.defeat_one_plus_additional,
+            goblin=special.defeat_all_plus_additional,
+            skeleton=special.defeat_one_plus_additional,
+            ooze=special.defeat_one_plus_additional,
         ),
     ),
 )
