@@ -3,11 +3,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with rolling dungeon and party dice."""
 
-import collections.abc
+from collections.abc import Callable
 
 from dataclasses import fields
 
-from . import struct
+from .struct import Dungeon, Party, Regroup
 
 __all__ = (
     "RandRange",
@@ -17,15 +17,13 @@ __all__ = (
     "roll_party",
 )
 
-RandRange = collections.abc.Callable[[int, int], int]
-RollDungeon = collections.abc.Callable[[int, RandRange], struct.Dungeon]
-RollParty = collections.abc.Callable[
-    [int, RandRange], tuple[struct.Party, struct.Regroup]
-]
+RandRange = Callable[[int, int], int]
+RollDungeon = Callable[[int, RandRange], Dungeon]
+RollParty = Callable[[int, RandRange], tuple[Party, Regroup]]
 
 
 def _roll(dice: int, start: int, stop: int, randrange: RandRange) -> list[int]:
-    """Roll dice and return counts for each outcome in the range [start, stop)."""
+    """Roll dice returning counts for outcomes in the range [start, stop)."""
     assert dice >= 0, "Dice count must be non-negative"
     result = [0] * (stop - start)
     for _ in range(dice):
@@ -33,24 +31,20 @@ def _roll(dice: int, start: int, stop: int, randrange: RandRange) -> list[int]:
     return result
 
 
-def roll_dungeon(dice: int, randrange: RandRange) -> struct.Dungeon:
+def roll_dungeon(dice: int, randrange: RandRange) -> Dungeon:
     """Roll a new Dungeon using given number of dice.
 
     Any implementation must follow type signature of RollDungeon.
     On Dungeon N one should account for the number of extant dragons."""
     assert dice >= 1, f"At least one dice required (requested {dice})"
-    return struct.Dungeon(
-        *_roll(dice, 0, len(fields(struct.Dungeon)), randrange)
-    )
+    return Dungeon(*_roll(dice, 0, len(fields(Dungeon)), randrange))
 
 
-def roll_party(
-    dice: int, randrange: RandRange
-) -> tuple[struct.Party, struct.Regroup]:
+def roll_party(dice: int, randrange: RandRange) -> tuple[Party, Regroup]:
     """Roll a new Party using given number of dice.
 
     Any implementation must follow type signature of RollParty."""
     return (
-        struct.Party(*_roll(dice, 0, len(fields(struct.Party)), randrange)),
-        struct.Regroup(),
+        Party(*_roll(dice, 0, len(fields(Party)), randrange)),
+        Regroup(),
     )
