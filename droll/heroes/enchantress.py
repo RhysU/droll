@@ -60,7 +60,9 @@ def _beguiler_ability(
 _beguiler_defeat_dragon = functools.partial(
     action.defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes_wildcard, wildcard={"scroll"}
+        action.defeat_dragon_heroes,
+        disallowed_heroes=(),
+        wildcard=frozenset({"scroll"}),
     ),
 )
 

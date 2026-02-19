@@ -58,7 +58,7 @@ def _necromancer_ability(
 _occultist_defeat_dragon = functools.partial(
     action.defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes_interchangeable,
+        action.defeat_dragon_heroes,
         interchangeable=frozenset({"cleric", "mage"}),
     ),
 )
