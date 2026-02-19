@@ -339,12 +339,12 @@ def test_dragon_wildcard_less_interesting_successful_cases():
         "cleric",
         "thief",
         "mage",
-        disallowed_heroes=(),
+        disallowed_heroes=frozenset(),
         wildcard=frozenset({"scroll"}),
     )
     assert action.defeat_dragon_heroes(
         "cleric", "thief", "fighter",
-        disallowed_heroes=(),
+        disallowed_heroes=frozenset(),
         wildcard=frozenset({"scroll"}),
     )
 
@@ -354,19 +354,19 @@ def test_dragon_wildcard_less_interesting_failure_cases():
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes(
             "cleric", "thief",
-            disallowed_heroes=(),
+            disallowed_heroes=frozenset(),
             wildcard=frozenset({"scroll"}),
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes(
             "cleric", "fighter",
-            disallowed_heroes=(),
+            disallowed_heroes=frozenset(),
             wildcard=frozenset({"fighter"}),
         )
     with pytest.raises(DrollError):
         action.defeat_dragon_heroes(
             "cleric", "thief", "champion", "mage",
-            disallowed_heroes=(),
+            disallowed_heroes=frozenset(),
             wildcard=frozenset({"fighter"}),
         )
     with pytest.raises(DrollError):
@@ -375,7 +375,7 @@ def test_dragon_wildcard_less_interesting_failure_cases():
             "thief",
             "champion",
             "fighter",
-            disallowed_heroes=(),
+            disallowed_heroes=frozenset(),
             wildcard=frozenset({"fighter"}),
         )
 
@@ -387,7 +387,7 @@ def test_dragon_wildcard_more_interesting_failure_cases():
             "mage",
             "mage",
             "scroll",
-            disallowed_heroes=(),
+            disallowed_heroes=frozenset(),
             wildcard=frozenset({"scroll"}),
         )
     with pytest.raises(DrollError):
@@ -395,7 +395,7 @@ def test_dragon_wildcard_more_interesting_failure_cases():
             "fighter",
             "fighter",
             "fighter",
-            disallowed_heroes=(),
+            disallowed_heroes=frozenset(),
             wildcard=frozenset({"mage"}),
         )
 

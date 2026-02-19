@@ -320,7 +320,7 @@ def distinct_heroes(
 
 def defeat_dragon_heroes(
     *heroes,
-    disallowed_heroes: Sequence[str] = ("scroll",),
+    disallowed_heroes: AbstractSet[str] = frozenset({"scroll"}),
     required: int = 3,
     wildcard: AbstractSet[str] = frozenset(),
     interchangeable: AbstractSet[str] = frozenset(),
