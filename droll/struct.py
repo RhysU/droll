@@ -65,20 +65,20 @@ class Party:
 
 @dataclasses.dataclass(frozen=True)
 class Roll:
-    dungeon: collections.abc.Callable | None = None
-    party: collections.abc.Callable | None = None
+    dungeon: typing.Optional[collections.abc.Callable] = None
+    party: typing.Optional[collections.abc.Callable] = None
 
 
 @dataclasses.dataclass(frozen=True)
 class Player:
-    name: str | None = None
-    ability: collections.abc.Callable | None = None
-    advance: collections.abc.Callable | None = None
-    bait: collections.abc.Callable | None = None
-    elixir: collections.abc.Callable | None = None
-    roll: Roll | None = None
-    artifacts: Party | None = None
-    party: Party | None = None
+    name: typing.Optional[str] = None
+    ability: typing.Optional[collections.abc.Callable] = None
+    advance: typing.Optional[collections.abc.Callable] = None
+    bait: typing.Optional[collections.abc.Callable] = None
+    elixir: typing.Optional[collections.abc.Callable] = None
+    roll: typing.Optional[Roll] = None
+    artifacts: typing.Optional[Party] = None
+    party: typing.Optional[Party] = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -110,11 +110,11 @@ class Regroup:
 @dataclasses.dataclass(frozen=True)
 class World:
     delve: int = 0
-    depth: int | None = None
+    depth: typing.Optional[int] = None
     experience: int = 0
-    dungeon: Dungeon | None = None
-    party: Party | None = None
-    ability: bool | None = None
+    dungeon: typing.Optional[Dungeon] = None
+    party: typing.Optional[Party] = None
+    ability: typing.Optional[bool] = None
     regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
 

@@ -5,6 +5,7 @@
 
 from dataclasses import replace
 import functools
+import typing
 
 from .. import action
 from .. import dice
@@ -23,7 +24,7 @@ def _crusader_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: typing.Optional[str] = None,
     *,
     _acceptable_targets: frozenset[str] = frozenset({"fighter", "cleric"}),
 ) -> struct.World:
@@ -43,7 +44,7 @@ def _paladin_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: typing.Optional[str] = None,
     *revivable: str,
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.

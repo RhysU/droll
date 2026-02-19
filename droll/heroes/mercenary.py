@@ -5,6 +5,7 @@
 
 from dataclasses import replace
 import functools
+import typing
 
 from .. import action
 from .. import dice
@@ -33,7 +34,7 @@ def _mercenary_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: typing.Optional[str] = None,
     *additional,
 ) -> struct.World:
     """Defeat any 2 monsters."""
@@ -53,7 +54,7 @@ def _commander_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: str | None = None,
+    target: typing.Optional[str] = None,
     *additional,
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice."""

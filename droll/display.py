@@ -26,7 +26,7 @@ class DisplayMode(enum.Enum):
 _ALWAYS_COUNT = frozenset({"dragon"})
 
 
-def _format_item(name: str, count: int, discard: int = 0) -> str | None:
+def _format_item(name: str, count: int, discard: int = 0) -> typing.Optional[str]:
     """Format a single item, returning None if count is zero."""
     if not count:
         return None
@@ -62,9 +62,9 @@ def _format_available(available: collections.abc.Sequence[str]) -> str:
 
 
 def _format_party(
-    party: struct.Party | None,
-    discard: struct.Party | None,
-) -> str | None:
+    party: typing.Optional[struct.Party],
+    discard: typing.Optional[struct.Party],
+) -> typing.Optional[str]:
     """Format party contents, returning None if empty."""
     if party is None or not any(struct.field_values(party)):
         return None
@@ -72,8 +72,8 @@ def _format_party(
 
 
 def _format_dungeon(
-    dungeon: struct.Dungeon | None,
-) -> str | None:
+    dungeon: typing.Optional[struct.Dungeon],
+) -> typing.Optional[str]:
     """Format dungeon contents, returning None only if no dungeon exists."""
     if dungeon is None:
         return None
