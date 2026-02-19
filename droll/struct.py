@@ -9,6 +9,7 @@ import dataclasses
 import typing
 
 __all__ = (
+    "Artifacts",
     "Dungeon",
     "Party",
     "Player",
@@ -82,7 +83,7 @@ class Player:
 
 
 @dataclasses.dataclass(frozen=True)
-class Treasure:
+class Artifacts:
     sword: int = 0
     talisman: int = 0
     sceptre: int = 0
@@ -93,6 +94,12 @@ class Treasure:
     portal: int = 0
     ring: int = 0
     scale: int = 0
+
+
+@dataclasses.dataclass(frozen=True)
+class Treasure:
+    own: Artifacts = Artifacts()
+    box: Artifacts = Artifacts()
 
 
 # Bookkeeping for operations performed during the regroup phase
@@ -111,15 +118,14 @@ class World:
     ability: bool | None = None
     regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
-    reserve: Treasure = Treasure()
 
 
-# Strictly speaking, "reserve" is genuine world state and tricky to deduce.
+# Strictly speaking, "box" is genuine world state and tricky to deduce.
 # Only for historical reasons is it omitted below.
 def brief(
     o: typing.Any,
     *,
-    omitted: collections.abc.Set[str] = frozenset({"reserve"}),
+    omitted: collections.abc.Set[str] = frozenset({"box"}),
 ) -> str:
     """A __str__(...) variant suppressing False fields within dataclasses."""
     try:

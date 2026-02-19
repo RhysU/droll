@@ -64,12 +64,14 @@ def test_paladin_ability_clears_dungeon():
         ability=True,
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1, dragon=1),
         party=droll.struct.Party(fighter=1, cleric=1),
-        treasure=droll.struct.Treasure(elixir=1),
-        reserve=droll.struct.Treasure(sword=1, talisman=1),
+        treasure=droll.struct.Treasure(
+            own=droll.struct.Artifacts(elixir=1),
+            box=droll.struct.Artifacts(sword=1, talisman=1),
+        ),
     )
     result = _paladin_ability(world, _UNUSED, "ability", "elixir")
     assert sum(droll.struct.field_values(result.dungeon)) == 0
-    assert result.treasure.elixir == 0
+    assert result.treasure.own.elixir == 0
     assert not result.ability
 
 
@@ -80,12 +82,14 @@ def test_paladin_ability_opens_chests():
         ability=True,
         dungeon=droll.struct.Dungeon(chest=2),
         party=droll.struct.Party(fighter=1),
-        treasure=droll.struct.Treasure(bait=1),
-        reserve=droll.struct.Treasure(sword=1, talisman=1, sceptre=1),
+        treasure=droll.struct.Treasure(
+            own=droll.struct.Artifacts(bait=1),
+            box=droll.struct.Artifacts(sword=1, talisman=1, sceptre=1),
+        ),
     )
-    pre_treasure = sum(droll.struct.field_values(world.treasure))
+    pre_treasure = sum(droll.struct.field_values(world.treasure.own))
     result = _paladin_ability(world, randrange, "ability", "bait")
-    post_treasure = sum(droll.struct.field_values(result.treasure))
+    post_treasure = sum(droll.struct.field_values(result.treasure.own))
     assert post_treasure == pre_treasure - 1 + 2  # -1 consumed, +2 from chests
 
 
@@ -95,7 +99,7 @@ def test_paladin_ability_revives_from_potions():
         ability=True,
         dungeon=droll.struct.Dungeon(potion=2),
         party=droll.struct.Party(fighter=1),
-        treasure=droll.struct.Treasure(elixir=1),
+        treasure=droll.struct.Treasure(own=droll.struct.Artifacts(elixir=1)),
     )
     result = _paladin_ability(
         world, _UNUSED, "ability", "elixir", "mage", "thief"
@@ -120,7 +124,7 @@ def test_paladin_ability_wrong_revivable_count():
         ability=True,
         dungeon=droll.struct.Dungeon(potion=2),
         party=droll.struct.Party(fighter=1),
-        treasure=droll.struct.Treasure(elixir=1),
+        treasure=droll.struct.Treasure(own=droll.struct.Artifacts(elixir=1)),
     )
     with pytest.raises(droll.error.DrollError):
         _paladin_ability(world, _UNUSED, "ability", "elixir", "mage")
@@ -131,7 +135,7 @@ def test_paladin_ability_requires_treasure():
     world = droll.struct.World(
         ability=True,
         party=droll.struct.Party(fighter=1),
-        treasure=droll.struct.Treasure(elixir=1),
+        treasure=droll.struct.Treasure(own=droll.struct.Artifacts(elixir=1)),
     )
     with pytest.raises(droll.error.DrollError):
         _paladin_ability(world, _UNUSED, "ability")

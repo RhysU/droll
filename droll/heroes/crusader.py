@@ -56,7 +56,7 @@ def _paladin_ability(
         raise DrollError(f"Treasure to consume required for {noun}.")
 
     # Consume the specified treasure (will error if not possessed)
-    world = replace_treasure(world, target)
+    world = replace(world, treasure=replace_treasure(world.treasure, target))
 
     # Validate potion/revivable count before making changes
     if world.dungeon is not None:
@@ -67,8 +67,10 @@ def _paladin_ability(
             )
 
         # Draw treasure for each chest
+        treasure = world.treasure
         for _ in range(world.dungeon.chest):
-            world = draw_treasure(world, randrange)
+            treasure = draw_treasure(treasure, randrange)
+        world = replace(world, treasure=treasure)
 
         # Revive heroes for each potion
         party = world.party

@@ -7,7 +7,7 @@ from dataclasses import replace
 
 from .dice import RandRange
 from .error import DrollError
-from .struct import Treasure, World, field_items, field_values
+from .struct import Artifacts, Treasure, field_items, field_values
 
 __all__ = (
     "draw_treasure",
@@ -15,43 +15,43 @@ __all__ = (
 )
 
 
-def _draw(reserve: Treasure, randrange: RandRange) -> str:
-    """Draw a random treasure from the reserve, weighted by counts."""
-    total = sum(field_values(reserve))
+def _draw(box: Artifacts, randrange: RandRange) -> str:
+    """Draw a random treasure from the box, weighted by counts."""
+    total = sum(field_values(box))
     if not total:
-        raise RuntimeError("No items remaining in the reserve")
+        raise RuntimeError("No items remaining in the box")
     choice = randrange(0, total)
     cumulative = 0
-    for name, count in field_items(reserve):
+    for name, count in field_items(box):
         cumulative += count
         if choice < cumulative:
             return name
     raise RuntimeError("Unreachable")
 
 
-def draw_treasure(world: World, randrange: RandRange) -> World:
-    """Draw a single item from the reserve into the player's treasures."""
-    drawn = _draw(reserve=world.reserve, randrange=randrange)
+def draw_treasure(treasure: Treasure, randrange: RandRange) -> Treasure:
+    """Draw a single item from the box into the player's own artifacts."""
+    drawn = _draw(box=treasure.box, randrange=randrange)
     return replace(
-        world,
-        treasure=replace(
-            world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}
+        treasure,
+        own=replace(
+            treasure.own, **{drawn: getattr(treasure.own, drawn) + 1}
         ),
-        reserve=replace(
-            world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}
+        box=replace(
+            treasure.box, **{drawn: getattr(treasure.box, drawn) - 1}
         ),
     )
 
 
-def replace_treasure(world: World, item: str) -> World:
-    """Replace a single item from the player's treasures into the reserve."""
-    prior_count = getattr(world.treasure, item)
+def replace_treasure(treasure: Treasure, item: str) -> Treasure:
+    """Replace a single item from the player's own artifacts into the box."""
+    prior_count = getattr(treasure.own, item)
     if not prior_count:
         raise DrollError(f"'{item}' not in player's treasure.")
     return replace(
-        world,
-        treasure=replace(world.treasure, **{item: prior_count - 1}),
-        reserve=replace(
-            world.reserve, **{item: getattr(world.reserve, item) + 1}
+        treasure,
+        own=replace(treasure.own, **{item: prior_count - 1}),
+        box=replace(
+            treasure.box, **{item: getattr(treasure.box, item) + 1}
         ),
     )
