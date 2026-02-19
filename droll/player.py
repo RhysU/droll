@@ -4,6 +4,7 @@
 """Functionality associated with player action mechanics."""
 
 import collections.abc
+import typing
 from dataclasses import replace
 
 from . import action
