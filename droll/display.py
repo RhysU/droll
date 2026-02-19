@@ -49,10 +49,10 @@ def _format_items(counts: typing.Any, discards: typing.Any = None) -> str:
     return " ".join(filter(None, parts)) or "None"
 
 
-def _format_treasure(treasure: struct.Artifacts) -> str:
+def _format_treasure(artifacts: struct.Artifacts) -> str:
     """Format treasure alphabetically."""
     parts = (
-        _format_item(n, c) for n, c in sorted(struct.field_items(treasure))
+        _format_item(n, c) for n, c in sorted(struct.field_items(artifacts))
     )
     return " ".join(filter(None, parts)) or "None"
 
