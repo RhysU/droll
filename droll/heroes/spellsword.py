@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 import functools
-import typing
+from typing import Optional
 
 from .. import action
 from .. import dice
@@ -23,7 +23,7 @@ def _spellsword_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: Optional[str] = None,
     *,
     _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
 ) -> struct.World:
@@ -53,7 +53,7 @@ def _battlemage_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: Optional[str] = None,
     *,
     _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
 ) -> struct.World:

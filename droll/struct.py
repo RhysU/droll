@@ -5,7 +5,7 @@
 
 import collections.abc
 import dataclasses
-import typing
+from typing import Any, Optional
 
 __all__ = (
     "Artifacts",
@@ -23,19 +23,19 @@ __all__ = (
 )
 
 
-def field_names(cls_or_instance: typing.Any) -> collections.abc.Iterator[str]:
+def field_names(cls_or_instance: Any) -> collections.abc.Iterator[str]:
     """Yield field names for a dataclass or instance thereof."""
     return (f.name for f in dataclasses.fields(cls_or_instance))
 
 
-def field_values(instance: typing.Any) -> collections.abc.Iterator[typing.Any]:
+def field_values(instance: Any) -> collections.abc.Iterator[Any]:
     """Yield field values for a dataclass instance."""
     return (getattr(instance, f.name) for f in dataclasses.fields(instance))
 
 
 def field_items(
-    instance: typing.Any,
-) -> collections.abc.Iterator[tuple[str, typing.Any]]:
+    instance: Any,
+) -> collections.abc.Iterator[tuple[str, Any]]:
     """Yield (name, value) pairs for a dataclass instance."""
     return (
         (f.name, getattr(instance, f.name))
@@ -45,40 +45,40 @@ def field_items(
 
 @dataclasses.dataclass(frozen=True)
 class Dungeon:
-    goblin: typing.Any = 0
-    skeleton: typing.Any = 0
-    ooze: typing.Any = 0
-    chest: typing.Any = 0
-    potion: typing.Any = 0
-    dragon: typing.Any = 0
+    goblin: Any = 0
+    skeleton: Any = 0
+    ooze: Any = 0
+    chest: Any = 0
+    potion: Any = 0
+    dragon: Any = 0
 
 
 @dataclasses.dataclass(frozen=True)
 class Party:
-    fighter: typing.Any = 0
-    cleric: typing.Any = 0
-    mage: typing.Any = 0
-    thief: typing.Any = 0
-    champion: typing.Any = 0
-    scroll: typing.Any = 0
+    fighter: Any = 0
+    cleric: Any = 0
+    mage: Any = 0
+    thief: Any = 0
+    champion: Any = 0
+    scroll: Any = 0
 
 
 @dataclasses.dataclass(frozen=True)
 class Roll:
-    dungeon: typing.Optional[collections.abc.Callable] = None
-    party: typing.Optional[collections.abc.Callable] = None
+    dungeon: Optional[collections.abc.Callable] = None
+    party: Optional[collections.abc.Callable] = None
 
 
 @dataclasses.dataclass(frozen=True)
 class Player:
-    name: typing.Optional[str] = None
-    ability: typing.Optional[collections.abc.Callable] = None
-    advance: typing.Optional[collections.abc.Callable] = None
-    bait: typing.Optional[collections.abc.Callable] = None
-    elixir: typing.Optional[collections.abc.Callable] = None
-    roll: typing.Optional[Roll] = None
-    artifacts: typing.Optional[Party] = None
-    party: typing.Optional[Party] = None
+    name: Optional[str] = None
+    ability: Optional[collections.abc.Callable] = None
+    advance: Optional[collections.abc.Callable] = None
+    bait: Optional[collections.abc.Callable] = None
+    elixir: Optional[collections.abc.Callable] = None
+    roll: Optional[Roll] = None
+    artifacts: Optional[Party] = None
+    party: Optional[Party] = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -110,11 +110,11 @@ class Regroup:
 @dataclasses.dataclass(frozen=True)
 class World:
     delve: int = 0
-    depth: typing.Optional[int] = None
+    depth: Optional[int] = None
     experience: int = 0
-    dungeon: typing.Optional[Dungeon] = None
-    party: typing.Optional[Party] = None
-    ability: typing.Optional[bool] = None
+    dungeon: Optional[Dungeon] = None
+    party: Optional[Party] = None
+    ability: Optional[bool] = None
     regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
 
@@ -122,7 +122,7 @@ class World:
 # Strictly speaking, "box" is genuine world state and tricky to deduce.
 # Only for historical reasons is it omitted below.
 def brief(
-    o: typing.Any,
+    o: Any,
     *,
     omitted: collections.abc.Set[str] = frozenset({"box"}),
 ) -> str:

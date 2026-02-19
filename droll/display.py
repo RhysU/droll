@@ -5,7 +5,7 @@
 
 import collections.abc
 import enum
-import typing
+from typing import Any, Optional
 
 from . import struct
 
@@ -26,7 +26,7 @@ class DisplayMode(enum.Enum):
 _ALWAYS_COUNT = frozenset({"dragon"})
 
 
-def _format_item(name: str, count: int, discard: int = 0) -> typing.Optional[str]:
+def _format_item(name: str, count: int, discard: int = 0) -> Optional[str]:
     """Format a single item, returning None if count is zero."""
     if not count:
         return None
@@ -36,7 +36,7 @@ def _format_item(name: str, count: int, discard: int = 0) -> typing.Optional[str
     return f"{name}×{count}" if counted else name
 
 
-def _format_items(counts: typing.Any, discards: typing.Any = None) -> str:
+def _format_items(counts: Any, discards: Any = None) -> str:
     """Format dataclass fields as 'name' or 'name×N' or 'name×N-M'."""
     if discards is None:
         parts = (_format_item(n, c) for n, c in struct.field_items(counts))
@@ -62,9 +62,9 @@ def _format_available(available: collections.abc.Sequence[str]) -> str:
 
 
 def _format_party(
-    party: typing.Optional[struct.Party],
-    discard: typing.Optional[struct.Party],
-) -> typing.Optional[str]:
+    party: Optional[struct.Party],
+    discard: Optional[struct.Party],
+) -> Optional[str]:
     """Format party contents, returning None if empty."""
     if party is None or not any(struct.field_values(party)):
         return None
@@ -72,8 +72,8 @@ def _format_party(
 
 
 def _format_dungeon(
-    dungeon: typing.Optional[struct.Dungeon],
-) -> typing.Optional[str]:
+    dungeon: Optional[struct.Dungeon],
+) -> Optional[str]:
     """Format dungeon contents, returning None only if no dungeon exists."""
     if dungeon is None:
         return None

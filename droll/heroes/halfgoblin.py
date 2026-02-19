@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 import functools
-import typing
+from typing import Optional
 
 from .. import action
 from .. import dice
@@ -24,7 +24,7 @@ def _halfgoblin_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: Optional[str] = None,
 ) -> struct.World:
     """Transform 1 goblin into 1 thief, discarding it at next regroup."""
     if target and target != "goblin":
@@ -39,7 +39,7 @@ def _chieftain_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
     """Transform 2 goblins into thieves, discarding them at next regroup."""

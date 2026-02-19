@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 import functools
-import typing
+from typing import Optional
 
 from .. import action
 from .. import dice
@@ -24,7 +24,7 @@ def _minstrel_ability(
     world: struct.World,
     randrange: dice.RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: Optional[str] = None,
 ) -> struct.World:
     """Discard all dragon dice."""
     target = "dragon" if target is None else target

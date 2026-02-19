@@ -6,7 +6,7 @@
 import collections.abc
 import copy
 import enum
-import typing
+from typing import Optional
 from random import Random
 
 from . import dungeon
@@ -43,7 +43,7 @@ class Game:
     def __init__(
         self,
         player: struct.Player = player.Default,
-        random: typing.Optional[Random] = None,
+        random: Optional[Random] = None,
     ) -> None:
         """Initialize a new game with the specified player and random number generator."""
         self._player = player

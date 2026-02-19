@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
 
-import typing
+from typing import Optional
 
 from collections import Counter
 from collections.abc import Sequence
@@ -434,7 +434,7 @@ def bait_dragon(
     world: World,
     randrange: RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: Optional[str] = None,
     *,
     _enemies: Sequence[str] = ("goblin", "skeleton", "ooze"),
     require_treasure: bool = True,
@@ -523,7 +523,7 @@ def nop_ability(
     world: World,
     randrange: RandRange,
     noun: str,
-    target: typing.Optional[str] = None,
+    target: Optional[str] = None,
 ) -> World:
     """No special ability available (though its consumption is tracked)"""
     if target is not None:
