@@ -116,7 +116,7 @@ def test_undo():
     # Supplies a private flag so that DrollErrors percolate to this level
     def onecmd(line):
         """Execute shell command with errors raised instead of printed."""
-        s.onecmd(line, _raises=True)
+        s.onecmd(line, raises=True)
 
     s.preloop()
 

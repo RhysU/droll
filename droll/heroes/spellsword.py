@@ -42,9 +42,9 @@ def _spellsword_ability(
 # Fighter/mage are interchangeable for dragon defeats
 _spellsword_defeat_dragon = functools.partial(
     action.defeat_dragon,
-    _defeat_dragon_heroes=functools.partial(
+    defeat_dragon_heroes=functools.partial(
         action.defeat_dragon_heroes_interchangeable,
-        _interchangeable=frozenset({"fighter", "mage"}),
+        interchangeable=frozenset({"fighter", "mage"}),
     ),
 )
 

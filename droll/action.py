@@ -159,10 +159,10 @@ def open_one(
     hero: str,
     target: str,
     *,
-    _after_monsters=True,
+    after_monsters=True,
 ) -> World:
     """Update world after hero opens exactly one chest."""
-    if _after_monsters and not defeated_monsters(world.dungeon):
+    if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
     return replace(
         draw_treasure(world, randrange),
@@ -178,10 +178,10 @@ def open_all(
     hero: str,
     target: str,
     *,
-    _after_monsters=True,
+    after_monsters=True,
 ) -> World:
     """Update world after hero opens all chests."""
-    if _after_monsters and not defeated_monsters(world.dungeon):
+    if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
     howmany = getattr(world.dungeon, target)
     if not howmany:
@@ -202,7 +202,7 @@ def quaff(
     hero: str,
     target: str,
     *revivable,
-    _after_monsters=True,
+    after_monsters=True,
 ) -> World:
     """Update world after hero quaffs all available potions.
 
@@ -212,7 +212,7 @@ def quaff(
         raise DrollError(f"At least 1 {target} required.")
     if len(revivable) != howmany:
         raise DrollError(f"Exactly {howmany} heroes to revive required.")
-    if _after_monsters and not defeated_monsters(world.dungeon):
+    if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before quaffing.")
     party = _decrement_party(world.party, hero)
     for revived in revivable:
@@ -298,7 +298,7 @@ def reroll(
 def defeat_dragon_heroes(
     *heroes,
     _disallowed_heroes: Sequence[str] = ("scroll",),
-    _distinct_heroes: int = 3,
+    distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
 
@@ -309,43 +309,43 @@ def defeat_dragon_heroes(
         raise DrollError(
             f"Heroes {_disallowed_heroes} cannot defeat a dragon."
         )
-    if len(heroes) != _distinct_heroes:
-        raise DrollError(f"Exactly {_distinct_heroes} heroes required.")
-    if len(hero_set) != _distinct_heroes:
+    if len(heroes) != distinct_heroes:
+        raise DrollError(f"Exactly {distinct_heroes} heroes required.")
+    if len(hero_set) != distinct_heroes:
         raise DrollError(
-            f"The {_distinct_heroes} heroes must all be distinct."
+            f"The {distinct_heroes} heroes must all be distinct."
         )
     return True
 
 
 def defeat_dragon_heroes_wildcard(
     *heroes,
-    _wildcard: Sequence[str] = ("scroll",),
-    _distinct_heroes: int = 3,
+    wildcard: Sequence[str] = ("scroll",),
+    distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
 
     Specifically, in the case when some hero is fungible for all others.
     """
-    distinct_heroes = _distinct_heroes  # Allow mutation saving original
-    if len(heroes) != distinct_heroes:
-        raise DrollError(f"Exactly {distinct_heroes} heroes required.")
+    n_required = distinct_heroes  # Allow mutation saving original
+    if len(heroes) != n_required:
+        raise DrollError(f"Exactly {n_required} heroes required.")
 
     # Account for wildcards by having each wildcard reduce the distinct count
-    non_wildcards = [hero for hero in heroes if hero not in _wildcard]
-    distinct_heroes -= len(heroes) - len(non_wildcards)
+    non_wildcards = [hero for hero in heroes if hero not in wildcard]
+    n_required -= len(heroes) - len(non_wildcards)
     heroes = non_wildcards
 
-    if len({*heroes}) != distinct_heroes:
+    if len({*heroes}) != n_required:
         raise DrollError(  # Error message uses original count
-            f"The {_distinct_heroes} heroes must all be distinct."
+            f"The {distinct_heroes} heroes must all be distinct."
         )
     return True
 
 
 def defeat_dragon_heroes_interchangeable(
     *heroes,
-    _interchangeable: set[str],
+    interchangeable: set[str],
     _disallowed_heroes: Sequence[str] = ("scroll",),
     _required_heroes: int = 3,
 ) -> bool:
@@ -360,18 +360,18 @@ def defeat_dragon_heroes_interchangeable(
     if len(heroes) != _required_heroes:
         raise DrollError(f"Exactly {_required_heroes} heroes required.")
 
-    # Count all heroes, accumulating all _interchangable into just one hero
+    # Count all heroes, accumulating all interchangeable into just one hero
     counter = Counter(heroes)
-    interchangeable = sorted(_interchangeable)
-    assert len(interchangeable) > 0, "At least one interchangeable required."
-    while len(interchangeable) > 1:
-        counter[interchangeable[0]] += counter.pop(interchangeable.pop(), 0)
+    ordered = sorted(interchangeable)
+    assert len(ordered) > 0, "At least one interchangeable required."
+    while len(ordered) > 1:
+        counter[ordered[0]] += counter.pop(ordered.pop(), 0)
 
     # Permit no more than number of distinct interchangeable heroes.
     # For example, 'fighter fighter mage' is only two distinct types
     # even when fighters and mages are interchangeable.
-    counter[interchangeable[0]] = min(
-        counter[interchangeable[0]], len(_interchangeable)
+    counter[ordered[0]] = min(
+        counter[ordered[0]], len(interchangeable)
     )
 
     # Sum the number of distinct heroes observed after these coercions.
@@ -388,7 +388,7 @@ def defeat_dragon(
     hero: str,
     target: str,
     *others,
-    _defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
+    defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
     _min_dragon_length: int = 3,
 ) -> World:
     """Update world after hero handles a dragon using multiple distinct heroes.
@@ -412,8 +412,8 @@ def defeat_dragon(
         party = _decrement_party(party, other)
         regroup = _decrement_regroup(regroup, other)
         heroes.append(other)
-    if not _defeat_dragon_heroes(*heroes):
-        raise RuntimeError("Unexpected result from _defeat_dragon_heroes")
+    if not defeat_dragon_heroes(*heroes):
+        raise RuntimeError("Unexpected result from defeat_dragon_heroes")
 
     # Attempt was successful, so update experience and treasure
     return replace(
@@ -432,14 +432,14 @@ def bait_dragon(
     target: str | None = None,
     *,
     _enemies: Sequence[str] = ("goblin", "skeleton", "ooze"),
-    _require_treasure: bool = True,
+    require_treasure: bool = True,
 ) -> World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target
     target = "dragon" if target is None else target
     if target != "dragon":
         raise DrollError(f"Cannot {noun} a {target}.")
-    if _require_treasure:
+    if require_treasure:
         world = replace_treasure(world, noun)
 
     # Compute how many new dragons will be produced and remove sources

@@ -59,8 +59,8 @@ def _beguiler_ability(
 # Scrolls act as wildcards for dragon defeats
 _beguiler_defeat_dragon = functools.partial(
     action.defeat_dragon,
-    _defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes_wildcard, _wildcard={"scroll"}
+    defeat_dragon_heroes=functools.partial(
+        action.defeat_dragon_heroes_wildcard, wildcard={"scroll"}
     ),
 )
 
