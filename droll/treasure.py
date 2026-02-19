@@ -34,8 +34,12 @@ def draw_treasure(world: World, randrange: RandRange) -> World:
     drawn = _draw(reserve=world.reserve, randrange=randrange)
     return replace(
         world,
-        treasure=replace(world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}),
-        reserve=replace(world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}),
+        treasure=replace(
+            world.treasure, **{drawn: getattr(world.treasure, drawn) + 1}
+        ),
+        reserve=replace(
+            world.reserve, **{drawn: getattr(world.reserve, drawn) - 1}
+        ),
     )
 
 
@@ -47,5 +51,7 @@ def replace_treasure(world: World, item: str) -> World:
     return replace(
         world,
         treasure=replace(world.treasure, **{item: prior_count - 1}),
-        reserve=replace(world.reserve, **{item: getattr(world.reserve, item) + 1}),
+        reserve=replace(
+            world.reserve, **{item: getattr(world.reserve, item) + 1}
+        ),
     )

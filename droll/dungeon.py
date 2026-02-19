@@ -21,12 +21,16 @@ __all__ = (
 
 def defeated_monsters(dungeon: Dungeon) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""
-    return (dungeon is None) or (dungeon.goblin + dungeon.skeleton + dungeon.ooze) == 0
+    return (dungeon is None) or (
+        dungeon.goblin + dungeon.skeleton + dungeon.ooze
+    ) == 0
 
 
 def defeated_dungeon(dungeon: Dungeon) -> bool:
     """Are all monsters and any dragon on this dungeon defeated?"""
-    return (dungeon is None) or (defeated_monsters(dungeon) and dungeon.dragon < 3)
+    return (dungeon is None) or (
+        defeated_monsters(dungeon) and dungeon.dragon < 3
+    )
 
 
 def blocking_dragon(dungeon: Dungeon) -> bool:
