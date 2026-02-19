@@ -5,7 +5,7 @@
 
 from typing import Optional
 
-from collections.abc import Sequence
+from collections.abc import Sequence, Set as AbstractSet
 from dataclasses import replace
 from operator import add
 
@@ -29,9 +29,8 @@ __all__ = (
     "defeat_one_plus_additional",
     "defeat_dragon",
     "defeat_dragon_heroes",
-    "defeat_dragon_heroes_interchangeable",
-    "defeat_dragon_heroes_wildcard",
     "defeat_one",
+    "distinct_heroes",
     "elixir",
     "increment_party",
     "nop_ability",
@@ -302,74 +301,50 @@ def reroll(
     )
 
 
+def distinct_heroes(
+    heroes: Sequence[str],
+    *,
+    wildcard: AbstractSet[str] = frozenset(),
+    interchangeable: AbstractSet[str] = frozenset(),
+) -> int:
+    """How many distinct heroes does the given list represent?
+
+    Wildcards are fungible for any other hero type.
+    Interchangeable heroes may substitute for one another.
+    """
+    n_wildcard = sum(1 for h in heroes if h in wildcard)
+    inter = [h for h in heroes if h not in wildcard and h in interchangeable]
+    regular = [h for h in heroes if h not in wildcard and h not in interchangeable]
+    return len(set(regular)) + min(len(inter), len(interchangeable)) + n_wildcard
+
+
 def defeat_dragon_heroes(
     *heroes,
     disallowed_heroes: Sequence[str] = ("scroll",),
-    distinct_heroes: int = 3,
+    required: int = 3,
+    wildcard: AbstractSet[str] = frozenset(),
+    interchangeable: AbstractSet[str] = frozenset(),
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
 
-    Specifically, in the case when all heroes must be distinct.
+    Supports strict distinctness, wildcard heroes (fungible for any other),
+    and interchangeable heroes (may substitute for one another).
     """
     hero_set = {*heroes}
     if hero_set & {*disallowed_heroes}:
         raise DrollError(
             f"Heroes {disallowed_heroes} cannot defeat a dragon."
         )
-    if len(heroes) != distinct_heroes:
-        raise DrollError(f"Exactly {distinct_heroes} heroes required.")
-    if len(hero_set) != distinct_heroes:
+    if len(heroes) != required:
+        raise DrollError(f"Exactly {required} heroes required.")
+    n_distinct = distinct_heroes(
+        heroes, wildcard=wildcard, interchangeable=interchangeable
+    )
+    if n_distinct < required:
         raise DrollError(
-            f"The {distinct_heroes} heroes must be sufficiently distinct."
+            f"At least {required} distinct heroes not found in {list(heroes)}"
         )
     return True
-
-
-def defeat_dragon_heroes_wildcard(
-    *heroes,
-    wildcard: Sequence[str] = ("scroll",),
-    distinct_heroes: int = 3,
-) -> bool:
-    """Have sufficiently many distinct heroes been provided to slay dragon?
-
-    Specifically, in the case when some hero is fungible for all others.
-    """
-    if len(heroes) != distinct_heroes:
-        raise DrollError(f"Exactly {distinct_heroes} heroes required.")
-
-    # Strip wildcards and reduce the distinct requirement accordingly
-    non_wildcards = [hero for hero in heroes if hero not in wildcard]
-    n_required = distinct_heroes - (len(heroes) - len(non_wildcards))
-    return defeat_dragon_heroes(
-        *non_wildcards,
-        disallowed_heroes=(),
-        distinct_heroes=n_required,
-    )
-
-
-def defeat_dragon_heroes_interchangeable(
-    *heroes,
-    interchangeable: set[str],
-    disallowed_heroes: Sequence[str] = ("scroll",),
-    _required_heroes: int = 3,
-) -> bool:
-    """Have sufficiently many heroes been provided to slay dragon?
-
-    Specifically, in the case when 'A may be used as B and B may be used as A'.
-    """
-    if len(heroes) != _required_heroes:
-        raise DrollError(f"Exactly {_required_heroes} heroes required.")
-
-    # Strip interchangeable heroes and reduce the distinct requirement
-    # by their effective contribution (capped at len(interchangeable)).
-    non_inter = [h for h in heroes if h not in interchangeable]
-    n_inter = len(heroes) - len(non_inter)
-    n_required = _required_heroes - min(n_inter, len(interchangeable))
-    return defeat_dragon_heroes(
-        *non_inter,
-        disallowed_heroes=disallowed_heroes,
-        distinct_heroes=n_required,
-    )
 
 
 def defeat_dragon(

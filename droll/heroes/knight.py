@@ -38,7 +38,7 @@ def _knight_bait_dragon(*args, **kwargs):
 _dragonslayer_defeat_dragon = functools.partial(
     action.defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes, distinct_heroes=2
+        action.defeat_dragon_heroes, required=2
     ),
 )
 
