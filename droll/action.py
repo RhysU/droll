@@ -278,9 +278,7 @@ def reroll(
     if party_targets:
         for target in party_targets:
             party = _decrement_party(party, target)
-        increased, _ = roll_party(
-            dice=len(party_targets), randrange=randrange
-        )
+        increased, _ = roll_party(dice=len(party_targets), randrange=randrange)
         party = Party(
             *map(
                 add,
