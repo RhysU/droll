@@ -5,7 +5,6 @@
 
 from typing import Optional
 
-from collections import Counter
 from collections.abc import Sequence
 from dataclasses import replace
 from operator import add
@@ -335,20 +334,17 @@ def defeat_dragon_heroes_wildcard(
 
     Specifically, in the case when some hero is fungible for all others.
     """
-    n_required = distinct_heroes  # Allow mutation saving original
-    if len(heroes) != n_required:
-        raise DrollError(f"Exactly {n_required} heroes required.")
+    if len(heroes) != distinct_heroes:
+        raise DrollError(f"Exactly {distinct_heroes} heroes required.")
 
-    # Account for wildcards by having each wildcard reduce the distinct count
+    # Strip wildcards and reduce the distinct requirement accordingly
     non_wildcards = [hero for hero in heroes if hero not in wildcard]
-    n_required -= len(heroes) - len(non_wildcards)
-    heroes = non_wildcards
-
-    if len({*heroes}) != n_required:
-        raise DrollError(  # Error message uses original count
-            f"The {distinct_heroes} heroes must all be distinct."
-        )
-    return True
+    n_required = distinct_heroes - (len(heroes) - len(non_wildcards))
+    return defeat_dragon_heroes(
+        *non_wildcards,
+        _disallowed_heroes=(),
+        distinct_heroes=n_required,
+    )
 
 
 def defeat_dragon_heroes_interchangeable(
@@ -361,33 +357,26 @@ def defeat_dragon_heroes_interchangeable(
 
     Specifically, in the case when 'A may be used as B and B may be used as A'.
     """
-    if {*heroes} & {*_disallowed_heroes}:
-        raise DrollError(
-            f"Heroes {_disallowed_heroes} cannot defeat a dragon."
-        )
-    if len(heroes) != _required_heroes:
-        raise DrollError(f"Exactly {_required_heroes} heroes required.")
-
-    # Count all heroes, accumulating all interchangeable into just one hero
-    counter = Counter(heroes)
-    ordered = sorted(interchangeable)
-    assert len(ordered) > 0, "At least one interchangeable required."
-    while len(ordered) > 1:
-        counter[ordered[0]] += counter.pop(ordered.pop(), 0)
-
-    # Permit no more than number of distinct interchangeable heroes.
-    # For example, 'fighter fighter mage' is only two distinct types
-    # even when fighters and mages are interchangeable.
-    counter[ordered[0]] = min(
-        counter[ordered[0]], len(interchangeable)
+    # Assign each interchangeable hero a distinct canonical name, up to
+    # len(interchangeable) slots.  Overflow keeps its original name so
+    # the base function's distinctness check naturally rejects it.
+    inter_names = sorted(interchangeable)
+    inter_idx = 0
+    new_heroes: list[str] = []
+    for h in heroes:
+        if h in interchangeable:
+            if inter_idx < len(interchangeable):
+                new_heroes.append(inter_names[inter_idx])
+                inter_idx += 1
+            else:
+                new_heroes.append(h)
+        else:
+            new_heroes.append(h)
+    return defeat_dragon_heroes(
+        *new_heroes,
+        _disallowed_heroes=_disallowed_heroes,
+        distinct_heroes=_required_heroes,
     )
-
-    # Sum the number of distinct heroes observed after these coercions.
-    distinct_heroes = sum(counter.values())
-    if distinct_heroes != _required_heroes:
-        raise DrollError(f"Heroes {heroes} not sufficiently distinct.")
-
-    return True
 
 
 def defeat_dragon(
