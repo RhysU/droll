@@ -4,12 +4,12 @@
 """Functionality associated with player action mechanics."""
 from __future__ import annotations
 
-import collections
-import collections.abc
+from collections import Counter
+from collections.abc import Sequence
 from dataclasses import replace
-import operator
+from operator import add
 
-from . import dice
+from .dice import RandRange, roll_dungeon, roll_party
 from .dungeon import (
     defeated_monsters,
     decrement_dungeon,
@@ -17,7 +17,7 @@ from .dungeon import (
     increment_dungeon,
 )
 from .error import DrollError
-from . import struct
+from .struct import Dungeon, Party, Regroup, World, field_names, field_values
 from .treasure import draw_treasure, replace_treasure
 
 __all__ = (
@@ -41,13 +41,13 @@ __all__ = (
     "reroll",
 )
 
-_DUNGEON_NAMES = frozenset(struct.field_names(struct.Dungeon))
-_PARTY_NAMES = frozenset(struct.field_names(struct.Party))
+_DUNGEON_NAMES = frozenset(field_names(Dungeon))
+_PARTY_NAMES = frozenset(field_names(Party))
 
 
 def defeat_one(
-    world: struct.World, randrange: dice.RandRange, hero: str, target: str
-) -> struct.World:
+    world: World, randrange: RandRange, hero: str, target: str
+) -> World:
     """Update world after hero handles exactly one target."""
     return replace(
         world,
@@ -58,7 +58,7 @@ def defeat_one(
 
 
 # Private because it must be used with _decrement_regroup for correctness
-def _decrement_party(party: struct.Party, hero: str) -> struct.Party:
+def _decrement_party(party: Party, hero: str) -> Party:
     """Decrease the count of the specified hero type by one."""
     if party is None:
         raise DrollError("No party currently active.")
@@ -69,7 +69,7 @@ def _decrement_party(party: struct.Party, hero: str) -> struct.Party:
 
 
 # Private because it must be used with _decrement_party for correctness
-def _decrement_regroup(regroup: struct.Regroup, hero: str) -> struct.Regroup:
+def _decrement_regroup(regroup: Regroup, hero: str) -> Regroup:
     """Decrement the regroup discard counter for hero, if positive."""
     prior = getattr(regroup.discard, hero, 0)
     return replace(
@@ -77,7 +77,7 @@ def _decrement_regroup(regroup: struct.Regroup, hero: str) -> struct.Regroup:
     )
 
 
-def increment_party(party: struct.Party, hero: str) -> struct.Party:
+def increment_party(party: Party, hero: str) -> Party:
     """Increase the count of the specified hero type by one."""
     if party is None:
         raise DrollError("No party currently active.")
@@ -85,8 +85,8 @@ def increment_party(party: struct.Party, hero: str) -> struct.Party:
 
 
 def defeat_all(
-    world: struct.World, randrange: dice.RandRange, hero: str, target: str
-) -> struct.World:
+    world: World, randrange: RandRange, hero: str, target: str
+) -> World:
     """Update world after hero handles all of one type of target."""
     return replace(
         world,
@@ -97,11 +97,11 @@ def defeat_all(
 
 
 def _defeat_plus_additional(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     hero: str,
     additional: tuple,
-) -> struct.World:
+) -> World:
     """After the initial defeat, optionally defeat one additional monster."""
     if defeated_monsters(world.dungeon):
         if additional:
@@ -126,12 +126,12 @@ def _defeat_plus_additional(
 
 
 def defeat_all_plus_additional(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     hero: str,
     target: str,
     *additional,
-) -> struct.World:
+) -> World:
     """Update world after hero handles all of one target type plus one more."""
     world = defeat_all(
         world=world, randrange=randrange, hero=hero, target=target
@@ -140,12 +140,12 @@ def defeat_all_plus_additional(
 
 
 def defeat_one_plus_additional(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     hero: str,
     target: str,
     *additional,
-) -> struct.World:
+) -> World:
     """Update world after hero handles one target plus one more."""
     world = defeat_one(
         world=world, randrange=randrange, hero=hero, target=target
@@ -154,13 +154,13 @@ def defeat_one_plus_additional(
 
 
 def open_one(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     hero: str,
     target: str,
     *,
     _after_monsters=True,
-) -> struct.World:
+) -> World:
     """Update world after hero opens exactly one chest."""
     if _after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
@@ -173,13 +173,13 @@ def open_one(
 
 
 def open_all(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     hero: str,
     target: str,
     *,
     _after_monsters=True,
-) -> struct.World:
+) -> World:
     """Update world after hero opens all chests."""
     if _after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
@@ -197,13 +197,13 @@ def open_all(
 
 
 def quaff(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     hero: str,
     target: str,
     *revivable,
     _after_monsters=True,
-) -> struct.World:
+) -> World:
     """Update world after hero quaffs all available potions.
 
     Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
@@ -245,12 +245,12 @@ def _classify_reroll_targets(
 
 
 def reroll(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     hero: str,
     *dungeon_or_party,
     allow_dragon: bool = False,
-) -> struct.World:
+) -> World:
     """Update world after hero re-rolls some number of dungeon or party dice."""
     if not dungeon_or_party:
         raise DrollError("At least 1 reroll target required.")
@@ -263,14 +263,14 @@ def reroll(
     if dungeon_targets:
         for target in dungeon_targets:
             dungeon = decrement_dungeon(dungeon, target)
-        increased = dice.roll_dungeon(
+        increased = roll_dungeon(
             dice=len(dungeon_targets), randrange=randrange
         )
-        dungeon = struct.Dungeon(
+        dungeon = Dungeon(
             *map(
-                operator.add,
-                struct.field_values(dungeon),
-                struct.field_values(increased),
+                add,
+                field_values(dungeon),
+                field_values(increased),
             )
         )
 
@@ -278,14 +278,14 @@ def reroll(
     if party_targets:
         for target in party_targets:
             party = _decrement_party(party, target)
-        increased, _ = dice.roll_party(
+        increased, _ = roll_party(
             dice=len(party_targets), randrange=randrange
         )
-        party = struct.Party(
+        party = Party(
             *map(
-                operator.add,
-                struct.field_values(party),
-                struct.field_values(increased),
+                add,
+                field_values(party),
+                field_values(increased),
             )
         )
 
@@ -299,7 +299,7 @@ def reroll(
 
 def defeat_dragon_heroes(
     *heroes,
-    _disallowed_heroes: collections.abc.Sequence[str] = ("scroll",),
+    _disallowed_heroes: Sequence[str] = ("scroll",),
     _distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
@@ -322,7 +322,7 @@ def defeat_dragon_heroes(
 
 def defeat_dragon_heroes_wildcard(
     *heroes,
-    _wildcard: collections.abc.Sequence[str] = ("scroll",),
+    _wildcard: Sequence[str] = ("scroll",),
     _distinct_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
@@ -348,7 +348,7 @@ def defeat_dragon_heroes_wildcard(
 def defeat_dragon_heroes_interchangeable(
     *heroes,
     _interchangeable: set[str],
-    _disallowed_heroes: collections.abc.Sequence[str] = ("scroll",),
+    _disallowed_heroes: Sequence[str] = ("scroll",),
     _required_heroes: int = 3,
 ) -> bool:
     """Have sufficiently many heroes been provided to slay dragon?
@@ -363,7 +363,7 @@ def defeat_dragon_heroes_interchangeable(
         raise DrollError(f"Exactly {_required_heroes} heroes required.")
 
     # Count all heroes, accumulating all _interchangable into just one hero
-    counter = collections.Counter(heroes)
+    counter = Counter(heroes)
     interchangeable = sorted(_interchangeable)
     assert len(interchangeable) > 0, "At least one interchangeable required."
     while len(interchangeable) > 1:
@@ -385,14 +385,14 @@ def defeat_dragon_heroes_interchangeable(
 
 
 def defeat_dragon(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     hero: str,
     target: str,
     *others,
     _defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
     _min_dragon_length: int = 3,
-) -> struct.World:
+) -> World:
     """Update world after hero handles a dragon using multiple distinct heroes.
 
     Additional required heroes are specified within variable-length others."""
@@ -428,14 +428,14 @@ def defeat_dragon(
 
 
 def bait_dragon(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     noun: str,
     target: str | None = None,
     *,
-    _enemies: collections.abc.Sequence[str] = ("goblin", "skeleton", "ooze"),
+    _enemies: Sequence[str] = ("goblin", "skeleton", "ooze"),
     _require_treasure: bool = True,
-) -> struct.World:
+) -> World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target
     target = "dragon" if target is None else target
@@ -466,8 +466,8 @@ def bait_dragon(
 
 
 def elixir(
-    world: struct.World, randrange: dice.RandRange, noun: str, target: str
-) -> struct.World:
+    world: World, randrange: RandRange, noun: str, target: str
+) -> World:
     """Add one hero die of any requested type."""
     return replace(
         replace_treasure(world, noun),
@@ -476,11 +476,11 @@ def elixir(
 
 
 def convert_dungeon_to_party(
-    world: struct.World,
+    world: World,
     source: str,
     destination: str,
     max_count: int,
-) -> struct.World:
+) -> World:
     """Convert up to max_count dungeon dice into party dice with regroup discard.
 
     Converts min(available, max_count) of source into destination."""
@@ -508,7 +508,7 @@ def convert_dungeon_to_party(
     )
 
 
-def consume_ability(world: struct.World):
+def consume_ability(world: World):
     """Mark the hero's special ability as used."""
     if not world.ability:
         raise DrollError("Ability not available.")
@@ -516,11 +516,11 @@ def consume_ability(world: struct.World):
 
 
 def nop_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
+    world: World,
+    randrange: RandRange,
     noun: str,
     target: str | None = None,
-) -> struct.World:
+) -> World:
     """No special ability available (though its consumption is tracked)"""
     if target is not None:
         raise DrollError(f"No targets accepted for {noun}.")
