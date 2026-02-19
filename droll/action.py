@@ -320,7 +320,7 @@ def defeat_dragon_heroes(
         raise DrollError(f"Exactly {distinct_heroes} heroes required.")
     if len(hero_set) != distinct_heroes:
         raise DrollError(
-            f"The {distinct_heroes} heroes must all be distinct."
+            f"The {distinct_heroes} heroes must be sufficiently distinct."
         )
     return True
 
