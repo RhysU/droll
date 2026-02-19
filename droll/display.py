@@ -27,9 +27,7 @@ class DisplayMode(enum.Enum):
 _ALWAYS_COUNT = frozenset({"dragon"})
 
 
-def _format_item(
-    name: str, count: int, discard: int = 0
-) -> str | None:
+def _format_item(name: str, count: int, discard: int = 0) -> str | None:
     """Format a single item, returning None if count is zero."""
     if not count:
         return None

@@ -16,10 +16,10 @@ from .game import Game, GameState
 
 __all__ = ("Shell",)
 
-_RESET = '\033[0m'
-_GREEN = '\033[92m'
-_RED = '\033[91m'
-_ORANGE = '\033[93m'  # TODO Make output between commands, e.g. help, orange
+_RESET = "\033[0m"
+_GREEN = "\033[92m"
+_RED = "\033[91m"
+_ORANGE = "\033[93m"  # TODO Make output between commands, e.g. help, orange
 
 
 class Shell(cmd.Cmd):
@@ -38,7 +38,9 @@ class Shell(cmd.Cmd):
         self._undo = None
         self._display_mode = display_mode
         self._color = (
-            sys.stdout.isatty() if display_mode == DisplayMode.CURRENT else False
+            sys.stdout.isatty()
+            if display_mode == DisplayMode.CURRENT
+            else False
         )
 
     def precmd(self, line: str) -> str:
@@ -229,7 +231,9 @@ class Shell(cmd.Cmd):
     #################
 
     doc_header = "Feasible commands (help <command>):"
-    doc_hero_template = "Attack monsters, quaff potions, and open chests with a {} like so:"
+    doc_hero_template = (
+        "Attack monsters, quaff potions, and open chests with a {} like so:"
+    )
     doc_hero_example = """
         champion skeleton            # Attack skeleton(s)
         thief chest                  # Open chest(s)

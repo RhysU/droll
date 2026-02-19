@@ -59,9 +59,7 @@ def _commander_ability(
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice."""
     if target is None:
-        raise DrollError(
-            f"At least 1 reroll target required for {noun}."
-        )
+        raise DrollError(f"At least 1 reroll target required for {noun}.")
     # Temporarily add a scroll to be consumed by reroll
     world = replace(world, party=action.increment_party(world.party, "scroll"))
     world = action.reroll(

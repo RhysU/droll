@@ -19,12 +19,12 @@ __all__ = (
 
 RandRange = collections.abc.Callable[[int, int], int]
 RollDungeon = collections.abc.Callable[[int, RandRange], struct.Dungeon]
-RollParty = collections.abc.Callable[[int, RandRange], tuple[struct.Party, struct.Regroup]]
+RollParty = collections.abc.Callable[
+    [int, RandRange], tuple[struct.Party, struct.Regroup]
+]
 
 
-def _roll(
-    dice: int, start: int, stop: int, randrange: RandRange
-) -> list[int]:
+def _roll(dice: int, start: int, stop: int, randrange: RandRange) -> list[int]:
     """Roll dice and return counts for each outcome in the range [start, stop)."""
     assert dice >= 0, "Dice count must be non-negative"
     result = [0] * (stop - start)

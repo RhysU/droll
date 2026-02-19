@@ -126,9 +126,7 @@ def _defeat_plus_additional(
         return world
 
     if not additional:
-        raise DrollError(
-            "Monsters remain so one additional target required."
-        )
+        raise DrollError("Monsters remain so one additional target required.")
     if len(additional) > 1:
         raise DrollError(
             f"Only one additional target allowed but {len(additional)} provided."
@@ -290,20 +288,30 @@ def reroll(
     if dungeon_targets:
         for target in dungeon_targets:
             dungeon = decrement_dungeon(dungeon, target)
-        increased = dice.roll_dungeon(dice=len(dungeon_targets), randrange=randrange)
+        increased = dice.roll_dungeon(
+            dice=len(dungeon_targets), randrange=randrange
+        )
         dungeon = struct.Dungeon(
-            *map(operator.add, struct.field_values(dungeon),
-                 struct.field_values(increased))
+            *map(
+                operator.add,
+                struct.field_values(dungeon),
+                struct.field_values(increased),
+            )
         )
 
     party = world.party
     if party_targets:
         for target in party_targets:
             party = _decrement_party(party, target)
-        increased, _ = dice.roll_party(dice=len(party_targets), randrange=randrange)
+        increased, _ = dice.roll_party(
+            dice=len(party_targets), randrange=randrange
+        )
         party = struct.Party(
-            *map(operator.add, struct.field_values(party),
-                 struct.field_values(increased))
+            *map(
+                operator.add,
+                struct.field_values(party),
+                struct.field_values(increased),
+            )
         )
 
     return replace(
@@ -329,9 +337,7 @@ def defeat_dragon_heroes(
             f"Heroes {_disallowed_heroes} cannot defeat a dragon."
         )
     if len(heroes) != _distinct_heroes:
-        raise DrollError(
-            f"Exactly {_distinct_heroes} heroes required."
-        )
+        raise DrollError(f"Exactly {_distinct_heroes} heroes required.")
     if len(hero_set) != _distinct_heroes:
         raise DrollError(
             f"The {_distinct_heroes} heroes must all be distinct."
@@ -350,9 +356,7 @@ def defeat_dragon_heroes_wildcard(
     """
     distinct_heroes = _distinct_heroes  # Allow mutation saving original
     if len(heroes) != distinct_heroes:
-        raise DrollError(
-            f"Exactly {distinct_heroes} heroes required."
-        )
+        raise DrollError(f"Exactly {distinct_heroes} heroes required.")
 
     # Account for wildcards by having each wildcard reduce the distinct count
     non_wildcards = [hero for hero in heroes if hero not in _wildcard]
@@ -381,9 +385,7 @@ def defeat_dragon_heroes_interchangeable(
             f"Heroes {_disallowed_heroes} cannot defeat a dragon."
         )
     if len(heroes) != _required_heroes:
-        raise DrollError(
-            f"Exactly {_required_heroes} heroes required."
-        )
+        raise DrollError(f"Exactly {_required_heroes} heroes required.")
 
     # Count all heroes, accumulating all _interchangable into just one hero
     counter = collections.Counter(heroes)
@@ -475,9 +477,7 @@ def bait_dragon(
         else 0
     )
     if not new_targets:
-        raise DrollError(
-            f"At least 1 of {_enemies} required for '{noun}'."
-        )
+        raise DrollError(f"At least 1 of {_enemies} required for '{noun}'.")
 
     # Zero all enemy sources and increment the number of dragons
     return replace(
@@ -524,7 +524,10 @@ def convert_dungeon_to_party(
             world.regroup,
             discard=replace(
                 world.regroup.discard,
-                **{destination: getattr(world.regroup.discard, destination) + count},
+                **{
+                    destination: getattr(world.regroup.discard, destination)
+                    + count
+                },
             ),
         ),
     )

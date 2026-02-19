@@ -40,7 +40,9 @@ class Game:
     """Tracks all state associated with a programmatically driven game."""
 
     def __init__(
-        self, player: struct.Player = player.Default, random: Random | None = None
+        self,
+        player: struct.Player = player.Default,
+        random: Random | None = None,
     ) -> None:
         """Initialize a new game with the specified player and random number generator."""
         self._player = player
@@ -161,9 +163,12 @@ class Game:
         if self._world.ability:
             possible.append("ability")
         for name, action in (
-            ("descend", lambda: world.descend(
-                self._world, self._player.roll.dungeon, _dummy_randrange
-            )),
+            (
+                "descend",
+                lambda: world.descend(
+                    self._world, self._player.roll.dungeon, _dummy_randrange
+                ),
+            ),
             ("retire", lambda: world.retire(self._world)),
             ("retreat", lambda: world.retreat(self._world)),
         ):
@@ -175,7 +180,10 @@ class Game:
         return possible
 
     def completenames(
-        self, text: str, head: collections.abc.Sequence[str], tail: collections.abc.Sequence[str]
+        self,
+        text: str,
+        head: collections.abc.Sequence[str],
+        tail: collections.abc.Sequence[str],
     ) -> collections.abc.Sequence[str]:
         """Complete possible command names based upon context."""
         results = [
@@ -186,14 +194,17 @@ class Game:
         return results
 
     def completedefault(
-        self, text: str, head: collections.abc.Sequence[str], tail: collections.abc.Sequence[str]
+        self,
+        text: str,
+        head: collections.abc.Sequence[str],
+        tail: collections.abc.Sequence[str],
     ) -> collections.abc.Sequence[str]:
         """Complete loosely based upon available heroes/treasures/dungeon."""
         return player.complete(
             world=self._world,
             tokens=head + tail,
             text=text,
-            position=len(head)
+            position=len(head),
         )
 
 

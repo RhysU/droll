@@ -141,9 +141,7 @@ def descend(
         try:
             world = _apply_ring(world)
         except DrollError:
-            raise DrollError(
-                "Dragon remains but no ring in hand."
-            )
+            raise DrollError("Dragon remains but no ring in hand.")
 
     # Success above, so regroup just prior to descending
     world = _regroup(world)
@@ -170,9 +168,7 @@ def _escape_dragon(world: struct.World) -> struct.World:
         try:
             return _apply_portal(world)
         except DrollError:
-            raise DrollError(
-                "Dragon remains but no ring or portal in hand."
-            )
+            raise DrollError("Dragon remains but no ring or portal in hand.")
 
 
 def retire(world: struct.World) -> struct.World:
@@ -272,9 +268,7 @@ def replace_treasure(world: struct.World, item: str) -> struct.World:
 def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     if not _blocking_dragon(world.dungeon):
-        raise DrollError(
-            f"A dragon must be present to use a {noun}."
-        )
+        raise DrollError(f"A dragon must be present to use a {noun}.")
     world = replace_treasure(world, noun)
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
 
@@ -285,7 +279,5 @@ def _apply_portal(
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):
-        raise DrollError(
-            f"No need to apply {noun} when dungeon clear."
-        )
+        raise DrollError(f"No need to apply {noun} when dungeon clear.")
     return replace(replace_treasure(world, "portal"), dungeon=struct.Dungeon())

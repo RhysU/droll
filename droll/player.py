@@ -137,9 +137,7 @@ def apply(
     if noun == "portal":
         raise DrollError('To use a portal, directly "retire".')
     if noun == "ring":
-        raise DrollError(
-            'To use a ring, directly "descend" or "retire".'
-        )
+        raise DrollError('To use a ring, directly "descend" or "retire".')
     if noun in {"ability", "bait", "elixir"}:
         try:
             action_ = getattr(player, noun)
@@ -149,7 +147,9 @@ def apply(
 
     # Temporarily inflate party with treasure-as-hero counts
     prior_treasure = world.treasure
-    world = _adjust_phantom_treasures(world, player.artifacts, prior_treasure, +1)
+    world = _adjust_phantom_treasures(
+        world, player.artifacts, prior_treasure, +1
+    )
 
     # Dispatch: reroll always uses scroll mechanics; everything else is hero-target
     if noun == "reroll":
@@ -165,7 +165,9 @@ def apply(
             raise DrollError(str(cause)) from cause
 
     # Undo phantom inflation, then consume treasure for any artifacts spent
-    world = _adjust_phantom_treasures(world, player.artifacts, prior_treasure, -1)
+    world = _adjust_phantom_treasures(
+        world, player.artifacts, prior_treasure, -1
+    )
     for hero, quantity in struct.field_items(world.party):
         if quantity >= 0:
             continue
@@ -237,7 +239,10 @@ def _all_dice_names() -> set[str]:
 
 
 def complete(
-    world: struct.World, tokens: collections.abc.Sequence[str], text: str, position: int
+    world: struct.World,
+    tokens: collections.abc.Sequence[str],
+    text: str,
+    position: int,
 ) -> collections.abc.Sequence[str]:
     """Possible completions for text with position among (partial) tokens."""
     if position == 0:

@@ -35,14 +35,16 @@ __all__ = (
     Spellsword.name,
 )
 
-AVAILABLE = MappingProxyType({
-    Default.name: Default,
-    Crusader.name: Crusader,
-    Enchantress.name: Enchantress,
-    HalfGoblin.name: HalfGoblin,
-    Knight.name: Knight,
-    Mercenary.name: Mercenary,
-    Minstrel.name: Minstrel,
-    Occultist.name: Occultist,
-    Spellsword.name: Spellsword,
-})
+AVAILABLE = MappingProxyType(
+    {
+        Default.name: Default,
+        Crusader.name: Crusader,
+        Enchantress.name: Enchantress,
+        HalfGoblin.name: HalfGoblin,
+        Knight.name: Knight,
+        Mercenary.name: Mercenary,
+        Minstrel.name: Minstrel,
+        Occultist.name: Occultist,
+        Spellsword.name: Spellsword,
+    }
+)

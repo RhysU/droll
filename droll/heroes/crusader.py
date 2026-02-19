@@ -26,9 +26,7 @@ def _crusader_ability(
     noun: str,
     target: str | None = None,
     *,
-    _acceptable_targets: frozenset[str] = frozenset(
-        {"fighter", "cleric"}
-    ),
+    _acceptable_targets: frozenset[str] = frozenset({"fighter", "cleric"}),
 ) -> struct.World:
     """Crusader usable as a fighter or a cleric, adding one hero.
 
@@ -36,9 +34,7 @@ def _crusader_ability(
     if target is None:
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
-        raise DrollError(
-            f"Target {target} not one of {_acceptable_targets}."
-        )
+        raise DrollError(f"Target {target} not one of {_acceptable_targets}.")
     return action.consume_ability(
         replace(world, party=action.increment_party(world.party, target))
     )
@@ -57,9 +53,7 @@ def _paladin_ability(
     For each potion, add one argument for the hero to review."""
     # Validate that a treasure was specified
     if target is None:
-        raise DrollError(
-            f"Treasure to consume required for {noun}."
-        )
+        raise DrollError(f"Treasure to consume required for {noun}.")
 
     # Consume the specified treasure (will error if not possessed)
     world = replace_treasure(world, target)

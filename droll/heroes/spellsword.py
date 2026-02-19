@@ -25,9 +25,7 @@ def _spellsword_ability(
     noun: str,
     target: str | None = None,
     *,
-    _acceptable_targets: frozenset[str] = frozenset(
-        {"fighter", "mage"}
-    ),
+    _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
 ) -> struct.World:
     """Spellsword usable as a fighter or a mage, adding one hero to party.
 
@@ -35,9 +33,7 @@ def _spellsword_ability(
     if target is None:
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
-        raise DrollError(
-            f"Target {target} not one of {_acceptable_targets}."
-        )
+        raise DrollError(f"Target {target} not one of {_acceptable_targets}.")
     return action.consume_ability(
         replace(world, party=action.increment_party(world.party, target))
     )
@@ -59,9 +55,7 @@ def _battlemage_ability(
     noun: str,
     target: str | None = None,
     *,
-    _acceptable_targets: frozenset[str] = frozenset(
-        {"fighter", "mage"}
-    ),
+    _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:
