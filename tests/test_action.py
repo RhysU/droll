@@ -225,6 +225,21 @@ class TestRerollParty:
         with pytest.raises(DrollError):
             action.reroll(self.world, randrange, "scroll", "nonexistent")
 
+    def test_reroll_requires_hero_before_rolling(self):
+        """Hero must be present before reroll; rolled results cannot pay the cost.
+
+        Regression test for issue #105: reroll previously decremented after
+        rolling, allowing a player with 0 scrolls to stochastically reroll
+        in hopes the new die shows a scroll.
+        """
+        # World with NO scrolls available
+        no_scroll_world = replace(self.world, party=replace(self.world.party, scroll=0))
+        # Even if the roll always produces a scroll (index 5 => scroll),
+        # the reroll must fail because the scroll cost is checked first.
+        randrange = self._canned_randrange([5, 5, 5, 5, 5])
+        with pytest.raises(DrollError):
+            action.reroll(no_scroll_world, randrange, "scroll", "fighter")
+
 
 def test_dragon_wildcard_less_interesting_successful_cases():
     """Test valid dragon defeats with wildcard heroes."""
