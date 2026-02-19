@@ -340,9 +340,9 @@ def defeat_dragon_heroes(
     n_distinct = distinct_heroes(
         heroes, wildcard=wildcard, interchangeable=interchangeable
     )
-    if n_distinct < required:
+    if n_distinct != required:
         raise DrollError(
-            f"Exactly {required} distinct heroes not found in {', '.join(heroes)}"
+            f"Exactly {required} distinct heroes not in {', '.join(heroes)}"
         )
     return True
 
