@@ -36,6 +36,7 @@ class Shell(cmd.Cmd):
         assert game is not None
         self._game = game
         self._undo = None
+        self._command_count = 0
         self._display_mode = display_mode
         self._color = (
             sys.stdout.isatty()
@@ -57,7 +58,7 @@ class Shell(cmd.Cmd):
 
     def _postcmd_current(self, stop, line) -> None:
         """Display state using the compact summary format."""
-        self.prompt = self._game.player_name + "> "
+        self.prompt = f"({self._command_count:03d} {self._game.player_name})> "
         if self._color:
             self.prompt = _GREEN + self.prompt + _RESET
         print()
@@ -76,7 +77,10 @@ class Shell(cmd.Cmd):
 
     def _postcmd_legacy(self, stop, line) -> None:
         """Display state using the brief summary format."""
-        self.prompt = self._game.prompt() + " "
+        self.prompt = (
+            f"({self._command_count:03d} {self._game.player_name}"
+            f" {self._game.score():-2d}) "
+        )
         print()
         if line != "EOF":
             print(self._game.summary())
@@ -137,6 +141,9 @@ class Shell(cmd.Cmd):
             self._undo.append(before)  # Same random state so undo permitted
         else:
             self._undo.clear()  # Random state mutated so no under permitted
+
+        if self._game != before:
+            self._command_count += 1
 
         return result
 
