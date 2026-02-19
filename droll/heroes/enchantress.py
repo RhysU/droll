@@ -9,9 +9,9 @@ import functools
 
 from .. import action
 from .. import dice
+from ..dungeon import defeated_monsters, decrement_dungeon, increment_dungeon
 from ..error import DrollError
 from .. import struct
-from ..world import defeated_monsters
 from ..player import Default
 
 __all__ = (
@@ -28,8 +28,8 @@ def _enchantress_ability(
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion."""
     dungeon = world.dungeon
-    dungeon = action.decrement_dungeon(dungeon, target)
-    dungeon = action.increment_dungeon(dungeon, "potion")
+    dungeon = decrement_dungeon(dungeon, target)
+    dungeon = increment_dungeon(dungeon, "potion")
     return action.consume_ability(replace(world, dungeon=dungeon))
 
 
@@ -44,15 +44,15 @@ def _beguiler_ability(
 
     Requires transforming 2 monsters when 2+ monsters available."""
     dungeon = world.dungeon
-    dungeon = action.decrement_dungeon(dungeon, target)
+    dungeon = decrement_dungeon(dungeon, target)
     if len(extra_targets) > 1:
         raise DrollError("At most 2 targets can be changed.")
     elif len(extra_targets) == 1:
-        dungeon = action.decrement_dungeon(dungeon, extra_targets[0])
+        dungeon = decrement_dungeon(dungeon, extra_targets[0])
     elif not defeated_monsters(dungeon):
         assert len(extra_targets) == 0
         raise DrollError("2 targets required when 2+ available.")
-    dungeon = action.increment_dungeon(dungeon, "potion")
+    dungeon = increment_dungeon(dungeon, "potion")
     return action.consume_ability(replace(world, dungeon=dungeon))
 
 

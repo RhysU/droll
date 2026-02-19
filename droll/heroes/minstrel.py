@@ -9,6 +9,7 @@ import functools
 
 from .. import action
 from .. import dice
+from ..dungeon import eliminate_dungeon
 from ..error import DrollError
 from .. import struct
 from ..player import Default
@@ -30,7 +31,7 @@ def _minstrel_ability(
     if target != "dragon":
         raise DrollError(f"Can only discard dragon dice, not {target}.")
     return action.consume_ability(
-        replace(world, dungeon=action.eliminate_dungeon(world.dungeon, target))
+        replace(world, dungeon=eliminate_dungeon(world.dungeon, target))
     )
 
 

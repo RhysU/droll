@@ -7,7 +7,7 @@ from dataclasses import replace
 import random
 import pytest
 
-from droll import dice, error, struct, world
+from droll import dice, dungeon, error, struct, treasure, world
 
 
 class TestWorld:
@@ -42,7 +42,7 @@ class TestWorld:
     def test_draw_treasure(self):
         """Test drawing treasure moves one item from reserve to treasure."""
         pre = world.new_world()
-        post = world.draw_treasure(pre, self.state.randrange)
+        post = treasure.draw_treasure(pre, self.state.randrange)
         assert sum(struct.field_values(pre.treasure)) == 0
         assert sum(struct.field_values(post.treasure)) == 1
         assert (
@@ -55,7 +55,7 @@ class TestWorld:
         """Test replacing treasure moves one item from treasure to reserve."""
         pre = world.new_world()
         pre = replace(pre, treasure=replace(pre.treasure, elixir=1))
-        post = world.replace_treasure(pre, "elixir")
+        post = treasure.replace_treasure(pre, "elixir")
         assert sum(struct.field_values(pre.treasure)) == 1
         assert sum(struct.field_values(post.treasure)) == 0
         assert (
@@ -275,21 +275,21 @@ class TestWorld:
     def test_exhausted_dungeon(self):
         """Test exhausted_dungeon detects when no actions remain."""
         # None dungeon is exhausted
-        assert world.exhausted_dungeon(None)
+        assert dungeon.exhausted_dungeon(None)
 
         # Empty dungeon is exhausted
-        assert world.exhausted_dungeon(struct.Dungeon())
+        assert dungeon.exhausted_dungeon(struct.Dungeon())
 
         # Dungeon with only dragons (blocking) is not exhausted
-        assert not world.exhausted_dungeon(struct.Dungeon(dragon=3))
+        assert not dungeon.exhausted_dungeon(struct.Dungeon(dragon=3))
 
         # Dungeon with monsters is not exhausted
-        assert not world.exhausted_dungeon(struct.Dungeon(goblin=1))
-        assert not world.exhausted_dungeon(struct.Dungeon(skeleton=2))
-        assert not world.exhausted_dungeon(struct.Dungeon(ooze=1))
+        assert not dungeon.exhausted_dungeon(struct.Dungeon(goblin=1))
+        assert not dungeon.exhausted_dungeon(struct.Dungeon(skeleton=2))
+        assert not dungeon.exhausted_dungeon(struct.Dungeon(ooze=1))
 
         # Dungeon with chests/potions still has actions (not exhausted)
-        assert not world.exhausted_dungeon(struct.Dungeon(chest=2, potion=3))
+        assert not dungeon.exhausted_dungeon(struct.Dungeon(chest=2, potion=3))
 
     def test_retreat_valid(self):
         """Test valid retreat scenarios."""
