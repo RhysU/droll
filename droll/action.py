@@ -342,7 +342,7 @@ def defeat_dragon_heroes(
     )
     if n_distinct < required:
         raise DrollError(
-            f"At least {required} distinct heroes not found in {list(heroes)}"
+            f"Exactly {required} distinct heroes not found in {list(heroes)}"
         )
     return True
 
