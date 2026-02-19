@@ -5,9 +5,9 @@
 
 from dataclasses import replace
 
-from . import dice
+from .dice import RandRange
 from .error import DrollError
-from . import struct
+from .struct import Treasure, World, field_items, field_values
 
 __all__ = (
     "draw_treasure",
@@ -15,21 +15,21 @@ __all__ = (
 )
 
 
-def _draw(reserve: struct.Treasure, randrange: dice.RandRange) -> str:
+def _draw(reserve: Treasure, randrange: RandRange) -> str:
     """Draw a random treasure from the reserve, weighted by counts."""
-    total = sum(struct.field_values(reserve))
+    total = sum(field_values(reserve))
     if not total:
         raise RuntimeError("No items remaining in the reserve")
     choice = randrange(0, total)
     cumulative = 0
-    for name, count in struct.field_items(reserve):
+    for name, count in field_items(reserve):
         cumulative += count
         if choice < cumulative:
             return name
     raise RuntimeError("Unreachable")
 
 
-def draw_treasure(world: struct.World, randrange: dice.RandRange) -> struct.World:
+def draw_treasure(world: World, randrange: RandRange) -> World:
     """Draw a single item from the reserve into the player's treasures."""
     drawn = _draw(reserve=world.reserve, randrange=randrange)
     return replace(
@@ -39,7 +39,7 @@ def draw_treasure(world: struct.World, randrange: dice.RandRange) -> struct.Worl
     )
 
 
-def replace_treasure(world: struct.World, item: str) -> struct.World:
+def replace_treasure(world: World, item: str) -> World:
     """Replace a single item from the player's treasures into the reserve."""
     prior_count = getattr(world.treasure, item)
     if not prior_count:
