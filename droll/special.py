@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 
-from .dice import RandRange
+from .struct import RandRange
 from .dungeon import defeated_monsters
 from .error import DrollError
 from .regular import defeat_all, defeat_one, increment_party

@@ -12,8 +12,11 @@ __all__ = (
     "Dungeon",
     "Party",
     "Player",
+    "RandRange",
     "Regroup",
     "Roll",
+    "RollDungeon",
+    "RollParty",
     "Treasure",
     "World",
     "brief",
@@ -102,6 +105,11 @@ class Treasure:
 @dataclass(frozen=True)
 class Regroup:
     discard: Party = Party()  # Discard N party dice in regroup phase
+
+
+RandRange = Callable[[int, int], int]
+RollDungeon = Callable[[int, RandRange], Dungeon]
+RollParty = Callable[[int, RandRange], tuple[Party, Regroup]]
 
 
 @dataclass(frozen=True)

@@ -6,7 +6,7 @@
 from dataclasses import replace
 from typing import Optional
 
-from . import dice, regular, special, struct
+from . import regular, special, struct
 from .dungeon import (
     defeated_monsters,
     decrement_dungeon,
@@ -95,7 +95,7 @@ def _convert_two(
 
 def default_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -108,7 +108,7 @@ def default_ability(
 
 def battlemage_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *,
@@ -123,7 +123,7 @@ def battlemage_ability(
 
 def beguiler_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *extra_targets: str,
@@ -147,7 +147,7 @@ def beguiler_ability(
 
 def chieftain_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *extra_targets: str,
@@ -160,7 +160,7 @@ def chieftain_ability(
 
 def commander_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *additional,
@@ -180,7 +180,7 @@ def commander_ability(
 
 def crusader_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *,
@@ -194,7 +194,7 @@ def crusader_ability(
 
 def enchantress_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -208,7 +208,7 @@ def enchantress_ability(
 
 def halfgoblin_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -218,7 +218,7 @@ def halfgoblin_ability(
 
 def knight_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -231,7 +231,7 @@ def knight_ability(
 
 def mercenary_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *additional,
@@ -251,7 +251,7 @@ def mercenary_ability(
 
 def minstrel_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -265,7 +265,7 @@ def minstrel_ability(
 
 def necromancer_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *extra_targets: str,
@@ -278,7 +278,7 @@ def necromancer_ability(
 
 def occultist_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -290,7 +290,7 @@ def occultist_ability(
 
 def paladin_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *revivable: str,
@@ -335,7 +335,7 @@ def paladin_ability(
 
 def spellsword_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *,

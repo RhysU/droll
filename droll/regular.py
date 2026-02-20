@@ -8,7 +8,7 @@ from operator import add
 from collections.abc import Sequence, Set
 from typing import Optional
 
-from .dice import RandRange, roll_dungeon, roll_party
+from .dice import roll_dungeon, roll_party
 from .dungeon import (
     defeated_monsters,
     decrement_dungeon,
@@ -16,7 +16,7 @@ from .dungeon import (
     increment_dungeon,
 )
 from .error import DrollError
-from .struct import Dungeon, Party, Regroup, World, field_names, field_values
+from .struct import Dungeon, Party, RandRange, Regroup, World, field_names, field_values
 from .treasure import draw_treasure, replace_treasure
 
 __all__ = (

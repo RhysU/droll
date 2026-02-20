@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 
-from . import dice, struct
+from . import struct
 from .dungeon import blocking_dragon, defeated_dungeon, defeated_monsters
 from .error import DrollError
 from .treasure import replace_treasure
@@ -50,8 +50,8 @@ def new_world() -> struct.World:
 
 def delve(
     world: struct.World,
-    roll_party: dice.RollParty,
-    randrange: dice.RandRange,
+    roll_party: struct.RollParty,
+    randrange: struct.RandRange,
     *,
     _party_dice: int = 7,
 ) -> struct.World:
@@ -92,8 +92,8 @@ def _regroup(world: struct.World) -> struct.World:
 
 def descend(
     world: struct.World,
-    roll_dungeon: dice.RollDungeon,
-    randrange: dice.RandRange,
+    roll_dungeon: struct.RollDungeon,
+    randrange: struct.RandRange,
     *,
     _max_depth: int = 10,
     _dungeon_dice: int = 7,

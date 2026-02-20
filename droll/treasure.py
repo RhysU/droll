@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 
-from .dice import RandRange
+from .struct import RandRange
 from .error import DrollError
 from .struct import Artifacts, Treasure, field_items, field_values
 

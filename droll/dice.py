@@ -3,22 +3,14 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with rolling dungeon and party dice."""
 
-from collections.abc import Callable
 from dataclasses import fields
 
-from .struct import Dungeon, Party, Regroup
+from .struct import Dungeon, Party, RandRange, Regroup
 
 __all__ = (
-    "RandRange",
-    "RollDungeon",
-    "RollParty",
     "roll_dungeon",
     "roll_party",
 )
-
-RandRange = Callable[[int, int], int]
-RollDungeon = Callable[[int, RandRange], Dungeon]
-RollParty = Callable[[int, RandRange], tuple[Party, Regroup]]
 
 
 def _roll(dice: int, start: int, stop: int, randrange: RandRange) -> list[int]:

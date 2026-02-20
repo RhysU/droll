@@ -114,7 +114,7 @@ def _adjust_phantom_treasures(world, artifacts, treasure, sign):
 def apply(
     player: struct.Player,
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *additional,

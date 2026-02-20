@@ -6,7 +6,7 @@
 from dataclasses import replace
 from functools import partial
 
-from .. import dice, special, struct
+from .. import special, struct
 from ..ability import minstrel_ability
 from ..player import Default
 from ..regular import defeat_dragon, defeat_dragon_heroes
