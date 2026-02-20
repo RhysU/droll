@@ -14,7 +14,7 @@ __all__ = (
     "defeated_dungeon",
     "defeated_monsters",
     "eliminate_dungeon",
-    "exhausted_dungeon",
+    "finished_dungeon",
     "increment_dungeon",
 )
 
@@ -34,7 +34,7 @@ def blocking_dragon(dungeon: Dungeon) -> bool:
     return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
 
 
-def exhausted_dungeon(dungeon: Dungeon) -> bool:
+def finished_dungeon(dungeon: Dungeon) -> bool:
     """Has the player exhausted all possible actions for this dungeon?
 
     In contrast to defeated_dungeon(...), returns True if chests/etc remain."""

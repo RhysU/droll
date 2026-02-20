@@ -316,24 +316,24 @@ class TestWorld:
             fighter=0, cleric=0, mage=0, thief=0, champion=0, scroll=0
         )
 
-    def test_exhausted_dungeon(self):
-        """Test exhausted_dungeon detects when no actions remain."""
+    def test_finished_dungeon(self):
+        """Test finished_dungeon detects when no actions remain."""
         # None dungeon is exhausted
-        assert dungeon.exhausted_dungeon(None)
+        assert dungeon.finished_dungeon(None)
 
         # Empty dungeon is exhausted
-        assert dungeon.exhausted_dungeon(struct.Dungeon())
+        assert dungeon.finished_dungeon(struct.Dungeon())
 
         # Dungeon with only dragons (blocking) is not exhausted
-        assert not dungeon.exhausted_dungeon(struct.Dungeon(dragon=3))
+        assert not dungeon.finished_dungeon(struct.Dungeon(dragon=3))
 
         # Dungeon with monsters is not exhausted
-        assert not dungeon.exhausted_dungeon(struct.Dungeon(goblin=1))
-        assert not dungeon.exhausted_dungeon(struct.Dungeon(skeleton=2))
-        assert not dungeon.exhausted_dungeon(struct.Dungeon(ooze=1))
+        assert not dungeon.finished_dungeon(struct.Dungeon(goblin=1))
+        assert not dungeon.finished_dungeon(struct.Dungeon(skeleton=2))
+        assert not dungeon.finished_dungeon(struct.Dungeon(ooze=1))
 
         # Dungeon with chests/potions still has actions (not exhausted)
-        assert not dungeon.exhausted_dungeon(struct.Dungeon(chest=2, potion=3))
+        assert not dungeon.finished_dungeon(struct.Dungeon(chest=2, potion=3))
 
     def test_retreat_valid(self):
         """Test valid retreat scenarios."""

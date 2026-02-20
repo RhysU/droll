@@ -183,7 +183,7 @@ class Game:
     ) -> Sequence[str]:
         """Complete possible command names based upon context."""
         results = [x for x in self._possible_world_actions() if x.startswith(text)]
-        if not dungeon.exhausted_dungeon(self._world.dungeon):
+        if not dungeon.finished_dungeon(self._world.dungeon):
             results += self.completedefault(text, head, tail)
         return results
 
