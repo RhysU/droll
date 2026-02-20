@@ -58,7 +58,7 @@ class Shell(cmd.Cmd):
 
     def _postcmd_current(self, stop, line) -> None:
         """Display state using the compact summary format."""
-        self.prompt = f"{self._command_count:03d} {self._game.player_name}> "
+        self.prompt = f"{self._command_count:02d} {self._game.player_name}> "
         if self._color:
             self.prompt = _GREEN + self.prompt + _RESET
         print()
@@ -78,7 +78,7 @@ class Shell(cmd.Cmd):
     def _postcmd_legacy(self, stop, line) -> None:
         """Display state using the brief summary format."""
         self.prompt = (
-            f"{self._command_count:03d} {self._game.player_name}"
+            f"{self._command_count:02d} {self._game.player_name}"
             f" {self._game.score():-2d}> "
         )
         print()

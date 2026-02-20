@@ -50,10 +50,10 @@ options:
 $ droll --seed 7 Knight
 
 Score 0:   delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability descend
 Party:     fighter×2 cleric mage thief champion×2
-Knight> help
+00 Knight> help
 
 Feasible commands (help <command>):
 ===================================
@@ -61,17 +61,17 @@ ability  descend
 
 
 Score 0:   delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability descend
 Party:     fighter×2 cleric mage thief champion×2
-Knight> descend
+00 Knight> descend
 
 Score 0:   depth 1 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability retreat
 Party:     fighter×2 cleric mage thief champion×2
 Dungeon:   goblin
-Knight> help fighter
+01 Knight> help fighter
 Attack monsters, quaff potions, and open chests with a fighter like so:
 
         champion skeleton            # Attack skeleton(s)
@@ -81,110 +81,112 @@ Attack monsters, quaff potions, and open chests with a fighter like so:
 
 
 Score 0:   depth 1 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability retreat
 Party:     fighter×2 cleric mage thief champion×2
 Dungeon:   goblin
-Knight> fighter goblin
+01 Knight> fighter goblin
 
 Score 0:   depth 1 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability descend retire undo
 Party:     fighter cleric mage thief champion×2
-Knight> descend
+Dungeon:   None
+02 Knight> descend
 
 Score 0:   depth 2 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability retreat
 Party:     fighter cleric mage thief champion×2
 Dungeon:   ooze potion
-Knight> mage ooze
+03 Knight> mage ooze
 
 Score 0:   depth 2 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability descend retire undo
 Party:     fighter cleric thief champion×2
 Dungeon:   potion
-Knight> champion potion mage
+04 Knight> champion potion mage
 
 Score 0:   depth 2 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability descend retire undo
 Party:     fighter cleric mage thief champion
-Knight> descend
+Dungeon:   None
+05 Knight> descend
 
 Score 0:   depth 3 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability retreat
 Party:     fighter cleric mage thief champion
 Dungeon:   goblin skeleton potion
-Knight> help ability
+06 Knight> help ability
 Invoke the player's ability.
 
     Convert all monster faces into dragon dice.
 
 Score 0:   depth 3 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: ability retreat
 Party:     fighter cleric mage thief champion
 Dungeon:   goblin skeleton potion
-Knight> ability
+06 Knight> ability
 
 Score 0:   depth 3 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: descend retire undo
 Party:     fighter cleric mage thief champion
 Dungeon:   potion dragon×2
-Knight> descend
+07 Knight> descend
 
 Score 0:   depth 4 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: retreat
 Party:     fighter cleric mage thief champion
 Dungeon:   goblin×2 chest×2 dragon×2
-Knight> fighter goblin
+08 Knight> fighter goblin
 
 Score 0:   depth 4 in delve 1 with experience 0
-Treasure:  none
+Treasure:  None
 Available: descend retire undo
 Party:     cleric mage thief champion
 Dungeon:   chest×2 dragon×2
-Knight> thief chest
+09 Knight> thief chest
 
 Score 2:   depth 4 in delve 1 with experience 0
 Treasure:  elixir talisman
 Available: descend retire
 Party:     cleric mage champion
 Dungeon:   dragon×2
-Knight> descend
+10 Knight> descend
 
 Score 2:   depth 5 in delve 1 with experience 0
 Treasure:  elixir talisman
 Available: retreat
 Party:     cleric mage champion
 Dungeon:   goblin×2 chest potion×2 dragon×2
-Knight> champion goblin
+11 Knight> champion goblin
 
 Score 2:   depth 5 in delve 1 with experience 0
 Treasure:  elixir talisman
 Available: descend retire undo
 Party:     cleric mage
 Dungeon:   chest potion×2 dragon×2
-Knight> mage potion champion thief
+12 Knight> mage potion champion thief
 
 Score 2:   depth 5 in delve 1 with experience 0
 Treasure:  elixir talisman
 Available: descend retire undo
 Party:     cleric thief champion
 Dungeon:   chest dragon×2
-Knight> thief chest
+13 Knight> thief chest
 
 Score 3:   depth 5 in delve 1 with experience 0
 Treasure:  elixir sceptre talisman
 Available: descend retire
 Party:     cleric champion
 Dungeon:   dragon×2
-Knight> help retreat
+14 Knight> help retreat
 Retreat from the dungeon at any time (e.g. after being defeated).
 
         Automatically starts a new delve or ends game, as suitable.
@@ -194,52 +196,55 @@ Treasure:  elixir sceptre talisman
 Available: descend retire
 Party:     cleric champion
 Dungeon:   dragon×2
-Knight> retire
+14 Knight> retire
 
 Score 8:      delve 2 with experience 5
 Treasure:     elixir sceptre talisman
 Available:    ability descend
 Party:        fighter cleric champion×5
-DragonSlayer> descend
+15 DragonSlayer> descend
 
 Score 8:      depth 1 in delve 2 with experience 5
 Treasure:     elixir sceptre talisman
 Available:    ability descend retire
 Party:        fighter cleric champion×5
 Dungeon:      chest
-DragonSlayer> champion chest
+16 DragonSlayer> champion chest
 
 Score 9:      depth 1 in delve 2 with experience 5
 Treasure:     elixir sceptre talisman×2
 Available:    ability descend retire
 Party:        fighter cleric champion×4
-DragonSlayer> descend
+Dungeon:      None
+17 DragonSlayer> descend
 
 Score 9:      depth 2 in delve 2 with experience 5
 Treasure:     elixir sceptre talisman×2
 Available:    ability retreat
 Party:        fighter cleric champion×4
 Dungeon:      goblin skeleton
-DragonSlayer> talisman goblin
+18 DragonSlayer> talisman goblin
 
 Score 9:      depth 2 in delve 2 with experience 5
 Treasure:     elixir sceptre talisman×2
 Available:    ability retreat undo
 Party:        fighter champion×4
 Dungeon:      skeleton
-DragonSlayer> sceptre skeleton
+19 DragonSlayer> sceptre skeleton
 
 Score 8:      depth 2 in delve 2 with experience 5
 Treasure:     elixir talisman×2
 Available:    ability descend retire undo
 Party:        fighter champion×4
-DragonSlayer> elixir mage
+Dungeon:      None
+20 DragonSlayer> elixir mage
 
 Score 7:      depth 2 in delve 2 with experience 5
 Treasure:     talisman×2
-Available:    ability descend retire
+Available:    ability descend retire undo
 Party:        fighter mage champion×4
-DragonSlayer> ^D
+Dungeon:      None
+21 DragonSlayer> ^D
 ```
 
 ## Without Installation

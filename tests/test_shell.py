@@ -47,7 +47,7 @@ def test_shell_EOF():
     assert not s.cmdqueue
     s.cmdqueue.append("EOF")
     s.cmdloop()
-    assert s.prompt == "000 Default  0> "
+    assert s.prompt == "00 Default  0> "
     assert s.lastcmd == ""
 
 
