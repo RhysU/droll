@@ -94,138 +94,150 @@ class TestRerollParty:
             )
 
 
-class TestDistinctHeroes:
-    """Tests for the distinct_heroes() function."""
+def test_all_distinct_no_options():
+    """All different heroes are fully distinct."""
+    assert regular.distinct_heroes(["fighter", "cleric", "mage"]) == 3
 
-    def test_all_distinct_no_options(self):
-        """All different heroes are fully distinct."""
-        assert regular.distinct_heroes(["fighter", "cleric", "mage"]) == 3
 
-    def test_duplicates_reduce_count(self):
-        """Duplicate heroes reduce distinct count."""
-        assert regular.distinct_heroes(["fighter", "fighter", "mage"]) == 2
+def test_duplicates_reduce_count():
+    """Duplicate heroes reduce distinct count."""
+    assert regular.distinct_heroes(["fighter", "fighter", "mage"]) == 2
 
-    def test_all_same(self):
-        """All identical heroes yield 1."""
-        assert regular.distinct_heroes(["fighter", "fighter", "fighter"]) == 1
 
-    def test_empty(self):
-        """No heroes means zero distinct."""
-        assert regular.distinct_heroes([]) == 0
+def test_all_same():
+    """All identical heroes yield 1."""
+    assert regular.distinct_heroes(["fighter", "fighter", "fighter"]) == 1
 
-    def test_single(self):
-        """Single hero is 1 distinct."""
-        assert regular.distinct_heroes(["mage"]) == 1
 
-    def test_wildcard_adds_one_each(self):
-        """Each wildcard counts as a distinct hero."""
-        assert (
-            regular.distinct_heroes(
-                ["cleric", "thief", "scroll"],
-                wildcard=frozenset({"scroll"}),
-            )
-            == 3
+def test_empty():
+    """No heroes means zero distinct."""
+    assert regular.distinct_heroes([]) == 0
+
+
+def test_single():
+    """Single hero is 1 distinct."""
+    assert regular.distinct_heroes(["mage"]) == 1
+
+
+def test_wildcard_adds_one_each():
+    """Each wildcard counts as a distinct hero."""
+    assert (
+        regular.distinct_heroes(
+            ["cleric", "thief", "scroll"],
+            wildcard=frozenset({"scroll"}),
         )
+        == 3
+    )
 
-    def test_multiple_wildcards(self):
-        """Multiple wildcards each contribute 1."""
-        assert (
-            regular.distinct_heroes(
-                ["fighter", "scroll", "scroll"],
-                wildcard=frozenset({"scroll"}),
-            )
-            == 3
-        )
 
-    def test_all_wildcards(self):
-        """All wildcards still count as distinct."""
-        assert (
-            regular.distinct_heroes(
-                ["scroll", "scroll", "scroll"],
-                wildcard=frozenset({"scroll"}),
-            )
-            == 3
+def test_multiple_wildcards():
+    """Multiple wildcards each contribute 1."""
+    assert (
+        regular.distinct_heroes(
+            ["fighter", "scroll", "scroll"],
+            wildcard=frozenset({"scroll"}),
         )
+        == 3
+    )
 
-    def test_wildcard_does_not_help_duplicates(self):
-        """Wildcards don't fix duplicate non-wildcards."""
-        assert (
-            regular.distinct_heroes(
-                ["mage", "mage", "scroll"],
-                wildcard=frozenset({"scroll"}),
-            )
-            == 2
-        )
 
-    def test_interchangeable_two_from_pool(self):
-        """Two interchangeable heroes contribute 2 distinct."""
-        assert (
-            regular.distinct_heroes(
-                ["fighter", "cleric", "mage"],
-                interchangeable=frozenset({"fighter", "cleric"}),
-            )
-            == 3
+def test_all_wildcards():
+    """All wildcards still count as distinct."""
+    assert (
+        regular.distinct_heroes(
+            ["scroll", "scroll", "scroll"],
+            wildcard=frozenset({"scroll"}),
         )
+        == 3
+    )
 
-    def test_interchangeable_capped_by_pool_size(self):
-        """Interchangeable contribution capped at pool size."""
-        assert (
-            regular.distinct_heroes(
-                ["mage", "mage", "mage"],
-                interchangeable=frozenset({"mage", "fighter"}),
-            )
-            == 2
-        )
 
-    def test_interchangeable_all_same_type(self):
-        """All same type from a 2-member pool still capped at 2."""
-        assert (
-            regular.distinct_heroes(
-                ["fighter", "fighter", "fighter"],
-                interchangeable=frozenset({"mage", "fighter"}),
-            )
-            == 2
+def test_wildcard_does_not_help_duplicates():
+    """Wildcards don't fix duplicate non-wildcards."""
+    assert (
+        regular.distinct_heroes(
+            ["mage", "mage", "scroll"],
+            wildcard=frozenset({"scroll"}),
         )
+        == 2
+    )
 
-    def test_interchangeable_mixed_overflow(self):
-        """Mixed interchangeable heroes exceeding pool size."""
-        assert (
-            regular.distinct_heroes(
-                ["fighter", "mage", "mage"],
-                interchangeable=frozenset({"mage", "fighter"}),
-            )
-            == 2
-        )
 
-    def test_interchangeable_with_regular(self):
-        """Interchangeable heroes + distinct regular hero."""
-        assert (
-            regular.distinct_heroes(
-                ["fighter", "cleric", "thief"],
-                interchangeable=frozenset({"fighter", "cleric"}),
-            )
-            == 3
+def test_interchangeable_two_from_pool():
+    """Two interchangeable heroes contribute 2 distinct."""
+    assert (
+        regular.distinct_heroes(
+            ["fighter", "cleric", "mage"],
+            interchangeable=frozenset({"fighter", "cleric"}),
         )
+        == 3
+    )
 
-    def test_interchangeable_single_member_present(self):
-        """One hero from interchangeable set contributes 1."""
-        assert (
-            regular.distinct_heroes(
-                ["cleric", "thief", "fighter"],
-                interchangeable=frozenset({"fighter"}),
-            )
-            == 3
-        )
 
-    def test_interchangeable_single_member_absent(self):
-        """No heroes from interchangeable set contribute 0 from pool."""
-        assert (
-            regular.distinct_heroes(
-                ["cleric", "thief", "mage"],
-                interchangeable=frozenset({"fighter"}),
-            )
-            == 3
+def test_interchangeable_capped_by_pool_size():
+    """Interchangeable contribution capped at pool size."""
+    assert (
+        regular.distinct_heroes(
+            ["mage", "mage", "mage"],
+            interchangeable=frozenset({"mage", "fighter"}),
         )
+        == 2
+    )
+
+
+def test_interchangeable_all_same_type():
+    """All same type from a 2-member pool still capped at 2."""
+    assert (
+        regular.distinct_heroes(
+            ["fighter", "fighter", "fighter"],
+            interchangeable=frozenset({"mage", "fighter"}),
+        )
+        == 2
+    )
+
+
+def test_interchangeable_mixed_overflow():
+    """Mixed interchangeable heroes exceeding pool size."""
+    assert (
+        regular.distinct_heroes(
+            ["fighter", "mage", "mage"],
+            interchangeable=frozenset({"mage", "fighter"}),
+        )
+        == 2
+    )
+
+
+def test_interchangeable_with_regular():
+    """Interchangeable heroes + distinct regular hero."""
+    assert (
+        regular.distinct_heroes(
+            ["fighter", "cleric", "thief"],
+            interchangeable=frozenset({"fighter", "cleric"}),
+        )
+        == 3
+    )
+
+
+def test_interchangeable_single_member_present():
+    """One hero from interchangeable set contributes 1."""
+    assert (
+        regular.distinct_heroes(
+            ["cleric", "thief", "fighter"],
+            interchangeable=frozenset({"fighter"}),
+        )
+        == 3
+    )
+
+
+def test_interchangeable_single_member_absent():
+    """No heroes from interchangeable set contribute 0 from pool."""
+    assert (
+        regular.distinct_heroes(
+            ["cleric", "thief", "mage"],
+            interchangeable=frozenset({"fighter"}),
+        )
+        == 3
+    )
 
 
 def test_dragon_wildcard_less_interesting_successful_cases():
