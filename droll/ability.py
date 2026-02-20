@@ -171,9 +171,7 @@ def commander_ability(
     if target is None:
         raise DrollError(f"At least 1 reroll target required for {noun}.")
     # Temporarily add a scroll to be consumed by reroll
-    world = replace(
-        world, party=increment_party(world.party, "scroll")
-    )
+    world = replace(world, party=increment_party(world.party, "scroll"))
     return regular.reroll(
         world, randrange, "scroll", target, *additional, allow_dragon=True
     )
@@ -242,9 +240,7 @@ def mercenary_ability(
     if target is None:
         raise DrollError(f"At least 1 target required for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
-    world = replace(
-        world, party=increment_party(world.party, "champion")
-    )
+    world = replace(world, party=increment_party(world.party, "champion"))
     return special.defeat_one_plus_additional(
         world, randrange, "champion", target, *additional
     )

@@ -103,7 +103,8 @@ def _adjust_phantom_treasures(world, artifacts, treasure, sign):
         party=replace(
             world.party,
             **{
-                hero: getattr(world.party, hero) + sign * getattr(treasure, artifact)
+                hero: getattr(world.party, hero)
+                + sign * getattr(treasure, artifact)
                 for hero, artifact in struct.field_items(artifacts)
                 if artifact is not None
             },

@@ -26,15 +26,20 @@ class TestTreasure:
         game = replace(
             self.game,
             treasure=replace(
-                self.game.treasure, own=replace(self.game.treasure.own, elixir=1)
+                self.game.treasure,
+                own=replace(self.game.treasure.own, elixir=1),
             ),
         )
-        game = player.apply(player.Default, game, self.randrange, "elixir", "cleric")
+        game = player.apply(
+            player.Default, game, self.randrange, "elixir", "cleric"
+        )
         assert game.party.cleric == 1
         assert game.treasure.own.elixir == 0
 
         with pytest.raises(struct.DrollError):
-            player.apply(player.Default, game, self.randrange, "elixir", "mage")
+            player.apply(
+                player.Default, game, self.randrange, "elixir", "mage"
+            )
 
     def test_bait(self):
         """Test bait treasure used to convert monsters to dragons."""
@@ -44,7 +49,9 @@ class TestTreasure:
                 self.game.treasure, own=replace(self.game.treasure.own, bait=2)
             ),
         )
-        game = player.apply(player.Default, game, self.randrange, "bait", "dragon")
+        game = player.apply(
+            player.Default, game, self.randrange, "bait", "dragon"
+        )
         assert game.treasure.own.bait == 1
         assert game.dungeon.goblin == 0
         assert game.dungeon.skeleton == 0
@@ -59,7 +66,8 @@ class TestTreasure:
         game = replace(
             self.game,
             treasure=replace(
-                self.game.treasure, own=replace(self.game.treasure.own, **{artifact: 2})
+                self.game.treasure,
+                own=replace(self.game.treasure.own, **{artifact: 2}),
             ),
         )
         game = player.apply(player.Default, game, None, artifact, specialty)
@@ -96,7 +104,8 @@ class TestTreasure:
         game = replace(
             self.game,
             treasure=replace(
-                self.game.treasure, own=replace(self.game.treasure.own, tools=1)
+                self.game.treasure,
+                own=replace(self.game.treasure.own, tools=1),
             ),
         )
         game = player.apply(player.Default, game, None, "tools", "goblin")

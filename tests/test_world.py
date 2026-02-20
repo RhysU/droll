@@ -21,7 +21,10 @@ class TestWorld:
         game = world.new_world()
         assert game.experience == 0
         assert sum(struct.field_values(game.treasure.own)) == 0
-        assert sum(struct.field_values(game.treasure.box)) == (6 * 3) + (4 * 3) + 6
+        assert (
+            sum(struct.field_values(game.treasure.box))
+            == (6 * 3) + (4 * 3) + 6
+        )
 
     def test_delve_initial(self):
         """Test starting a new delve rolls party dice correctly."""
@@ -42,7 +45,9 @@ class TestWorld:
     def test_draw_treasure(self):
         """Test drawing treasure moves one item from box to own."""
         pre = world.new_world()
-        post_treasure = treasure.draw_treasure(pre.treasure, self.state.randrange)
+        post_treasure = treasure.draw_treasure(
+            pre.treasure, self.state.randrange
+        )
         post = replace(pre, treasure=post_treasure)
         assert sum(struct.field_values(pre.treasure.own)) == 0
         assert sum(struct.field_values(post.treasure.own)) == 1
@@ -56,7 +61,10 @@ class TestWorld:
         """Test replacing treasure moves one item from own to box."""
         pre = world.new_world()
         pre = replace(
-            pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, elixir=1))
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, elixir=1)
+            ),
         )
         post_treasure = treasure.replace_treasure(pre.treasure, "elixir")
         post = replace(pre, treasure=post_treasure)
@@ -102,14 +110,20 @@ class TestWorld:
 
         # Ring of invisibility
         pre = replace(
-            pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1))
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=1)
+            ),
         )
         with pytest.raises(struct.DrollError):
             world.retire(pre)
 
         # Town portal
         pre = replace(
-            pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, portal=1))
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, portal=1)
+            ),
         )
         post = world.retire(pre)
         assert post.experience == pre.depth + pre.experience
@@ -289,7 +303,9 @@ class TestWorld:
         )
 
         # First, confirm descending works as expected
-        descended = world.descend(pre1, dice.roll_dungeon, self.state.randrange)
+        descended = world.descend(
+            pre1, dice.roll_dungeon, self.state.randrange
+        )
         assert descended.party == struct.Party(
             fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
         )
@@ -307,7 +323,9 @@ class TestWorld:
         )
 
         # Third, confirm retreating works as expected
-        pre2 = replace(pre1, dungeon=struct.Dungeon(goblin=1))  # Threat required!
+        pre2 = replace(
+            pre1, dungeon=struct.Dungeon(goblin=1)
+        )  # Threat required!
         retreated = world.retreat(pre2)
         assert retreated.party == struct.Party(
             fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0

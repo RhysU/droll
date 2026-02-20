@@ -248,14 +248,16 @@ def test_command_counter_increments_on_mutation():
     assert s._command_count == 1
 
     # Two successful undos in a row each decrement
-    s._game._world = replace(s._game._world, dungeon=struct.Dungeon(goblin=1, ooze=1))
-    s.onecmd("fighter goblin")   # count -> 2; undo stack: [before_1st]
+    s._game._world = replace(
+        s._game._world, dungeon=struct.Dungeon(goblin=1, ooze=1)
+    )
+    s.onecmd("fighter goblin")  # count -> 2; undo stack: [before_1st]
     assert s._command_count == 2
-    s.onecmd("cleric ooze")      # count -> 3; undo stack: [before_1st, before_2nd]
+    s.onecmd("cleric ooze")  # count -> 3; undo stack: [before_1st, before_2nd]
     assert s._command_count == 3
-    s.onecmd("undo")             # success: count -> 2
+    s.onecmd("undo")  # success: count -> 2
     assert s._command_count == 2
-    s.onecmd("undo")             # success: count -> 1
+    s.onecmd("undo")  # success: count -> 1
     assert s._command_count == 1
 
     # Failed undo (nothing left to undo) does not decrement

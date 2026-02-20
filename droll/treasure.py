@@ -5,7 +5,14 @@
 
 from dataclasses import replace
 
-from .struct import Artifacts, DrollError, RandRange, Treasure, field_items, field_values
+from .struct import (
+    Artifacts,
+    DrollError,
+    RandRange,
+    Treasure,
+    field_items,
+    field_values,
+)
 
 __all__ = (
     "draw_treasure",

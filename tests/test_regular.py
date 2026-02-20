@@ -51,7 +51,9 @@ class TestRerollParty:
         """Rerolling multiple party dice removes and re-rolls each."""
         # Roll values: 0 => fighter, 1 => cleric
         randrange = self._canned_randrange([0, 1])
-        result = regular.reroll(self.world, randrange, "scroll", "fighter", "cleric")
+        result = regular.reroll(
+            self.world, randrange, "scroll", "fighter", "cleric"
+        )
         # One scroll consumed
         assert result.party.scroll == 1
         # fighter: 2 - 1 + 1(rolled) = 2; cleric: 1 - 1 + 1(rolled) = 1
@@ -64,7 +66,9 @@ class TestRerollParty:
         """Rerolling a mix of dungeon and party dice handles both."""
         # Dungeon roll: value 0 => goblin; Party roll: value 2 => mage
         randrange = self._canned_randrange([0, 2])
-        result = regular.reroll(self.world, randrange, "scroll", "goblin", "fighter")
+        result = regular.reroll(
+            self.world, randrange, "scroll", "goblin", "fighter"
+        )
         # One scroll consumed
         assert result.party.scroll == 1
         # Dungeon: goblin was 2, removed 1, re-rolled as goblin (+1) => 2
@@ -430,7 +434,8 @@ class TestDragon:
         game = replace(
             self.game,
             treasure=replace(
-                self.game.treasure, own=replace(self.game.treasure.own, sword=7)
+                self.game.treasure,
+                own=replace(self.game.treasure.own, sword=7),
             ),
         )
         game = replace(game, party=replace(game.party, fighter=0))

@@ -96,7 +96,9 @@ def testpaladin_ability_revives_from_potions():
         party=struct.Party(fighter=1),
         treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
     )
-    result = paladin_ability(world, _UNUSED, "ability", "elixir", "mage", "thief")
+    result = paladin_ability(
+        world, _UNUSED, "ability", "elixir", "mage", "thief"
+    )
     assert result.party.mage == 1
     assert result.party.thief == 1
 

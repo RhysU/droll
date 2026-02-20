@@ -27,7 +27,9 @@ def _defeat_plus_additional(
     """After the initial defeat, optionally defeat one additional monster."""
     if defeated_monsters(world.dungeon):
         if additional:
-            raise DrollError(f"Additional {additional} given but no monsters left.")
+            raise DrollError(
+                f"Additional {additional} given but no monsters left."
+            )
         return world
 
     if not additional:
@@ -53,7 +55,9 @@ def defeat_all_plus_additional(
     *additional,
 ) -> World:
     """Update world after hero handles all of one target type plus one more."""
-    world = defeat_all(world=world, randrange=randrange, hero=hero, target=target)
+    world = defeat_all(
+        world=world, randrange=randrange, hero=hero, target=target
+    )
     return _defeat_plus_additional(world, randrange, hero, additional)
 
 
@@ -65,7 +69,9 @@ def defeat_one_plus_additional(
     *additional,
 ) -> World:
     """Update world after hero handles one target plus one more."""
-    world = defeat_one(world=world, randrange=randrange, hero=hero, target=target)
+    world = defeat_one(
+        world=world, randrange=randrange, hero=hero, target=target
+    )
     return _defeat_plus_additional(world, randrange, hero, additional)
 
 
@@ -93,7 +99,10 @@ def convert_dungeon_to_party(
             world.regroup,
             discard=replace(
                 world.regroup.discard,
-                **{destination: getattr(world.regroup.discard, destination) + count},
+                **{
+                    destination: getattr(world.regroup.discard, destination)
+                    + count
+                },
             ),
         ),
     )

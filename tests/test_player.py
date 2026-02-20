@@ -12,7 +12,9 @@ from droll import player, struct, world
 
 def _remove_monsters(world: struct.World) -> struct.World:
     """Remove all monsters from dungeon for testing treasure interactions."""
-    return replace(world, dungeon=replace(world.dungeon, goblin=0, skeleton=0, ooze=0))
+    return replace(
+        world, dungeon=replace(world.dungeon, goblin=0, skeleton=0, ooze=0)
+    )
 
 
 class TestPlayer:
@@ -28,7 +30,9 @@ class TestPlayer:
 
     def test_fighter(self):
         """Test fighter hero attacking goblins and oozes."""
-        game = player.apply(player.Default, self.game, None, "fighter", "goblin")
+        game = player.apply(
+            player.Default, self.game, None, "fighter", "goblin"
+        )
         assert game.party.fighter == 1
         assert game.dungeon.goblin == 0
 
@@ -44,12 +48,16 @@ class TestPlayer:
         with pytest.raises(struct.DrollError):
             player.apply(player.Default, self.game, None, "cleric", "dragon")
 
-        game = player.apply(player.Default, self.game, None, "cleric", "skeleton")
+        game = player.apply(
+            player.Default, self.game, None, "cleric", "skeleton"
+        )
         assert game.party.cleric == 1
         assert game.dungeon.skeleton == 0
 
         game = _remove_monsters(game)  # Required for opening chest
-        game = player.apply(player.Default, game, self.randrange, "cleric", "chest")
+        game = player.apply(
+            player.Default, game, self.randrange, "cleric", "chest"
+        )
         assert game.party.cleric == 0
         assert game.dungeon.chest == 1
         assert sum(struct.field_values(game.treasure.own)) == 1
@@ -71,7 +79,9 @@ class TestPlayer:
         assert game.dungeon.ooze == 1
 
         game = _remove_monsters(game)  # Required for opening chest
-        game = player.apply(player.Default, game, self.randrange, "thief", "chest")
+        game = player.apply(
+            player.Default, game, self.randrange, "thief", "chest"
+        )
         assert game.party.thief == 0
         assert game.dungeon.chest == 0
         assert sum(struct.field_values(game.treasure.own)) == 2
@@ -82,7 +92,9 @@ class TestPlayer:
 
     def test_champion(self):
         """Test champion hero attacking goblins and drinking potions."""
-        game = player.apply(player.Default, self.game, None, "champion", "goblin")
+        game = player.apply(
+            player.Default, self.game, None, "champion", "goblin"
+        )
         assert game.party.champion == 1
         assert game.dungeon.goblin == 0
 
@@ -178,7 +190,9 @@ class TestComplete:
         assert complete(game, ("bai",), "bai", 0) == []  # treasure
         game = replace(
             game,
-            treasure=replace(game.treasure, own=replace(game.treasure.own, bait=1)),
+            treasure=replace(
+                game.treasure, own=replace(game.treasure.own, bait=1)
+            ),
         )
         assert complete(game, ("bai",), "bai", 0) == ["bait"]  # treasure
 
@@ -189,7 +203,8 @@ class TestComplete:
         game = replace(
             game,
             treasure=replace(
-                game.treasure, own=replace(game.treasure.own, portal=1, ring=1, scale=1)
+                game.treasure,
+                own=replace(game.treasure.own, portal=1, ring=1, scale=1),
             ),
         )
         # None of them should appear in completions
@@ -199,7 +214,9 @@ class TestComplete:
         # But a command treasure like elixir should still work
         game = replace(
             game,
-            treasure=replace(game.treasure, own=replace(game.treasure.own, elixir=1)),
+            treasure=replace(
+                game.treasure, own=replace(game.treasure.own, elixir=1)
+            ),
         )
         assert complete(game, ("eli",), "eli", 0) == ["elixir"]
 
@@ -215,7 +232,9 @@ class TestComplete:
         assert complete(game, ("fig", "fig"), "fig", 1) == []  # dungeon
         game = replace(
             game,
-            treasure=replace(game.treasure, own=replace(game.treasure.own, bait=1)),
+            treasure=replace(
+                game.treasure, own=replace(game.treasure.own, bait=1)
+            ),
         )
         assert complete(game, ("fig", "bai"), "fig", 1) == []  # treasure
 

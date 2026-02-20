@@ -15,7 +15,15 @@ from .dungeon import (
     eliminate_dungeon,
 )
 from .party import decrement_party, decrement_regroup, increment_party
-from .struct import DrollError, Dungeon, Party, RandRange, World, field_names, field_values
+from .struct import (
+    DrollError,
+    Dungeon,
+    Party,
+    RandRange,
+    World,
+    field_names,
+    field_values,
+)
 from .treasure import draw_treasure, replace_treasure
 
 __all__ = (
@@ -36,7 +44,9 @@ _DUNGEON_NAMES = frozenset(field_names(Dungeon))
 _PARTY_NAMES = frozenset(field_names(Party))
 
 
-def defeat_one(world: World, randrange: RandRange, hero: str, target: str) -> World:
+def defeat_one(
+    world: World, randrange: RandRange, hero: str, target: str
+) -> World:
     """Update world after hero handles exactly one target."""
     return replace(
         world,
@@ -46,7 +56,9 @@ def defeat_one(world: World, randrange: RandRange, hero: str, target: str) -> Wo
     )
 
 
-def defeat_all(world: World, randrange: RandRange, hero: str, target: str) -> World:
+def defeat_all(
+    world: World, randrange: RandRange, hero: str, target: str
+) -> World:
     """Update world after hero handles all of one type of target."""
     return replace(
         world,
@@ -174,7 +186,9 @@ def reroll(
     if dungeon_targets:
         for target in dungeon_targets:
             dungeon = decrement_dungeon(dungeon, target)
-        increased = roll_dungeon(dice=len(dungeon_targets), randrange=randrange)
+        increased = roll_dungeon(
+            dice=len(dungeon_targets), randrange=randrange
+        )
         dungeon = Dungeon(
             *map(
                 add,
@@ -216,8 +230,12 @@ def distinct_heroes(
     """
     n_wildcard = sum(1 for h in heroes if h in wildcard)
     inter = [h for h in heroes if h not in wildcard and h in interchangeable]
-    regular = [h for h in heroes if h not in wildcard and h not in interchangeable]
-    return len(set(regular)) + min(len(inter), len(interchangeable)) + n_wildcard
+    regular = [
+        h for h in heroes if h not in wildcard and h not in interchangeable
+    ]
+    return (
+        len(set(regular)) + min(len(inter), len(interchangeable)) + n_wildcard
+    )
 
 
 def defeat_dragon_heroes(
@@ -261,9 +279,13 @@ def defeat_dragon(
     Additional required heroes are specified within variable-length others."""
     # Simple prerequisites for attempting to defeat the dragon
     if world.dungeon.dragon < _min_dragon_length:
-        raise DrollError(f"Enemy {target} only comes at length {_min_dragon_length}.")
+        raise DrollError(
+            f"Enemy {target} only comes at length {_min_dragon_length}."
+        )
     if not defeated_monsters(world.dungeon):
-        raise DrollError(f"Enemy {target} only comes after all others defeated.")
+        raise DrollError(
+            f"Enemy {target} only comes after all others defeated."
+        )
 
     # Confirm required number of distinct heroes available
     party = decrement_party(world.party, hero)
@@ -307,7 +329,9 @@ def bait_dragon(
     # Compute how many new dragons will be produced and remove sources
     dungeon = world.dungeon
     new_targets = (
-        sum(getattr(dungeon, enemy) for enemy in _enemies) if dungeon is not None else 0
+        sum(getattr(dungeon, enemy) for enemy in _enemies)
+        if dungeon is not None
+        else 0
     )
     if not new_targets:
         raise DrollError(f"At least 1 of {_enemies} required for '{noun}'.")
@@ -323,7 +347,9 @@ def bait_dragon(
     )
 
 
-def elixir(world: World, randrange: RandRange, noun: str, target: Optional[str] = None) -> World:
+def elixir(
+    world: World, randrange: RandRange, noun: str, target: Optional[str] = None
+) -> World:
     """Add one hero die of any requested type."""
     if target is None:
         raise DrollError(f"Hero required for {noun}.")
@@ -332,5 +358,3 @@ def elixir(world: World, randrange: RandRange, noun: str, target: Optional[str] 
         treasure=replace_treasure(world.treasure, noun),
         party=increment_party(world.party, target),
     )
-
-

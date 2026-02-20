@@ -84,7 +84,9 @@ def test_chieftain_rejects_non_goblin_targets():
     with pytest.raises(struct.DrollError):
         chieftain_ability(world, _UNUSED, "ability", "goblin", "skeleton")
     with pytest.raises(struct.DrollError):
-        chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin", "goblin")
+        chieftain_ability(
+            world, _UNUSED, "ability", "goblin", "goblin", "goblin"
+        )
 
 
 def test_halfgoblin_advances_to_chieftain():
@@ -110,7 +112,9 @@ def test_halfgoblin_fighter_chests_potions():
         ),
     )
 
-    result1 = HalfGoblin.party.fighter.chest(world, randrange, "fighter", "chest")
+    result1 = HalfGoblin.party.fighter.chest(
+        world, randrange, "fighter", "chest"
+    )
     assert result1.dungeon.chest == 0
     assert result1.dungeon.goblin == 1
     assert result1.party.fighter == 4

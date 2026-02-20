@@ -95,7 +95,9 @@ def test_apply_ring_directly_fails():
     g.descend()
     g._world = replace(
         g._world,
-        treasure=replace(g._world.treasure, own=replace(g._world.treasure.own, ring=1)),
+        treasure=replace(
+            g._world.treasure, own=replace(g._world.treasure.own, ring=1)
+        ),
     )
     with pytest.raises(DrollError):
         g.apply("ring")
@@ -126,7 +128,9 @@ def test_completenames():
     assert "retreat" in names
     assert "retire" not in names
     # Hero-related completions appear (dungeon not exhausted)
-    assert any(n not in ("ability", "descend", "retire", "retreat") for n in names)
+    assert any(
+        n not in ("ability", "descend", "retire", "retreat") for n in names
+    )
 
     # With cleared dungeon: retire is possible
     g._world = replace(g._world, dungeon=struct.Dungeon())

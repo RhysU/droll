@@ -198,7 +198,9 @@ def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
 
 
-def _apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
+def _apply_portal(
+    world: struct.World, *, noun: str = "portal"
+) -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):

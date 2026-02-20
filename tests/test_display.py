@@ -22,7 +22,9 @@ def test_format_items_dragon_always_shows_count():
 def test_format_treasure_multiple_items_alphabetized():
     """Test multiple treasure items are alphabetized and use × notation."""
     artifacts = struct.Artifacts(scale=4, sceptre=1, talisman=1, tools=1)
-    assert display._format_treasure(artifacts) == "scale×4 sceptre talisman tools"
+    assert (
+        display._format_treasure(artifacts) == "scale×4 sceptre talisman tools"
+    )
 
 
 def test_format_available_alphabetized():
@@ -54,7 +56,9 @@ def test_compact_summary_in_dungeon():
         ability=True,
         treasure=struct.Treasure(own=struct.Artifacts(talisman=1)),
     )
-    result = display.compact_summary(world, "Default", 1, ["ability", "retreat"])
+    result = display.compact_summary(
+        world, "Default", 1, ["ability", "retreat"]
+    )
     lines = result.split("\n")
     assert len(lines) == 5
     assert "depth 3 in delve 1 with experience 0" in lines[0]
@@ -75,7 +79,9 @@ def test_compact_summary_long_player_name_alignment():
         ability=True,
         treasure=struct.Treasure(own=struct.Artifacts(talisman=1)),
     )
-    result = display.compact_summary(world, "DragonSlayer", 6, ["ability", "descend"])
+    result = display.compact_summary(
+        world, "DragonSlayer", 6, ["ability", "descend"]
+    )
     lines = result.split("\n")
     # Check that alignment matches DragonSlayer> width (13 chars)
     for line in lines:
