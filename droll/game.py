@@ -56,6 +56,15 @@ class Game:
         new._random = copy.copy(self._random)  # Mutable, needs state copy
         return new
 
+    def __repr__(self) -> str:
+        """Provide a meaningful representation of the game state."""
+        return (
+            f"Game(player={self._player.name}"
+            f", score={self.score}"
+            f", delve={self._world.delve}"
+            f", depth={self._world.depth})"
+        )
+
     def randhash(self) -> int:
         """Hash of the current random state."""
         return hash(self._random.getstate())
