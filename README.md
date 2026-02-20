@@ -247,6 +247,38 @@ Dungeon:      None
 21 DragonSlayer> ^D
 ```
 
+## How does scoring work?
+
+Your score has two components: **experience** and **treasure**.
+
+**Experience** is earned by retiring from a delve.  When you retire,
+you gain experience equal to the depth you reached in the dungeon.
+For example, retiring at depth 5 earns 5 experience points.
+Retreating earns no experience.
+
+**Treasure** is drawn randomly from a shared box whenever you open
+chests.  Each piece of treasure scores **1 point**, with two exceptions:
+
+| Treasure   | Points | Notes                                  |
+|------------|--------|----------------------------------------|
+| sword      | 1      | Usable as a fighter                    |
+| talisman   | 1      | Usable as a cleric                     |
+| sceptre    | 1      | Usable as a mage                       |
+| tools      | 1      | Usable as a thief                      |
+| scroll     | 1      | Usable as a scroll                     |
+| elixir     | 1      | Revive party members                   |
+| bait       | 1      | Lure the dragon                        |
+| portal     | **2**  | Escape the dungeon (town portal)       |
+| ring       | 1      | Sneak past a dragon                    |
+| scale      | 1      | But a **pair** of scales scores **4**  |
+
+Town portals are worth 2 points each.  Scales score 1 point each,
+but every *pair* of scales scores 4 rather than 2 (a +2 bonus per pair).
+Using a treasure during a delve removes it from your collection and
+reduces your score accordingly.
+
+**Total score = experience + treasure points.**
+
 ## Without Installation
 
 Clone this repository then run via:
