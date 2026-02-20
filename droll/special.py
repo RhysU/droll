@@ -85,6 +85,8 @@ def convert_dungeon_to_party(
 
     Converts min(available, max_count) of source into destination."""
     count = min(getattr(world.dungeon, source), max_count)
+    if count < 1:
+        raise DrollError(f"No {source} in dungeon to convert.")
     return replace(
         world,
         dungeon=replace(

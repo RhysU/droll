@@ -164,6 +164,18 @@ def test_convert_dungeon_to_party_up_to_max_count():
     assert result.regroup.discard.thief == 2
 
 
+def test_convert_dungeon_to_party_zero_source_raises():
+    """Raises DrollError when zero of the requested source exist in dungeon."""
+    w = struct.World(
+        dungeon=struct.Dungeon(skeleton=2),
+        party=struct.Party(),
+    )
+    with pytest.raises(DrollError):
+        special.convert_dungeon_to_party(
+            w, source="goblin", destination="thief", max_count=1
+        )
+
+
 def test_convert_dungeon_to_party_fewer_when_limited():
     """Converts only available count when fewer than max_count."""
     w = struct.World(
