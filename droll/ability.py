@@ -147,7 +147,7 @@ def chieftain_ability(
     target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
-    """Transform up to 2 goblins into thieves, discarding them at next regroup."""
+    """Transform up to 2 goblins into thieves, discarding them on regroup."""
     return _convert_two(world, target, extra_targets, source="goblin", destination="thief")
 
 
@@ -201,7 +201,7 @@ def halfgoblin_ability(
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
-    """Transform 1 goblin into 1 thief, discarding it at next regroup."""
+    """Transform 1 goblin into 1 thief, discarding it on regroup."""
     return _convert_one(world, target, source="goblin", destination="thief")
 
 
@@ -255,7 +255,7 @@ def necromancer_ability(
     target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
-    """Transform up to 2 skeletons into fighters, discarding them at next regroup."""
+    """Transform up to 2 skeletons into fighters, discarding them on regroup."""
     return _convert_two(world, target, extra_targets, source="skeleton", destination="fighter")
 
 
@@ -265,7 +265,7 @@ def occultist_ability(
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
-    """Transform 1 skeleton into 1 fighter, discarding it at next regroup."""
+    """Transform 1 skeleton into 1 fighter, discarding it on regroup."""
     return _convert_one(world, target, source="skeleton", destination="fighter")
 
 
