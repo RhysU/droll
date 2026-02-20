@@ -24,7 +24,7 @@ def _draw(box: Artifacts, randrange: RandRange) -> str:
     """Draw a random treasure from the box, weighted by counts."""
     total = sum(field_values(box))
     if not total:
-        raise RuntimeError("No items remaining in the box")
+        raise DrollError("No items remaining in the box")
     choice = randrange(0, total)
     cumulative = 0
     for name, count in field_items(box):
