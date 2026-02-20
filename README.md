@@ -268,18 +268,3 @@ When installed, run unit tests with:
 ```
 python -m unittest discover -s tests
 ```
-
-## Boolean Predicates
-
-Functions returning only `bool` within the `droll` package:
-
-| Function | Location | Docstring |
-|---|---|---|
-| `defeated_monsters(dungeon)` | `dungeon.py:22` | Are all non-dragon monsters on this dungeon defeated? |
-| `defeated_dungeon(dungeon)` | `dungeon.py:27` | Are all monsters and any dragon on this dungeon defeated? |
-| `blocking_dragon(dungeon)` | `dungeon.py:32` | Is a dragon blocking progress to the next level? |
-| `exhausted_dungeon(dungeon)` | `dungeon.py:37` | Has the player exhausted all possible actions for this dungeon? |
-| `defeat_dragon_heroes(*heroes, ...)` | `regular.py:251` | Have sufficiently many distinct heroes been provided to slay dragon? |
-| `GameState.__bool__(self)` | `game.py:26` | All non-STOP states coerce to False. |
-| `Game.__eq__(self, other)` | `game.py:50` | Is other equivalent to self? |
-| `Shell.postcmd(self, stop, line)` | `shell.py:86` | Print game state after each command and final details on exit. |
