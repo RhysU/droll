@@ -460,26 +460,26 @@ class TestWorld:
         )
         assert world.score(game) == 20
 
-    @pytest.mark.parametrize("depth,dragons", [
-        (1, 0),  # No dragons, baseline
-        (4, 0),  # Mid-depth, no dragons
-        (1, 1),  # Low depth with dragon
-        (4, 2),  # Mid-depth with dragons
-        (7, 2),  # High depth capped at 7
-        (1, 2),  # Dragons exceed depth, guarantees at least 1 die
-    ])
-    def test_dragon_carryforward(self, depth, dragons):
+    def test_dragon_carryforward(self):
         """Total dice at a level equals min(depth, 7), with at least 1 new."""
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
-        game = replace(
-            game, depth=depth - 1, dungeon=struct.Dungeon(dragon=dragons)
-        )
-        result = world.descend(game, _roll_all_goblins, self.state.randrange)
-        assert result.depth == depth
-        new_dice = max(1, min(depth, 7) - dragons)
-        assert result.dungeon.goblin == new_dice
-        assert result.dungeon.dragon == dragons
+        for depth, dragons in [
+            (1, 0),  # No dragons, baseline
+            (4, 0),  # Mid-depth, no dragons
+            (1, 1),  # Low depth with dragon
+            (4, 2),  # Mid-depth with dragons
+            (7, 2),  # High depth capped at 7
+            (1, 2),  # Dragons exceed depth, guarantees at least 1 die
+        ]:
+            g = replace(
+                game, depth=depth - 1, dungeon=struct.Dungeon(dragon=dragons)
+            )
+            result = world.descend(g, _roll_all_goblins, self.state.randrange)
+            assert result.depth == depth
+            new_dice = max(1, min(depth, 7) - dragons)
+            assert result.dungeon.goblin == new_dice
+            assert result.dungeon.dragon == dragons
 
     def test_dragon_no_carryforward_to_fresh_delve(self):
         """Dragons do not carry over to a fresh delve."""
