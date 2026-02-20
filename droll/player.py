@@ -125,10 +125,9 @@ def apply(
     Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
     # Convert any artifacts in the command into any corresponding hero types
-    reverse = _artifact_to_hero(player.artifacts)
-    noun = _partify(noun, reverse)
-    target = _partify(target, reverse)
-    additional = tuple(_partify(i, reverse) for i in additional)
+    noun, target, additional = _partify_all(
+        player.artifacts, noun, target, additional
+    )
 
     # One-off handling of some treasures, with error wrapping to aid usability
     if noun == "portal":
@@ -161,35 +160,42 @@ def apply(
 
     # Undo phantom inflation, then consume treasure for any artifacts spent
     world = _adjust_phantom_treasures(world, player.artifacts, prior_own, -1)
+    treasure = world.treasure
+    party_updates = {}
     for hero, quantity in struct.field_items(world.party):
         if quantity >= 0:
             continue
+        artifact = getattr(player.artifacts, hero)
         for _ in range(-quantity):
-            world = replace(
-                world,
-                treasure=replace_treasure(
-                    world.treasure, getattr(player.artifacts, hero)
-                ),
-            )
-        world = replace(world, party=replace(world.party, **{hero: 0}))
+            treasure = replace_treasure(treasure, artifact)
+        party_updates[hero] = 0
+    if party_updates:
+        world = replace(
+            world,
+            party=replace(world.party, **party_updates),
+            treasure=treasure,
+        )
 
     return world
 
 
-def _artifact_to_hero(artifacts: struct.Party) -> dict[str, str]:
-    """Build a reverse mapping from artifact name to hero name."""
-    return {
+def _partify_all(
+    artifacts: struct.Party,
+    noun: str,
+    target: Optional[str],
+    additional: tuple,
+) -> tuple[str, Optional[str], tuple]:
+    """Convert any artifact names in noun, target, additional to hero names."""
+    reverse = {
         artifact: hero
         for hero, artifact in struct.field_items(artifacts)
         if artifact is not None
     }
-
-
-def _partify(token: str, reverse: dict[str, str]) -> Optional[str]:
-    """Possibly convert tokens from treasures into associated party members."""
-    if token is None:
-        return None
-    return reverse.get(token, token)
+    return (
+        reverse.get(noun, noun),
+        reverse.get(target, target),
+        tuple(reverse.get(i, i) for i in additional),
+    )
 
 
 # Early tokens dominated by items/dice that can be applied/attacked.
