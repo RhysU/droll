@@ -1,10 +1,11 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-"""Functionality for hero-specific special action mechanics."""
+"""Functionality for hero-specific special actions."""
 
 from dataclasses import replace
 
+from .action import defeat_all, defeat_one, increment_party
 from .dice import RandRange
 from .dungeon import defeated_monsters
 from .error import DrollError
@@ -24,8 +25,6 @@ def _defeat_plus_additional(
     additional: tuple,
 ) -> World:
     """After the initial defeat, optionally defeat one additional monster."""
-    from .action import defeat_one, increment_party
-
     if defeated_monsters(world.dungeon):
         if additional:
             raise DrollError(
@@ -56,8 +55,6 @@ def defeat_all_plus_additional(
     *additional,
 ) -> World:
     """Update world after hero handles all of one target type plus one more."""
-    from .action import defeat_all
-
     world = defeat_all(
         world=world, randrange=randrange, hero=hero, target=target
     )
@@ -72,8 +69,6 @@ def defeat_one_plus_additional(
     *additional,
 ) -> World:
     """Update world after hero handles one target plus one more."""
-    from .action import defeat_one
-
     world = defeat_one(
         world=world, randrange=randrange, hero=hero, target=target
     )
