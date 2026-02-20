@@ -6,8 +6,7 @@
 from typing import Dict, Optional, Sequence
 from dataclasses import replace
 
-from . import dice, regular, struct
-from .ability import default_ability
+from . import ability, dice, regular, struct
 from .error import DrollError
 from .treasure import replace_treasure
 
@@ -23,7 +22,7 @@ __all__ = (
 Default = struct.Player(
     name="Default",
     # Behavior of special commands?
-    ability=default_ability,
+    ability=ability.default_ability,
     # Advance maps struct.World -> struct.Player, permitting promotion.
     # However, the Default player is not promotable.
     advance=(lambda _: Default),
