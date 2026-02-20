@@ -43,6 +43,9 @@ def field_items(
     return ((f.name, getattr(instance, f.name)) for f in fields(instance))
 
 
+RandRange = Callable[[int, int], int]
+
+
 @dataclass(frozen=True)
 class Dungeon:
     goblin: Any = 0
@@ -51,6 +54,9 @@ class Dungeon:
     chest: Any = 0
     potion: Any = 0
     dragon: Any = 0
+
+
+RollDungeon = Callable[[int, RandRange], Dungeon]
 
 
 @dataclass(frozen=True)
@@ -63,10 +69,25 @@ class Party:
     scroll: Any = 0
 
 
+# Bookkeeping for operations performed during the regroup phase
+@dataclass(frozen=True)
+class Regroup:
+    discard: Party = Party()  # Discard N party dice in regroup phase
+
+
+RollParty = Callable[[int, RandRange], tuple[Party, Regroup]]
+
+
 @dataclass(frozen=True)
 class Roll:
-    dungeon: Optional[Callable] = None
-    party: Optional[Callable] = None
+    dungeon: Optional[RollDungeon] = None
+    party: Optional[RollParty] = None
+
+
+# TODO Add type signature for "ability"
+# TODO Add type signature for "advance"
+# TODO Add type signature for "bait"
+# TODO Add type signature for "elixir"
 
 
 @dataclass(frozen=True)
@@ -99,17 +120,6 @@ class Artifacts:
 class Treasure:
     own: Artifacts = Artifacts()
     box: Artifacts = Artifacts()
-
-
-# Bookkeeping for operations performed during the regroup phase
-@dataclass(frozen=True)
-class Regroup:
-    discard: Party = Party()  # Discard N party dice in regroup phase
-
-
-RandRange = Callable[[int, int], int]
-RollDungeon = Callable[[int, RandRange], Dungeon]
-RollParty = Callable[[int, RandRange], tuple[Party, Regroup]]
 
 
 @dataclass(frozen=True)
