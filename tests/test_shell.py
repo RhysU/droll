@@ -51,6 +51,20 @@ def test_shell_EOF():
     assert s.lastcmd == ""
 
 
+def test_postcmd_stop_prints_summary():
+    """Confirm postcmd prints summary when game ends naturally."""
+    from droll.game import GameState
+
+    s = _mechanical_shell(
+        Game(random=random.Random(4), player=Default)
+    )
+    s.preloop()
+    with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
+        s.postcmd(stop=GameState.STOP, line="retire")
+    output = fake_out.getvalue()
+    assert "delve=" in output
+
+
 def test_shell_reroll():
     """Confirm reroll command forwards to game."""
     s = _mechanical_shell(Game(random=random.Random(4), player=Default))
