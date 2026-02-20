@@ -34,6 +34,7 @@ __all__ = (
     "defeat_one",
     "distinct_heroes",
     "elixir",
+    "not_reroll",
     "open_all",
     "open_one",
     "quaff",
@@ -42,6 +43,13 @@ __all__ = (
 
 _DUNGEON_NAMES = frozenset(field_names(Dungeon))
 _PARTY_NAMES = frozenset(field_names(Party))
+
+
+def not_reroll(
+    world: World, randrange: RandRange, hero: str, target: str, *additional
+) -> World:
+    """Scrolls cannot target dungeon dice directly; use 'reroll' instead."""
+    raise DrollError(f'Use "reroll {target}" to re-roll with a scroll.')
 
 
 def defeat_one(
