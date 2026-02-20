@@ -20,6 +20,17 @@ def test_game_construction():
     Game(random=random.Random(4))
 
 
+def test_game_repr():
+    """Game has a meaningful repr showing player, score, delve, and depth."""
+    g = Game(random=random.Random(4), player=Default)
+    r = repr(g)
+    assert r.startswith("Game(")
+    assert "player=Default" in r
+    assert "score=" in r
+    assert "delve=" in r
+    assert "depth=" in r
+
+
 def test_gamestate_identity():
     """GameState enum members are distinct and comparable."""
     assert GameState.STOP is not GameState.PLAY
