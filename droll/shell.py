@@ -20,6 +20,7 @@ _RESET = "\033[0m"
 _GREEN = "\033[92m"
 _RED = "\033[91m"
 _ORANGE = "\033[93m"
+_GREY = "\033[90m"
 
 
 class Shell(cmd.Cmd):
@@ -64,14 +65,17 @@ class Shell(cmd.Cmd):
         print()
         if line != "EOF":
             available = [] if stop else self._available_commands()
-            print(
-                display.compact_summary(
-                    self._game.current_world,
-                    self._game.player_name,
-                    self._game.score(),
-                    available,
-                )
+            summary = display.compact_summary(
+                self._game.current_world,
+                self._game.player_name,
+                self._game.score(),
+                available,
             )
+            if self._color:
+                summary = summary.replace(
+                    "dragon", _RED + "dragon" + _RESET
+                ).replace("None", _GREY + "None" + _RESET)
+            print(summary)
             if stop:
                 print(self.prompt)
 
