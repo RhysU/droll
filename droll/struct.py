@@ -130,7 +130,7 @@ class Treasure:
 @dataclass(frozen=True)
 class World:
     delve: int = 0
-    depth: Optional[int] = None
+    depth: int = 0
     experience: int = 0
     dungeon: Optional[Dungeon] = None
     party: Optional[Party] = None

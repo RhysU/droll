@@ -24,7 +24,7 @@ def new_world() -> struct.World:
     """Establish a new world independent of a delve/dungeon."""
     return struct.World(
         delve=0,
-        depth=None,
+        depth=0,
         experience=0,
         dungeon=None,
         party=None,
@@ -116,7 +116,7 @@ def descend(
     world = _regroup(world)
 
     # Update the world in anticipation of the next dungeon
-    next_depth = (world.depth if world.depth else 0) + 1
+    next_depth = world.depth + 1
     if next_depth > _max_depth:
         raise DrollError(f"Maximum depth is {_max_depth}.")
     prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
