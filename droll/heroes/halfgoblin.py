@@ -7,9 +7,10 @@ from dataclasses import replace
 import functools
 from typing import Optional
 
-from .. import action
+from .. import regular
 from .. import dice
 from ..error import DrollError
+from .. import special
 from .. import struct
 from .. import world
 from ..player import Default
@@ -29,10 +30,10 @@ def _halfgoblin_ability(
     """Transform 1 goblin into 1 thief, discarding it at next regroup."""
     if target and target != "goblin":
         raise DrollError("Ability can only target 1 goblin.")
-    world = action.convert_dungeon_to_party(
+    world = special.convert_dungeon_to_party(
         world, source="goblin", destination="thief", max_count=1
     )
-    return action.consume_ability(world)
+    return regular.consume_ability(world)
 
 
 def _chieftain_ability(
@@ -49,23 +50,23 @@ def _chieftain_ability(
         raise DrollError("Ability can only target goblins.")
     if len(extra_targets) > 1:
         raise DrollError("At most 2 targets can be changed.")
-    world = action.convert_dungeon_to_party(
+    world = special.convert_dungeon_to_party(
         world, source="goblin", destination="thief", max_count=2
     )
-    return action.consume_ability(world)
+    return regular.consume_ability(world)
 
 
 # You may open chests and quaff potions at any time during the monster phase
 _halfgoblin_open_one = functools.partial(
-    action.open_one,
+    regular.open_one,
     after_monsters=False,
 )
 _halfgoblin_open_all = functools.partial(
-    action.open_all,
+    regular.open_all,
     after_monsters=False,
 )
 _halfgoblin_quaff = functools.partial(
-    action.quaff,
+    regular.quaff,
     after_monsters=False,
 )
 

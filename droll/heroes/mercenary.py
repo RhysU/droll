@@ -7,9 +7,10 @@ from dataclasses import replace
 import functools
 from typing import Optional
 
-from .. import action
+from ..regular import consume_ability, increment_party, reroll
 from .. import dice
 from ..error import DrollError
+from .. import special
 from .. import struct
 from ..player import Default
 
@@ -42,12 +43,12 @@ def _mercenary_ability(
         raise DrollError(f"At least 1 target required for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
     world = replace(
-        world, party=action.increment_party(world.party, "champion")
+        world, party=increment_party(world.party, "champion")
     )
-    world = action.defeat_one_plus_additional(
+    world = special.defeat_one_plus_additional(
         world, randrange, "champion", target, *additional
     )
-    return action.consume_ability(world)
+    return consume_ability(world)
 
 
 def _commander_ability(
@@ -61,11 +62,11 @@ def _commander_ability(
     if target is None:
         raise DrollError(f"At least 1 reroll target required for {noun}.")
     # Temporarily add a scroll to be consumed by reroll
-    world = replace(world, party=action.increment_party(world.party, "scroll"))
-    world = action.reroll(
+    world = replace(world, party=increment_party(world.party, "scroll"))
+    world = reroll(
         world, randrange, "scroll", target, *additional, allow_dragon=True
     )
-    return action.consume_ability(world)
+    return consume_ability(world)
 
 
 # Defined in terms of Default, not Mercenary, to permit advance(...) closure
@@ -79,9 +80,9 @@ Commander = replace(
         Default.party,
         fighter=replace(
             Default.party.fighter,
-            goblin=action.defeat_all_plus_additional,
-            skeleton=action.defeat_one_plus_additional,
-            ooze=action.defeat_one_plus_additional,
+            goblin=special.defeat_all_plus_additional,
+            skeleton=special.defeat_one_plus_additional,
+            ooze=special.defeat_one_plus_additional,
         ),
     ),
 )

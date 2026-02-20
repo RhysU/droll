@@ -7,9 +7,10 @@ from dataclasses import replace
 import functools
 from typing import Optional
 
-from .. import action
+from ..regular import consume_ability, defeat_dragon, defeat_dragon_heroes
 from .. import dice
 from ..error import DrollError
+from .. import special
 from .. import struct
 from ..player import Default
 
@@ -28,10 +29,10 @@ def _occultist_ability(
     """Transform 1 skeleton into 1 fighter, discarding it at next regroup."""
     if target and target != "skeleton":
         raise DrollError("Ability can only target 1 skeleton.")
-    world = action.convert_dungeon_to_party(
+    world = special.convert_dungeon_to_party(
         world, source="skeleton", destination="fighter", max_count=1
     )
-    return action.consume_ability(world)
+    return consume_ability(world)
 
 
 def _necromancer_ability(
@@ -48,17 +49,17 @@ def _necromancer_ability(
         raise DrollError("Ability can only target skeletons.")
     if len(extra_targets) > 1:
         raise DrollError("At most 2 targets can be changed.")
-    world = action.convert_dungeon_to_party(
+    world = special.convert_dungeon_to_party(
         world, source="skeleton", destination="fighter", max_count=2
     )
-    return action.consume_ability(world)
+    return consume_ability(world)
 
 
 # Cleric/mage are interchangeable for dragon defeats
 _occultist_defeat_dragon = functools.partial(
-    action.defeat_dragon,
+    defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes,
+        defeat_dragon_heroes,
         interchangeable=frozenset({"cleric", "mage"}),
     ),
 )

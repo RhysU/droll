@@ -7,7 +7,7 @@ from dataclasses import replace
 import functools
 from typing import Optional
 
-from .. import action
+from .. import regular
 from .. import dice
 from ..dungeon import defeated_monsters, decrement_dungeon, increment_dungeon
 from ..error import DrollError
@@ -30,7 +30,7 @@ def _enchantress_ability(
     dungeon = world.dungeon
     dungeon = decrement_dungeon(dungeon, target)
     dungeon = increment_dungeon(dungeon, "potion")
-    return action.consume_ability(replace(world, dungeon=dungeon))
+    return regular.consume_ability(replace(world, dungeon=dungeon))
 
 
 def _beguiler_ability(
@@ -53,14 +53,14 @@ def _beguiler_ability(
         assert len(extra_targets) == 0
         raise DrollError("2 targets required when 2+ available.")
     dungeon = increment_dungeon(dungeon, "potion")
-    return action.consume_ability(replace(world, dungeon=dungeon))
+    return regular.consume_ability(replace(world, dungeon=dungeon))
 
 
 # Scrolls act as wildcards for dragon defeats
 _beguiler_defeat_dragon = functools.partial(
-    action.defeat_dragon,
+    regular.defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes,
+        regular.defeat_dragon_heroes,
         disallowed_heroes=frozenset(),
         wildcard=frozenset({"scroll"}),
     ),
@@ -76,11 +76,11 @@ Beguiler = replace(
         Default.party,
         # Scrolls act offensively (defeat enemies, not re-roll)
         scroll=struct.Dungeon(
-            goblin=action.defeat_all,
-            skeleton=action.defeat_all,
-            ooze=action.defeat_all,
-            chest=action.open_all,
-            potion=action.quaff,
+            goblin=regular.defeat_all,
+            skeleton=regular.defeat_all,
+            ooze=regular.defeat_all,
+            chest=regular.open_all,
+            potion=regular.quaff,
             dragon=_beguiler_defeat_dragon,
         ),
     ),
