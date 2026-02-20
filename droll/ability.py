@@ -14,6 +14,7 @@ from .dungeon import (
     increment_dungeon,
 )
 from .error import DrollError
+from .party import increment_party
 from .treasure import draw_treasure, replace_treasure
 
 
@@ -55,7 +56,7 @@ def _choose_and_add_hero(
         target = next(iter(sorted(acceptable)))
     if target not in acceptable:
         raise DrollError(f"Target {target} not one of {acceptable}.")
-    return replace(world, party=regular.increment_party(world.party, target))
+    return replace(world, party=increment_party(world.party, target))
 
 
 def _convert_one(
@@ -171,7 +172,7 @@ def commander_ability(
         raise DrollError(f"At least 1 reroll target required for {noun}.")
     # Temporarily add a scroll to be consumed by reroll
     world = replace(
-        world, party=regular.increment_party(world.party, "scroll")
+        world, party=increment_party(world.party, "scroll")
     )
     return regular.reroll(
         world, randrange, "scroll", target, *additional, allow_dragon=True
@@ -242,7 +243,7 @@ def mercenary_ability(
         raise DrollError(f"At least 1 target required for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
     world = replace(
-        world, party=regular.increment_party(world.party, "champion")
+        world, party=increment_party(world.party, "champion")
     )
     return special.defeat_one_plus_additional(
         world, randrange, "champion", target, *additional
@@ -324,7 +325,7 @@ def paladin_ability(
         # Revive heroes for each potion
         party = world.party
         for revived in revivable:
-            party = regular.increment_party(party, revived)
+            party = increment_party(party, revived)
         world = replace(world, party=party)
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)

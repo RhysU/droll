@@ -5,11 +5,11 @@
 
 from dataclasses import replace
 
-from .struct import RandRange
 from .dungeon import defeated_monsters
 from .error import DrollError
-from .regular import defeat_all, defeat_one, increment_party
-from .struct import World
+from .party import increment_party
+from .regular import defeat_all, defeat_one
+from .struct import RandRange, World
 
 __all__ = (
     "convert_dungeon_to_party",
