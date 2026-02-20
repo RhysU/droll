@@ -464,22 +464,20 @@ class TestWorld:
         """Total dice at a level equals min(depth, 7), with at least 1 new."""
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
-        for depth, dragons in [
-            (1, 0),  # No dragons, baseline
-            (4, 0),  # Mid-depth, no dragons
-            (1, 1),  # Low depth with dragon
-            (4, 2),  # Mid-depth with dragons
-            (7, 2),  # High depth capped at 7
-            (1, 2),  # Dragons exceed depth, guarantees at least 1 die
+        for depth, dragons, expected in [
+            (1, 0, struct.Dungeon(goblin=1)),
+            (4, 0, struct.Dungeon(goblin=4)),
+            (1, 1, struct.Dungeon(goblin=1, dragon=1)),
+            (4, 2, struct.Dungeon(goblin=2, dragon=2)),
+            (7, 2, struct.Dungeon(goblin=5, dragon=2)),
+            (1, 2, struct.Dungeon(goblin=1, dragon=2)),  # At least 1 new
         ]:
             g = replace(
                 game, depth=depth - 1, dungeon=struct.Dungeon(dragon=dragons)
             )
             result = world.descend(g, _roll_all_goblins, self.state.randrange)
             assert result.depth == depth
-            new_dice = max(1, min(depth, 7) - dragons)
-            assert result.dungeon.goblin == new_dice
-            assert result.dungeon.dragon == dragons
+            assert result.dungeon == expected
 
     def test_dragon_no_carryforward_to_fresh_delve(self):
         """Dragons do not carry over to a fresh delve."""
