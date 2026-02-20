@@ -19,7 +19,7 @@ __all__ = ("Shell",)
 _RESET = "\033[0m"
 _GREEN = "\033[92m"
 _RED = "\033[91m"
-_ORANGE = "\033[93m"  # TODO Make output between commands, e.g. help, orange
+_ORANGE = "\033[93m"
 
 
 class Shell(cmd.Cmd):
@@ -239,6 +239,16 @@ class Shell(cmd.Cmd):
     #################
     # HELP BELOW HERE
     #################
+
+    def do_help(self, arg):
+        """List available commands or show help for a specific command."""
+        if self._color:
+            print(_ORANGE, end="")
+        try:
+            super().do_help(arg)
+        finally:
+            if self._color:
+                print(_RESET, end="")
 
     doc_header = "Feasible commands (help <command>):"
     doc_hero_template = (
