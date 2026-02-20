@@ -296,12 +296,7 @@ pip install -e .
 
 ## Testing
 
-When not installed, run unit tests with:
+Run unit tests with:
 ```
-PYTHONPATH=. python -m unittest discover -s tests
-```
-
-When installed, run unit tests with:
-```
-python -m unittest discover -s tests
+pytest
 ```
