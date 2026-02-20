@@ -20,10 +20,11 @@ def test_game_construction():
     Game(random=random.Random(4))
 
 
-def test_gamestate_truthiness():
-    """GameState values coerce to boolean correctly for control flow."""
-    assert GameState.STOP, "STOP must coerce to True."
-    assert not GameState.PLAY, "PLAY must coerce to False."
+def test_gamestate_identity():
+    """GameState enum members are distinct and comparable."""
+    assert GameState.STOP is not GameState.PLAY
+    assert GameState.STOP == GameState.STOP
+    assert GameState.PLAY == GameState.PLAY
 
 
 def test_reroll_dungeon_dice():

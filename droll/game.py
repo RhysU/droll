@@ -23,14 +23,6 @@ class GameState(enum.Enum):
     STOP = 0
     PLAY = 1
 
-    def __bool__(self):
-        """STOP is truthy; non-STOP states are falsy."""
-        # Inverted so STOP is truthy and PLAY is falsy because cmd.Cmd.cmdloop
-        # stops its loop when postcmd returns a truthy value.  Shell.postcmd
-        # passes through the GameState returned by each do_XXX handler, so
-        # STOP must be truthy to signal loop termination.
-        return self.value == self.STOP.value
-
 
 class Game:
     """Tracks all state associated with a programmatically driven game."""
