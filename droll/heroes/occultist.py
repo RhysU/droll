@@ -7,7 +7,7 @@ from dataclasses import replace
 import functools
 from typing import Optional
 
-from .. import action
+from .. import regular
 from .. import dice
 from ..error import DrollError
 from .. import special
@@ -32,7 +32,7 @@ def _occultist_ability(
     world = special.convert_dungeon_to_party(
         world, source="skeleton", destination="fighter", max_count=1
     )
-    return action.consume_ability(world)
+    return regular.consume_ability(world)
 
 
 def _necromancer_ability(
@@ -52,14 +52,14 @@ def _necromancer_ability(
     world = special.convert_dungeon_to_party(
         world, source="skeleton", destination="fighter", max_count=2
     )
-    return action.consume_ability(world)
+    return regular.consume_ability(world)
 
 
 # Cleric/mage are interchangeable for dragon defeats
 _occultist_defeat_dragon = functools.partial(
-    action.defeat_dragon,
+    regular.defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes,
+        regular.defeat_dragon_heroes,
         interchangeable=frozenset({"cleric", "mage"}),
     ),
 )

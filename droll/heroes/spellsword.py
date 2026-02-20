@@ -7,7 +7,7 @@ from dataclasses import replace
 import functools
 from typing import Optional
 
-from .. import action
+from .. import regular
 from .. import dice
 from ..error import DrollError
 from .. import struct
@@ -34,16 +34,16 @@ def _spellsword_ability(
         target = next(iter(sorted(_acceptable_targets)))
     if target not in _acceptable_targets:
         raise DrollError(f"Target {target} not one of {_acceptable_targets}.")
-    return action.consume_ability(
-        replace(world, party=action.increment_party(world.party, target))
+    return regular.consume_ability(
+        replace(world, party=regular.increment_party(world.party, target))
     )
 
 
 # Fighter/mage are interchangeable for dragon defeats
 _spellsword_defeat_dragon = functools.partial(
-    action.defeat_dragon,
+    regular.defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes,
+        regular.defeat_dragon_heroes,
         interchangeable=frozenset({"fighter", "mage"}),
     ),
 )
@@ -60,7 +60,7 @@ def _battlemage_ability(
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     if target is not None:
         raise DrollError(f"No targets accepted for {noun}.")
-    return action.consume_ability(replace(world, dungeon=struct.Dungeon()))
+    return regular.consume_ability(replace(world, dungeon=struct.Dungeon()))
 
 
 # Defined in terms of Default, not Spellsword, to permit advance(...) closure

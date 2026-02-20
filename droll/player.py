@@ -7,7 +7,7 @@ import collections.abc
 from typing import Dict, Optional
 from dataclasses import replace
 
-from . import action
+from . import regular
 from . import dice
 from .error import DrollError
 from . import struct
@@ -25,12 +25,12 @@ __all__ = (
 Default = struct.Player(
     name="Default",
     # Behavior of special commands?
-    ability=action.nop_ability,
+    ability=regular.nop_ability,
     # Advance maps struct.World -> struct.Player, permitting promotion.
     # However, the Default player is not promotable.
     advance=(lambda _: Default),
-    bait=action.bait_dragon,
-    elixir=action.elixir,
+    bait=regular.bait_dragon,
+    elixir=regular.elixir,
     # Behavior at specific lifecycle events?
     roll=struct.Roll(dungeon=dice.roll_dungeon, party=dice.roll_party),
     # How do artifacts map to heroes?
@@ -45,54 +45,54 @@ Default = struct.Player(
     # What effect does each hero have on each enemy?
     party=struct.Party(
         fighter=struct.Dungeon(
-            goblin=action.defeat_all,
-            skeleton=action.defeat_one,
-            ooze=action.defeat_one,
-            chest=action.open_one,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
+            goblin=regular.defeat_all,
+            skeleton=regular.defeat_one,
+            ooze=regular.defeat_one,
+            chest=regular.open_one,
+            potion=regular.quaff,
+            dragon=regular.defeat_dragon,
         ),
         cleric=struct.Dungeon(
-            goblin=action.defeat_one,
-            skeleton=action.defeat_all,
-            ooze=action.defeat_one,
-            chest=action.open_one,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
+            goblin=regular.defeat_one,
+            skeleton=regular.defeat_all,
+            ooze=regular.defeat_one,
+            chest=regular.open_one,
+            potion=regular.quaff,
+            dragon=regular.defeat_dragon,
         ),
         mage=struct.Dungeon(
-            goblin=action.defeat_one,
-            skeleton=action.defeat_one,
-            ooze=action.defeat_all,
-            chest=action.open_one,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
+            goblin=regular.defeat_one,
+            skeleton=regular.defeat_one,
+            ooze=regular.defeat_all,
+            chest=regular.open_one,
+            potion=regular.quaff,
+            dragon=regular.defeat_dragon,
         ),
         thief=struct.Dungeon(
-            goblin=action.defeat_one,
-            skeleton=action.defeat_one,
-            ooze=action.defeat_one,
-            chest=action.open_all,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
+            goblin=regular.defeat_one,
+            skeleton=regular.defeat_one,
+            ooze=regular.defeat_one,
+            chest=regular.open_all,
+            potion=regular.quaff,
+            dragon=regular.defeat_dragon,
         ),
         champion=struct.Dungeon(
-            goblin=action.defeat_all,
-            skeleton=action.defeat_all,
-            ooze=action.defeat_all,
-            chest=action.open_all,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
+            goblin=regular.defeat_all,
+            skeleton=regular.defeat_all,
+            ooze=regular.defeat_all,
+            chest=regular.open_all,
+            potion=regular.quaff,
+            dragon=regular.defeat_dragon,
         ),
         # Scrolls can re-roll chests and potions though doing so feels odd.
         # Scrolls can also, less oddly, quaff potions so always assume quaff.
         scroll=struct.Dungeon(
-            goblin=action.reroll,
-            skeleton=action.reroll,
-            ooze=action.reroll,
-            chest=action.reroll,
-            potion=action.quaff,
-            dragon=action.defeat_dragon,
+            goblin=regular.reroll,
+            skeleton=regular.reroll,
+            ooze=regular.reroll,
+            chest=regular.reroll,
+            potion=regular.quaff,
+            dragon=regular.defeat_dragon,
         ),
     ),
 )
@@ -153,7 +153,7 @@ def apply(
 
     # Dispatch: reroll always uses scroll mechanics; everything else is hero-target
     if noun == "reroll":
-        world = action.reroll(world, randrange, "scroll", target, *additional)
+        world = regular.reroll(world, randrange, "scroll", target, *additional)
     else:
         try:
             action_ = getattr(player.party, noun)

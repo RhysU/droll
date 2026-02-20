@@ -5,7 +5,7 @@
 from dataclasses import replace
 import functools
 
-from .. import action
+from .. import regular
 from .. import dice
 from .. import struct
 from ..player import Default
@@ -29,16 +29,16 @@ def _knight_roll_party(
 
 def _knight_bait_dragon(*args, **kwargs):
     """Convert all monster faces into dragon dice."""
-    return action.consume_ability(
-        action.bait_dragon(*args, require_treasure=False, **kwargs)
+    return regular.consume_ability(
+        regular.bait_dragon(*args, require_treasure=False, **kwargs)
     )
 
 
 # DragonSlayer only needs 2 distinct heroes instead of 3
 _dragonslayer_defeat_dragon = functools.partial(
-    action.defeat_dragon,
+    regular.defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        action.defeat_dragon_heroes, required=2
+        regular.defeat_dragon_heroes, required=2
     ),
 )
 
