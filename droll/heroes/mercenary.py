@@ -4,17 +4,18 @@
 """Hero definitions for Mercenary advancing to Commander."""
 
 from dataclasses import replace
-from typing import Optional
 
 from .. import dice, special, struct
-from ..error import DrollError
+from ..ability import commander_ability, mercenary_ability
 from ..player import Default
-from ..regular import consume_ability, increment_party, reroll
 
 __all__ = (
     "Commander",
     "Mercenary",
 )
+
+_commander_ability = commander_ability
+_mercenary_ability = mercenary_ability
 
 
 def _mercenary_roll_party(
@@ -26,40 +27,6 @@ def _mercenary_roll_party(
         replace(party, scroll=party.scroll + 1),
         replace(regroup, discard=replace(regroup.discard, scroll=1)),
     )
-
-
-def _mercenary_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-    *additional,
-) -> struct.World:
-    """Defeat any 2 monsters."""
-    if target is None:
-        raise DrollError(f"At least 1 target required for {noun}.")
-    # Temporarily add a champion to be consumed by defeat_one_plus_additional
-    world = replace(world, party=increment_party(world.party, "champion"))
-    world = special.defeat_one_plus_additional(
-        world, randrange, "champion", target, *additional
-    )
-    return consume_ability(world)
-
-
-def _commander_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-    *additional,
-) -> struct.World:
-    """Rerolls any number of Party and Dungeon dice."""
-    if target is None:
-        raise DrollError(f"At least 1 reroll target required for {noun}.")
-    # Temporarily add a scroll to be consumed by reroll
-    world = replace(world, party=increment_party(world.party, "scroll"))
-    world = reroll(world, randrange, "scroll", target, *additional, allow_dragon=True)
-    return consume_ability(world)
 
 
 # Defined in terms of Default, not Mercenary, to permit advance(...) closure

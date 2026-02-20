@@ -5,53 +5,19 @@
 
 from dataclasses import replace
 from functools import partial
-from typing import Optional
 
-from .. import dice, special, struct
-from ..error import DrollError
+from .. import struct
+from ..ability import necromancer_ability, occultist_ability
 from ..player import Default
-from ..regular import consume_ability, defeat_dragon, defeat_dragon_heroes
+from ..regular import defeat_dragon, defeat_dragon_heroes
 
 __all__ = (
     "Necromancer",
     "Occultist",
 )
 
-
-def _occultist_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-) -> struct.World:
-    """Transform 1 skeleton into 1 fighter, discarding it at next regroup."""
-    if target and target != "skeleton":
-        raise DrollError("Ability can only target 1 skeleton.")
-    world = special.convert_dungeon_to_party(
-        world, source="skeleton", destination="fighter", max_count=1
-    )
-    return consume_ability(world)
-
-
-def _necromancer_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-    *extra_targets: str,
-) -> struct.World:
-    """Transform 2 skeletons into fighters, discarding them at next regroup."""
-    if target and target != "skeleton":
-        raise DrollError("Ability can only target skeletons.")
-    if extra_targets and extra_targets[0] != "skeleton":
-        raise DrollError("Ability can only target skeletons.")
-    if len(extra_targets) > 1:
-        raise DrollError("At most 2 targets can be changed.")
-    world = special.convert_dungeon_to_party(
-        world, source="skeleton", destination="fighter", max_count=2
-    )
-    return consume_ability(world)
-
+_necromancer_ability = necromancer_ability
+_occultist_ability = occultist_ability
 
 # Cleric/mage are interchangeable for dragon defeats
 _occultist_defeat_dragon = partial(

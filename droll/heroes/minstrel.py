@@ -5,34 +5,18 @@
 
 from dataclasses import replace
 from functools import partial
-from typing import Optional
 
 from .. import dice, special, struct
-from ..dungeon import eliminate_dungeon
-from ..error import DrollError
+from ..ability import minstrel_ability
 from ..player import Default
-from ..regular import consume_ability, defeat_dragon, defeat_dragon_heroes
+from ..regular import defeat_dragon, defeat_dragon_heroes
 
 __all__ = (
     "Bard",
     "Minstrel",
 )
 
-
-def _minstrel_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-) -> struct.World:
-    """Discard all dragon dice."""
-    target = "dragon" if target is None else target
-    if target != "dragon":
-        raise DrollError(f"Can only discard dragon dice, not {target}.")
-    return consume_ability(
-        replace(world, dungeon=eliminate_dungeon(world.dungeon, target))
-    )
-
+_minstrel_ability = minstrel_ability
 
 # Mage/thief are interchangeable for dragon defeats
 _minstrel_defeat_dragon = partial(

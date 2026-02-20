@@ -20,7 +20,6 @@ from .treasure import draw_treasure, replace_treasure
 
 __all__ = (
     "bait_dragon",
-    "consume_ability",
     "defeat_all",
     "defeat_dragon",
     "defeat_dragon_heroes",
@@ -28,7 +27,6 @@ __all__ = (
     "distinct_heroes",
     "elixir",
     "increment_party",
-    "nop_ability",
     "open_all",
     "open_one",
     "quaff",
@@ -362,20 +360,3 @@ def elixir(world: World, randrange: RandRange, noun: str, target: str) -> World:
     )
 
 
-def consume_ability(world: World):
-    """Mark the hero's special ability as used."""
-    if not world.ability:
-        raise DrollError("Ability not available.")
-    return replace(world, ability=False)
-
-
-def nop_ability(
-    world: World,
-    randrange: RandRange,
-    noun: str,
-    target: Optional[str] = None,
-) -> World:
-    """No special ability available (though its consumption is tracked)"""
-    if target is not None:
-        raise DrollError(f"No targets accepted for {noun}.")
-    return consume_ability(world)

@@ -6,6 +6,7 @@ from dataclasses import replace
 from functools import partial
 
 from .. import dice, regular, struct
+from ..ability import knight_ability
 from ..player import Default
 
 __all__ = (
@@ -25,13 +26,6 @@ def _knight_roll_party(
     )
 
 
-def _knight_bait_dragon(*args, **kwargs):
-    """Convert all monster faces into dragon dice."""
-    return regular.consume_ability(
-        regular.bait_dragon(*args, require_treasure=False, **kwargs)
-    )
-
-
 # DragonSlayer only needs 2 distinct heroes instead of 3
 _dragonslayer_defeat_dragon = partial(
     regular.defeat_dragon,
@@ -42,7 +36,7 @@ _dragonslayer_defeat_dragon = partial(
 DragonSlayer = replace(
     Default,
     name="DragonSlayer",
-    ability=_knight_bait_dragon,
+    ability=knight_ability,
     advance=(lambda _: DragonSlayer),
     roll=replace(Default.roll, party=_knight_roll_party),
     party=struct.Party(
@@ -77,7 +71,7 @@ DragonSlayer = replace(
 Knight = replace(
     Default,
     name="Knight",
-    ability=_knight_bait_dragon,
+    ability=knight_ability,
     advance=(lambda world: Knight if world.experience < 5 else DragonSlayer),
     roll=replace(Default.roll, party=_knight_roll_party),
 )
