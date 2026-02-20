@@ -6,7 +6,7 @@
 import random
 import pytest
 
-import droll.struct
+from droll import struct
 from droll.ability import commander_ability, mercenary_ability
 from droll.heroes.mercenary import Commander, Mercenary, _mercenary_roll_party
 
@@ -18,16 +18,16 @@ def test_mercenary_roll_party_adds_bonus_scroll():
     """Mercenary roll adds one bonus scroll with regroup discard."""
     randrange = random.Random(4).randrange
     party, regroup = _mercenary_roll_party(7, randrange)
-    assert sum(droll.struct.field_values(party)) == 8
+    assert sum(struct.field_values(party)) == 8
     assert regroup.discard.scroll == 1
 
 
 def testmercenary_ability_defeats_two_monsters():
     """Mercenary ability defeats 2 different monsters."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
-        party=droll.struct.Party(fighter=2),
+        dungeon=struct.Dungeon(goblin=1, skeleton=1),
+        party=struct.Party(fighter=2),
     )
     result = mercenary_ability(world, _UNUSED, "ability", "goblin", "skeleton")
     assert result.dungeon.goblin == 0
@@ -38,10 +38,10 @@ def testmercenary_ability_defeats_two_monsters():
 
 def testmercenary_ability_defeats_one_when_only_one():
     """Mercenary ability defeats 1 monster when only 1 exists."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1),
-        party=droll.struct.Party(fighter=2),
+        dungeon=struct.Dungeon(goblin=1),
+        party=struct.Party(fighter=2),
     )
     result = mercenary_ability(world, _UNUSED, "ability", "goblin")
     assert result.dungeon.goblin == 0
@@ -50,22 +50,22 @@ def testmercenary_ability_defeats_one_when_only_one():
 
 def testmercenary_ability_requires_target():
     """Mercenary ability requires at least one target."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1),
-        party=droll.struct.Party(fighter=2),
+        dungeon=struct.Dungeon(goblin=1),
+        party=struct.Party(fighter=2),
     )
-    with pytest.raises(droll.struct.DrollError):
+    with pytest.raises(struct.DrollError):
         mercenary_ability(world, _UNUSED, "ability")
 
 
 def testcommander_ability_rerolls_dungeon_dice():
     """Commander ability rerolls dungeon dice."""
     randrange = random.Random(7).randrange
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-        party=droll.struct.Party(fighter=2),
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(fighter=2),
     )
     result = commander_ability(world, randrange, "ability", "goblin", "goblin")
     assert not result.ability
@@ -75,10 +75,10 @@ def testcommander_ability_rerolls_dungeon_dice():
 def testcommander_ability_rerolls_dragon():
     """Commander ability can reroll dragon dice."""
     randrange = random.Random(7).randrange
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(dragon=3),
-        party=droll.struct.Party(fighter=2),
+        dungeon=struct.Dungeon(dragon=3),
+        party=struct.Party(fighter=2),
     )
     result = commander_ability(
         world, randrange, "ability", "dragon", "dragon", "dragon"
@@ -88,21 +88,21 @@ def testcommander_ability_rerolls_dragon():
 
 def testcommander_ability_requires_target():
     """Commander ability requires at least one target."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1),
-        party=droll.struct.Party(fighter=2),
+        dungeon=struct.Dungeon(goblin=1),
+        party=struct.Party(fighter=2),
     )
-    with pytest.raises(droll.struct.DrollError):
+    with pytest.raises(struct.DrollError):
         commander_ability(world, _UNUSED, "ability")
 
 
 def test_commander_fighter_defeats_goblin_plus_additional():
     """Commander fighters defeat all goblins plus one additional."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-        party=droll.struct.Party(fighter=2),
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(fighter=2),
     )
     result = Commander.party.fighter.goblin(
         world, _UNUSED, "fighter", "goblin", "skeleton"
@@ -114,10 +114,10 @@ def test_commander_fighter_defeats_goblin_plus_additional():
 
 def test_commander_fighter_defeats_skeleton_plus_additional():
     """Commander fighters defeat one skeleton plus one additional."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(skeleton=2, ooze=1),
-        party=droll.struct.Party(fighter=2),
+        dungeon=struct.Dungeon(skeleton=2, ooze=1),
+        party=struct.Party(fighter=2),
     )
     result = Commander.party.fighter.skeleton(
         world, _UNUSED, "fighter", "skeleton", "ooze"
@@ -129,8 +129,8 @@ def test_commander_fighter_defeats_skeleton_plus_additional():
 
 def test_mercenary_advances_to_commander():
     """Mercenary advances to Commander at 5+ experience."""
-    low_xp = droll.struct.World(experience=4)
-    high_xp = droll.struct.World(experience=5)
+    low_xp = struct.World(experience=4)
+    high_xp = struct.World(experience=5)
     assert Mercenary.advance(low_xp) == Mercenary
     assert Mercenary.advance(high_xp) == Commander
     assert Commander.advance(high_xp) == Commander

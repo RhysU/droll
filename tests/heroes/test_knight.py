@@ -5,8 +5,8 @@
 
 import random
 
-import droll.dice
-import droll.struct
+from droll import dice
+from droll import struct
 from droll.heroes.knight import Knight, DragonSlayer, _knight_roll_party
 
 # Known to be unused because it would raise NameErrors on any use
@@ -18,16 +18,16 @@ def test_knight_roll_party_converts_scrolls():
     randrange = random.Random(4).randrange
     party, regroup = _knight_roll_party(7, randrange)
     assert party.scroll == 0
-    assert sum(droll.struct.field_values(party)) == 7
-    assert regroup == droll.struct.Regroup()
+    assert sum(struct.field_values(party)) == 7
+    assert regroup == struct.Regroup()
 
 
 def test_knight_ability_baits_dragon():
     """Knight ability converts monsters to dragons without treasure."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-        party=droll.struct.Party(fighter=2, champion=1),
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(fighter=2, champion=1),
     )
     result = Knight.ability(world, _UNUSED, "ability")
     assert result.dungeon.dragon == 3
@@ -39,14 +39,14 @@ def test_knight_ability_baits_dragon():
 def test_dragonslayer_defeats_dragon_with_two_heroes():
     """DragonSlayer defeats a dragon with only 2 distinct heroes."""
     randrange = random.Random(4).randrange
-    world = droll.struct.World(
+    world = struct.World(
         delve=1,
         depth=1,
-        dungeon=droll.struct.Dungeon(dragon=3),
-        party=droll.struct.Party(fighter=1, mage=1),
-        treasure=droll.struct.Treasure(
-            own=droll.struct.Artifacts(),
-            box=droll.struct.Artifacts(scale=6),
+        dungeon=struct.Dungeon(dragon=3),
+        party=struct.Party(fighter=1, mage=1),
+        treasure=struct.Treasure(
+            own=struct.Artifacts(),
+            box=struct.Artifacts(scale=6),
         ),
     )
     result = DragonSlayer.party.fighter.dragon(
@@ -58,9 +58,9 @@ def test_dragonslayer_defeats_dragon_with_two_heroes():
 
 def test_dragonslayer_advance():
     """Knight advances to DragonSlayer advances to DragonSlayer."""
-    low_xp = droll.struct.World(experience=2)
-    mid_xp = droll.struct.World(experience=7)
-    high_xp = droll.struct.World(experience=15)
+    low_xp = struct.World(experience=2)
+    mid_xp = struct.World(experience=7)
+    high_xp = struct.World(experience=15)
     assert Knight.advance(low_xp) == Knight
     assert Knight.advance(mid_xp) == DragonSlayer
     assert DragonSlayer.advance(high_xp) == DragonSlayer

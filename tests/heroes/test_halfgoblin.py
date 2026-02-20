@@ -6,7 +6,7 @@
 import random
 import pytest
 
-import droll.struct
+from droll import struct
 from droll.ability import chieftain_ability, halfgoblin_ability
 from droll.heroes.halfgoblin import Chieftain, HalfGoblin
 
@@ -16,10 +16,10 @@ _UNUSED = object()
 
 def test_halfgoblin_transforms_goblin_to_thief():
     """HalfGoblin transforms 1 goblin into 1 thief."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-        party=droll.struct.Party(fighter=1),
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(fighter=1),
     )
     result = halfgoblin_ability(world, _UNUSED, "ability", "goblin")
     # Discard during subsequent regroup phase tested elsewhere
@@ -30,10 +30,10 @@ def test_halfgoblin_transforms_goblin_to_thief():
 
 def test_chieftain_transforms_two_monsters():
     """Chieftain transforms 2 goblins into 2 thieves when available."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-        party=droll.struct.Party(fighter=1),
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(fighter=1),
     )
     result = chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin")
     # Discard during subsequent regroup phase tested elsewhere
@@ -44,10 +44,10 @@ def test_chieftain_transforms_two_monsters():
 
 def test_chieftain_transforms_one_monster():
     """Chieftain transforms 1 goblin into 1 thief when 1 available."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
-        party=droll.struct.Party(fighter=1),
+        dungeon=struct.Dungeon(goblin=1, skeleton=1),
+        party=struct.Party(fighter=1),
     )
     result = chieftain_ability(
         world,
@@ -63,34 +63,34 @@ def test_chieftain_transforms_one_monster():
 
 def test_halfgoblin_rejects_non_goblin():
     """HalfGoblin ability rejects non-goblin targets."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
-        party=droll.struct.Party(fighter=1),
+        dungeon=struct.Dungeon(goblin=1, skeleton=1),
+        party=struct.Party(fighter=1),
     )
-    with pytest.raises(droll.struct.DrollError):
+    with pytest.raises(struct.DrollError):
         halfgoblin_ability(world, _UNUSED, "ability", "skeleton")
 
 
 def test_chieftain_rejects_non_goblin_targets():
     """Chieftain rejects non-goblin target, extra target, and excess targets."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-        party=droll.struct.Party(fighter=1),
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(fighter=1),
     )
-    with pytest.raises(droll.struct.DrollError):
+    with pytest.raises(struct.DrollError):
         chieftain_ability(world, _UNUSED, "ability", "skeleton")
-    with pytest.raises(droll.struct.DrollError):
+    with pytest.raises(struct.DrollError):
         chieftain_ability(world, _UNUSED, "ability", "goblin", "skeleton")
-    with pytest.raises(droll.struct.DrollError):
+    with pytest.raises(struct.DrollError):
         chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin", "goblin")
 
 
 def test_halfgoblin_advances_to_chieftain():
     """HalfGoblin advances to Chieftain at 5+ experience."""
-    low_xp = droll.struct.World(experience=4)
-    high_xp = droll.struct.World(experience=5)
+    low_xp = struct.World(experience=4)
+    high_xp = struct.World(experience=5)
     assert HalfGoblin.advance(low_xp) == HalfGoblin
     assert HalfGoblin.advance(high_xp) == Chieftain
 
@@ -98,15 +98,15 @@ def test_halfgoblin_advances_to_chieftain():
 def test_halfgoblin_fighter_chests_potions():
     """HalfGoblin opens chests and quaff portions when monsters present."""
     randrange = random.Random(4).randrange
-    world = droll.struct.World(
+    world = struct.World(
         delve=1,
         depth=1,
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1, chest=1, potion=1),
-        party=droll.struct.Party(fighter=5),
-        treasure=droll.struct.Treasure(
-            own=droll.struct.Artifacts(),
-            box=droll.struct.Artifacts(scale=1),
+        dungeon=struct.Dungeon(goblin=1, chest=1, potion=1),
+        party=struct.Party(fighter=5),
+        treasure=struct.Treasure(
+            own=struct.Artifacts(),
+            box=struct.Artifacts(scale=1),
         ),
     )
 

@@ -5,7 +5,7 @@
 
 import pytest
 
-import droll.struct
+from droll import struct
 from droll.ability import minstrel_ability
 from droll.heroes.minstrel import Bard, Minstrel
 
@@ -15,10 +15,10 @@ _UNUSED = object()
 
 def testminstrel_ability_discards_dragons():
     """Minstrel/Bard ability discards all dragon dice."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
-        party=droll.struct.Party(fighter=1),
+        dungeon=struct.Dungeon(goblin=1, dragon=3),
+        party=struct.Party(fighter=1),
     )
     result = minstrel_ability(world, _UNUSED, "ability")
     assert result.dungeon.dragon == 0
@@ -28,21 +28,21 @@ def testminstrel_ability_discards_dragons():
 
 def testminstrel_ability_rejects_non_dragon():
     """Minstrel/Bard ability only works on dragons."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
-        party=droll.struct.Party(fighter=1),
+        dungeon=struct.Dungeon(goblin=1, dragon=3),
+        party=struct.Party(fighter=1),
     )
-    with pytest.raises(droll.struct.DrollError):
+    with pytest.raises(struct.DrollError):
         minstrel_ability(world, _UNUSED, "ability", "goblin")
 
 
 def test_bard_champion_defeats_all_plus_additional():
     """Bard champion defeats all of one type plus one additional."""
-    world = droll.struct.World(
+    world = struct.World(
         ability=True,
-        dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
-        party=droll.struct.Party(champion=1),
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(champion=1),
     )
     result = Bard.party.champion.goblin(
         world, _UNUSED, "champion", "goblin", "skeleton"
@@ -54,7 +54,7 @@ def test_bard_champion_defeats_all_plus_additional():
 
 def test_minstrel_advances_to_bard():
     """Minstrel advances to Bard at 5+ experience."""
-    low_xp = droll.struct.World(experience=4)
-    high_xp = droll.struct.World(experience=5)
+    low_xp = struct.World(experience=4)
+    high_xp = struct.World(experience=5)
     assert Minstrel.advance(low_xp) == Minstrel
     assert Minstrel.advance(high_xp) == Bard
