@@ -40,9 +40,7 @@ class Shell(cmd.Cmd):
         self._command_count = 0
         self._display_mode = display_mode
         self._color = (
-            sys.stdout.isatty()
-            if display_mode == display.DisplayMode.CURRENT
-            else False
+            display_mode == display.DisplayMode.CURRENT and sys.stdout.isatty()
         )
 
     def precmd(self, line: str) -> str:
@@ -99,24 +97,17 @@ class Shell(cmd.Cmd):
             self._postcmd_legacy(stop, line)
         return stop
 
+    _AVAILABLE_COMMANDS = frozenset(
+        {"ability", "descend", "retire", "retreat", "reroll", "undo"}
+    )
+
     def _available_commands(self) -> list[str]:
         """Get available non-hero/non-treasure commands from help system."""
-        names = self.get_names()
-        commands = set()
-        for name in names:
-            if name.startswith("do_"):
-                cmd_name = name[3:]
-                if cmd_name in (
-                    "ability",
-                    "descend",
-                    "retire",
-                    "retreat",
-                    "reroll",
-                ):
-                    commands.add(cmd_name)
-        if self._undo:
-            commands.add("undo")
-        return list(commands)
+        return [
+            name[3:]
+            for name in self.get_names()
+            if name.startswith("do_") and name[3:] in self._AVAILABLE_COMMANDS
+        ]
 
     def onecmd(self, line, *, raises=False) -> GameState:
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
@@ -147,10 +138,7 @@ class Shell(cmd.Cmd):
             self._undo.clear()  # Random state mutated so no under permitted
 
         if self._game != before:
-            if line == "undo":
-                self._command_count -= 1
-            else:
-                self._command_count += 1
+            self._command_count += -1 if line == "undo" else 1
 
         return result
 
