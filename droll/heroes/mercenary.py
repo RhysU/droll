@@ -14,6 +14,7 @@ __all__ = (
     "Mercenary",
 )
 
+
 def _mercenary_roll_party(
     count: int, randrange: dice.RandRange
 ) -> tuple[struct.Party, struct.Regroup]:

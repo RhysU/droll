@@ -7,7 +7,12 @@ from dataclasses import replace
 from typing import Optional
 
 from . import dice, regular, special, struct
-from .dungeon import defeated_monsters, decrement_dungeon, eliminate_dungeon, increment_dungeon
+from .dungeon import (
+    defeated_monsters,
+    decrement_dungeon,
+    eliminate_dungeon,
+    increment_dungeon,
+)
 from .error import DrollError
 from .treasure import draw_treasure, replace_treasure
 
@@ -44,7 +49,7 @@ def _choose_and_add_hero(
     target: Optional[str],
     acceptable: frozenset[str],
 ) -> struct.World:
-    """Default target to sorted-first acceptable; validate; add one hero to party."""
+    """Default target to sorted-first acceptable; validate; add one hero."""
     world = _consume_ability(world)
     if target is None:
         target = next(iter(sorted(acceptable)))
@@ -59,7 +64,7 @@ def _convert_one(
     source: str,
     destination: str,
 ) -> struct.World:
-    """Validate optional target is source type; convert 1 dungeon die to party."""
+    """Validate optional target; convert 1 dungeon die to party."""
     world = _consume_ability(world)
     if target and target != source:
         raise DrollError(f"Ability can only target 1 {source}.")
@@ -75,7 +80,7 @@ def _convert_two(
     source: str,
     destination: str,
 ) -> struct.World:
-    """Validate optional targets are source type; convert up to 2 dungeon dice to party."""
+    """Validate optional targets; convert up to 2 dungeon dice to party."""
     world = _consume_ability(world)
     if target and target != source:
         raise DrollError(f"Ability can only target {source}s.")
@@ -148,7 +153,9 @@ def chieftain_ability(
     *extra_targets: str,
 ) -> struct.World:
     """Transform up to 2 goblins into thieves, discarding them on regroup."""
-    return _convert_two(world, target, extra_targets, source="goblin", destination="thief")
+    return _convert_two(
+        world, target, extra_targets, source="goblin", destination="thief"
+    )
 
 
 def commander_ability(
@@ -163,8 +170,12 @@ def commander_ability(
     if target is None:
         raise DrollError(f"At least 1 reroll target required for {noun}.")
     # Temporarily add a scroll to be consumed by reroll
-    world = replace(world, party=regular.increment_party(world.party, "scroll"))
-    return regular.reroll(world, randrange, "scroll", target, *additional, allow_dragon=True)
+    world = replace(
+        world, party=regular.increment_party(world.party, "scroll")
+    )
+    return regular.reroll(
+        world, randrange, "scroll", target, *additional, allow_dragon=True
+    )
 
 
 def crusader_ability(
@@ -213,7 +224,9 @@ def knight_ability(
 ) -> struct.World:
     """Convert all monster faces into dragon dice."""
     world = _consume_ability(world)
-    return regular.bait_dragon(world, randrange, noun, target, require_treasure=False)
+    return regular.bait_dragon(
+        world, randrange, noun, target, require_treasure=False
+    )
 
 
 def mercenary_ability(
@@ -228,7 +241,9 @@ def mercenary_ability(
     if target is None:
         raise DrollError(f"At least 1 target required for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
-    world = replace(world, party=regular.increment_party(world.party, "champion"))
+    world = replace(
+        world, party=regular.increment_party(world.party, "champion")
+    )
     return special.defeat_one_plus_additional(
         world, randrange, "champion", target, *additional
     )
@@ -256,7 +271,9 @@ def necromancer_ability(
     *extra_targets: str,
 ) -> struct.World:
     """Transform up to 2 skeletons into fighters, discarding them on regroup."""
-    return _convert_two(world, target, extra_targets, source="skeleton", destination="fighter")
+    return _convert_two(
+        world, target, extra_targets, source="skeleton", destination="fighter"
+    )
 
 
 def occultist_ability(
@@ -266,7 +283,9 @@ def occultist_ability(
     target: Optional[str] = None,
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it on regroup."""
-    return _convert_one(world, target, source="skeleton", destination="fighter")
+    return _convert_one(
+        world, target, source="skeleton", destination="fighter"
+    )
 
 
 def paladin_ability(
@@ -292,7 +311,9 @@ def paladin_ability(
     if world.dungeon is not None:
         potion_count = world.dungeon.potion
         if len(revivable) != potion_count:
-            raise DrollError(f"Exactly {potion_count} heroes to revive required.")
+            raise DrollError(
+                f"Exactly {potion_count} heroes to revive required."
+            )
 
         # Draw treasure for each chest
         treasure = world.treasure
