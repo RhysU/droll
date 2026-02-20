@@ -57,6 +57,16 @@ class TestWorld:
             == 1
         )
 
+    def test_draw_treasure_empty_box(self):
+        """Test drawing from an empty box raises DrollError."""
+        pre = world.new_world()
+        pre = replace(
+            pre,
+            treasure=replace(pre.treasure, box=struct.Artifacts()),
+        )
+        with pytest.raises(struct.DrollError):
+            treasure.draw_treasure(pre.treasure, self.state.randrange)
+
     def test_replace_treasure(self):
         """Test replacing treasure moves one item from own to box."""
         pre = world.new_world()
