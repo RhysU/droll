@@ -40,9 +40,7 @@ class Shell(cmd.Cmd):
         self._command_count = 0
         self._display_mode = display_mode
         self._color = (
-            sys.stdout.isatty()
-            if display_mode == display.DisplayMode.CURRENT
-            else False
+            display_mode == display.DisplayMode.CURRENT and sys.stdout.isatty()
         )
 
     def precmd(self, line: str) -> str:
@@ -99,24 +97,17 @@ class Shell(cmd.Cmd):
             self._postcmd_legacy(stop, line)
         return stop
 
+    _META_COMMANDS = frozenset(
+        {"ability", "descend", "retire", "retreat", "reroll", "undo"}
+    )
+
     def _available_commands(self) -> list[str]:
         """Get available non-hero/non-treasure commands from help system."""
-        names = self.get_names()
-        commands = set()
-        for name in names:
-            if name.startswith("do_"):
-                cmd_name = name[3:]
-                if cmd_name in (
-                    "ability",
-                    "descend",
-                    "retire",
-                    "retreat",
-                    "reroll",
-                ):
-                    commands.add(cmd_name)
-        if self._undo:
-            commands.add("undo")
-        return list(commands)
+        return [
+            name[3:]
+            for name in self.get_names()
+            if name.startswith("do_") and name[3:] in self._META_COMMANDS
+        ]
 
     def onecmd(self, line, *, raises=False) -> GameState:
         """Performs undo tracking whenever undo won't cause re-roll/re-draw."""
@@ -147,10 +138,7 @@ class Shell(cmd.Cmd):
             self._undo.clear()  # Random state mutated so no under permitted
 
         if self._game != before:
-            if line == "undo":
-                self._command_count -= 1
-            else:
-                self._command_count += 1
+            self._command_count += -1 if line == "undo" else 1
 
         return result
 
@@ -275,29 +263,9 @@ class Shell(cmd.Cmd):
         """Display help for using bait against dragons."""
         print(bait_dragon.__doc__)
 
-    def help_champion(self):
-        """Display help for using the champion hero."""
-        print(self.doc_hero_template.format("champion"))
-        print(self.doc_hero_example)
-
-    def help_cleric(self):
-        """Display help for using the cleric hero."""
-        print(self.doc_hero_template.format("cleric"))
-        print(self.doc_hero_example)
-
     def help_elixir(self):
         """Display help for using elixir treasures."""
         print(elixir.__doc__)
-
-    def help_fighter(self):
-        """Display help for using the fighter hero."""
-        print(self.doc_hero_template.format("fighter"))
-        print(self.doc_hero_example)
-
-    def help_mage(self):
-        """Display help for using the mage hero."""
-        print(self.doc_hero_template.format("mage"))
-        print(self.doc_hero_example)
 
     def help_ring(self):
         """Display help for using rings of invisibility."""
@@ -346,14 +314,24 @@ class Shell(cmd.Cmd):
         """Display help for using talisman treasures."""
         print("""Talismans behave identically to a cleric.""")
 
-    def help_thief(self):
-        """Display help for using the thief hero."""
-        print(self.doc_hero_template.format("thief"))
-        print(self.doc_hero_example)
-
     def help_tools(self):
         """Display help for using tools treasures."""
         print("""Tools behave identically to a thief.""")
+
+
+def _hero_help(name: str):
+    """Create a help method for a hero type."""
+
+    def method(self):
+        print(self.doc_hero_template.format(name))
+        print(self.doc_hero_example)
+
+    method.__doc__ = f"Display help for using the {name} hero."
+    return method
+
+
+for _name in ("champion", "cleric", "fighter", "mage", "thief"):
+    setattr(Shell, f"help_{_name}", _hero_help(_name))
 
 
 def _parse(line: str) -> tuple[str, ...]:
