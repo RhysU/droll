@@ -7,12 +7,8 @@ import pytest
 
 import droll.error
 import droll.struct
-from droll.heroes.occultist import (
-    Necromancer,
-    Occultist,
-    _necromancer_ability,
-    _occultist_ability,
-)
+from droll.ability import necromancer_ability, occultist_ability
+from droll.heroes.occultist import Necromancer, Occultist
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -25,7 +21,7 @@ def test_occultist_transforms_skeleton_to_fighter():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
         party=droll.struct.Party(cleric=1),
     )
-    result = _occultist_ability(world, _UNUSED, "ability", "skeleton")
+    result = occultist_ability(world, _UNUSED, "ability", "skeleton")
     # Discard during subsequent regroup phase tested elsewhere
     assert result.dungeon.skeleton == 1
     assert result.party.fighter == 1
@@ -40,7 +36,7 @@ def test_occultist_rejects_non_skeleton_target():
         party=droll.struct.Party(cleric=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _occultist_ability(world, _UNUSED, "ability", "goblin")
+        occultist_ability(world, _UNUSED, "ability", "goblin")
 
 
 def test_occultist_sets_regroup_discard():
@@ -50,7 +46,7 @@ def test_occultist_sets_regroup_discard():
         dungeon=droll.struct.Dungeon(skeleton=1),
         party=droll.struct.Party(cleric=1),
     )
-    result = _occultist_ability(world, _UNUSED, "ability", "skeleton")
+    result = occultist_ability(world, _UNUSED, "ability", "skeleton")
     assert result.regroup.discard.fighter == 1
 
 
@@ -61,7 +57,7 @@ def test_necromancer_transforms_two_skeletons():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
         party=droll.struct.Party(cleric=1),
     )
-    result = _necromancer_ability(world, _UNUSED, "ability", "skeleton", "skeleton")
+    result = necromancer_ability(world, _UNUSED, "ability", "skeleton", "skeleton")
     # Discard during subsequent regroup phase tested elsewhere
     assert result.dungeon.skeleton == 0
     assert result.dungeon.goblin == 1
@@ -75,7 +71,7 @@ def test_necromancer_transforms_one_skeleton():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
         party=droll.struct.Party(cleric=1),
     )
-    result = _necromancer_ability(
+    result = necromancer_ability(
         world,
         _UNUSED,
         "ability",
@@ -94,7 +90,7 @@ def test_necromancer_sets_regroup_discard():
         dungeon=droll.struct.Dungeon(skeleton=2),
         party=droll.struct.Party(cleric=1),
     )
-    result = _necromancer_ability(world, _UNUSED, "ability", "skeleton", "skeleton")
+    result = necromancer_ability(world, _UNUSED, "ability", "skeleton", "skeleton")
     assert result.regroup.discard.fighter == 2
 
 
@@ -106,7 +102,7 @@ def test_necromancer_rejects_non_skeleton_target():
         party=droll.struct.Party(cleric=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _necromancer_ability(world, _UNUSED, "ability", "goblin")
+        necromancer_ability(world, _UNUSED, "ability", "goblin")
 
 
 def test_necromancer_rejects_non_skeleton_extra_target():
@@ -117,7 +113,7 @@ def test_necromancer_rejects_non_skeleton_extra_target():
         party=droll.struct.Party(cleric=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _necromancer_ability(world, _UNUSED, "ability", "skeleton", "goblin")
+        necromancer_ability(world, _UNUSED, "ability", "skeleton", "goblin")
 
 
 def test_necromancer_rejects_too_many_targets():
@@ -128,7 +124,7 @@ def test_necromancer_rejects_too_many_targets():
         party=droll.struct.Party(cleric=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _necromancer_ability(
+        necromancer_ability(
             world, _UNUSED, "ability", "skeleton", "skeleton", "skeleton"
         )
 

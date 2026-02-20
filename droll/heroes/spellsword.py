@@ -5,37 +5,15 @@
 
 from dataclasses import replace
 from functools import partial
-from typing import Optional
 
-from .. import dice, regular, struct
-from ..error import DrollError
+from .. import regular, struct
+from ..ability import battlemage_ability, spellsword_ability
 from ..player import Default
 
 __all__ = (
     "Battlemage",
     "Spellsword",
 )
-
-
-def _spellsword_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-    *,
-    _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
-) -> struct.World:
-    """Spellsword usable as a fighter or a mage, adding one hero to party.
-
-    Optionally, specify 'fighter' or 'mage' to select which to choose."""
-    if target is None:
-        target = next(iter(sorted(_acceptable_targets)))
-    if target not in _acceptable_targets:
-        raise DrollError(f"Target {target} not one of {_acceptable_targets}.")
-    return regular.consume_ability(
-        replace(world, party=regular.increment_party(world.party, target))
-    )
-
 
 # Fighter/mage are interchangeable for dragon defeats
 _spellsword_defeat_dragon = partial(
@@ -47,25 +25,11 @@ _spellsword_defeat_dragon = partial(
 )
 
 
-def _battlemage_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-    *,
-    _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
-) -> struct.World:
-    """Discard all monsters, chests, potions, and dice in the dragon's lair."""
-    if target is not None:
-        raise DrollError(f"No targets accepted for {noun}.")
-    return regular.consume_ability(replace(world, dungeon=struct.Dungeon()))
-
-
 # Defined in terms of Default, not Spellsword, to permit advance(...) closure
 Battlemage = replace(
     Default,
     name="Battlemage",
-    ability=_battlemage_ability,
+    ability=battlemage_ability,
     advance=(lambda _: Battlemage),
     party=replace(
         Default.party,
@@ -102,7 +66,7 @@ Battlemage = replace(
 Spellsword = replace(
     Default,
     name="Spellsword",
-    ability=_spellsword_ability,
+    ability=spellsword_ability,
     advance=(lambda world: Spellsword if world.experience < 5 else Battlemage),
     party=Battlemage.party,
 )

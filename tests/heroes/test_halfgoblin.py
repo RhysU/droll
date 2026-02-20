@@ -8,12 +8,8 @@ import pytest
 
 import droll.error
 import droll.struct
-from droll.heroes.halfgoblin import (
-    Chieftain,
-    HalfGoblin,
-    _chieftain_ability,
-    _halfgoblin_ability,
-)
+from droll.ability import chieftain_ability, halfgoblin_ability
+from droll.heroes.halfgoblin import Chieftain, HalfGoblin
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -26,7 +22,7 @@ def test_halfgoblin_transforms_goblin_to_thief():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    result = _halfgoblin_ability(world, _UNUSED, "ability", "goblin")
+    result = halfgoblin_ability(world, _UNUSED, "ability", "goblin")
     # Discard during subsequent regroup phase tested elsewhere
     assert result.dungeon.goblin == 1
     assert result.party.thief == 1
@@ -40,7 +36,7 @@ def test_chieftain_transforms_two_monsters():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    result = _chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin")
+    result = chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin")
     # Discard during subsequent regroup phase tested elsewhere
     assert result.dungeon.goblin == 0
     assert result.dungeon.skeleton == 1
@@ -54,7 +50,7 @@ def test_chieftain_transforms_one_monster():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    result = _chieftain_ability(
+    result = chieftain_ability(
         world,
         _UNUSED,
         "ability",
@@ -74,7 +70,7 @@ def test_halfgoblin_rejects_non_goblin():
         party=droll.struct.Party(fighter=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _halfgoblin_ability(world, _UNUSED, "ability", "skeleton")
+        halfgoblin_ability(world, _UNUSED, "ability", "skeleton")
 
 
 def test_chieftain_rejects_non_goblin_targets():
@@ -85,11 +81,11 @@ def test_chieftain_rejects_non_goblin_targets():
         party=droll.struct.Party(fighter=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _chieftain_ability(world, _UNUSED, "ability", "skeleton")
+        chieftain_ability(world, _UNUSED, "ability", "skeleton")
     with pytest.raises(droll.error.DrollError):
-        _chieftain_ability(world, _UNUSED, "ability", "goblin", "skeleton")
+        chieftain_ability(world, _UNUSED, "ability", "goblin", "skeleton")
     with pytest.raises(droll.error.DrollError):
-        _chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin", "goblin")
+        chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin", "goblin")
 
 
 def test_halfgoblin_advances_to_chieftain():

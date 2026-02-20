@@ -7,12 +7,8 @@ import pytest
 
 import droll.error
 import droll.struct
-from droll.heroes.enchantress import (
-    Enchantress,
-    Beguiler,
-    _enchantress_ability,
-    _beguiler_ability,
-)
+from droll.ability import beguiler_ability, enchantress_ability
+from droll.heroes.enchantress import Beguiler, Enchantress
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -25,7 +21,7 @@ def test_enchantress_transforms_monster_to_potion():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    result = _enchantress_ability(world, _UNUSED, "ability", "goblin")
+    result = enchantress_ability(world, _UNUSED, "ability", "goblin")
     assert result.dungeon.goblin == 1
     assert result.dungeon.potion == 1
     assert not result.ability
@@ -38,7 +34,7 @@ def test_beguiler_transforms_two_monsters():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    result = _beguiler_ability(world, _UNUSED, "ability", "goblin", "skeleton")
+    result = beguiler_ability(world, _UNUSED, "ability", "goblin", "skeleton")
     assert result.dungeon.goblin == 1
     assert result.dungeon.skeleton == 0
     assert result.dungeon.potion == 1
@@ -52,7 +48,7 @@ def test_beguiler_requires_two_when_available():
         party=droll.struct.Party(fighter=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _beguiler_ability(world, _UNUSED, "ability", "goblin")
+        beguiler_ability(world, _UNUSED, "ability", "goblin")
 
 
 def test_beguiler_rejects_too_many_targets():
@@ -63,7 +59,7 @@ def test_beguiler_rejects_too_many_targets():
         party=droll.struct.Party(fighter=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _beguiler_ability(world, _UNUSED, "ability", "goblin", "skeleton", "goblin")
+        beguiler_ability(world, _UNUSED, "ability", "goblin", "skeleton", "goblin")
 
 
 def test_enchantress_advances_to_beguiler():

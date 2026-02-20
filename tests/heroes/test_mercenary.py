@@ -8,13 +8,8 @@ import pytest
 
 import droll.error
 import droll.struct
-from droll.heroes.mercenary import (
-    Commander,
-    Mercenary,
-    _commander_ability,
-    _mercenary_ability,
-    _mercenary_roll_party,
-)
+from droll.ability import commander_ability, mercenary_ability
+from droll.heroes.mercenary import Commander, Mercenary, _mercenary_roll_party
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -28,33 +23,33 @@ def test_mercenary_roll_party_adds_bonus_scroll():
     assert regroup.discard.scroll == 1
 
 
-def test_mercenary_ability_defeats_two_monsters():
+def testmercenary_ability_defeats_two_monsters():
     """Mercenary ability defeats 2 different monsters."""
     world = droll.struct.World(
         ability=True,
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
         party=droll.struct.Party(fighter=2),
     )
-    result = _mercenary_ability(world, _UNUSED, "ability", "goblin", "skeleton")
+    result = mercenary_ability(world, _UNUSED, "ability", "goblin", "skeleton")
     assert result.dungeon.goblin == 0
     assert result.dungeon.skeleton == 0
     assert result.party.fighter == 2
     assert not result.ability
 
 
-def test_mercenary_ability_defeats_one_when_only_one():
+def testmercenary_ability_defeats_one_when_only_one():
     """Mercenary ability defeats 1 monster when only 1 exists."""
     world = droll.struct.World(
         ability=True,
         dungeon=droll.struct.Dungeon(goblin=1),
         party=droll.struct.Party(fighter=2),
     )
-    result = _mercenary_ability(world, _UNUSED, "ability", "goblin")
+    result = mercenary_ability(world, _UNUSED, "ability", "goblin")
     assert result.dungeon.goblin == 0
     assert not result.ability
 
 
-def test_mercenary_ability_requires_target():
+def testmercenary_ability_requires_target():
     """Mercenary ability requires at least one target."""
     world = droll.struct.World(
         ability=True,
@@ -62,10 +57,10 @@ def test_mercenary_ability_requires_target():
         party=droll.struct.Party(fighter=2),
     )
     with pytest.raises(droll.error.DrollError):
-        _mercenary_ability(world, _UNUSED, "ability")
+        mercenary_ability(world, _UNUSED, "ability")
 
 
-def test_commander_ability_rerolls_dungeon_dice():
+def testcommander_ability_rerolls_dungeon_dice():
     """Commander ability rerolls dungeon dice."""
     randrange = random.Random(7).randrange
     world = droll.struct.World(
@@ -73,12 +68,12 @@ def test_commander_ability_rerolls_dungeon_dice():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=2),
     )
-    result = _commander_ability(world, randrange, "ability", "goblin", "goblin")
+    result = commander_ability(world, randrange, "ability", "goblin", "goblin")
     assert not result.ability
     assert result.party.fighter == 2
 
 
-def test_commander_ability_rerolls_dragon():
+def testcommander_ability_rerolls_dragon():
     """Commander ability can reroll dragon dice."""
     randrange = random.Random(7).randrange
     world = droll.struct.World(
@@ -86,13 +81,13 @@ def test_commander_ability_rerolls_dragon():
         dungeon=droll.struct.Dungeon(dragon=3),
         party=droll.struct.Party(fighter=2),
     )
-    result = _commander_ability(
+    result = commander_ability(
         world, randrange, "ability", "dragon", "dragon", "dragon"
     )
     assert not result.ability
 
 
-def test_commander_ability_requires_target():
+def testcommander_ability_requires_target():
     """Commander ability requires at least one target."""
     world = droll.struct.World(
         ability=True,
@@ -100,7 +95,7 @@ def test_commander_ability_requires_target():
         party=droll.struct.Party(fighter=2),
     )
     with pytest.raises(droll.error.DrollError):
-        _commander_ability(world, _UNUSED, "ability")
+        commander_ability(world, _UNUSED, "ability")
 
 
 def test_commander_fighter_defeats_goblin_plus_additional():

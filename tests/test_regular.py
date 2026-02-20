@@ -621,20 +621,6 @@ def test_bait_non_dragon_target():
         regular.bait_dragon(w, _UNUSED, "bait", "goblin")
 
 
-def test_consume_ability_when_unavailable():
-    """Cannot consume ability that is already used."""
-    w = struct.World(ability=False)
-    with pytest.raises(DrollError):
-        regular.consume_ability(w)
-
-
-def test_nop_ability_rejects_target():
-    """Default nop ability rejects any target."""
-    w = struct.World(ability=True)
-    with pytest.raises(DrollError):
-        regular.nop_ability(w, _UNUSED, "ability", "fighter")
-
-
 def test_regroup_discard_after_quaff():
     """
     Quaffing a new thief with a force-discard thief clears discarding.

@@ -5,52 +5,15 @@
 
 from dataclasses import replace
 from functools import partial
-from typing import Optional
 
-from .. import dice, regular, special, struct, world
-from ..error import DrollError
+from .. import regular, struct
+from ..ability import chieftain_ability, halfgoblin_ability
 from ..player import Default
 
 __all__ = (
     "Chieftain",
     "HalfGoblin",
 )
-
-
-def _halfgoblin_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-) -> struct.World:
-    """Transform 1 goblin into 1 thief, discarding it at next regroup."""
-    if target and target != "goblin":
-        raise DrollError("Ability can only target 1 goblin.")
-    world = special.convert_dungeon_to_party(
-        world, source="goblin", destination="thief", max_count=1
-    )
-    return regular.consume_ability(world)
-
-
-def _chieftain_ability(
-    world: struct.World,
-    randrange: dice.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-    *extra_targets: str,
-) -> struct.World:
-    """Transform 2 goblins into thieves, discarding them at next regroup."""
-    if target and target != "goblin":
-        raise DrollError("Ability can only target goblins.")
-    if extra_targets and extra_targets[0] != "goblin":
-        raise DrollError("Ability can only target goblins.")
-    if len(extra_targets) > 1:
-        raise DrollError("At most 2 targets can be changed.")
-    world = special.convert_dungeon_to_party(
-        world, source="goblin", destination="thief", max_count=2
-    )
-    return regular.consume_ability(world)
-
 
 # You may open chests and quaff potions at any time during the monster phase
 _halfgoblin_open_one = partial(
@@ -70,7 +33,7 @@ _halfgoblin_quaff = partial(
 Chieftain = replace(
     Default,
     name="Chieftain",
-    ability=_chieftain_ability,
+    ability=chieftain_ability,
     advance=(lambda _: Chieftain),
     party=replace(
         Default.party,
@@ -110,7 +73,7 @@ Chieftain = replace(
 HalfGoblin = replace(
     Default,
     name="HalfGoblin",
-    ability=_halfgoblin_ability,
+    ability=halfgoblin_ability,
     advance=(lambda world: HalfGoblin if world.experience < 5 else Chieftain),
     party=Chieftain.party,
 )
