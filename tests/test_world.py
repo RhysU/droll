@@ -461,14 +461,14 @@ class TestWorld:
         assert world.score(game) == 20
 
     def test_dragon_carryforward(self):
-        """Total dice at a level equals min(depth, 7), with at least 1 new."""
+        """New dice equals min(available, depth) with at least 1 new."""
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
         for depth, dragons, expected in [
             (1, 0, struct.Dungeon(goblin=1)),
             (4, 0, struct.Dungeon(goblin=4)),
             (1, 1, struct.Dungeon(goblin=1, dragon=1)),
-            (4, 2, struct.Dungeon(goblin=2, dragon=2)),
+            (4, 2, struct.Dungeon(goblin=4, dragon=2)),
             (7, 2, struct.Dungeon(goblin=5, dragon=2)),
             (1, 2, struct.Dungeon(goblin=1, dragon=2)),  # At least 1 new
         ]:
