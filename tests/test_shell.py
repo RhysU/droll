@@ -87,6 +87,8 @@ def test_shell_help():
     s.help_talisman()
     s.help_thief()
     s.help_tools()
+    s.help_score()
+    s.help_treasure()
 
 
 # Strategy for testing, further below, will turn docstrings into assertions
