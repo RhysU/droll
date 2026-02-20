@@ -220,14 +220,18 @@ class Shell(cmd.Cmd):
 
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
+    _HELP_TOPICS = ("score", "treasure")
+
     def get_names(self):
         """Compute potential help topics from contextual completions."""
         names = self._game.completenames(text="", head=[], tail=[])
         if self._undo:
             names.append("undo")
-        return ["do_" + x for x in names] + [
-            "help_" + x for x in names if not getattr(self, "do_" + x, None)
-        ]
+        return (
+            ["do_" + x for x in names]
+            + ["help_" + x for x in names if not getattr(self, "do_" + x, None)]
+            + ["help_" + x for x in self._HELP_TOPICS]
+        )
 
     #################
     # HELP BELOW HERE
@@ -343,6 +347,41 @@ class Shell(cmd.Cmd):
     def help_tools(self):
         """Display help for using tools treasures."""
         print("""Tools behave identically to a thief.""")
+
+    def help_score(self):
+        """Display help for the scoring system."""
+        print("Your score has two components: experience and treasure.")
+        print()
+        print("Experience is earned by retiring from a delve.  When you retire,")
+        print("you gain experience equal to the depth you reached in the dungeon.")
+        print("For example, retiring at depth 5 earns 5 experience points.")
+        print("Retreating earns no experience.")
+        print()
+        print("Town portals are worth 2 points each.  Scales score 1 point each,")
+        print("but every pair of scales scores 4 rather than 2 (a +2 bonus per pair).")
+        print("Using a treasure during a delve removes it from your collection and")
+        print("reduces your score accordingly.")
+        print()
+        print("Total score = experience + treasure points.")
+
+    def help_treasure(self):
+        """Display help for the treasure system."""
+        print("Treasure is drawn randomly from a shared box whenever you open")
+        print("chests.  Each piece of treasure scores 1 point, with two exceptions:")
+        print(
+            """
+            sword       1   Usable as a fighter
+            talisman    1   Usable as a cleric
+            sceptre     1   Usable as a mage
+            tools       1   Usable as a thief
+            scroll      1   Usable as a scroll
+            elixir      1   Revive party members
+            bait        1   Lure the dragon
+            portal      2   Escape the dungeon (town portal)
+            ring        1   Sneak past a dragon
+            scale       1   But a pair of scales scores 4
+            """
+        )
 
 
 def _parse(line: str) -> tuple[str, ...]:
