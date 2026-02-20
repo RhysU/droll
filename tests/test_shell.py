@@ -47,7 +47,7 @@ def test_shell_EOF():
     assert not s.cmdqueue
     s.cmdqueue.append("EOF")
     s.cmdloop()
-    assert s.prompt == "(Default  0) "
+    assert s.prompt == "00 Default  0> "
     assert s.lastcmd == ""
 
 
@@ -220,3 +220,44 @@ def test_quaff_wrong_revive_count_prints_error():
     # - action.py quaff raises "Exactly 1 heroes to revive required."
     # - onecmd catches and prints the DrollError
     s.onecmd("fighter potion")
+
+
+def test_command_counter_increments_on_mutation():
+    """Counter increments on state-mutating commands but not on help or errors."""
+    s = _mechanical_shell(Game(random=random.Random(4), player=Default))
+    s.preloop()
+    assert s._command_count == 0
+
+    # Help does not increment
+    s.onecmd("help")
+    assert s._command_count == 0
+
+    # Error does not increment
+    s.onecmd("undo")  # Nothing to undo; prints DrollError
+    assert s._command_count == 0
+
+    # Mutating commands increment
+    s.onecmd("descend")
+    assert s._command_count == 1
+
+    s.onecmd("fighter goblin")  # seed 4 depth 1 has a goblin
+    assert s._command_count == 2
+
+    # Successful undo decrements; the decrement is only known after it succeeds
+    s.onecmd("undo")
+    assert s._command_count == 1
+
+    # Two successful undos in a row each decrement
+    s._game._world = replace(s._game._world, dungeon=struct.Dungeon(goblin=1, ooze=1))
+    s.onecmd("fighter goblin")   # count -> 2; undo stack: [before_1st]
+    assert s._command_count == 2
+    s.onecmd("cleric ooze")      # count -> 3; undo stack: [before_1st, before_2nd]
+    assert s._command_count == 3
+    s.onecmd("undo")             # success: count -> 2
+    assert s._command_count == 2
+    s.onecmd("undo")             # success: count -> 1
+    assert s._command_count == 1
+
+    # Failed undo (nothing left to undo) does not decrement
+    s.onecmd("undo")
+    assert s._command_count == 1
