@@ -94,14 +94,16 @@ class Game:
         return self._player.elixir.__doc__
 
     @property
-    def current_world(self) -> struct.World:
+    def world(self) -> struct.World:
         """The current world state (read-only frozen dataclass)."""
         return self._world
 
+    @property
     def summary(self) -> str:
         """Brief, string description of the world."""
         return struct.brief(self._world)
 
+    @property
     def score(self) -> int:
         """The current score for the world."""
         return world.score(self._world)
