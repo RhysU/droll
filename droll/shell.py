@@ -2,17 +2,17 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """A REPL permitting playing a Game via a tab-completion shell."""
+
 import cmd
 import copy
 import functools
 import sys
 import textwrap
 
-from .regular import bait_dragon, elixir
 from . import display
-from .display import DisplayMode
 from .error import DrollError
 from .game import Game, GameState
+from .regular import bait_dragon, elixir
 
 __all__ = ("Shell",)
 
@@ -29,7 +29,7 @@ class Shell(cmd.Cmd):
         self,
         game: Game,
         *,
-        display_mode: DisplayMode = DisplayMode.CURRENT,
+        display_mode: display.DisplayMode = display.DisplayMode.CURRENT,
     ) -> None:
         """Initialize the shell with a game instance and display mode."""
         super().__init__()
@@ -39,7 +39,7 @@ class Shell(cmd.Cmd):
         self._display_mode = display_mode
         self._color = (
             sys.stdout.isatty()
-            if display_mode == DisplayMode.CURRENT
+            if display_mode == display.DisplayMode.CURRENT
             else False
         )
 
@@ -85,7 +85,7 @@ class Shell(cmd.Cmd):
 
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
-        if self._display_mode == DisplayMode.CURRENT:
+        if self._display_mode == display.DisplayMode.CURRENT:
             self._postcmd_current(stop, line)
         else:
             self._postcmd_legacy(stop, line)

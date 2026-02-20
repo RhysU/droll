@@ -3,9 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Type definitions, generally of the struct-like variety."""
 
-import collections.abc
-import dataclasses
-from typing import Any, Optional
+from collections.abc import Callable, Set
+from dataclasses import dataclass, fields
+from typing import Any, Iterator, Optional
 
 __all__ = (
     "Artifacts",
@@ -23,27 +23,24 @@ __all__ = (
 )
 
 
-def field_names(cls_or_instance: Any) -> collections.abc.Iterator[str]:
+def field_names(cls_or_instance: Any) -> Iterator[str]:
     """Yield field names for a dataclass or instance thereof."""
-    return (f.name for f in dataclasses.fields(cls_or_instance))
+    return (f.name for f in fields(cls_or_instance))
 
 
-def field_values(instance: Any) -> collections.abc.Iterator[Any]:
+def field_values(instance: Any) -> Iterator[Any]:
     """Yield field values for a dataclass instance."""
-    return (getattr(instance, f.name) for f in dataclasses.fields(instance))
+    return (getattr(instance, f.name) for f in fields(instance))
 
 
 def field_items(
     instance: Any,
-) -> collections.abc.Iterator[tuple[str, Any]]:
+) -> Iterator[tuple[str, Any]]:
     """Yield (name, value) pairs for a dataclass instance."""
-    return (
-        (f.name, getattr(instance, f.name))
-        for f in dataclasses.fields(instance)
-    )
+    return ((f.name, getattr(instance, f.name)) for f in fields(instance))
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Dungeon:
     goblin: Any = 0
     skeleton: Any = 0
@@ -53,7 +50,7 @@ class Dungeon:
     dragon: Any = 0
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Party:
     fighter: Any = 0
     cleric: Any = 0
@@ -63,25 +60,25 @@ class Party:
     scroll: Any = 0
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Roll:
-    dungeon: Optional[collections.abc.Callable] = None
-    party: Optional[collections.abc.Callable] = None
+    dungeon: Optional[Callable] = None
+    party: Optional[Callable] = None
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Player:
     name: Optional[str] = None
-    ability: Optional[collections.abc.Callable] = None
-    advance: Optional[collections.abc.Callable] = None
-    bait: Optional[collections.abc.Callable] = None
-    elixir: Optional[collections.abc.Callable] = None
+    ability: Optional[Callable] = None
+    advance: Optional[Callable] = None
+    bait: Optional[Callable] = None
+    elixir: Optional[Callable] = None
     roll: Optional[Roll] = None
     artifacts: Optional[Party] = None
     party: Optional[Party] = None
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Artifacts:
     sword: int = 0
     talisman: int = 0
@@ -95,19 +92,19 @@ class Artifacts:
     scale: int = 0
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Treasure:
     own: Artifacts = Artifacts()
     box: Artifacts = Artifacts()
 
 
 # Bookkeeping for operations performed during the regroup phase
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Regroup:
     discard: Party = Party()  # Discard N party dice in regroup phase
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class World:
     delve: int = 0
     depth: Optional[int] = None
@@ -124,7 +121,7 @@ class World:
 def brief(
     o: Any,
     *,
-    omitted: collections.abc.Set[str] = frozenset({"box"}),
+    omitted: Set[str] = frozenset({"box"}),
 ) -> str:
     """A __str__(...) variant suppressing False fields within dataclasses."""
     try:

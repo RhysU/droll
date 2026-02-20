@@ -4,7 +4,6 @@
 """Functionality associated with rolling dungeon and party dice."""
 
 from collections.abc import Callable
-
 from dataclasses import fields
 
 from .struct import Dungeon, Party, Regroup

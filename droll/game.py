@@ -3,17 +3,13 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Tracks details associated with a playable game."""
 
-import collections.abc
 import copy
 import enum
-from typing import Optional
+from typing import Optional, Sequence
 from random import Random
 
-from . import dungeon
+from . import dungeon, player, struct, world
 from .error import DrollError
-from . import player
-from . import struct
-from . import world
 
 __all__ = (
     "Game",
@@ -183,13 +179,11 @@ class Game:
     def completenames(
         self,
         text: str,
-        head: collections.abc.Sequence[str],
-        tail: collections.abc.Sequence[str],
-    ) -> collections.abc.Sequence[str]:
+        head: Sequence[str],
+        tail: Sequence[str],
+    ) -> Sequence[str]:
         """Complete possible command names based upon context."""
-        results = [
-            x for x in self._possible_world_actions() if x.startswith(text)
-        ]
+        results = [x for x in self._possible_world_actions() if x.startswith(text)]
         if not dungeon.exhausted_dungeon(self._world.dungeon):
             results += self.completedefault(text, head, tail)
         return results
@@ -197,9 +191,9 @@ class Game:
     def completedefault(
         self,
         text: str,
-        head: collections.abc.Sequence[str],
-        tail: collections.abc.Sequence[str],
-    ) -> collections.abc.Sequence[str]:
+        head: Sequence[str],
+        tail: Sequence[str],
+    ) -> Sequence[str]:
         """Complete loosely based upon available heroes/treasures/dungeon."""
         return player.complete(
             world=self._world,

@@ -3,9 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Compact display formatting for the experimental CLI mode."""
 
-import collections.abc
-import enum
-from typing import Any, Optional
+from enum import Enum
+from typing import Any, Optional, Sequence
 
 from . import struct
 
@@ -15,7 +14,7 @@ __all__ = (
 )
 
 
-class DisplayMode(enum.Enum):
+class DisplayMode(Enum):
     """Display mode for the droll CLI."""
 
     CURRENT = "current"
@@ -50,13 +49,11 @@ def _format_items(counts: Any, discards: Any = None) -> str:
 
 def _format_treasure(artifacts: struct.Artifacts) -> str:
     """Format treasure alphabetically."""
-    parts = (
-        _format_item(n, c) for n, c in sorted(struct.field_items(artifacts))
-    )
+    parts = (_format_item(n, c) for n, c in sorted(struct.field_items(artifacts)))
     return " ".join(filter(None, parts)) or "None"
 
 
-def _format_available(available: collections.abc.Sequence[str]) -> str:
+def _format_available(available: Sequence[str]) -> str:
     """Format available commands alphabetically."""
     return " ".join(sorted(available)) or "None"
 
@@ -84,7 +81,7 @@ def compact_summary(
     w: struct.World,
     player_name: str,
     score: int,
-    available: collections.abc.Sequence[str],
+    available: Sequence[str],
 ) -> str:
     """Format the world state in compact multi-line format."""
     # Compute the width for alignment (prompt width)

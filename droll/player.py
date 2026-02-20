@@ -3,14 +3,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
 
-import collections.abc
-from typing import Dict, Optional
+from typing import Dict, Optional, Sequence
 from dataclasses import replace
 
-from . import regular
-from . import dice
+from . import dice, regular, struct
 from .error import DrollError
-from . import struct
 from .treasure import replace_treasure
 
 __all__ = (
@@ -105,8 +102,7 @@ def _adjust_phantom_treasures(world, artifacts, treasure, sign):
         party=replace(
             world.party,
             **{
-                hero: getattr(world.party, hero)
-                + sign * getattr(treasure, artifact)
+                hero: getattr(world.party, hero) + sign * getattr(treasure, artifact)
                 for hero, artifact in struct.field_items(artifacts)
                 if artifact is not None
             },
@@ -147,9 +143,7 @@ def apply(
 
     # Temporarily inflate party with treasure-as-hero counts
     prior_own = world.treasure.own
-    world = _adjust_phantom_treasures(
-        world, player.artifacts, prior_own, +1
-    )
+    world = _adjust_phantom_treasures(world, player.artifacts, prior_own, +1)
 
     # Dispatch: reroll always uses scroll mechanics; everything else is hero-target
     if noun == "reroll":
@@ -165,9 +159,7 @@ def apply(
             raise DrollError(str(cause)) from cause
 
     # Undo phantom inflation, then consume treasure for any artifacts spent
-    world = _adjust_phantom_treasures(
-        world, player.artifacts, prior_own, -1
-    )
+    world = _adjust_phantom_treasures(world, player.artifacts, prior_own, -1)
     for hero, quantity in struct.field_items(world.party):
         if quantity >= 0:
             continue
@@ -245,10 +237,10 @@ def _all_dice_names() -> set[str]:
 
 def complete(
     world: struct.World,
-    tokens: collections.abc.Sequence[str],
+    tokens: Sequence[str],
     text: str,
     position: int,
-) -> collections.abc.Sequence[str]:
+) -> Sequence[str]:
     """Possible completions for text with position among (partial) tokens."""
     if position == 0:
         candidates = _available_nouns(world)

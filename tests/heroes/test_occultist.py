@@ -61,9 +61,7 @@ def test_necromancer_transforms_two_skeletons():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
         party=droll.struct.Party(cleric=1),
     )
-    result = _necromancer_ability(
-        world, _UNUSED, "ability", "skeleton", "skeleton"
-    )
+    result = _necromancer_ability(world, _UNUSED, "ability", "skeleton", "skeleton")
     # Discard during subsequent regroup phase tested elsewhere
     assert result.dungeon.skeleton == 0
     assert result.dungeon.goblin == 1
@@ -96,9 +94,7 @@ def test_necromancer_sets_regroup_discard():
         dungeon=droll.struct.Dungeon(skeleton=2),
         party=droll.struct.Party(cleric=1),
     )
-    result = _necromancer_ability(
-        world, _UNUSED, "ability", "skeleton", "skeleton"
-    )
+    result = _necromancer_ability(world, _UNUSED, "ability", "skeleton", "skeleton")
     assert result.regroup.discard.fighter == 2
 
 

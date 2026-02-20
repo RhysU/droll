@@ -35,9 +35,7 @@ def test_mercenary_ability_defeats_two_monsters():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
         party=droll.struct.Party(fighter=2),
     )
-    result = _mercenary_ability(
-        world, _UNUSED, "ability", "goblin", "skeleton"
-    )
+    result = _mercenary_ability(world, _UNUSED, "ability", "goblin", "skeleton")
     assert result.dungeon.goblin == 0
     assert result.dungeon.skeleton == 0
     assert result.party.fighter == 2
@@ -75,9 +73,7 @@ def test_commander_ability_rerolls_dungeon_dice():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=2),
     )
-    result = _commander_ability(
-        world, randrange, "ability", "goblin", "goblin"
-    )
+    result = _commander_ability(world, randrange, "ability", "goblin", "goblin")
     assert not result.ability
     assert result.party.fighter == 2
 

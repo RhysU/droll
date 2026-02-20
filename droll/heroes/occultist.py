@@ -4,15 +4,13 @@
 """Hero definitions for Occultist advancing to Necromancer."""
 
 from dataclasses import replace
-import functools
+from functools import partial
 from typing import Optional
 
-from ..regular import consume_ability, defeat_dragon, defeat_dragon_heroes
-from .. import dice
+from .. import dice, special, struct
 from ..error import DrollError
-from .. import special
-from .. import struct
 from ..player import Default
+from ..regular import consume_ability, defeat_dragon, defeat_dragon_heroes
 
 __all__ = (
     "Necromancer",
@@ -56,9 +54,9 @@ def _necromancer_ability(
 
 
 # Cleric/mage are interchangeable for dragon defeats
-_occultist_defeat_dragon = functools.partial(
+_occultist_defeat_dragon = partial(
     defeat_dragon,
-    defeat_dragon_heroes=functools.partial(
+    defeat_dragon_heroes=partial(
         defeat_dragon_heroes,
         interchangeable=frozenset({"cleric", "mage"}),
     ),

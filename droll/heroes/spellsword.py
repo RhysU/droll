@@ -4,13 +4,11 @@
 """Hero definitions for Spellsword advancing to Battlemage."""
 
 from dataclasses import replace
-import functools
+from functools import partial
 from typing import Optional
 
-from .. import regular
-from .. import dice
+from .. import dice, regular, struct
 from ..error import DrollError
-from .. import struct
 from ..player import Default
 
 __all__ = (
@@ -40,9 +38,9 @@ def _spellsword_ability(
 
 
 # Fighter/mage are interchangeable for dragon defeats
-_spellsword_defeat_dragon = functools.partial(
+_spellsword_defeat_dragon = partial(
     regular.defeat_dragon,
-    defeat_dragon_heroes=functools.partial(
+    defeat_dragon_heroes=partial(
         regular.defeat_dragon_heroes,
         interchangeable=frozenset({"fighter", "mage"}),
     ),

@@ -4,15 +4,13 @@
 """Hero definitions for Crusader advancing to Paladin."""
 
 from dataclasses import replace
-import functools
+from functools import partial
 from typing import Optional
 
-from .. import regular
-from .. import dice
+from .. import dice, regular, struct
 from ..error import DrollError
-from .. import struct
-from ..treasure import replace_treasure, draw_treasure
 from ..player import Default
+from ..treasure import replace_treasure, draw_treasure
 
 __all__ = (
     "Crusader",
@@ -62,9 +60,7 @@ def _paladin_ability(
     if world.dungeon is not None:
         potion_count = world.dungeon.potion
         if len(revivable) != potion_count:
-            raise DrollError(
-                f"Exactly {potion_count} heroes to revive required."
-            )
+            raise DrollError(f"Exactly {potion_count} heroes to revive required.")
 
         # Draw treasure for each chest
         treasure = world.treasure
@@ -85,9 +81,9 @@ def _paladin_ability(
 
 
 # Fighter/cleric are interchangeable for dragon defeats
-_crusader_defeat_dragon = functools.partial(
+_crusader_defeat_dragon = partial(
     regular.defeat_dragon,
-    defeat_dragon_heroes=functools.partial(
+    defeat_dragon_heroes=partial(
         regular.defeat_dragon_heroes,
         interchangeable=frozenset({"fighter", "cleric"}),
     ),

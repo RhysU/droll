@@ -3,11 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality for hero-agnostic regular actions."""
 
-from typing import Optional
-
-from collections.abc import Sequence, Set as AbstractSet
 from dataclasses import replace
 from operator import add
+from typing import Optional, Sequence, Set
 
 from .dice import RandRange, roll_dungeon, roll_party
 from .dungeon import (
@@ -41,9 +39,7 @@ _DUNGEON_NAMES = frozenset(field_names(Dungeon))
 _PARTY_NAMES = frozenset(field_names(Party))
 
 
-def defeat_one(
-    world: World, randrange: RandRange, hero: str, target: str
-) -> World:
+def defeat_one(world: World, randrange: RandRange, hero: str, target: str) -> World:
     """Update world after hero handles exactly one target."""
     return replace(
         world,
@@ -80,9 +76,7 @@ def increment_party(party: Party, hero: str) -> Party:
     return replace(party, **{hero: getattr(party, hero) + 1})
 
 
-def defeat_all(
-    world: World, randrange: RandRange, hero: str, target: str
-) -> World:
+def defeat_all(world: World, randrange: RandRange, hero: str, target: str) -> World:
     """Update world after hero handles all of one type of target."""
     return replace(
         world,
@@ -210,9 +204,7 @@ def reroll(
     if dungeon_targets:
         for target in dungeon_targets:
             dungeon = decrement_dungeon(dungeon, target)
-        increased = roll_dungeon(
-            dice=len(dungeon_targets), randrange=randrange
-        )
+        increased = roll_dungeon(dice=len(dungeon_targets), randrange=randrange)
         dungeon = Dungeon(
             *map(
                 add,
@@ -244,8 +236,8 @@ def reroll(
 def distinct_heroes(
     heroes: Sequence[str],
     *,
-    wildcard: AbstractSet[str] = frozenset(),
-    interchangeable: AbstractSet[str] = frozenset(),
+    wildcard: Set[str] = frozenset(),
+    interchangeable: Set[str] = frozenset(),
 ) -> int:
     """How many distinct heroes does the given list represent?
 
@@ -260,10 +252,10 @@ def distinct_heroes(
 
 def defeat_dragon_heroes(
     *heroes,
-    disallowed_heroes: AbstractSet[str] = frozenset({"scroll"}),
+    disallowed_heroes: Set[str] = frozenset({"scroll"}),
     required: int = 3,
-    wildcard: AbstractSet[str] = frozenset(),
-    interchangeable: AbstractSet[str] = frozenset(),
+    wildcard: Set[str] = frozenset(),
+    interchangeable: Set[str] = frozenset(),
 ) -> bool:
     """Have sufficiently many distinct heroes been provided to slay dragon?
 
@@ -272,9 +264,7 @@ def defeat_dragon_heroes(
     """
     hero_set = {*heroes}
     if hero_set & {*disallowed_heroes}:
-        raise DrollError(
-            f"Heroes {disallowed_heroes} cannot defeat a dragon."
-        )
+        raise DrollError(f"Heroes {disallowed_heroes} cannot defeat a dragon.")
     if len(heroes) != required:
         raise DrollError(f"Exactly {required} heroes required.")
     n_distinct = distinct_heroes(
@@ -301,13 +291,9 @@ def defeat_dragon(
     Additional required heroes are specified within variable-length others."""
     # Simple prerequisites for attempting to defeat the dragon
     if world.dungeon.dragon < _min_dragon_length:
-        raise DrollError(
-            f"Enemy {target} only comes at length {_min_dragon_length}."
-        )
+        raise DrollError(f"Enemy {target} only comes at length {_min_dragon_length}.")
     if not defeated_monsters(world.dungeon):
-        raise DrollError(
-            f"Enemy {target} only comes after all others defeated."
-        )
+        raise DrollError(f"Enemy {target} only comes after all others defeated.")
 
     # Confirm required number of distinct heroes available
     party = _decrement_party(world.party, hero)
@@ -351,9 +337,7 @@ def bait_dragon(
     # Compute how many new dragons will be produced and remove sources
     dungeon = world.dungeon
     new_targets = (
-        sum(getattr(dungeon, enemy) for enemy in _enemies)
-        if dungeon is not None
-        else 0
+        sum(getattr(dungeon, enemy) for enemy in _enemies) if dungeon is not None else 0
     )
     if not new_targets:
         raise DrollError(f"At least 1 of {_enemies} required for '{noun}'.")
@@ -369,9 +353,7 @@ def bait_dragon(
     )
 
 
-def elixir(
-    world: World, randrange: RandRange, noun: str, target: str
-) -> World:
+def elixir(world: World, randrange: RandRange, noun: str, target: str) -> World:
     """Add one hero die of any requested type."""
     return replace(
         world,

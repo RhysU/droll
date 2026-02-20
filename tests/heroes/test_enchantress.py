@@ -63,9 +63,7 @@ def test_beguiler_rejects_too_many_targets():
         party=droll.struct.Party(fighter=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _beguiler_ability(
-            world, _UNUSED, "ability", "goblin", "skeleton", "goblin"
-        )
+        _beguiler_ability(world, _UNUSED, "ability", "goblin", "skeleton", "goblin")
 
 
 def test_enchantress_advances_to_beguiler():

@@ -55,7 +55,9 @@ class TestWorld:
     def test_replace_treasure(self):
         """Test replacing treasure moves one item from own to box."""
         pre = world.new_world()
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, elixir=1)))
+        pre = replace(
+            pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, elixir=1))
+        )
         post_treasure = treasure.replace_treasure(pre.treasure, "elixir")
         post = replace(pre, treasure=post_treasure)
         assert sum(struct.field_values(pre.treasure.own)) == 1
@@ -99,12 +101,16 @@ class TestWorld:
             world.retire(pre)
 
         # Ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1)))
+        pre = replace(
+            pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1))
+        )
         with pytest.raises(error.DrollError):
             world.retire(pre)
 
         # Town portal
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, portal=1)))
+        pre = replace(
+            pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, portal=1))
+        )
         post = world.retire(pre)
         assert post.experience == pre.depth + pre.experience
         assert post.treasure.own.portal == 0
@@ -127,21 +133,36 @@ class TestWorld:
             world.retire(pre)
 
         # Ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)))
+        pre = replace(
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)
+            ),
+        )
         post1 = world.retire(pre)
         assert post1.experience == pre.depth + pre.experience
         assert post1.treasure.own.ring == 0
         assert post1.treasure.own.portal == 0
 
         # Town portal
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=0, portal=1)))
+        pre = replace(
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=0, portal=1)
+            ),
+        )
         post2 = world.retire(pre)
         assert post2.experience == pre.depth + pre.experience
         assert post2.treasure.own.ring == 0
         assert post2.treasure.own.portal == 0
 
         # Both should consume the ring of invisibility first
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=1)))
+        pre = replace(
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=1, portal=1)
+            ),
+        )
         post3 = world.retire(pre)
         assert post3.experience == pre.depth + pre.experience
         assert post3.treasure.own.ring == 0
@@ -179,12 +200,22 @@ class TestWorld:
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)))
+        pre = replace(
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)
+            ),
+        )
         with pytest.raises(error.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Town portal
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)))
+        pre = replace(
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)
+            ),
+        )
         with pytest.raises(error.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
@@ -206,19 +237,34 @@ class TestWorld:
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)))
+        pre = replace(
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)
+            ),
+        )
         post1 = world.descend(pre, dice.roll_dungeon, self.state.randrange)
         assert post1.depth == pre.depth + 1
         assert post1.treasure.own.ring == 0
         assert post1.treasure.own.portal == 0
 
         # Town portal
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=0, portal=1)))
+        pre = replace(
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=0, portal=1)
+            ),
+        )
         with pytest.raises(error.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Both should consume the ring of invisibility
-        pre = replace(pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1, portal=1)))
+        pre = replace(
+            pre,
+            treasure=replace(
+                pre.treasure, own=replace(pre.treasure.own, ring=1, portal=1)
+            ),
+        )
         post3 = world.descend(pre, dice.roll_dungeon, self.state.randrange)
         assert post3.depth == pre.depth + 1
         assert post3.treasure.own.ring == 0
@@ -243,9 +289,7 @@ class TestWorld:
         )
 
         # First, confirm descending works as expected
-        descended = world.descend(
-            pre1, dice.roll_dungeon, self.state.randrange
-        )
+        descended = world.descend(pre1, dice.roll_dungeon, self.state.randrange)
         assert descended.party == struct.Party(
             fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0
         )
@@ -263,9 +307,7 @@ class TestWorld:
         )
 
         # Third, confirm retreating works as expected
-        pre2 = replace(
-            pre1, dungeon=struct.Dungeon(goblin=1)  # Threat required!
-        )
+        pre2 = replace(pre1, dungeon=struct.Dungeon(goblin=1))  # Threat required!
         retreated = world.retreat(pre2)
         assert retreated.party == struct.Party(
             fighter=5, cleric=0, mage=0, thief=1, champion=1, scroll=0

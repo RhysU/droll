@@ -51,9 +51,7 @@ class TestRerollParty:
         """Rerolling multiple party dice removes and re-rolls each."""
         # Roll values: 0 => fighter, 1 => cleric
         randrange = self._canned_randrange([0, 1])
-        result = regular.reroll(
-            self.world, randrange, "scroll", "fighter", "cleric"
-        )
+        result = regular.reroll(self.world, randrange, "scroll", "fighter", "cleric")
         # One scroll consumed
         assert result.party.scroll == 1
         # fighter: 2 - 1 + 1(rolled) = 2; cleric: 1 - 1 + 1(rolled) = 1
@@ -66,9 +64,7 @@ class TestRerollParty:
         """Rerolling a mix of dungeon and party dice handles both."""
         # Dungeon roll: value 0 => goblin; Party roll: value 2 => mage
         randrange = self._canned_randrange([0, 2])
-        result = regular.reroll(
-            self.world, randrange, "scroll", "goblin", "fighter"
-        )
+        result = regular.reroll(self.world, randrange, "scroll", "goblin", "fighter")
         # One scroll consumed
         assert result.party.scroll == 1
         # Dungeon: goblin was 2, removed 1, re-rolled as goblin (+1) => 2
@@ -93,7 +89,9 @@ class TestRerollParty:
         """A rolled scroll cannot pay the cost of the reroll (issue #105)."""
         w = replace(self.world, party=replace(self.world.party, scroll=0))
         with pytest.raises(DrollError):
-            regular.reroll(w, self._canned_randrange([5, 5, 5, 5, 5]), "scroll", "fighter")
+            regular.reroll(
+                w, self._canned_randrange([5, 5, 5, 5, 5]), "scroll", "fighter"
+            )
 
 
 class TestDistinctHeroes:
@@ -121,80 +119,113 @@ class TestDistinctHeroes:
 
     def test_wildcard_adds_one_each(self):
         """Each wildcard counts as a distinct hero."""
-        assert regular.distinct_heroes(
-            ["cleric", "thief", "scroll"],
-            wildcard=frozenset({"scroll"}),
-        ) == 3
+        assert (
+            regular.distinct_heroes(
+                ["cleric", "thief", "scroll"],
+                wildcard=frozenset({"scroll"}),
+            )
+            == 3
+        )
 
     def test_multiple_wildcards(self):
         """Multiple wildcards each contribute 1."""
-        assert regular.distinct_heroes(
-            ["fighter", "scroll", "scroll"],
-            wildcard=frozenset({"scroll"}),
-        ) == 3
+        assert (
+            regular.distinct_heroes(
+                ["fighter", "scroll", "scroll"],
+                wildcard=frozenset({"scroll"}),
+            )
+            == 3
+        )
 
     def test_all_wildcards(self):
         """All wildcards still count as distinct."""
-        assert regular.distinct_heroes(
-            ["scroll", "scroll", "scroll"],
-            wildcard=frozenset({"scroll"}),
-        ) == 3
+        assert (
+            regular.distinct_heroes(
+                ["scroll", "scroll", "scroll"],
+                wildcard=frozenset({"scroll"}),
+            )
+            == 3
+        )
 
     def test_wildcard_does_not_help_duplicates(self):
         """Wildcards don't fix duplicate non-wildcards."""
-        assert regular.distinct_heroes(
-            ["mage", "mage", "scroll"],
-            wildcard=frozenset({"scroll"}),
-        ) == 2
+        assert (
+            regular.distinct_heroes(
+                ["mage", "mage", "scroll"],
+                wildcard=frozenset({"scroll"}),
+            )
+            == 2
+        )
 
     def test_interchangeable_two_from_pool(self):
         """Two interchangeable heroes contribute 2 distinct."""
-        assert regular.distinct_heroes(
-            ["fighter", "cleric", "mage"],
-            interchangeable=frozenset({"fighter", "cleric"}),
-        ) == 3
+        assert (
+            regular.distinct_heroes(
+                ["fighter", "cleric", "mage"],
+                interchangeable=frozenset({"fighter", "cleric"}),
+            )
+            == 3
+        )
 
     def test_interchangeable_capped_by_pool_size(self):
         """Interchangeable contribution capped at pool size."""
-        assert regular.distinct_heroes(
-            ["mage", "mage", "mage"],
-            interchangeable=frozenset({"mage", "fighter"}),
-        ) == 2
+        assert (
+            regular.distinct_heroes(
+                ["mage", "mage", "mage"],
+                interchangeable=frozenset({"mage", "fighter"}),
+            )
+            == 2
+        )
 
     def test_interchangeable_all_same_type(self):
         """All same type from a 2-member pool still capped at 2."""
-        assert regular.distinct_heroes(
-            ["fighter", "fighter", "fighter"],
-            interchangeable=frozenset({"mage", "fighter"}),
-        ) == 2
+        assert (
+            regular.distinct_heroes(
+                ["fighter", "fighter", "fighter"],
+                interchangeable=frozenset({"mage", "fighter"}),
+            )
+            == 2
+        )
 
     def test_interchangeable_mixed_overflow(self):
         """Mixed interchangeable heroes exceeding pool size."""
-        assert regular.distinct_heroes(
-            ["fighter", "mage", "mage"],
-            interchangeable=frozenset({"mage", "fighter"}),
-        ) == 2
+        assert (
+            regular.distinct_heroes(
+                ["fighter", "mage", "mage"],
+                interchangeable=frozenset({"mage", "fighter"}),
+            )
+            == 2
+        )
 
     def test_interchangeable_with_regular(self):
         """Interchangeable heroes + distinct regular hero."""
-        assert regular.distinct_heroes(
-            ["fighter", "cleric", "thief"],
-            interchangeable=frozenset({"fighter", "cleric"}),
-        ) == 3
+        assert (
+            regular.distinct_heroes(
+                ["fighter", "cleric", "thief"],
+                interchangeable=frozenset({"fighter", "cleric"}),
+            )
+            == 3
+        )
 
     def test_interchangeable_single_member_present(self):
         """One hero from interchangeable set contributes 1."""
-        assert regular.distinct_heroes(
-            ["cleric", "thief", "fighter"],
-            interchangeable=frozenset({"fighter"}),
-        ) == 3
+        assert (
+            regular.distinct_heroes(
+                ["cleric", "thief", "fighter"],
+                interchangeable=frozenset({"fighter"}),
+            )
+            == 3
+        )
 
     def test_interchangeable_single_member_absent(self):
         """No heroes from interchangeable set contribute 0 from pool."""
-        assert regular.distinct_heroes(
-            ["cleric", "thief", "mage"],
-            interchangeable=frozenset({"fighter"}),
-        ) == 3
+        assert (
+            regular.distinct_heroes(
+                ["cleric", "thief", "mage"],
+                interchangeable=frozenset({"fighter"}),
+            )
+            == 3
+        )
 
 
 def test_dragon_wildcard_less_interesting_successful_cases():
@@ -207,7 +238,9 @@ def test_dragon_wildcard_less_interesting_successful_cases():
         wildcard=frozenset({"scroll"}),
     )
     assert regular.defeat_dragon_heroes(
-        "cleric", "thief", "fighter",
+        "cleric",
+        "thief",
+        "fighter",
         disallowed_heroes=frozenset(),
         wildcard=frozenset({"scroll"}),
     )
@@ -217,19 +250,24 @@ def test_dragon_wildcard_less_interesting_failure_cases():
     """Test invalid dragon defeats with wildcard heroes."""
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric", "thief",
+            "cleric",
+            "thief",
             disallowed_heroes=frozenset(),
             wildcard=frozenset({"scroll"}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric", "fighter",
+            "cleric",
+            "fighter",
             disallowed_heroes=frozenset(),
             wildcard=frozenset({"fighter"}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric", "thief", "champion", "mage",
+            "cleric",
+            "thief",
+            "champion",
+            "mage",
             disallowed_heroes=frozenset(),
             wildcard=frozenset({"fighter"}),
         )
@@ -267,11 +305,15 @@ def test_dragon_wildcard_more_interesting_failure_cases():
 def test_dragon_interchangeable_less_interesting_successful_cases():
     """Test valid dragon defeats with interchangeable heroes."""
     assert regular.defeat_dragon_heroes(
-        "cleric", "thief", "mage",
+        "cleric",
+        "thief",
+        "mage",
         interchangeable=frozenset({"fighter"}),
     )
     assert regular.defeat_dragon_heroes(
-        "cleric", "thief", "fighter",
+        "cleric",
+        "thief",
+        "fighter",
         interchangeable=frozenset({"fighter"}),
     )
 
@@ -280,12 +322,14 @@ def test_dragon_interchangeable_less_interesting_failure_cases():
     """Test invalid dragon defeats with interchangeable heroes."""
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric", "thief",
+            "cleric",
+            "thief",
             interchangeable=frozenset({"fighter"}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric", "fighter",
+            "cleric",
+            "fighter",
             interchangeable=frozenset({"fighter"}),
         )
     with pytest.raises(DrollError):
@@ -310,7 +354,9 @@ def test_dragon_interchangeable_more_interesting_failure_cases():
     """Invalid dragon defeats with multiple interchangeable hero types."""
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "mage", "mage", "mage",
+            "mage",
+            "mage",
+            "mage",
             interchangeable=frozenset({"mage", "fighter"}),
         )
     with pytest.raises(DrollError):
@@ -322,7 +368,9 @@ def test_dragon_interchangeable_more_interesting_failure_cases():
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "fighter", "mage", "mage",
+            "fighter",
+            "mage",
+            "mage",
             interchangeable=frozenset({"mage", "fighter"}),
         )
     with pytest.raises(DrollError):
@@ -368,7 +416,10 @@ class TestDragon:
     def test_treasure_slot1(self):
         """Sword treasure can substitute for fighter in dragon combat."""
         game = replace(
-            self.game, treasure=replace(self.game.treasure, own=replace(self.game.treasure.own, sword=7))
+            self.game,
+            treasure=replace(
+                self.game.treasure, own=replace(self.game.treasure.own, sword=7)
+            ),
         )
         game = replace(game, party=replace(game.party, fighter=0))
         game = player.apply(

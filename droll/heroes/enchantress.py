@@ -4,14 +4,12 @@
 """Hero definitions for Enchantress advancing to Beguiler."""
 
 from dataclasses import replace
-import functools
+from functools import partial
 from typing import Optional
 
-from .. import regular
-from .. import dice
+from .. import dice, regular, struct
 from ..dungeon import defeated_monsters, decrement_dungeon, increment_dungeon
 from ..error import DrollError
-from .. import struct
 from ..player import Default
 
 __all__ = (
@@ -57,9 +55,9 @@ def _beguiler_ability(
 
 
 # Scrolls act as wildcards for dragon defeats
-_beguiler_defeat_dragon = functools.partial(
+_beguiler_defeat_dragon = partial(
     regular.defeat_dragon,
-    defeat_dragon_heroes=functools.partial(
+    defeat_dragon_heroes=partial(
         regular.defeat_dragon_heroes,
         disallowed_heroes=frozenset(),
         wildcard=frozenset({"scroll"}),

@@ -4,16 +4,14 @@
 """Hero definitions for Minstrel advancing to Bard."""
 
 from dataclasses import replace
-import functools
+from functools import partial
 from typing import Optional
 
-from ..regular import consume_ability, defeat_dragon, defeat_dragon_heroes
-from .. import dice
+from .. import dice, special, struct
 from ..dungeon import eliminate_dungeon
 from ..error import DrollError
-from .. import special
-from .. import struct
 from ..player import Default
+from ..regular import consume_ability, defeat_dragon, defeat_dragon_heroes
 
 __all__ = (
     "Bard",
@@ -37,9 +35,9 @@ def _minstrel_ability(
 
 
 # Mage/thief are interchangeable for dragon defeats
-_minstrel_defeat_dragon = functools.partial(
+_minstrel_defeat_dragon = partial(
     defeat_dragon,
-    defeat_dragon_heroes=functools.partial(
+    defeat_dragon_heroes=partial(
         defeat_dragon_heroes,
         interchangeable=frozenset({"mage", "thief"}),
     ),

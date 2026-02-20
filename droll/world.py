@@ -5,10 +5,9 @@
 
 from dataclasses import replace
 
-from . import dice
+from . import dice, struct
 from .dungeon import blocking_dragon, defeated_dungeon, defeated_monsters
 from .error import DrollError
-from . import struct
 from .treasure import replace_treasure
 
 __all__ = (
@@ -199,9 +198,7 @@ def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
     return replace(world, dungeon=replace(world.dungeon, dragon=0))
 
 
-def _apply_portal(
-    world: struct.World, *, noun: str = "portal"
-) -> struct.World:
+def _apply_portal(world: struct.World, *, noun: str = "portal") -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):

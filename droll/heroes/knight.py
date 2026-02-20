@@ -3,11 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Hero definitions for Knight advancing to DragonSlayer."""
 from dataclasses import replace
-import functools
+from functools import partial
 
-from .. import regular
-from .. import dice
-from .. import struct
+from .. import dice, regular, struct
 from ..player import Default
 
 __all__ = (
@@ -35,11 +33,9 @@ def _knight_bait_dragon(*args, **kwargs):
 
 
 # DragonSlayer only needs 2 distinct heroes instead of 3
-_dragonslayer_defeat_dragon = functools.partial(
+_dragonslayer_defeat_dragon = partial(
     regular.defeat_dragon,
-    defeat_dragon_heroes=functools.partial(
-        regular.defeat_dragon_heroes, required=2
-    ),
+    defeat_dragon_heroes=partial(regular.defeat_dragon_heroes, required=2),
 )
 
 # Defined in terms of Default, not Knight, to permit advance(...) closure

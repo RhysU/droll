@@ -4,15 +4,11 @@
 """Hero definitions for Half-Goblin advancing to Chieftain."""
 
 from dataclasses import replace
-import functools
+from functools import partial
 from typing import Optional
 
-from .. import regular
-from .. import dice
+from .. import dice, regular, special, struct, world
 from ..error import DrollError
-from .. import special
-from .. import struct
-from .. import world
 from ..player import Default
 
 __all__ = (
@@ -57,15 +53,15 @@ def _chieftain_ability(
 
 
 # You may open chests and quaff potions at any time during the monster phase
-_halfgoblin_open_one = functools.partial(
+_halfgoblin_open_one = partial(
     regular.open_one,
     after_monsters=False,
 )
-_halfgoblin_open_all = functools.partial(
+_halfgoblin_open_all = partial(
     regular.open_all,
     after_monsters=False,
 )
-_halfgoblin_quaff = functools.partial(
+_halfgoblin_quaff = partial(
     regular.quaff,
     after_monsters=False,
 )
