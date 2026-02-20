@@ -7,7 +7,7 @@ from dataclasses import fields, replace
 import random
 import pytest
 
-from droll import regular, dice, error, heroes, player, struct, world
+from droll import dice, error, heroes, player, regular, struct, world
 from droll.dungeon import decrement_dungeon, eliminate_dungeon
 from droll.error import DrollError
 
