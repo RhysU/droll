@@ -98,7 +98,7 @@ def descend(
     _max_depth: int = 10,
     _dungeon_dice: int = 7,
 ) -> struct.World:
-    """Move one dungeon deeper in the dungeon, retaining any partial dragons.
+    """Move one level deeper in the dungeon, retaining any partial dragons.
 
     If necessary, a ring of invisibility will be used to sneak past a dragon.
     Argument roll_dungeon can be dice.roll_dungeon but other choices okay

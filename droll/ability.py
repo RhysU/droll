@@ -147,7 +147,7 @@ def chieftain_ability(
     target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
-    """Transform 2 goblins into thieves, discarding them at next regroup."""
+    """Transform up to 2 goblins into thieves, discarding them at next regroup."""
     return _convert_two(world, target, extra_targets, source="goblin", destination="thief")
 
 
@@ -255,7 +255,7 @@ def necromancer_ability(
     target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
-    """Transform 2 skeletons into fighters, discarding them at next regroup."""
+    """Transform up to 2 skeletons into fighters, discarding them at next regroup."""
     return _convert_two(world, target, extra_targets, source="skeleton", destination="fighter")
 
 
@@ -279,7 +279,7 @@ def paladin_ability(
     """Consume treasure to clear dungeon, open chests, and quaff potions.
 
     Specify consumed treasure as first argument.
-    For each potion, add one argument for the hero to review."""
+    For each potion, add one argument for the hero to revive."""
     world = _consume_ability(world)
     # Validate that a treasure was specified
     if target is None:
