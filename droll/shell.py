@@ -96,6 +96,8 @@ class Shell(cmd.Cmd):
             self._postcmd_current(stop, line)
         else:
             self._postcmd_legacy(stop, line)
+        if stop:
+            print(f"Game Over! Final score: {self._game.score}")
         return stop
 
     _AVAILABLE_COMMANDS = frozenset(

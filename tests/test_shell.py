@@ -51,6 +51,29 @@ def test_shell_EOF():
     assert s.lastcmd == ""
 
 
+def test_shell_EOF_prints_game_over():
+    """Confirm EOF prints a Game Over message with the final score."""
+    s = _mechanical_shell(Game())
+    s.cmdqueue.append("EOF")
+    with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
+        s.cmdloop()
+    output = fake_out.getvalue()
+    assert "Game Over! Final score:" in output
+
+
+def test_postcmd_game_over_includes_score():
+    """Confirm postcmd prints Game Over with correct score when stopping."""
+    from droll.game import GameState
+
+    s = _mechanical_shell(Game(random=random.Random(4), player=Default))
+    s.preloop()
+    score = s._game.score
+    with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
+        s.postcmd(stop=GameState.STOP, line="retire")
+    output = fake_out.getvalue()
+    assert f"Game Over! Final score: {score}" in output
+
+
 def test_shell_reroll():
     """Confirm reroll command forwards to game."""
     s = _mechanical_shell(Game(random=random.Random(4), player=Default))
