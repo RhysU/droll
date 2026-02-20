@@ -63,9 +63,9 @@ class Shell(cmd.Cmd):
         if line != "EOF":
             available = [] if stop else self._available_commands()
             summary = display.compact_summary(
-                self._game.current_world,
+                self._game.world,
                 self._game.player_name,
-                self._game.score(),
+                self._game.score,
                 available,
             )
             if self._color:
@@ -80,11 +80,11 @@ class Shell(cmd.Cmd):
         """Display state using the brief summary format."""
         self.prompt = (
             f"{self._command_count:02d} {self._game.player_name}"
-            f" {self._game.score():-2d}> "
+            f" {self._game.score:-2d}> "
         )
         print()
         if line != "EOF":
-            print(self._game.summary())
+            print(self._game.summary)
             if stop:
                 print(self.prompt)
 
