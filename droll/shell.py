@@ -299,18 +299,17 @@ class Shell(cmd.Cmd):
 
     def help_scroll(self):
         """Display help for using scroll treasures."""
-        print("Scrolls may quaff potions and re-roll dungeon dice like so:")
+        print("Scrolls quaff potions or re-roll dice via 'reroll':")
         print(
             """
             scroll potion mage thief    # Drink 2 potions obtaining mage, thief
-            scroll skeleton goblin      # Re-roll all skeletons and goblins
+            reroll skeleton goblin      # Re-roll a skeleton and a goblin
             """
         )
-        print("Heroes like the Enchantress instead kill enemies with 'scroll'")
+        print("Heroes like the Enchantress instead kill enemies with 'scroll':")
         print(
             """
-            scroll skeleton             # Enchantress would kill skeleton...
-            reroll skeleton goblin      # ...but 'reroll' forces re-rolling"""
+            scroll skeleton             # Enchantress kills all skeletons"""
         )
 
     def help_reroll(self):

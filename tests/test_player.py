@@ -140,7 +140,7 @@ class TestPlayer:
             player.apply(player.Default, self.game, None, "fighter")
 
     def test_scroll_reroll(self):
-        """Test scroll used to reroll dungeon dice."""
+        """Test reroll command to reroll dungeon dice (issue #133)."""
         # Consumed by canned_sequence just below
         sequence = [0, 1, 2]
 
@@ -148,12 +148,12 @@ class TestPlayer:
             """Predetermined sequence values for deterministic testing."""
             return start + sequence.pop(0)
 
-        # Notice scroll causes chests to be re-rolled
+        # 'reroll' re-rolls chests via the scroll mechanic
         game = player.apply(
             player.Default,
             self.game,
             canned_sequence,
-            "scroll",
+            "reroll",
             "chest",
             "ooze",
             "chest",
@@ -162,6 +162,13 @@ class TestPlayer:
         assert game.dungeon == struct.Dungeon(
             goblin=3, skeleton=3, ooze=2, chest=0, potion=2, dragon=2
         )
+
+    def test_scroll_not_reroll(self):
+        """Using 'scroll' as a noun for rerolling raises DrollError (#133)."""
+        with pytest.raises(struct.DrollError, match="reroll"):
+            player.apply(
+                player.Default, self.game, None, "scroll", "goblin"
+            )
 
 
 # Shorthand for testing completions given that method returns unsorted generator
