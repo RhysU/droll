@@ -6,7 +6,7 @@
 from dataclasses import replace
 from typing import Optional
 
-from . import dice, regular, special, struct
+from . import regular, special, struct
 from .dungeon import (
     defeated_monsters,
     decrement_dungeon,
@@ -14,6 +14,7 @@ from .dungeon import (
     increment_dungeon,
 )
 from .error import DrollError
+from .party import increment_party
 from .treasure import draw_treasure, replace_treasure
 
 
@@ -55,7 +56,7 @@ def _choose_and_add_hero(
         target = next(iter(sorted(acceptable)))
     if target not in acceptable:
         raise DrollError(f"Target {target} not one of {acceptable}.")
-    return replace(world, party=regular.increment_party(world.party, target))
+    return replace(world, party=increment_party(world.party, target))
 
 
 def _convert_one(
@@ -95,7 +96,7 @@ def _convert_two(
 
 def default_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -108,7 +109,7 @@ def default_ability(
 
 def battlemage_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *,
@@ -123,7 +124,7 @@ def battlemage_ability(
 
 def beguiler_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *extra_targets: str,
@@ -147,7 +148,7 @@ def beguiler_ability(
 
 def chieftain_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *extra_targets: str,
@@ -160,7 +161,7 @@ def chieftain_ability(
 
 def commander_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *additional,
@@ -171,7 +172,7 @@ def commander_ability(
         raise DrollError(f"At least 1 reroll target required for {noun}.")
     # Temporarily add a scroll to be consumed by reroll
     world = replace(
-        world, party=regular.increment_party(world.party, "scroll")
+        world, party=increment_party(world.party, "scroll")
     )
     return regular.reroll(
         world, randrange, "scroll", target, *additional, allow_dragon=True
@@ -180,7 +181,7 @@ def commander_ability(
 
 def crusader_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *,
@@ -194,7 +195,7 @@ def crusader_ability(
 
 def enchantress_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -208,7 +209,7 @@ def enchantress_ability(
 
 def halfgoblin_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -218,7 +219,7 @@ def halfgoblin_ability(
 
 def knight_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -231,7 +232,7 @@ def knight_ability(
 
 def mercenary_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *additional,
@@ -242,7 +243,7 @@ def mercenary_ability(
         raise DrollError(f"At least 1 target required for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
     world = replace(
-        world, party=regular.increment_party(world.party, "champion")
+        world, party=increment_party(world.party, "champion")
     )
     return special.defeat_one_plus_additional(
         world, randrange, "champion", target, *additional
@@ -251,7 +252,7 @@ def mercenary_ability(
 
 def minstrel_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -265,7 +266,7 @@ def minstrel_ability(
 
 def necromancer_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *extra_targets: str,
@@ -278,7 +279,7 @@ def necromancer_ability(
 
 def occultist_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
 ) -> struct.World:
@@ -290,7 +291,7 @@ def occultist_ability(
 
 def paladin_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *revivable: str,
@@ -324,7 +325,7 @@ def paladin_ability(
         # Revive heroes for each potion
         party = world.party
         for revived in revivable:
-            party = regular.increment_party(party, revived)
+            party = increment_party(party, revived)
         world = replace(world, party=party)
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
@@ -335,7 +336,7 @@ def paladin_ability(
 
 def spellsword_ability(
     world: struct.World,
-    randrange: dice.RandRange,
+    randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
     *,

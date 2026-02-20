@@ -16,7 +16,7 @@ __all__ = (
 
 
 def _knight_roll_party(
-    count: int, randrange: dice.RandRange
+    count: int, randrange: struct.RandRange
 ) -> tuple[struct.Party, struct.Regroup]:
     """Roll a new Party, changing all Scrolls into Champions."""
     default, regroup = dice.roll_party(dice=count, randrange=randrange)

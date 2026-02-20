@@ -12,7 +12,6 @@ import textwrap
 from . import display
 from .error import DrollError
 from .game import Game, GameState
-from .regular import bait_dragon, elixir
 
 __all__ = ("Shell",)
 
@@ -261,7 +260,7 @@ class Shell(cmd.Cmd):
 
     def help_bait(self):
         """Display help for using bait against dragons."""
-        print(bait_dragon.__doc__)
+        print(self._game.bait_doc)
 
     def help_champion(self):
         """Display help for using the champion hero."""
@@ -275,7 +274,7 @@ class Shell(cmd.Cmd):
 
     def help_elixir(self):
         """Display help for using elixir treasures."""
-        print(elixir.__doc__)
+        print(self._game.elixir_doc)
 
     def help_fighter(self):
         """Display help for using the fighter hero."""

@@ -8,15 +8,15 @@ from operator import add
 from collections.abc import Sequence, Set
 from typing import Optional
 
-from .dice import RandRange, roll_dungeon, roll_party
+from .dice import roll_dungeon, roll_party
 from .dungeon import (
     defeated_monsters,
     decrement_dungeon,
     eliminate_dungeon,
-    increment_dungeon,
 )
 from .error import DrollError
-from .struct import Dungeon, Party, Regroup, World, field_names, field_values
+from .party import decrement_party, decrement_regroup, increment_party
+from .struct import Dungeon, Party, RandRange, World, field_names, field_values
 from .treasure import draw_treasure, replace_treasure
 
 __all__ = (
@@ -27,7 +27,6 @@ __all__ = (
     "defeat_one",
     "distinct_heroes",
     "elixir",
-    "increment_party",
     "open_all",
     "open_one",
     "quaff",
@@ -43,36 +42,9 @@ def defeat_one(world: World, randrange: RandRange, hero: str, target: str) -> Wo
     return replace(
         world,
         dungeon=decrement_dungeon(world.dungeon, target),
-        party=_decrement_party(world.party, hero),
-        regroup=_decrement_regroup(world.regroup, hero),
+        party=decrement_party(world.party, hero),
+        regroup=decrement_regroup(world.regroup, hero),
     )
-
-
-# Private because it must be used with _decrement_regroup for correctness
-def _decrement_party(party: Party, hero: str) -> Party:
-    """Decrease the count of the specified hero type by one."""
-    if party is None:
-        raise DrollError("No party currently active.")
-    prior_heroes = getattr(party, hero)
-    if not prior_heroes:
-        raise DrollError(f"At least 1 {hero} required.")
-    return replace(party, **{hero: prior_heroes - 1})
-
-
-# Private because it must be used with _decrement_party for correctness
-def _decrement_regroup(regroup: Regroup, hero: str) -> Regroup:
-    """Decrement the regroup discard counter for hero, if positive."""
-    prior = getattr(regroup.discard, hero, 0)
-    return replace(
-        regroup, discard=replace(regroup.discard, **{hero: max(0, prior - 1)})
-    )
-
-
-def increment_party(party: Party, hero: str) -> Party:
-    """Increase the count of the specified hero type by one."""
-    if party is None:
-        raise DrollError("No party currently active.")
-    return replace(party, **{hero: getattr(party, hero) + 1})
 
 
 def defeat_all(world: World, randrange: RandRange, hero: str, target: str) -> World:
@@ -80,8 +52,8 @@ def defeat_all(world: World, randrange: RandRange, hero: str, target: str) -> Wo
     return replace(
         world,
         dungeon=eliminate_dungeon(world.dungeon, target),
-        party=_decrement_party(world.party, hero),
-        regroup=_decrement_regroup(world.regroup, hero),
+        party=decrement_party(world.party, hero),
+        regroup=decrement_regroup(world.regroup, hero),
     )
 
 
@@ -100,8 +72,8 @@ def open_one(
         world,
         treasure=draw_treasure(world.treasure, randrange),
         dungeon=decrement_dungeon(world.dungeon, target),
-        party=_decrement_party(world.party, hero),
-        regroup=_decrement_regroup(world.regroup, hero),
+        party=decrement_party(world.party, hero),
+        regroup=decrement_regroup(world.regroup, hero),
     )
 
 
@@ -126,8 +98,8 @@ def open_all(
         world,
         treasure=treasure,
         dungeon=eliminate_dungeon(world.dungeon, target),
-        party=_decrement_party(world.party, hero),
-        regroup=_decrement_regroup(world.regroup, hero),
+        party=decrement_party(world.party, hero),
+        regroup=decrement_regroup(world.regroup, hero),
     )
 
 
@@ -149,14 +121,14 @@ def quaff(
         raise DrollError(f"Exactly {howmany} heroes to revive required.")
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before quaffing.")
-    party = _decrement_party(world.party, hero)
+    party = decrement_party(world.party, hero)
     for revived in revivable:
         party = increment_party(party, revived)
     return replace(
         world,
         dungeon=eliminate_dungeon(world.dungeon, target),
         party=party,
-        regroup=_decrement_regroup(world.regroup, hero),
+        regroup=decrement_regroup(world.regroup, hero),
     )
 
 
@@ -196,8 +168,8 @@ def reroll(
 
     # Decrement hero and regroup BEFORE any dice are rolled to prevent
     # stochastic exploitation: a rolled result cannot be immediately spent.
-    party = _decrement_party(world.party, hero)
-    regroup = _decrement_regroup(world.regroup, hero)
+    party = decrement_party(world.party, hero)
+    regroup = decrement_regroup(world.regroup, hero)
 
     dungeon = world.dungeon
     if dungeon_targets:
@@ -214,7 +186,7 @@ def reroll(
 
     if party_targets:
         for target in party_targets:
-            party = _decrement_party(party, target)
+            party = decrement_party(party, target)
         increased, _ = roll_party(dice=len(party_targets), randrange=randrange)
         party = Party(
             *map(
@@ -295,12 +267,12 @@ def defeat_dragon(
         raise DrollError(f"Enemy {target} only comes after all others defeated.")
 
     # Confirm required number of distinct heroes available
-    party = _decrement_party(world.party, hero)
-    regroup = _decrement_regroup(world.regroup, hero)
+    party = decrement_party(world.party, hero)
+    regroup = decrement_regroup(world.regroup, hero)
     heroes = [hero]
     for other in others:
-        party = _decrement_party(party, other)
-        regroup = _decrement_regroup(regroup, other)
+        party = decrement_party(party, other)
+        regroup = decrement_regroup(regroup, other)
         heroes.append(other)
     if not defeat_dragon_heroes(*heroes):
         raise RuntimeError("Unexpected result from defeat_dragon_heroes")
