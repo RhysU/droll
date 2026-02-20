@@ -166,7 +166,7 @@ class Shell(cmd.Cmd):
         return GameState.STOP
 
     def emptyline(self) -> GameState:
-        """Empty line causes no action to occur."""
+        """Empty line displays help."""
         return self.onecmd("help")
 
     ####################
@@ -191,18 +191,18 @@ class Shell(cmd.Cmd):
 
     @functools.wraps(Game.reroll)
     def do_reroll(self, line) -> GameState:
-        """Reroll the specified dungeon dice."""
+        """Reroll the specified party or dungeon dice."""
         return self._game.reroll(*_parse(line))
 
     @functools.wraps(Game.retire)
     def do_retire(self, line) -> GameState:
-        """Retire from the dungeon and end the game."""
+        """Retire to the tavern after clearing a dungeon depth."""
         _no_arguments(line)
         return self._game.retire()
 
     @functools.wraps(Game.retreat)
     def do_retreat(self, line) -> GameState:
-        """Retreat from the current level back to the previous one."""
+        """Retreat to the tavern without completing the dungeon."""
         _no_arguments(line)
         return self._game.retreat()
 

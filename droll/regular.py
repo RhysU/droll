@@ -141,7 +141,7 @@ def quaff(
 ) -> World:
     """Update world after hero quaffs all available potions.
 
-    Unlike {defend,open}_{one,all}(...), heroes to revive are arguments."""
+    Unlike {defeat,open}_{one,all}(...), heroes to revive are arguments."""
     howmany = getattr(world.dungeon, target)
     if not howmany:
         raise DrollError(f"At least 1 {target} required.")
