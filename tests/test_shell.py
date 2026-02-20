@@ -243,12 +243,21 @@ def test_command_counter_increments_on_mutation():
     s.onecmd("fighter goblin")  # seed 4 depth 1 has a goblin
     assert s._command_count == 2
 
-    # Undo winds the counter backwards
+    # Successful undo decrements; the decrement is only known after it succeeds
     s.onecmd("undo")
     assert s._command_count == 1
 
-    # Multiple undos continue winding backwards
-    s.onecmd("fighter goblin")  # seed 4 depth 1 has a goblin; count -> 2
-    s.onecmd("undo")            # count -> 1
-    s.onecmd("undo")            # nothing left to undo; error, no change
+    # Two successful undos in a row each decrement
+    s._game._world = replace(s._game._world, dungeon=struct.Dungeon(goblin=1, ooze=1))
+    s.onecmd("fighter goblin")   # count -> 2; undo stack: [before_1st]
+    assert s._command_count == 2
+    s.onecmd("cleric ooze")      # count -> 3; undo stack: [before_1st, before_2nd]
+    assert s._command_count == 3
+    s.onecmd("undo")             # success: count -> 2
+    assert s._command_count == 2
+    s.onecmd("undo")             # success: count -> 1
+    assert s._command_count == 1
+
+    # Failed undo (nothing left to undo) does not decrement
+    s.onecmd("undo")
     assert s._command_count == 1
