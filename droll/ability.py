@@ -12,12 +12,6 @@ from .error import DrollError
 from .treasure import draw_treasure, replace_treasure
 
 
-def _consume_ability(world: struct.World) -> struct.World:
-    """Mark the hero's special ability as used."""
-    if not world.ability:
-        raise DrollError("Ability not available.")
-    return replace(world, ability=False)
-
 __all__ = (
     "default_ability",
     "battlemage_ability",
@@ -35,6 +29,13 @@ __all__ = (
     "paladin_ability",
     "spellsword_ability",
 )
+
+
+def _consume_ability(world: struct.World) -> struct.World:
+    """Mark the hero's special ability as used."""
+    if not world.ability:
+        raise DrollError("Ability not available.")
+    return replace(world, ability=False)
 
 
 def default_ability(
