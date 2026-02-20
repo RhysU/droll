@@ -97,7 +97,7 @@ class Shell(cmd.Cmd):
             self._postcmd_legacy(stop, line)
         return stop
 
-    _META_COMMANDS = frozenset(
+    _AVAILABLE_COMMANDS = frozenset(
         {"ability", "descend", "retire", "retreat", "reroll", "undo"}
     )
 
@@ -106,7 +106,7 @@ class Shell(cmd.Cmd):
         return [
             name[3:]
             for name in self.get_names()
-            if name.startswith("do_") and name[3:] in self._META_COMMANDS
+            if name.startswith("do_") and name[3:] in self._AVAILABLE_COMMANDS
         ]
 
     def onecmd(self, line, *, raises=False) -> GameState:
