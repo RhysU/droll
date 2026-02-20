@@ -92,6 +92,16 @@ class Game:
         return self._player.ability.__doc__
 
     @property
+    def bait_doc(self) -> str:
+        """The docstring of the current player's bait action."""
+        return self._player.bait.__doc__
+
+    @property
+    def elixir_doc(self) -> str:
+        """The docstring of the current player's elixir action."""
+        return self._player.elixir.__doc__
+
+    @property
     def current_world(self) -> struct.World:
         """The current world state (read-only frozen dataclass)."""
         return self._world
