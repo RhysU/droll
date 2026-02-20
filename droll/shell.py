@@ -60,7 +60,7 @@ class Shell(cmd.Cmd):
         if self._color:
             self.prompt = _GREEN + self.prompt + _RESET
         print()
-        if stop or line != "EOF":
+        if line != "EOF":
             available = [] if stop else self._available_commands()
             summary = display.compact_summary(
                 self._game.world,
@@ -83,7 +83,7 @@ class Shell(cmd.Cmd):
             f" {self._game.score:-2d}> "
         )
         print()
-        if stop or line != "EOF":
+        if line != "EOF":
             print(self._game.summary)
             if stop:
                 print(self.prompt)

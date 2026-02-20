@@ -51,18 +51,8 @@ def test_shell_EOF():
     assert s.lastcmd == ""
 
 
-def test_shell_EOF_prints_summary():
-    """Confirm EOF prints the final summary even though input is EOF."""
-    s = _mechanical_shell(Game())
-    s.cmdqueue.append("EOF")
-    with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
-        s.cmdloop()
-    output = fake_out.getvalue()
-    assert "delve=" in output
-
-
 def test_postcmd_stop_prints_summary():
-    """Confirm postcmd prints summary when stopping."""
+    """Confirm postcmd prints summary when game ends naturally."""
     from droll.game import GameState
 
     s = _mechanical_shell(
