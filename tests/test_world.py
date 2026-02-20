@@ -10,6 +10,11 @@ import pytest
 from droll import dice, dungeon, struct, treasure, world
 
 
+def _roll_all_goblins(n, _randrange):
+    """Deterministic roll where every die lands on goblin."""
+    return struct.Dungeon(goblin=n)
+
+
 class TestWorld:
 
     def setup_method(self):
@@ -464,3 +469,59 @@ class TestWorld:
             ),
         )
         assert world.score(game) == 20
+
+    def test_dragon_carryforward(self):
+        """Exhaustively check new dice = min(7 - dragons, depth) per rules.
+
+        The rules state one rolls dice equal to the level number, capped
+        by available dice (7 minus those set aside in the Dragon's Lair).
+        At most 2 dragons can carry forward (3+ require a ring, resetting
+        to 0).  The table below covers every (level, dragons) combination.
+        """
+        game = world.new_world()
+        game = world.delve(game, dice.roll_party, self.state.randrange)
+        #                depth  dragons  new_dice
+        for depth, dragons, new_dice in [
+            # dragons=0: always roll depth dice (all 7 available)
+            ( 1, 0,  1),
+            ( 2, 0,  2),
+            ( 3, 0,  3),
+            ( 4, 0,  4),
+            ( 5, 0,  5),
+            ( 6, 0,  6),
+            ( 7, 0,  7),
+            ( 8, 0,  7),
+            ( 9, 0,  7),
+            (10, 0,  7),
+            # dragons=1: min(depth, 6)
+            ( 1, 1,  1),
+            ( 2, 1,  2),
+            ( 3, 1,  3),
+            ( 4, 1,  4),
+            ( 5, 1,  5),
+            ( 6, 1,  6),
+            ( 7, 1,  6),
+            ( 8, 1,  6),
+            ( 9, 1,  6),
+            (10, 1,  6),
+            # dragons=2: min(depth, 5)
+            ( 1, 2,  1),
+            ( 2, 2,  2),
+            ( 3, 2,  3),
+            ( 4, 2,  4),
+            ( 5, 2,  5),
+            ( 6, 2,  5),
+            ( 7, 2,  5),
+            ( 8, 2,  5),
+            ( 9, 2,  5),
+            (10, 2,  5),
+        ]:
+            g = replace(
+                game, depth=depth - 1, dungeon=struct.Dungeon(dragon=dragons)
+            )
+            result = world.descend(g, _roll_all_goblins, self.state.randrange)
+            assert result.depth == depth
+            assert result.dungeon == struct.Dungeon(
+                goblin=new_dice, dragon=dragons
+            ), f"depth={depth}, dragons={dragons}"
+
