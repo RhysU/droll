@@ -160,7 +160,9 @@ class Game:
             (
                 "descend",
                 lambda: world.descend(
-                    self._world, self._player.roll.dungeon, _dummy_randrange
+                    self._world,
+                    self._player.roll.dungeon,
+                    lambda start, stop=None: start,
                 ),
             ),
             ("retire", lambda: world.retire(self._world)),
@@ -198,8 +200,3 @@ class Game:
             text=text,
             position=len(head),
         )
-
-
-def _dummy_randrange(start, stop=None):
-    """Non-random pseudorandom generator so that completion is stateless."""
-    return start
