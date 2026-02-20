@@ -10,6 +10,11 @@ import pytest
 from droll import dice, dungeon, struct, treasure, world
 
 
+def _roll_all_goblins(n, _randrange):
+    """Deterministic roll where every die lands on goblin."""
+    return struct.Dungeon(goblin=n)
+
+
 class TestWorld:
 
     def setup_method(self):
@@ -457,15 +462,12 @@ class TestWorld:
 
     def test_dragon_carryforward_reduces_new_dice(self):
         """Dragons from the prior level reduce new dice so total equals depth."""
-        def roll_all_goblins(n, _randrange):
-            return struct.Dungeon(goblin=n)
-
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
 
         # At depth 4 with 2 prior dragons, total dice should be min(5, 7) = 5
         game = replace(game, depth=4, dungeon=struct.Dungeon(dragon=2))
-        result = world.descend(game, roll_all_goblins, self.state.randrange)
+        result = world.descend(game, _roll_all_goblins, self.state.randrange)
         assert result.depth == 5
         # new_dice = max(1, min(5, 7) - 2) = 3, total = 3 goblins + 2 dragons
         assert result.dungeon.goblin == 3
@@ -474,15 +476,12 @@ class TestWorld:
 
     def test_dragon_carryforward_at_low_depth(self):
         """At low depths, dragons correctly reduce new dice rolled."""
-        def roll_all_goblins(n, _randrange):
-            return struct.Dungeon(goblin=n)
-
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
 
         # At depth 1 with 1 prior dragon, total should be min(2, 7) = 2
         game = replace(game, depth=1, dungeon=struct.Dungeon(dragon=1))
-        result = world.descend(game, roll_all_goblins, self.state.randrange)
+        result = world.descend(game, _roll_all_goblins, self.state.randrange)
         assert result.depth == 2
         # new_dice = max(1, min(2, 7) - 1) = 1, total = 1 goblin + 1 dragon
         assert result.dungeon.goblin == 1
@@ -491,15 +490,12 @@ class TestWorld:
 
     def test_dragon_carryforward_at_high_depth(self):
         """At depths >= 7, total dice are capped at 7 with dragon carryforward."""
-        def roll_all_goblins(n, _randrange):
-            return struct.Dungeon(goblin=n)
-
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
 
         # At depth 7 with 2 prior dragons, total should be min(8, 7) = 7
         game = replace(game, depth=7, dungeon=struct.Dungeon(dragon=2))
-        result = world.descend(game, roll_all_goblins, self.state.randrange)
+        result = world.descend(game, _roll_all_goblins, self.state.randrange)
         assert result.depth == 8
         # new_dice = max(1, min(8, 7) - 2) = 5, total = 5 goblins + 2 dragons
         assert result.dungeon.goblin == 5
@@ -508,15 +504,12 @@ class TestWorld:
 
     def test_dragon_carryforward_guarantees_at_least_one_die(self):
         """Even when prior dragons equal the depth, at least 1 die is rolled."""
-        def roll_all_goblins(n, _randrange):
-            return struct.Dungeon(goblin=n)
-
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
 
         # At depth 1 with 2 prior dragons, new_dice = max(1, min(2,7) - 2) = 1
         game = replace(game, depth=1, dungeon=struct.Dungeon(dragon=2))
-        result = world.descend(game, roll_all_goblins, self.state.randrange)
+        result = world.descend(game, _roll_all_goblins, self.state.randrange)
         assert result.depth == 2
         assert result.dungeon.goblin == 1
         assert result.dungeon.dragon == 2
@@ -542,10 +535,7 @@ class TestWorld:
         game = world.delve(game, dice.roll_party, self.state.randrange)
         assert game.dungeon is None  # No carry-over
 
-        def roll_all_goblins(n, _randrange):
-            return struct.Dungeon(goblin=n)
-
-        result = world.descend(game, roll_all_goblins, self.state.randrange)
+        result = world.descend(game, _roll_all_goblins, self.state.randrange)
         assert result.depth == 1
         # At depth 1 with no prior dragons, exactly 1 die
         assert result.dungeon.goblin == 1
@@ -554,14 +544,11 @@ class TestWorld:
 
     def test_dragon_carryforward_no_dragons(self):
         """Without prior dragons, dice count equals depth (up to 7)."""
-        def roll_all_goblins(n, _randrange):
-            return struct.Dungeon(goblin=n)
-
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
 
         for depth in range(1, 8):
             g = replace(game, depth=depth - 1, dungeon=struct.Dungeon())
-            result = world.descend(g, roll_all_goblins, self.state.randrange)
+            result = world.descend(g, _roll_all_goblins, self.state.randrange)
             assert result.depth == depth
             assert sum(struct.field_values(result.dungeon)) == min(depth, 7)
