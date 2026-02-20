@@ -5,8 +5,7 @@
 
 from dataclasses import replace
 
-from .error import DrollError
-from .struct import Dungeon, field_values
+from .struct import DrollError, Dungeon, field_values
 
 __all__ = (
     "blocking_dragon",

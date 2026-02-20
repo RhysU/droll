@@ -5,9 +5,8 @@
 
 import pytest
 
-from droll.error import DrollError
 from droll.party import decrement_party, decrement_regroup, increment_party
-from droll.struct import Party, Regroup
+from droll.struct import DrollError, Party, Regroup
 
 
 def test_decrement_party():

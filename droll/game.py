@@ -9,7 +9,7 @@ from typing import Optional, Sequence
 from random import Random
 
 from . import dungeon, player, struct, world
-from .error import DrollError
+from .struct import DrollError
 
 __all__ = (
     "Game",

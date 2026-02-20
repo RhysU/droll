@@ -8,7 +8,7 @@ import random
 import pytest
 
 from droll import struct
-from droll.error import DrollError
+from droll.struct import DrollError
 from droll.game import Game, GameState
 from droll.player import Default
 

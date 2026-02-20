@@ -7,9 +7,9 @@ from dataclasses import fields, replace
 import random
 import pytest
 
-from droll import dice, error, heroes, player, regular, struct, world
+from droll import dice, heroes, player, regular, struct, world
 from droll.dungeon import decrement_dungeon, eliminate_dungeon
-from droll.error import DrollError
+from droll.struct import DrollError
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -454,7 +454,7 @@ class TestDragon:
     def test_monsters_remain(self):
         """Dragon cannot be attacked while monsters remain in dungeon."""
         game = replace(self.game, dungeon=replace(self.game.dungeon, goblin=1))
-        with pytest.raises(error.DrollError):
+        with pytest.raises(DrollError):
             player.apply(
                 player.Default,
                 game,
@@ -467,7 +467,7 @@ class TestDragon:
 
     def test_too_few_specified(self):
         """Attacking dragon with too few heroes raises an error."""
-        with pytest.raises(error.DrollError):
+        with pytest.raises(DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -477,7 +477,7 @@ class TestDragon:
                 "cleric",
             )
 
-        with pytest.raises(error.DrollError):
+        with pytest.raises(DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -487,7 +487,7 @@ class TestDragon:
             )
 
         # Dragon Slayer requires only two
-        with pytest.raises(error.DrollError):
+        with pytest.raises(DrollError):
             player.apply(
                 heroes.DragonSlayer,
                 self.game,
@@ -498,7 +498,7 @@ class TestDragon:
 
     def test_only_heroes_accepted(self):
         """Only valid heroes can be used against dragons."""
-        with pytest.raises(error.DrollError):
+        with pytest.raises(DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -511,7 +511,7 @@ class TestDragon:
 
     def test_one_scroll(self):
         """A single scroll cannot be used as a hero substitute."""
-        with pytest.raises(error.DrollError):
+        with pytest.raises(DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -523,7 +523,7 @@ class TestDragon:
             )
 
         # Dragon Slayer requires only two
-        with pytest.raises(error.DrollError):
+        with pytest.raises(DrollError):
             player.apply(
                 heroes.DragonSlayer,
                 self.game,
@@ -535,7 +535,7 @@ class TestDragon:
 
     def test_not_enough_distinct(self):
         """Duplicate heroes cannot defeat a dragon."""
-        with pytest.raises(error.DrollError):
+        with pytest.raises(DrollError):
             player.apply(
                 player.Default,
                 self.game,

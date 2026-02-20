@@ -10,8 +10,8 @@ import sys
 import textwrap
 
 from . import display
-from .error import DrollError
 from .game import Game, GameState
+from .struct import DrollError
 
 __all__ = ("Shell",)
 

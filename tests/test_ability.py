@@ -5,7 +5,6 @@
 
 import pytest
 
-import droll.error
 import droll.struct
 from droll.ability import default_ability
 
@@ -16,12 +15,12 @@ _UNUSED = object()
 def test_consume_ability_when_unavailable():
     """Cannot consume ability that is already used."""
     w = droll.struct.World(ability=False)
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         default_ability(w, _UNUSED, "ability")
 
 
 def test_default_ability_rejects_target():
     """Default ability rejects any target."""
     w = droll.struct.World(ability=True)
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         default_ability(w, _UNUSED, "ability", "fighter")

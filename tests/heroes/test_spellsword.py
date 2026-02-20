@@ -5,7 +5,6 @@
 
 import pytest
 
-import droll.error
 import droll.struct
 from droll.ability import battlemage_ability, spellsword_ability
 from droll.heroes.spellsword import Battlemage, Spellsword
@@ -42,7 +41,7 @@ def testspellsword_ability_rejects_invalid_target():
         dungeon=droll.struct.Dungeon(),
         party=droll.struct.Party(fighter=1, mage=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         spellsword_ability(world, _UNUSED, "ability", "cleric")
 
 
@@ -75,7 +74,7 @@ def testbattlemage_ability_rejects_target():
         dungeon=droll.struct.Dungeon(goblin=1),
         party=droll.struct.Party(fighter=1, mage=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         battlemage_ability(world, _UNUSED, "ability", "goblin")
 
 

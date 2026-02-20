@@ -6,8 +6,8 @@
 from dataclasses import replace
 
 from .dungeon import defeated_monsters
-from .error import DrollError
 from .party import increment_party
+from .struct import DrollError
 from .regular import defeat_all, defeat_one
 from .struct import RandRange, World
 

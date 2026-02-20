@@ -7,7 +7,7 @@ from dataclasses import replace
 import random
 import pytest
 
-from droll import dice, dungeon, error, struct, treasure, world
+from droll import dice, dungeon, struct, treasure, world
 
 
 class TestWorld:
@@ -97,14 +97,14 @@ class TestWorld:
         assert pre.depth > 0
 
         # Neither town portal nor ring of invisibility
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.retire(pre)
 
         # Ring of invisibility
         pre = replace(
             pre, treasure=replace(pre.treasure, own=replace(pre.treasure.own, ring=1))
         )
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.retire(pre)
 
         # Town portal
@@ -129,7 +129,7 @@ class TestWorld:
         assert pre.depth > 0
 
         # Neither town portal nor ring of invisibility
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.retire(pre)
 
         # Ring of invisibility
@@ -196,7 +196,7 @@ class TestWorld:
         assert pre.depth > 0
 
         # Neither town portal nor ring of invisibility
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Ring of invisibility
@@ -206,7 +206,7 @@ class TestWorld:
                 pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)
             ),
         )
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Town portal
@@ -216,7 +216,7 @@ class TestWorld:
                 pre.treasure, own=replace(pre.treasure.own, ring=1, portal=0)
             ),
         )
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
     def test_descend_dragon(self):
@@ -233,7 +233,7 @@ class TestWorld:
         assert pre.depth > 0
 
         # Neither town portal nor ring of invisibility
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Ring of invisibility
@@ -255,7 +255,7 @@ class TestWorld:
                 pre.treasure, own=replace(pre.treasure.own, ring=0, portal=1)
             ),
         )
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.descend(pre, dice.roll_dungeon, self.state.randrange)
 
         # Both should consume the ring of invisibility
@@ -358,7 +358,7 @@ class TestWorld:
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
         game = replace(game, depth=1)
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.retreat(game)
 
     def test_retreat_without_descending(self):
@@ -367,7 +367,7 @@ class TestWorld:
         game = world.delve(game, dice.roll_party, self.state.randrange)
         assert game.depth == 0
 
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.retreat(game)
 
     def test_retreat_when_could_retire(self):
@@ -376,7 +376,7 @@ class TestWorld:
         game = world.delve(game, dice.roll_party, self.state.randrange)
         game = replace(game, depth=2, dungeon=struct.Dungeon())
 
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.retreat(game)
 
     def test_max_dungeon_depth(self):
@@ -385,7 +385,7 @@ class TestWorld:
         game = world.delve(game, dice.roll_party, self.state.randrange)
         game = replace(game, depth=10, dungeon=struct.Dungeon())
 
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.descend(game, dice.roll_dungeon, self.state.randrange)
 
     def test_dungeon_dice_count(self):
@@ -408,7 +408,7 @@ class TestWorld:
         game = world.delve(game, dice.roll_party, self.state.randrange)
         game = world.delve(game, dice.roll_party, self.state.randrange)
         assert game.delve == 3
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             world.delve(game, dice.roll_party, self.state.randrange)
 
     def test_score(self):

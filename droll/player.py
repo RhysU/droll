@@ -8,7 +8,7 @@ from typing import Optional
 from dataclasses import replace
 
 from . import ability, dice, regular, struct
-from .error import DrollError
+from .struct import DrollError
 from .treasure import replace_treasure
 
 __all__ = (

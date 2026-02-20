@@ -5,7 +5,6 @@
 
 import pytest
 
-import droll.error
 import droll.struct
 from droll.ability import minstrel_ability
 from droll.heroes.minstrel import Bard, Minstrel
@@ -34,7 +33,7 @@ def testminstrel_ability_rejects_non_dragon():
         dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
         party=droll.struct.Party(fighter=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         minstrel_ability(world, _UNUSED, "ability", "goblin")
 
 

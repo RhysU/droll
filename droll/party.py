@@ -5,8 +5,7 @@
 
 from dataclasses import replace
 
-from .error import DrollError
-from .struct import Party, Regroup
+from .struct import DrollError, Party, Regroup
 
 __all__ = (
     "decrement_party",

@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 from droll import struct
 from droll.display import DisplayMode
-from droll.error import DrollError
+from droll.struct import DrollError
 from droll.game import Game
 from droll.player import Default
 from droll.shell import Shell, _RESET

@@ -7,7 +7,7 @@ from dataclasses import fields, replace
 import random
 import pytest
 
-from droll import error, player, struct, world
+from droll import player, struct, world
 
 
 def _remove_monsters(world: struct.World) -> struct.World:
@@ -36,12 +36,12 @@ class TestPlayer:
         assert game.party.fighter == 0
         assert game.dungeon.ooze == 1
 
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             player.apply(player.Default, game, None, "fighter", "ooze")
 
     def test_cleric(self):
         """Test cleric hero attacking skeletons and opening chests."""
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             player.apply(player.Default, self.game, None, "cleric", "dragon")
 
         game = player.apply(player.Default, self.game, None, "cleric", "skeleton")
@@ -77,7 +77,7 @@ class TestPlayer:
         assert sum(struct.field_values(game.treasure.own)) == 2
 
         game = replace(game, party=replace(game.party, thief=1))  # Add one
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             player.apply(player.Default, game, None, "thief", "chest")
 
     def test_champion(self):
@@ -97,7 +97,7 @@ class TestPlayer:
 
     def test_scroll_quaff(self):
         """Test scroll used to drink potions and obtain duplicate heroes."""
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             player.apply(
                 player.Default,
                 self.game,
@@ -124,7 +124,7 @@ class TestPlayer:
 
     def test_apply_hero_without_target(self):
         """Applying a hero without a target raises DrollError."""
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             player.apply(player.Default, self.game, None, "fighter")
 
     def test_scroll_reroll(self):
