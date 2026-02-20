@@ -27,7 +27,7 @@ __all__ = (
 )
 
 
-class DrollError(RuntimeError):
+class DrollError(Exception):
     """Indicates attempts to take impossible actions."""
 
 
