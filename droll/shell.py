@@ -90,6 +90,8 @@ class Shell(cmd.Cmd):
 
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
+        # cmd.Cmd.cmdloop stops when postcmd returns truthy
+        stop = stop is GameState.STOP
         if self._display_mode == display.DisplayMode.CURRENT:
             self._postcmd_current(stop, line)
         else:
