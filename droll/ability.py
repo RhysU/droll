@@ -45,13 +45,12 @@ def _choose_and_add_hero(
     acceptable: frozenset[str],
 ) -> struct.World:
     """Default target to sorted-first acceptable; validate; add one hero to party."""
+    world = _consume_ability(world)
     if target is None:
         target = next(iter(sorted(acceptable)))
     if target not in acceptable:
         raise DrollError(f"Target {target} not one of {acceptable}.")
-    return _consume_ability(
-        replace(world, party=regular.increment_party(world.party, target))
-    )
+    return replace(world, party=regular.increment_party(world.party, target))
 
 
 def _convert_one(
@@ -61,12 +60,11 @@ def _convert_one(
     destination: str,
 ) -> struct.World:
     """Validate optional target is source type; convert 1 dungeon die to party."""
+    world = _consume_ability(world)
     if target and target != source:
         raise DrollError(f"Ability can only target 1 {source}.")
-    return _consume_ability(
-        special.convert_dungeon_to_party(
-            world, source=source, destination=destination, max_count=1
-        )
+    return special.convert_dungeon_to_party(
+        world, source=source, destination=destination, max_count=1
     )
 
 
@@ -78,16 +76,15 @@ def _convert_two(
     destination: str,
 ) -> struct.World:
     """Validate optional targets are source type; convert up to 2 dungeon dice to party."""
+    world = _consume_ability(world)
     if target and target != source:
         raise DrollError(f"Ability can only target {source}s.")
     if extra_targets and extra_targets[0] != source:
         raise DrollError(f"Ability can only target {source}s.")
     if len(extra_targets) > 1:
         raise DrollError("At most 2 targets can be changed.")
-    return _consume_ability(
-        special.convert_dungeon_to_party(
-            world, source=source, destination=destination, max_count=2
-        )
+    return special.convert_dungeon_to_party(
+        world, source=source, destination=destination, max_count=2
     )
 
 
@@ -98,9 +95,10 @@ def default_ability(
     target: Optional[str] = None,
 ) -> struct.World:
     """No special ability available (though its consumption is tracked)"""
+    world = _consume_ability(world)
     if target is not None:
         raise DrollError(f"No targets accepted for {noun}.")
-    return _consume_ability(world)
+    return world
 
 
 def battlemage_ability(
@@ -112,9 +110,10 @@ def battlemage_ability(
     _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
+    world = _consume_ability(world)
     if target is not None:
         raise DrollError(f"No targets accepted for {noun}.")
-    return _consume_ability(replace(world, dungeon=struct.Dungeon()))
+    return replace(world, dungeon=struct.Dungeon())
 
 
 def beguiler_ability(
@@ -127,6 +126,7 @@ def beguiler_ability(
     """Transform at most 2 monsters into 1 potion.
 
     Requires transforming 2 monsters when 2+ monsters available."""
+    world = _consume_ability(world)
     dungeon = world.dungeon
     dungeon = decrement_dungeon(dungeon, target)
     if len(extra_targets) > 1:
@@ -137,7 +137,7 @@ def beguiler_ability(
         assert len(extra_targets) == 0
         raise DrollError("2 targets required when 2+ available.")
     dungeon = increment_dungeon(dungeon, "potion")
-    return _consume_ability(replace(world, dungeon=dungeon))
+    return replace(world, dungeon=dungeon)
 
 
 def chieftain_ability(
@@ -159,12 +159,12 @@ def commander_ability(
     *additional,
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice."""
+    world = _consume_ability(world)
     if target is None:
         raise DrollError(f"At least 1 reroll target required for {noun}.")
     # Temporarily add a scroll to be consumed by reroll
     world = replace(world, party=regular.increment_party(world.party, "scroll"))
-    world = regular.reroll(world, randrange, "scroll", target, *additional, allow_dragon=True)
-    return _consume_ability(world)
+    return regular.reroll(world, randrange, "scroll", target, *additional, allow_dragon=True)
 
 
 def crusader_ability(
@@ -188,10 +188,11 @@ def enchantress_ability(
     target: Optional[str] = None,
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion."""
+    world = _consume_ability(world)
     dungeon = world.dungeon
     dungeon = decrement_dungeon(dungeon, target)
     dungeon = increment_dungeon(dungeon, "potion")
-    return _consume_ability(replace(world, dungeon=dungeon))
+    return replace(world, dungeon=dungeon)
 
 
 def halfgoblin_ability(
@@ -206,9 +207,8 @@ def halfgoblin_ability(
 
 def knight_ability(*args, **kwargs):
     """Convert all monster faces into dragon dice."""
-    return _consume_ability(
-        regular.bait_dragon(*args, require_treasure=False, **kwargs)
-    )
+    world = _consume_ability(args[0])
+    return regular.bait_dragon(world, *args[1:], require_treasure=False, **kwargs)
 
 
 def mercenary_ability(
@@ -219,14 +219,14 @@ def mercenary_ability(
     *additional,
 ) -> struct.World:
     """Defeat any 2 monsters."""
+    world = _consume_ability(world)
     if target is None:
         raise DrollError(f"At least 1 target required for {noun}.")
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
     world = replace(world, party=regular.increment_party(world.party, "champion"))
-    world = special.defeat_one_plus_additional(
+    return special.defeat_one_plus_additional(
         world, randrange, "champion", target, *additional
     )
-    return _consume_ability(world)
 
 
 def minstrel_ability(
@@ -236,12 +236,11 @@ def minstrel_ability(
     target: Optional[str] = None,
 ) -> struct.World:
     """Discard all dragon dice."""
+    world = _consume_ability(world)
     target = "dragon" if target is None else target
     if target != "dragon":
         raise DrollError(f"Can only discard dragon dice, not {target}.")
-    return _consume_ability(
-        replace(world, dungeon=eliminate_dungeon(world.dungeon, target))
-    )
+    return replace(world, dungeon=eliminate_dungeon(world.dungeon, target))
 
 
 def necromancer_ability(
@@ -276,6 +275,7 @@ def paladin_ability(
 
     Specify consumed treasure as first argument.
     For each potion, add one argument for the hero to review."""
+    world = _consume_ability(world)
     # Validate that a treasure was specified
     if target is None:
         raise DrollError(f"Treasure to consume required for {noun}.")
@@ -304,7 +304,7 @@ def paladin_ability(
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
     world = replace(world, dungeon=struct.Dungeon())
 
-    return _consume_ability(world)
+    return world
 
 
 def spellsword_ability(
