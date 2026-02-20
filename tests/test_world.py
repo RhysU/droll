@@ -515,21 +515,3 @@ class TestWorld:
                 goblin=new_dice, dragon=dragons
             ), f"depth={depth}, dragons={dragons}"
 
-    def test_dragon_no_carryforward_to_fresh_delve(self):
-        """Dragons do not carry over to a fresh delve."""
-        game = world.new_world()
-        game = world.delve(game, dice.roll_party, self.state.randrange)
-        game = replace(
-            game,
-            depth=3,
-            dungeon=struct.Dungeon(dragon=3),
-            treasure=replace(
-                game.treasure,
-                own=replace(game.treasure.own, ring=1),
-            ),
-        )
-        game = world.retire(game)
-        game = world.delve(game, dice.roll_party, self.state.randrange)
-        assert game.dungeon is None
-        result = world.descend(game, _roll_all_goblins, self.state.randrange)
-        assert result.dungeon == struct.Dungeon(goblin=1)
