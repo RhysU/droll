@@ -38,6 +38,59 @@ def _consume_ability(world: struct.World) -> struct.World:
     return replace(world, ability=False)
 
 
+def _choose_and_add_hero(
+    world: struct.World,
+    noun: str,
+    target: Optional[str],
+    acceptable: frozenset[str],
+) -> struct.World:
+    """Default target to sorted-first acceptable; validate; add one hero to party."""
+    if target is None:
+        target = next(iter(sorted(acceptable)))
+    if target not in acceptable:
+        raise DrollError(f"Target {target} not one of {acceptable}.")
+    return _consume_ability(
+        replace(world, party=regular.increment_party(world.party, target))
+    )
+
+
+def _convert_one(
+    world: struct.World,
+    target: Optional[str],
+    source: str,
+    destination: str,
+) -> struct.World:
+    """Validate optional target is source type; convert 1 dungeon die to party."""
+    if target and target != source:
+        raise DrollError(f"Ability can only target 1 {source}.")
+    return _consume_ability(
+        special.convert_dungeon_to_party(
+            world, source=source, destination=destination, max_count=1
+        )
+    )
+
+
+def _convert_two(
+    world: struct.World,
+    target: Optional[str],
+    extra_targets: tuple[str, ...],
+    source: str,
+    destination: str,
+) -> struct.World:
+    """Validate optional targets are source type; convert up to 2 dungeon dice to party."""
+    if target and target != source:
+        raise DrollError(f"Ability can only target {source}s.")
+    if extra_targets and extra_targets[0] != source:
+        raise DrollError(f"Ability can only target {source}s.")
+    if len(extra_targets) > 1:
+        raise DrollError("At most 2 targets can be changed.")
+    return _consume_ability(
+        special.convert_dungeon_to_party(
+            world, source=source, destination=destination, max_count=2
+        )
+    )
+
+
 def default_ability(
     world: struct.World,
     randrange: dice.RandRange,
@@ -95,16 +148,7 @@ def chieftain_ability(
     *extra_targets: str,
 ) -> struct.World:
     """Transform 2 goblins into thieves, discarding them at next regroup."""
-    if target and target != "goblin":
-        raise DrollError("Ability can only target goblins.")
-    if extra_targets and extra_targets[0] != "goblin":
-        raise DrollError("Ability can only target goblins.")
-    if len(extra_targets) > 1:
-        raise DrollError("At most 2 targets can be changed.")
-    world = special.convert_dungeon_to_party(
-        world, source="goblin", destination="thief", max_count=2
-    )
-    return _consume_ability(world)
+    return _convert_two(world, target, extra_targets, source="goblin", destination="thief")
 
 
 def commander_ability(
@@ -134,13 +178,7 @@ def crusader_ability(
     """Crusader usable as a fighter or a cleric, adding one hero.
 
     Optionally, specify 'fighter' or 'cleric' to select which to choose."""
-    if target is None:
-        target = next(iter(sorted(_acceptable_targets)))
-    if target not in _acceptable_targets:
-        raise DrollError(f"Target {target} not one of {_acceptable_targets}.")
-    return _consume_ability(
-        replace(world, party=regular.increment_party(world.party, target))
-    )
+    return _choose_and_add_hero(world, noun, target, _acceptable_targets)
 
 
 def enchantress_ability(
@@ -163,12 +201,7 @@ def halfgoblin_ability(
     target: Optional[str] = None,
 ) -> struct.World:
     """Transform 1 goblin into 1 thief, discarding it at next regroup."""
-    if target and target != "goblin":
-        raise DrollError("Ability can only target 1 goblin.")
-    world = special.convert_dungeon_to_party(
-        world, source="goblin", destination="thief", max_count=1
-    )
-    return _consume_ability(world)
+    return _convert_one(world, target, source="goblin", destination="thief")
 
 
 def knight_ability(*args, **kwargs):
@@ -219,16 +252,7 @@ def necromancer_ability(
     *extra_targets: str,
 ) -> struct.World:
     """Transform 2 skeletons into fighters, discarding them at next regroup."""
-    if target and target != "skeleton":
-        raise DrollError("Ability can only target skeletons.")
-    if extra_targets and extra_targets[0] != "skeleton":
-        raise DrollError("Ability can only target skeletons.")
-    if len(extra_targets) > 1:
-        raise DrollError("At most 2 targets can be changed.")
-    world = special.convert_dungeon_to_party(
-        world, source="skeleton", destination="fighter", max_count=2
-    )
-    return _consume_ability(world)
+    return _convert_two(world, target, extra_targets, source="skeleton", destination="fighter")
 
 
 def occultist_ability(
@@ -238,12 +262,7 @@ def occultist_ability(
     target: Optional[str] = None,
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it at next regroup."""
-    if target and target != "skeleton":
-        raise DrollError("Ability can only target 1 skeleton.")
-    world = special.convert_dungeon_to_party(
-        world, source="skeleton", destination="fighter", max_count=1
-    )
-    return _consume_ability(world)
+    return _convert_one(world, target, source="skeleton", destination="fighter")
 
 
 def paladin_ability(
@@ -299,10 +318,4 @@ def spellsword_ability(
     """Spellsword usable as a fighter or a mage, adding one hero to party.
 
     Optionally, specify 'fighter' or 'mage' to select which to choose."""
-    if target is None:
-        target = next(iter(sorted(_acceptable_targets)))
-    if target not in _acceptable_targets:
-        raise DrollError(f"Target {target} not one of {_acceptable_targets}.")
-    return _consume_ability(
-        replace(world, party=regular.increment_party(world.party, target))
-    )
+    return _choose_and_add_hero(world, noun, target, _acceptable_targets)
