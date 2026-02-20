@@ -7,7 +7,7 @@ from dataclasses import replace
 import functools
 from typing import Optional
 
-from .. import regular
+from ..regular import consume_ability, defeat_dragon, defeat_dragon_heroes
 from .. import dice
 from ..dungeon import eliminate_dungeon
 from ..error import DrollError
@@ -31,16 +31,16 @@ def _minstrel_ability(
     target = "dragon" if target is None else target
     if target != "dragon":
         raise DrollError(f"Can only discard dragon dice, not {target}.")
-    return regular.consume_ability(
+    return consume_ability(
         replace(world, dungeon=eliminate_dungeon(world.dungeon, target))
     )
 
 
 # Mage/thief are interchangeable for dragon defeats
 _minstrel_defeat_dragon = functools.partial(
-    regular.defeat_dragon,
+    defeat_dragon,
     defeat_dragon_heroes=functools.partial(
-        regular.defeat_dragon_heroes,
+        defeat_dragon_heroes,
         interchangeable=frozenset({"mage", "thief"}),
     ),
 )

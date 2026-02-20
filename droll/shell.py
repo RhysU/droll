@@ -8,7 +8,7 @@ import functools
 import sys
 import textwrap
 
-from . import regular
+from .regular import bait_dragon, elixir
 from . import display
 from .display import DisplayMode
 from .error import DrollError
@@ -249,7 +249,7 @@ class Shell(cmd.Cmd):
 
     def help_bait(self):
         """Display help for using bait against dragons."""
-        print(regular.bait_dragon.__doc__)
+        print(bait_dragon.__doc__)
 
     def help_champion(self):
         """Display help for using the champion hero."""
@@ -263,7 +263,7 @@ class Shell(cmd.Cmd):
 
     def help_elixir(self):
         """Display help for using elixir treasures."""
-        print(regular.elixir.__doc__)
+        print(elixir.__doc__)
 
     def help_fighter(self):
         """Display help for using the fighter hero."""
