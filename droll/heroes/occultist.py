@@ -16,9 +16,6 @@ __all__ = (
     "Occultist",
 )
 
-_necromancer_ability = necromancer_ability
-_occultist_ability = occultist_ability
-
 # Cleric/mage are interchangeable for dragon defeats
 _occultist_defeat_dragon = partial(
     defeat_dragon,
@@ -32,7 +29,7 @@ _occultist_defeat_dragon = partial(
 Necromancer = replace(
     Default,
     name="Necromancer",
-    ability=_necromancer_ability,
+    ability=necromancer_ability,
     advance=(lambda _: Necromancer),
     party=replace(
         Default.party,
@@ -69,7 +66,7 @@ Necromancer = replace(
 Occultist = replace(
     Default,
     name="Occultist",
-    ability=_occultist_ability,
+    ability=occultist_ability,
     advance=(lambda world: Occultist if world.experience < 5 else Necromancer),
     party=Necromancer.party,
 )

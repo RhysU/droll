@@ -15,9 +15,6 @@ __all__ = (
     "Spellsword",
 )
 
-_battlemage_ability = battlemage_ability
-_spellsword_ability = spellsword_ability
-
 # Fighter/mage are interchangeable for dragon defeats
 _spellsword_defeat_dragon = partial(
     regular.defeat_dragon,
@@ -32,7 +29,7 @@ _spellsword_defeat_dragon = partial(
 Battlemage = replace(
     Default,
     name="Battlemage",
-    ability=_battlemage_ability,
+    ability=battlemage_ability,
     advance=(lambda _: Battlemage),
     party=replace(
         Default.party,
@@ -69,7 +66,7 @@ Battlemage = replace(
 Spellsword = replace(
     Default,
     name="Spellsword",
-    ability=_spellsword_ability,
+    ability=spellsword_ability,
     advance=(lambda world: Spellsword if world.experience < 5 else Battlemage),
     party=Battlemage.party,
 )

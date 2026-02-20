@@ -15,9 +15,6 @@ __all__ = (
     "Paladin",
 )
 
-_crusader_ability = crusader_ability
-_paladin_ability = paladin_ability
-
 # Fighter/cleric are interchangeable for dragon defeats
 _crusader_defeat_dragon = partial(
     regular.defeat_dragon,
@@ -31,7 +28,7 @@ _crusader_defeat_dragon = partial(
 Paladin = replace(
     Default,
     name="Paladin",
-    ability=_paladin_ability,
+    ability=paladin_ability,
     advance=(lambda _: Paladin),
     party=struct.Party(
         fighter=replace(
@@ -67,7 +64,7 @@ Paladin = replace(
 Crusader = replace(
     Paladin,
     name="Crusader",
-    ability=_crusader_ability,
+    ability=crusader_ability,
     advance=(lambda world: Crusader if world.experience < 5 else Paladin),
     party=Paladin.party,
 )

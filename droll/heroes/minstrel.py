@@ -16,8 +16,6 @@ __all__ = (
     "Minstrel",
 )
 
-_minstrel_ability = minstrel_ability
-
 # Mage/thief are interchangeable for dragon defeats
 _minstrel_defeat_dragon = partial(
     defeat_dragon,
@@ -61,7 +59,7 @@ _Minstrel_Party = struct.Party(
 Bard = replace(
     Default,
     name="Bard",
-    ability=_minstrel_ability,
+    ability=minstrel_ability,
     advance=(lambda _: Bard),  # Cannot advance further
     party=replace(
         _Minstrel_Party,
@@ -79,7 +77,7 @@ Bard = replace(
 Minstrel = replace(
     Default,
     name="Minstrel",
-    ability=_minstrel_ability,
+    ability=minstrel_ability,
     advance=(lambda world: Minstrel if world.experience < 5 else Bard),
     party=_Minstrel_Party,
 )

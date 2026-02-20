@@ -7,26 +7,27 @@ import pytest
 
 import droll.error
 import droll.struct
-from droll.heroes.minstrel import Minstrel, Bard, _minstrel_ability
+from droll.ability import minstrel_ability
+from droll.heroes.minstrel import Bard, Minstrel
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
 
 
-def test_minstrel_ability_discards_dragons():
+def testminstrel_ability_discards_dragons():
     """Minstrel/Bard ability discards all dragon dice."""
     world = droll.struct.World(
         ability=True,
         dungeon=droll.struct.Dungeon(goblin=1, dragon=3),
         party=droll.struct.Party(fighter=1),
     )
-    result = _minstrel_ability(world, _UNUSED, "ability")
+    result = minstrel_ability(world, _UNUSED, "ability")
     assert result.dungeon.dragon == 0
     assert result.dungeon.goblin == 1
     assert not result.ability
 
 
-def test_minstrel_ability_rejects_non_dragon():
+def testminstrel_ability_rejects_non_dragon():
     """Minstrel/Bard ability only works on dragons."""
     world = droll.struct.World(
         ability=True,
@@ -34,7 +35,7 @@ def test_minstrel_ability_rejects_non_dragon():
         party=droll.struct.Party(fighter=1),
     )
     with pytest.raises(droll.error.DrollError):
-        _minstrel_ability(world, _UNUSED, "ability", "goblin")
+        minstrel_ability(world, _UNUSED, "ability", "goblin")
 
 
 def test_bard_champion_defeats_all_plus_additional():

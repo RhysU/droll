@@ -14,10 +14,6 @@ __all__ = (
     "Mercenary",
 )
 
-_commander_ability = commander_ability
-_mercenary_ability = mercenary_ability
-
-
 def _mercenary_roll_party(
     count: int, randrange: dice.RandRange
 ) -> tuple[struct.Party, struct.Regroup]:
@@ -33,7 +29,7 @@ def _mercenary_roll_party(
 Commander = replace(
     Default,
     name="Commander",
-    ability=_commander_ability,
+    ability=commander_ability,
     advance=(lambda _: Commander),
     roll=replace(Default.roll, party=_mercenary_roll_party),
     party=replace(
@@ -51,7 +47,7 @@ Commander = replace(
 Mercenary = replace(
     Default,
     name="Mercenary",
-    ability=_mercenary_ability,
+    ability=mercenary_ability,
     advance=(lambda world: Mercenary if world.experience < 5 else Commander),
     roll=replace(Default.roll, party=_mercenary_roll_party),
 )

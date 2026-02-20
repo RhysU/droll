@@ -15,9 +15,6 @@ __all__ = (
     "HalfGoblin",
 )
 
-_chieftain_ability = chieftain_ability
-_halfgoblin_ability = halfgoblin_ability
-
 # You may open chests and quaff potions at any time during the monster phase
 _halfgoblin_open_one = partial(
     regular.open_one,
@@ -36,7 +33,7 @@ _halfgoblin_quaff = partial(
 Chieftain = replace(
     Default,
     name="Chieftain",
-    ability=_chieftain_ability,
+    ability=chieftain_ability,
     advance=(lambda _: Chieftain),
     party=replace(
         Default.party,
@@ -76,7 +73,7 @@ Chieftain = replace(
 HalfGoblin = replace(
     Default,
     name="HalfGoblin",
-    ability=_halfgoblin_ability,
+    ability=halfgoblin_ability,
     advance=(lambda world: HalfGoblin if world.experience < 5 else Chieftain),
     party=Chieftain.party,
 )

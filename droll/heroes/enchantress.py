@@ -15,9 +15,6 @@ __all__ = (
     "Enchantress",
 )
 
-_beguiler_ability = beguiler_ability
-_enchantress_ability = enchantress_ability
-
 # Scrolls act as wildcards for dragon defeats
 _beguiler_defeat_dragon = partial(
     regular.defeat_dragon,
@@ -32,7 +29,7 @@ _beguiler_defeat_dragon = partial(
 Beguiler = replace(
     Default,
     name="Beguiler",
-    ability=_beguiler_ability,
+    ability=beguiler_ability,
     advance=(lambda _: Beguiler),
     party=replace(
         Default.party,
@@ -52,7 +49,7 @@ Beguiler = replace(
 Enchantress = replace(
     Default,
     name="Enchantress",
-    ability=_enchantress_ability,
+    ability=enchantress_ability,
     advance=(lambda world: Enchantress if world.experience < 5 else Beguiler),
     party=Beguiler.party,
 )
