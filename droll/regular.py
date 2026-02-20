@@ -5,7 +5,8 @@
 
 from dataclasses import replace
 from operator import add
-from typing import Optional, Sequence, Set
+from collections.abc import Sequence, Set
+from typing import Optional
 
 from .dice import RandRange, roll_dungeon, roll_party
 from .dungeon import (
@@ -351,8 +352,10 @@ def bait_dragon(
     )
 
 
-def elixir(world: World, randrange: RandRange, noun: str, target: str) -> World:
+def elixir(world: World, randrange: RandRange, noun: str, target: Optional[str] = None) -> World:
     """Add one hero die of any requested type."""
+    if target is None:
+        raise DrollError(f"Hero required for {noun}.")
     return replace(
         world,
         treasure=replace_treasure(world.treasure, noun),

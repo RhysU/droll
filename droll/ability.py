@@ -205,10 +205,15 @@ def halfgoblin_ability(
     return _convert_one(world, target, source="goblin", destination="thief")
 
 
-def knight_ability(*args, **kwargs):
+def knight_ability(
+    world: struct.World,
+    randrange: dice.RandRange,
+    noun: str,
+    target: Optional[str] = None,
+) -> struct.World:
     """Convert all monster faces into dragon dice."""
-    world = _consume_ability(args[0])
-    return regular.bait_dragon(world, *args[1:], require_treasure=False, **kwargs)
+    world = _consume_ability(world)
+    return regular.bait_dragon(world, randrange, noun, target, require_treasure=False)
 
 
 def mercenary_ability(

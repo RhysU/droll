@@ -337,7 +337,7 @@ def _parse(line: str) -> tuple[str, ...]:
     return tuple(line.split())
 
 
-def _no_arguments(line):
+def _no_arguments(line: str) -> None:
     """Raise DrollError if line is non-empty."""
     if line:
         raise DrollError("Command accepts no arguments.")
