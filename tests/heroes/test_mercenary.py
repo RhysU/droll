@@ -6,7 +6,6 @@
 import random
 import pytest
 
-import droll.error
 import droll.struct
 from droll.ability import commander_ability, mercenary_ability
 from droll.heroes.mercenary import Commander, Mercenary, _mercenary_roll_party
@@ -56,7 +55,7 @@ def testmercenary_ability_requires_target():
         dungeon=droll.struct.Dungeon(goblin=1),
         party=droll.struct.Party(fighter=2),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         mercenary_ability(world, _UNUSED, "ability")
 
 
@@ -94,7 +93,7 @@ def testcommander_ability_requires_target():
         dungeon=droll.struct.Dungeon(goblin=1),
         party=droll.struct.Party(fighter=2),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         commander_ability(world, _UNUSED, "ability")
 
 

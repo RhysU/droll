@@ -7,7 +7,7 @@ from dataclasses import fields, replace
 import random
 import pytest
 
-from droll import error, player, struct, world
+from droll import player, struct, world
 
 
 class TestTreasure:
@@ -33,7 +33,7 @@ class TestTreasure:
         assert game.party.cleric == 1
         assert game.treasure.own.elixir == 0
 
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             player.apply(player.Default, game, self.randrange, "elixir", "mage")
 
     def test_bait(self):
@@ -51,7 +51,7 @@ class TestTreasure:
         assert game.dungeon.ooze == 0
         assert game.dungeon.dragon == 8
 
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             player.apply(player.Default, game, self.randrange, "bait")
 
     def _helper_artifact(self, artifact, hero, specialty, other):
@@ -72,7 +72,7 @@ class TestTreasure:
         assert getattr(game.party, hero) == 0
         assert getattr(game.dungeon, other) == 1
 
-        with pytest.raises(error.DrollError):
+        with pytest.raises(struct.DrollError):
             player.apply(player.Default, game, None, artifact, other)
 
     def test_sword_via_fighter(self):

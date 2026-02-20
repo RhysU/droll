@@ -6,7 +6,6 @@
 import random
 import pytest
 
-import droll.error
 import droll.struct
 from droll.ability import crusader_ability, paladin_ability
 from droll.heroes.crusader import Crusader, Paladin
@@ -42,7 +41,7 @@ def testcrusader_ability_rejects_invalid_target():
         ability=True,
         party=droll.struct.Party(fighter=1, cleric=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         crusader_ability(world, _UNUSED, "ability", "mage")
 
 
@@ -120,7 +119,7 @@ def testpaladin_ability_wrong_revivable_count():
         party=droll.struct.Party(fighter=1),
         treasure=droll.struct.Treasure(own=droll.struct.Artifacts(elixir=1)),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         paladin_ability(world, _UNUSED, "ability", "elixir", "mage")
 
 
@@ -131,5 +130,5 @@ def testpaladin_ability_requires_treasure():
         party=droll.struct.Party(fighter=1),
         treasure=droll.struct.Treasure(own=droll.struct.Artifacts(elixir=1)),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         paladin_ability(world, _UNUSED, "ability")

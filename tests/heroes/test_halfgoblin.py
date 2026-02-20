@@ -6,7 +6,6 @@
 import random
 import pytest
 
-import droll.error
 import droll.struct
 from droll.ability import chieftain_ability, halfgoblin_ability
 from droll.heroes.halfgoblin import Chieftain, HalfGoblin
@@ -69,7 +68,7 @@ def test_halfgoblin_rejects_non_goblin():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         halfgoblin_ability(world, _UNUSED, "ability", "skeleton")
 
 
@@ -80,11 +79,11 @@ def test_chieftain_rejects_non_goblin_targets():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         chieftain_ability(world, _UNUSED, "ability", "skeleton")
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         chieftain_ability(world, _UNUSED, "ability", "goblin", "skeleton")
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin", "goblin")
 
 

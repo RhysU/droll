@@ -5,7 +5,6 @@
 
 import pytest
 
-import droll.error
 import droll.struct
 from droll.ability import necromancer_ability, occultist_ability
 from droll.heroes.occultist import Necromancer, Occultist
@@ -35,7 +34,7 @@ def test_occultist_rejects_non_skeleton_target():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=1),
         party=droll.struct.Party(cleric=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         occultist_ability(world, _UNUSED, "ability", "goblin")
 
 
@@ -101,7 +100,7 @@ def test_necromancer_rejects_non_skeleton_target():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
         party=droll.struct.Party(cleric=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         necromancer_ability(world, _UNUSED, "ability", "goblin")
 
 
@@ -112,7 +111,7 @@ def test_necromancer_rejects_non_skeleton_extra_target():
         dungeon=droll.struct.Dungeon(goblin=1, skeleton=2),
         party=droll.struct.Party(cleric=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         necromancer_ability(world, _UNUSED, "ability", "skeleton", "goblin")
 
 
@@ -123,7 +122,7 @@ def test_necromancer_rejects_too_many_targets():
         dungeon=droll.struct.Dungeon(skeleton=3),
         party=droll.struct.Party(cleric=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         necromancer_ability(
             world, _UNUSED, "ability", "skeleton", "skeleton", "skeleton"
         )

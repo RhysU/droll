@@ -9,6 +9,7 @@ from typing import Any, Iterator, Optional
 
 __all__ = (
     "Artifacts",
+    "DrollError",
     "Dungeon",
     "Party",
     "Player",
@@ -24,6 +25,10 @@ __all__ = (
     "field_names",
     "field_values",
 )
+
+
+class DrollError(RuntimeError):
+    """Indicates attempts to take impossible actions."""
 
 
 def field_names(cls_or_instance: Any) -> Iterator[str]:

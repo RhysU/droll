@@ -5,7 +5,6 @@
 
 import pytest
 
-import droll.error
 import droll.struct
 from droll.ability import beguiler_ability, enchantress_ability
 from droll.heroes.enchantress import Beguiler, Enchantress
@@ -47,7 +46,7 @@ def test_beguiler_requires_two_when_available():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         beguiler_ability(world, _UNUSED, "ability", "goblin")
 
 
@@ -58,7 +57,7 @@ def test_beguiler_rejects_too_many_targets():
         dungeon=droll.struct.Dungeon(goblin=2, skeleton=1),
         party=droll.struct.Party(fighter=1),
     )
-    with pytest.raises(droll.error.DrollError):
+    with pytest.raises(droll.struct.DrollError):
         beguiler_ability(world, _UNUSED, "ability", "goblin", "skeleton", "goblin")
 
 

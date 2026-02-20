@@ -13,8 +13,8 @@ from .dungeon import (
     eliminate_dungeon,
     increment_dungeon,
 )
-from .error import DrollError
 from .party import increment_party
+from .struct import DrollError
 from .treasure import draw_treasure, replace_treasure
 
 

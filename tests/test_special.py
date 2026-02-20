@@ -6,7 +6,7 @@
 import pytest
 
 from droll import special, struct
-from droll.error import DrollError
+from droll.struct import DrollError
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()

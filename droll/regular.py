@@ -14,9 +14,8 @@ from .dungeon import (
     decrement_dungeon,
     eliminate_dungeon,
 )
-from .error import DrollError
 from .party import decrement_party, decrement_regroup, increment_party
-from .struct import Dungeon, Party, RandRange, World, field_names, field_values
+from .struct import DrollError, Dungeon, Party, RandRange, World, field_names, field_values
 from .treasure import draw_treasure, replace_treasure
 
 __all__ = (

@@ -7,7 +7,7 @@ from dataclasses import replace
 
 from . import struct
 from .dungeon import blocking_dragon, defeated_dungeon, defeated_monsters
-from .error import DrollError
+from .struct import DrollError
 from .treasure import replace_treasure
 
 __all__ = (
