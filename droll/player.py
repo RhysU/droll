@@ -3,7 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with player action mechanics."""
 
-from typing import Dict, Optional, Sequence
+from collections.abc import Sequence
+from typing import Optional
 from dataclasses import replace
 
 from . import ability, dice, regular, struct
@@ -175,7 +176,7 @@ def apply(
     return world
 
 
-def _artifact_to_hero(artifacts: struct.Party) -> Dict[str, str]:
+def _artifact_to_hero(artifacts: struct.Party) -> dict[str, str]:
     """Build a reverse mapping from artifact name to hero name."""
     return {
         artifact: hero
@@ -184,7 +185,7 @@ def _artifact_to_hero(artifacts: struct.Party) -> Dict[str, str]:
     }
 
 
-def _partify(token: str, reverse: Dict[str, str]):
+def _partify(token: str, reverse: dict[str, str]) -> Optional[str]:
     """Possibly convert tokens from treasures into associated party members."""
     if token is None:
         return None
