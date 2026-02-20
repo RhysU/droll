@@ -116,13 +116,7 @@ class World:
     treasure: Treasure = Treasure()
 
 
-# Strictly speaking, "box" is genuine world state and tricky to deduce.
-# Only for historical reasons is it omitted below.
-def brief(
-    o: Any,
-    *,
-    omitted: Set[str] = frozenset({"box"}),
-) -> str:
+def brief(o: Any) -> str:
     """A __str__(...) variant suppressing False fields within dataclasses."""
     try:
         names = field_names(o)
@@ -132,6 +126,6 @@ def brief(
 
     keyvalues = []
     for field, value in zip(names, values):
-        if value and field not in omitted:
+        if value:
             keyvalues.append(f"{field}={brief(value)}")
     return f"({', '.join(keyvalues)})"
