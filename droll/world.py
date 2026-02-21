@@ -27,8 +27,8 @@ def new_world() -> struct.World:
         depth=0,
         experience=0,
         dungeon=None,
-        party=None,
-        ability=None,
+        party=struct.Party(),
+        ability=False,
         regroup=struct.Regroup(),
         treasure=struct.Treasure(
             own=struct.Artifacts(),
@@ -141,10 +141,10 @@ def _escape_dragon(world: struct.World) -> struct.World:
 
 
 def retire(world: struct.World) -> struct.World:
-    """Retire to the tavern after completing the present dungeon.
+    """Retire from the dungeon after clearing all monsters.
 
-    If monsters or a dragon remains, either ring of invisibility or
-    a town portal will be used when available."""
+    Earns experience equal to the current depth.
+    If a dragon blocks, a ring or portal is consumed automatically."""
     if world.depth == 0:
         raise DrollError("Descend at least once prior to retiring.")
 
@@ -166,11 +166,11 @@ def retire(world: struct.World) -> struct.World:
 
 
 def retreat(world: struct.World) -> struct.World:
-    """Retreat to the tavern without completing the present dungeon."""
+    """Retreat from the dungeon while monsters remain."""
     if world.depth < 1:
         raise DrollError("Descend at least once prior to retreating.")
     if defeated_dungeon(world.dungeon):
-        raise DrollError("Dungeon is clear; retire instead of retreating.")
+        raise DrollError("No monsters to retreat from; use 'retire' to leave the dungeon.")
 
     # Regroup just prior to retreating
     world = _regroup(world)

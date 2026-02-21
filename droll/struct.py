@@ -117,8 +117,8 @@ class World:
     depth: int = 0
     experience: int = 0
     dungeon: Optional[Dungeon] = None
-    party: Optional[Party] = None
-    ability: Optional[bool] = None
+    party: Party = Party()
+    ability: bool = False
     regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
 

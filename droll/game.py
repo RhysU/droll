@@ -148,15 +148,15 @@ class Game:
         return GameState.PLAY
 
     def retire(self) -> GameState:
-        """Retire to the tavern after successfully clearing a dungeon depth.
+        """Retire from the dungeon after clearing all monsters.
 
-        Automatically uses a 'ring' or 'portal' treasure if so required.
+        Earns experience equal to the current depth.
         Automatically starts a new delve or ends game, as suitable."""
         self._world = world.retire(self._world)
         return self._next_delve()
 
     def retreat(self) -> GameState:
-        """Retreat from the dungeon at any time (e.g. after being defeated).
+        """Retreat from the dungeon while monsters remain.
 
         Automatically starts a new delve or ends game, as suitable."""
         self._world = world.retreat(self._world)

@@ -323,7 +323,7 @@ def bait_dragon(
     _enemies: Sequence[str] = ("goblin", "skeleton", "ooze"),
     require_treasure: bool = True,
 ) -> World:
-    """Convert all monster faces into dragon dice."""
+    """Consume dragon bait to convert all monsters into dragon dice."""
     # Confirm well-formed request optionally containing a target
     if any(t != "dragon" for t in targets):
         raise DrollError(f"Can only {command} dragon dice.")
@@ -354,7 +354,7 @@ def bait_dragon(
 def elixir(
     world: World, randrange: RandRange, command: str, targets: tuple[str, ...] = ()
 ) -> World:
-    """Add one hero die of any requested type."""
+    """Consume an elixir to add one hero die of any type."""
     if not targets:
         raise DrollError(f"Hero required for {command}.")
     return replace(

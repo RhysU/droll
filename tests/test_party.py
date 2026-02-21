@@ -23,23 +23,11 @@ def test_decrement_party_zero_target():
         decrement_party(party, "fighter")
 
 
-def test_decrement_party_none():
-    """Cannot decrement when no party is active."""
-    with pytest.raises(DrollError):
-        decrement_party(None, "fighter")
-
-
 def test_increment_party():
     """Incrementing a hero count yields one more."""
     party = Party(fighter=1)
     result = increment_party(party, "fighter")
     assert result.fighter == 2
-
-
-def test_increment_party_none():
-    """Cannot increment when no party is active."""
-    with pytest.raises(DrollError):
-        increment_party(None, "fighter")
 
 
 def test_decrement_regroup_positive():

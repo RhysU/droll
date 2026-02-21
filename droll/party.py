@@ -4,7 +4,6 @@
 """Functionality associated with party state and party mechanics."""
 
 from dataclasses import replace
-from typing import Optional
 
 from .struct import DrollError, Party, Regroup
 
@@ -15,10 +14,8 @@ __all__ = (
 )
 
 
-def decrement_party(party: Optional[Party], hero: str) -> Party:
+def decrement_party(party: Party, hero: str) -> Party:
     """Decrease the count of the specified hero type by one."""
-    if party is None:
-        raise DrollError("No party currently active.")
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
         raise DrollError(f"At least 1 {hero} required in party.")
@@ -33,8 +30,6 @@ def decrement_regroup(regroup: Regroup, hero: str) -> Regroup:
     )
 
 
-def increment_party(party: Optional[Party], hero: str) -> Party:
+def increment_party(party: Party, hero: str) -> Party:
     """Increase the count of the specified hero type by one."""
-    if party is None:
-        raise DrollError("No party currently active.")
     return replace(party, **{hero: getattr(party, hero) + 1})

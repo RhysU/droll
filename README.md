@@ -5,9 +5,9 @@ Droll
 ## What is it?
 
 Droll implements [Dungeon Roll](https://boardgamegeek.com/boardgame/138788/dungeon-roll),
-a product of [Tasty Minstrel Games](http://playtmg.com/).  Droll is
-in no way affiliated with either the game or the publisher.  Go buy their
-excellent game, learn [how to play](https://www.youtube.com/watch?v=PzZ8hUzXBtE)
+a product of [Tasty Minstrel Games](https://boardgamegeek.com/boardgamepublisher/9499/tasty-minstrel-games).
+Droll is in no way affiliated with either the game or the publisher.  Go buy
+their excellent game, learn [how to play](https://www.youtube.com/watch?v=PzZ8hUzXBtE)
 it, and then come back here.
 
 ## What is implemented?
@@ -33,8 +33,8 @@ said, I've done such things in neither 2018 nor 2026.
 
 ```
 $ droll --help
-usage: droll [-h] [--seed N]
-             {Default,Crusader,Enchantress,Knight,Mercenary,Minstrel,Occultist,Spellsword}
+usage: droll [-h] [--seed N] [--mechanical]
+             {Default,Crusader,Enchantress,HalfGoblin,Knight,Mercenary,Minstrel,Occultist,Spellsword}
 
 Command-line version of droll.
 
@@ -45,6 +45,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --seed N              An integer to seed random number generation.
+  --mechanical          Use mechanical display format.
 
 
 $ droll --seed 7 Knight
@@ -58,6 +59,10 @@ Party:     fighter×2 cleric mage thief champion×2
 Feasible commands (help <command>):
 ===================================
 ability  descend
+
+Miscellaneous help topics:
+==========================
+score  treasure
 
 
 Score 0:   delve 1 with experience 0
@@ -189,7 +194,7 @@ Available: descend retire
 Party:     cleric champion
 Dungeon:   dragon×2
 14 Knight> help retreat
-Retreat from the dungeon at any time (e.g. after being defeated).
+Retreat from the dungeon while monsters remain.
 
         Automatically starts a new delve or ends game, as suitable.
 
@@ -261,8 +266,9 @@ as follows:
 3. Use party members to defeat monsters, open chests, and quaff
    potions.  Monsters must be cleared before opening chests, quaffing
    potions, or descending further.
-4. Retire (earn experience equal to your depth) or retreat
-   (earn nothing) to end the delve.
+4. After defeating any monsters, "retire" from the delve to earn
+   experience equal to your depth.  If monsters remain and you cannot
+   defeat them, instead "retreat" but earn nothing.
 
 Combat: each party member can target any monster, but specialists
 defeat all of their favored type while non-specialists defeat one:
@@ -274,17 +280,58 @@ defeat all of their favored type while non-specialists defeat one:
 | mage     | ooze        | goblin, skeleton       | opens one chest  |
 | thief    | —           | goblin, skeleton, ooze | opens all chests |
 | champion | all three   | —                      | opens all chests |
+| scroll   | —           | —                      | quaffs potions, rerolls dice |
+
+Scrolls cannot target monsters directly.  Instead, spend a scroll
+via `reroll <targets>` to re-roll any dungeon or party dice,
+for example `reroll goblin skeleton` re-rolls those two dice.
 
 Dragons accumulate across depths.  At 3 or more, the dragon
 blocks progress and must be fought by 3 distinct party members.
 Defeating a dragon earns 1 experience and draws 1 treasure.
 A ring or portal can bypass a blocking dragon automatically.
 
+Display notation: `name×N` means N dice of that type (e.g.
+`champion×3`).  In the party line, `name~D` or `name×N~D` means
+D of those dice will be discarded at the next regroup—these are
+temporary allies converted from monsters by hero abilities.
+For example, `thief×2~1` means 2 thieves, 1 temporary.
+
 Level up: at 5+ experience your hero gains a new name and
-upgraded abilities (e.g. Knight becomes DragonSlayer).
+upgraded abilities, for example Knight becomes DragonSlayer.
 
 Abilities: each hero has a once-per-delve special ability.
 Type `help ability` in-game to see what your hero can do.
+
+### Hero abilities
+
+| Hero        | Ability                          | Syntax example                    | Requires                |
+|-------------|----------------------------------|-----------------------------------|-------------------------|
+| Default     | No special ability               | `ability`                         | —                       |
+| Crusader    | Add 1 fighter or cleric          | `ability` or `ability cleric`     | —                       |
+| Enchantress | Transform 1 monster into potion  | `ability goblin`                  | 1 monster target        |
+| HalfGoblin  | Transform 1 goblin into thief    | `ability` or `ability goblin`     | goblin present          |
+| Knight      | Convert all monsters to dragons  | `ability`                         | —                       |
+| Mercenary   | Defeat any 2 monsters            | `ability goblin skeleton`         | 1–2 monster targets     |
+| Minstrel    | Discard all dragon dice          | `ability`                         | —                       |
+| Occultist   | Transform 1 skeleton into fighter| `ability` or `ability skeleton`   | skeleton present        |
+| Spellsword  | Add 1 fighter or mage            | `ability` or `ability mage`       | —                       |
+
+### Level-up progression
+
+At 5+ experience, each hero advances to a stronger form with an
+upgraded ability and enhanced party interactions:
+
+| Base        | Advanced      | New ability                          | Party change                            |
+|-------------|---------------|--------------------------------------|-----------------------------------------|
+| Crusader    | Paladin       | Consume treasure to clear dungeon    | Fighter/Cleric interchangeable          |
+| Enchantress | Beguiler      | Transform up to 2 monsters to potion | Scrolls become offensive combatants     |
+| HalfGoblin  | Chieftain     | Transform up to 2 goblins to thieves | Chests/potions accessible during combat |
+| Knight      | DragonSlayer  | Convert monsters to dragons          | Dragon needs only 2 distinct heroes     |
+| Mercenary   | Commander     | Reroll any number of dice            | Fighter defeats extra monster per use   |
+| Minstrel    | Bard          | Discard all dragon dice              | Champion defeats extra monster per use  |
+| Occultist   | Necromancer   | Transform up to 2 skeletons to fighters | Cleric/Mage interchangeable          |
+| Spellsword  | Battlemage    | Discard all monsters, chests, potions | Fighter/Mage interchangeable           |
 
 ## How does scoring work?
 
@@ -307,12 +354,12 @@ chests.  Each piece of treasure scores 1 point, with two exceptions:
 | scroll     | 1      | Usable as a scroll                     |
 | elixir     | 1      | Revive party members                   |
 | bait       | 1      | Lure the dragon                        |
-| portal     | 2      | Escape the dungeon (town portal)       |
+| portal     | 2      | Town portal to escape the dungeon      |
 | ring       | 1      | Sneak past a dragon                    |
 | scale      | 1      | But a pair of scales scores 4          |
 
 Town portals are worth 2 points each.  Scales score 1 point each,
-but every pair of scales scores 4 rather than 2 (a +2 bonus per pair).
+but every pair of scales scores 4 rather than 2, a +2 bonus per pair.
 Using a treasure during a delve removes it from your collection and
 reduces your score accordingly.
 

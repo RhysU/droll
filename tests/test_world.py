@@ -427,9 +427,8 @@ class TestWorld:
             delve=3,
             depth=1,
             experience=15,
-            ability=None,
+            ability=False,
             dungeon=None,
-            party=None,
             treasure=struct.Treasure(
                 own=struct.Artifacts(
                     sword=0,
