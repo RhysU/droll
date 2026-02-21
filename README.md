@@ -194,7 +194,7 @@ Available: descend retire
 Party:     cleric champion
 Dungeon:   dragon×2
 14 Knight> help retreat
-Retreat from the dungeon at any time (e.g. after being defeated).
+Retreat from the dungeon while monsters remain.
 
         Automatically starts a new delve or ends game, as suitable.
 
@@ -266,8 +266,9 @@ as follows:
 3. Use party members to defeat monsters, open chests, and quaff
    potions.  Monsters must be cleared before opening chests, quaffing
    potions, or descending further.
-4. Retire (earn experience equal to your depth) or retreat
-   (earn nothing) to end the delve.
+4. After defeating any monsters, "retire" from the delve to earn
+   experience equal to your depth.  If monsters remain and you cannot
+   defeat them, instead "retreat" but earn nothing.
 
 Combat: each party member can target any monster, but specialists
 defeat all of their favored type while non-specialists defeat one:
