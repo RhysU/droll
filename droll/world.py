@@ -141,10 +141,10 @@ def _escape_dragon(world: struct.World) -> struct.World:
 
 
 def retire(world: struct.World) -> struct.World:
-    """Retire to the tavern after completing the present dungeon.
+    """Retire from the dungeon after clearing all monsters.
 
-    If monsters or a dragon remains, either ring of invisibility or
-    a town portal will be used when available."""
+    Earns experience equal to the current depth.
+    If a dragon blocks, a ring or portal is consumed automatically."""
     if world.depth == 0:
         raise DrollError("Descend at least once prior to retiring.")
 
