@@ -338,11 +338,11 @@ class Shell(cmd.Cmd):
             scroll potion mage thief    # Drink 2 potions obtaining mage, thief
             reroll skeleton goblin      # Re-roll a skeleton and a goblin
             """)
-        print(
-            "Heroes like the Enchantress instead kill enemies with 'scroll':"
-        )
+        print("Scroll behavior varies by hero:")
         print("""
-            scroll skeleton             # Enchantress kills all skeletons""")
+            scroll skeleton             # Enchantress/Beguiler: kill all skeletons
+            (Knight: scrolls become champions during party roll)
+            (Mercenary/Commander: one bonus scroll, discarded on regroup)""")
 
     def help_reroll(self):
         """Display help for the reroll command."""
