@@ -33,8 +33,8 @@ said, I've done such things in neither 2018 nor 2026.
 
 ```
 $ droll --help
-usage: droll [-h] [--seed N]
-             {Default,Crusader,Enchantress,Knight,Mercenary,Minstrel,Occultist,Spellsword}
+usage: droll [-h] [--seed N] [--mechanical]
+             {Default,Crusader,Enchantress,HalfGoblin,Knight,Mercenary,Minstrel,Occultist,Spellsword}
 
 Command-line version of droll.
 
@@ -45,6 +45,7 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --seed N              An integer to seed random number generation.
+  --mechanical          Use mechanical display format.
 
 
 $ droll --seed 7 Knight
@@ -58,6 +59,10 @@ Party:     fighter×2 cleric mage thief champion×2
 Feasible commands (help <command>):
 ===================================
 ability  descend
+
+Miscellaneous help topics:
+==========================
+score  treasure
 
 
 Score 0:   delve 1 with experience 0
