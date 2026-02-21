@@ -166,7 +166,7 @@ def retire(world: struct.World) -> struct.World:
 
 
 def retreat(world: struct.World) -> struct.World:
-    """Retreat to the tavern without completing the present dungeon."""
+    """Retreat from the dungeon while monsters remain."""
     if world.depth < 1:
         raise DrollError("Descend at least once prior to retreating.")
     if defeated_dungeon(world.dungeon):

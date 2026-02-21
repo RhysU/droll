@@ -156,7 +156,7 @@ class Game:
         return self._next_delve()
 
     def retreat(self) -> GameState:
-        """Retreat from the dungeon at any time (e.g. after being defeated).
+        """Retreat from the dungeon while monsters remain.
 
         Automatically starts a new delve or ends game, as suitable."""
         self._world = world.retreat(self._world)
