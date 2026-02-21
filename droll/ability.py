@@ -65,7 +65,7 @@ def _convert_one(
 ) -> struct.World:
     """Validate optional target; convert 1 dungeon die to party."""
     world = _consume_ability(world)
-    if not all(t == source for t in targets):
+    if any(t != source for t in targets):
         raise DrollError(f"Ability can only target 1 {source}.")
     if len(targets) > 1:
         raise DrollError(f"Ability can only target 1 {source}.")
@@ -248,7 +248,7 @@ def minstrel_ability(
 ) -> struct.World:
     """Discard all dragon dice."""
     world = _consume_ability(world)
-    if not all(t == "dragon" for t in targets):
+    if any(t != "dragon" for t in targets):
         raise DrollError("Can discard only dragon dice.")
     return replace(world, dungeon=eliminate_dungeon(world.dungeon, "dragon"))
 
