@@ -266,9 +266,7 @@ def necromancer_ability(
     target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
-    """Transform up to 2 skeletons into fighters.
-
-    Discards them on regroup."""
+    """Transform up to 2 skeletons into fighters, discarding on regroup."""
     return _convert_two(
         world, target, extra_targets, source="skeleton", destination="fighter"
     )
