@@ -32,7 +32,7 @@ class Game:
         player: struct.Player = player.Default,
         random: Optional[Random] = None,
     ) -> None:
-        """Initialize a new game with the specified player and random number generator."""
+        """Initialize a new game with the given player and RNG."""
         self._player = player
         self._random = Random() if random is None else copy.copy(random)
         self._world = world.new_world()
@@ -49,7 +49,7 @@ class Game:
         )
 
     def __copy__(self):
-        """Shallow copy sharing frozen dataclass fields, copying random state."""
+        """Shallow copy sharing frozen fields, copying random state."""
         new = object.__new__(type(self))
         new._player = self._player  # Frozen dataclass, safe to share
         new._world = self._world  # Frozen dataclass, safe to share

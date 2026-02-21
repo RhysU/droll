@@ -73,7 +73,7 @@ def test_halfgoblin_rejects_non_goblin():
 
 
 def test_chieftain_rejects_non_goblin_targets():
-    """Chieftain rejects non-goblin target, extra target, and excess targets."""
+    """Chieftain rejects non-goblin, extra, and excess targets."""
     world = struct.World(
         ability=True,
         dungeon=struct.Dungeon(goblin=2, skeleton=1),

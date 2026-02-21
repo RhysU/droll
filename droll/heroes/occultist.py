@@ -6,7 +6,6 @@
 from dataclasses import replace
 from functools import partial
 
-from .. import struct
 from ..ability import necromancer_ability, occultist_ability
 from ..player import Default
 from ..regular import defeat_dragon, defeat_dragon_heroes

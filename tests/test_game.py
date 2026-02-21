@@ -128,7 +128,7 @@ def test_retreat():
 
 
 def test_completenames():
-    """completenames returns contextual completions including retire/retreat."""
+    """completenames returns contextual completions."""
     g = Game(random=random.Random(4), player=Default)
     g.descend()
 

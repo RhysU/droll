@@ -173,7 +173,7 @@ class Shell(cmd.Cmd):
 
     @functools.wraps(Game.apply)
     def default(self, line) -> GameState:
-        """Handle unknown commands by attempting to apply them as game actions."""
+        """Handle unknown commands as game actions."""
         return self._game.apply(*_parse(line))
 
     @functools.wraps(Game.descend)
@@ -229,7 +229,11 @@ class Shell(cmd.Cmd):
             names.append("undo")
         return (
             ["do_" + x for x in names]
-            + ["help_" + x for x in names if not getattr(self, "do_" + x, None)]
+            + [
+                "help_" + x
+                for x in names
+                if not getattr(self, "do_" + x, None)
+            ]
             + ["help_" + x for x in self._HELP_TOPICS]
         )
 
@@ -304,27 +308,23 @@ class Shell(cmd.Cmd):
     def help_scroll(self):
         """Display help for using scroll treasures."""
         print("Scrolls quaff potions or re-roll dice via 'reroll':")
-        print(
-            """
+        print("""
             scroll potion mage thief    # Drink 2 potions obtaining mage, thief
             reroll skeleton goblin      # Re-roll a skeleton and a goblin
-            """
-        )
-        print("Heroes like the Enchantress instead kill enemies with 'scroll':")
+            """)
         print(
-            """
-            scroll skeleton             # Enchantress kills all skeletons"""
+            "Heroes like the Enchantress instead kill enemies with 'scroll':"
         )
+        print("""
+            scroll skeleton             # Enchantress kills all skeletons""")
 
     def help_reroll(self):
         """Display help for the reroll command."""
         print(self.do_reroll.__doc__)
-        print(
-            """
+        print("""
             reroll goblin skeleton      # Re-roll a goblin and a skeleton
-            reroll fighter              # Re-roll one fighter into new party die
-            """
-        )
+            reroll fighter              # Re-roll one fighter
+            """)
 
     def help_scale(self):
         """Display help for scale treasures."""
@@ -351,14 +351,27 @@ class Shell(cmd.Cmd):
         """Display help for the scoring system."""
         print("Your score has two components: experience and treasure.")
         print()
-        print("Experience is earned by retiring from a delve.  When you retire,")
-        print("you gain experience equal to the depth you reached in the dungeon.")
+        print(
+            "Experience is earned by retiring from a delve.  When you retire,"
+        )
+        print(
+            "you gain experience equal to the depth"
+            " you reached in the dungeon."
+        )
         print("For example, retiring at depth 5 earns 5 experience points.")
         print("Retreating earns no experience.")
         print()
-        print("Town portals are worth 2 points each.  Scales score 1 point each,")
-        print("but every pair of scales scores 4 rather than 2 (a +2 bonus per pair).")
-        print("Using a treasure during a delve removes it from your collection and")
+        print(
+            "Town portals are worth 2 points each.  Scales score 1 point each,"
+        )
+        print(
+            "but every pair of scales scores 4"
+            " rather than 2 (a +2 bonus per pair)."
+        )
+        print(
+            "Using a treasure during a delve removes"
+            " it from your collection and"
+        )
         print("reduces your score accordingly.")
         print()
         print("Total score = experience + treasure points.")
@@ -366,9 +379,11 @@ class Shell(cmd.Cmd):
     def help_treasure(self):
         """Display help for the treasure system."""
         print("Treasure is drawn randomly from a shared box whenever you open")
-        print("chests.  Each piece of treasure scores 1 point, with two exceptions:")
         print(
-            """
+            "chests.  Each piece of treasure scores"
+            " 1 point, with two exceptions:"
+        )
+        print("""
             sword       1   Usable as a fighter
             talisman    1   Usable as a cleric
             sceptre     1   Usable as a mage
@@ -379,8 +394,7 @@ class Shell(cmd.Cmd):
             portal      2   Escape the dungeon (town portal)
             ring        1   Sneak past a dragon
             scale       1   But a pair of scales scores 4
-            """
-        )
+            """)
 
 
 def _parse(line: str) -> tuple[str, ...]:

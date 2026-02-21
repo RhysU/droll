@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Type definitions, generally of the struct-like variety."""
 
-from collections.abc import Callable, Set
+from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import Any, Iterator, Optional
 

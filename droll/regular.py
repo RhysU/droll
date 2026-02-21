@@ -177,7 +177,7 @@ def reroll(
     *dungeon_or_party,
     allow_dragon: bool = False,
 ) -> World:
-    """Update world after hero re-rolls some number of dungeon or party dice."""
+    """Update world after hero re-rolls dungeon or party dice."""
     if not dungeon_or_party:
         raise DrollError("At least 1 reroll target required.")
 

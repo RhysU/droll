@@ -6,7 +6,7 @@
 from dataclasses import replace
 from functools import partial
 
-from .. import regular, struct
+from .. import regular
 from ..ability import chieftain_ability, halfgoblin_ability
 from ..player import Default
 

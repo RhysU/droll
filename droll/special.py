@@ -36,7 +36,8 @@ def _defeat_plus_additional(
         raise DrollError("Monsters remain so one additional target required.")
     if len(additional) > 1:
         raise DrollError(
-            f"Only one additional target allowed but {len(additional)} provided."
+            f"Only one additional target allowed"
+            f" but {len(additional)} provided."
         )
 
     return defeat_one(
@@ -81,7 +82,7 @@ def convert_dungeon_to_party(
     destination: str,
     max_count: int,
 ) -> World:
-    """Convert up to max_count dungeon dice into party dice with regroup discard.
+    """Convert dungeon dice into party dice with regroup discard.
 
     Converts min(available, max_count) of source into destination."""
     count = min(getattr(world.dungeon, source), max_count)

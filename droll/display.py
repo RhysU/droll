@@ -92,7 +92,10 @@ def compact_summary(
 
     # Build the location line
     if w.depth:
-        location = f"depth {w.depth} in delve {w.delve} with experience {w.experience}"
+        location = (
+            f"depth {w.depth} in delve {w.delve}"
+            f" with experience {w.experience}"
+        )
     else:
         location = f"delve {w.delve} with experience {w.experience}"
 

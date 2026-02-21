@@ -5,7 +5,6 @@
 
 import random
 
-from droll import dice
 from droll import struct
 from droll.heroes.knight import Knight, DragonSlayer, _knight_roll_party
 

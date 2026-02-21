@@ -130,7 +130,7 @@ def descend(
 
 
 def _escape_dragon(world: struct.World) -> struct.World:
-    """Attempt to escape a blocking dragon using a ring first, then a portal."""
+    """Escape a blocking dragon using a ring first, then a portal."""
     try:
         return _apply_ring(world)
     except DrollError:
