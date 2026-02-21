@@ -20,7 +20,7 @@ def testcrusader_ability_adds_fighter():
         ability=True,
         party=struct.Party(fighter=1, cleric=1),
     )
-    result = crusader_ability(world, _UNUSED, "ability", "fighter")
+    result = crusader_ability(world, _UNUSED, "ability", ("fighter",))
     assert result.party.fighter == 2
     assert not result.ability
 
@@ -31,7 +31,7 @@ def testcrusader_ability_adds_cleric():
         ability=True,
         party=struct.Party(fighter=1, cleric=1),
     )
-    result = crusader_ability(world, _UNUSED, "ability", "cleric")
+    result = crusader_ability(world, _UNUSED, "ability", ("cleric",))
     assert result.party.cleric == 2
 
 
@@ -42,7 +42,7 @@ def testcrusader_ability_rejects_invalid_target():
         party=struct.Party(fighter=1, cleric=1),
     )
     with pytest.raises(struct.DrollError):
-        crusader_ability(world, _UNUSED, "ability", "mage")
+        crusader_ability(world, _UNUSED, "ability", ("mage",))
 
 
 def test_crusader_advances_to_paladin():
@@ -64,7 +64,7 @@ def testpaladin_ability_clears_dungeon():
             box=struct.Artifacts(sword=1, talisman=1),
         ),
     )
-    result = paladin_ability(world, _UNUSED, "ability", "elixir")
+    result = paladin_ability(world, _UNUSED, "ability", ("elixir",))
     assert sum(struct.field_values(result.dungeon)) == 0
     assert result.treasure.own.elixir == 0
     assert not result.ability
@@ -83,7 +83,7 @@ def testpaladin_ability_opens_chests():
         ),
     )
     pre_treasure = sum(struct.field_values(world.treasure.own))
-    result = paladin_ability(world, randrange, "ability", "bait")
+    result = paladin_ability(world, randrange, "ability", ("bait",))
     post_treasure = sum(struct.field_values(result.treasure.own))
     assert post_treasure == pre_treasure - 1 + 2  # -1 consumed, +2 from chests
 
@@ -97,7 +97,7 @@ def testpaladin_ability_revives_from_potions():
         treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
     )
     result = paladin_ability(
-        world, _UNUSED, "ability", "elixir", "mage", "thief"
+        world, _UNUSED, "ability", ("elixir", "mage", "thief")
     )
     assert result.party.mage == 1
     assert result.party.thief == 1
@@ -122,7 +122,7 @@ def testpaladin_ability_wrong_revivable_count():
         treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
     )
     with pytest.raises(struct.DrollError):
-        paladin_ability(world, _UNUSED, "ability", "elixir", "mage")
+        paladin_ability(world, _UNUSED, "ability", ("elixir", "mage"))
 
 
 def testpaladin_ability_requires_treasure():

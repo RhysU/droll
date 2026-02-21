@@ -20,7 +20,7 @@ def test_enchantress_transforms_monster_to_potion():
         dungeon=struct.Dungeon(goblin=2, skeleton=1),
         party=struct.Party(fighter=1),
     )
-    result = enchantress_ability(world, _UNUSED, "ability", "goblin")
+    result = enchantress_ability(world, _UNUSED, "ability", ("goblin",))
     assert result.dungeon.goblin == 1
     assert result.dungeon.potion == 1
     assert not result.ability
@@ -33,7 +33,7 @@ def test_beguiler_transforms_two_monsters():
         dungeon=struct.Dungeon(goblin=2, skeleton=1),
         party=struct.Party(fighter=1),
     )
-    result = beguiler_ability(world, _UNUSED, "ability", "goblin", "skeleton")
+    result = beguiler_ability(world, _UNUSED, "ability", ("goblin", "skeleton"))
     assert result.dungeon.goblin == 1
     assert result.dungeon.skeleton == 0
     assert result.dungeon.potion == 1
@@ -47,7 +47,7 @@ def test_beguiler_requires_two_when_available():
         party=struct.Party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        beguiler_ability(world, _UNUSED, "ability", "goblin")
+        beguiler_ability(world, _UNUSED, "ability", ("goblin",))
 
 
 def test_beguiler_rejects_too_many_targets():
@@ -59,7 +59,7 @@ def test_beguiler_rejects_too_many_targets():
     )
     with pytest.raises(struct.DrollError):
         beguiler_ability(
-            world, _UNUSED, "ability", "goblin", "skeleton", "goblin"
+            world, _UNUSED, "ability", ("goblin", "skeleton", "goblin")
         )
 
 

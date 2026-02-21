@@ -4,7 +4,6 @@
 """Functionality associated with player action mechanics."""
 
 from collections.abc import Sequence
-from typing import Optional
 from dataclasses import replace
 
 from . import ability, dice, regular, struct
@@ -116,29 +115,25 @@ def apply(
     player: struct.Player,
     world: struct.World,
     randrange: struct.RandRange,
-    noun: str,
-    target: Optional[str] = None,
-    *additional,
+    command: str,
+    *targets: str,
 ) -> struct.World:
-    """Apply noun to target within world, returning a new version.
+    """Apply command to targets within world, returning a new version.
 
     Processes hero-like artifacts (i.e. not rings/portals/scales).
-    Varargs 'additional' permits passing more required information.
     For example, what heroes to revive when quaffing a potion."""
     # Convert any artifacts in the command into any corresponding hero types
-    noun, target, additional = _partify_all(
-        player.artifacts, noun, target, additional
-    )
+    command, targets = _partify_all(player.artifacts, command, targets)
 
     # One-off handling of some treasures, with error wrapping to aid usability
-    if noun == "portal":
+    if command == "portal":
         raise DrollError('To use a portal, directly "retire".')
-    if noun == "ring":
+    if command == "ring":
         raise DrollError('To use a ring, directly "descend" or "retire".')
-    if noun in {"ability", "bait", "elixir"}:
+    if command in {"ability", "bait", "elixir"}:
         try:
-            action_ = getattr(player, noun)
-            return action_(world, randrange, noun, target, *additional)
+            action_ = getattr(player, command)
+            return action_(world, randrange, command, targets)
         except AttributeError as cause:
             raise DrollError(str(cause)) from cause
 
@@ -148,15 +143,16 @@ def apply(
 
     # Dispatch: reroll always uses scroll mechanics;
     # everything else is hero-target
-    if noun == "reroll":
-        world = regular.reroll(world, randrange, "scroll", target, *additional)
+    if command == "reroll":
+        world = regular.reroll(world, randrange, "scroll", *targets)
     else:
         try:
-            action_ = getattr(player.party, noun)
-            if target is None:
-                raise DrollError(f'"{noun}" requires a target.')
+            action_ = getattr(player.party, command)
+            if not targets:
+                raise DrollError(f'"{command}" requires a target.')
+            target, *additional = targets
             action_ = getattr(action_, target)
-            world = action_(world, randrange, noun, target, *additional)
+            world = action_(world, randrange, command, target, *additional)
         except (AttributeError, TypeError) as cause:
             raise DrollError(str(cause)) from cause
 
@@ -183,20 +179,18 @@ def apply(
 
 def _partify_all(
     artifacts: struct.Party,
-    noun: str,
-    target: Optional[str],
-    additional: tuple,
-) -> tuple[str, Optional[str], tuple]:
-    """Convert any artifact names in noun, target, additional to hero names."""
+    command: str,
+    targets: tuple[str, ...],
+) -> tuple[str, tuple[str, ...]]:
+    """Convert any artifact names in command and targets to hero names."""
     reverse = {
         artifact: hero
         for hero, artifact in struct.field_items(artifacts)
         if artifact is not None
     }
     return (
-        reverse.get(noun, noun),
-        reverse.get(target, target),
-        tuple(reverse.get(i, i) for i in additional),
+        reverse.get(command, command),
+        tuple(reverse.get(t, t) for t in targets),
     )
 
 

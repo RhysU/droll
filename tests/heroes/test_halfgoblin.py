@@ -21,7 +21,7 @@ def test_halfgoblin_transforms_goblin_to_thief():
         dungeon=struct.Dungeon(goblin=2, skeleton=1),
         party=struct.Party(fighter=1),
     )
-    result = halfgoblin_ability(world, _UNUSED, "ability", "goblin")
+    result = halfgoblin_ability(world, _UNUSED, "ability", ("goblin",))
     # Discard during subsequent regroup phase tested elsewhere
     assert result.dungeon.goblin == 1
     assert result.party.thief == 1
@@ -35,7 +35,7 @@ def test_chieftain_transforms_two_monsters():
         dungeon=struct.Dungeon(goblin=2, skeleton=1),
         party=struct.Party(fighter=1),
     )
-    result = chieftain_ability(world, _UNUSED, "ability", "goblin", "goblin")
+    result = chieftain_ability(world, _UNUSED, "ability", ("goblin", "goblin"))
     # Discard during subsequent regroup phase tested elsewhere
     assert result.dungeon.goblin == 0
     assert result.dungeon.skeleton == 1
@@ -53,7 +53,7 @@ def test_chieftain_transforms_one_monster():
         world,
         _UNUSED,
         "ability",
-        "goblin",
+        ("goblin",),
     )
     # Discard during subsequent regroup phase tested elsewhere
     assert result.dungeon.goblin == 0
@@ -69,7 +69,7 @@ def test_halfgoblin_rejects_non_goblin():
         party=struct.Party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        halfgoblin_ability(world, _UNUSED, "ability", "skeleton")
+        halfgoblin_ability(world, _UNUSED, "ability", ("skeleton",))
 
 
 def test_chieftain_rejects_non_goblin_targets():
@@ -80,12 +80,12 @@ def test_chieftain_rejects_non_goblin_targets():
         party=struct.Party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        chieftain_ability(world, _UNUSED, "ability", "skeleton")
+        chieftain_ability(world, _UNUSED, "ability", ("skeleton",))
     with pytest.raises(struct.DrollError):
-        chieftain_ability(world, _UNUSED, "ability", "goblin", "skeleton")
+        chieftain_ability(world, _UNUSED, "ability", ("goblin", "skeleton"))
     with pytest.raises(struct.DrollError):
         chieftain_ability(
-            world, _UNUSED, "ability", "goblin", "goblin", "goblin"
+            world, _UNUSED, "ability", ("goblin", "goblin", "goblin")
         )
 
 

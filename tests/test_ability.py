@@ -23,4 +23,4 @@ def test_default_ability_rejects_target():
     """Default ability rejects any target."""
     w = struct.World(ability=True)
     with pytest.raises(struct.DrollError):
-        default_ability(w, _UNUSED, "ability", "fighter")
+        default_ability(w, _UNUSED, "ability", ("fighter",))

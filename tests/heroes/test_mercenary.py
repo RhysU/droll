@@ -29,7 +29,7 @@ def testmercenary_ability_defeats_two_monsters():
         dungeon=struct.Dungeon(goblin=1, skeleton=1),
         party=struct.Party(fighter=2),
     )
-    result = mercenary_ability(world, _UNUSED, "ability", "goblin", "skeleton")
+    result = mercenary_ability(world, _UNUSED, "ability", ("goblin", "skeleton"))
     assert result.dungeon.goblin == 0
     assert result.dungeon.skeleton == 0
     assert result.party.fighter == 2
@@ -43,7 +43,7 @@ def testmercenary_ability_defeats_one_when_only_one():
         dungeon=struct.Dungeon(goblin=1),
         party=struct.Party(fighter=2),
     )
-    result = mercenary_ability(world, _UNUSED, "ability", "goblin")
+    result = mercenary_ability(world, _UNUSED, "ability", ("goblin",))
     assert result.dungeon.goblin == 0
     assert not result.ability
 
@@ -67,7 +67,7 @@ def testcommander_ability_rerolls_dungeon_dice():
         dungeon=struct.Dungeon(goblin=2, skeleton=1),
         party=struct.Party(fighter=2),
     )
-    result = commander_ability(world, randrange, "ability", "goblin", "goblin")
+    result = commander_ability(world, randrange, "ability", ("goblin", "goblin"))
     assert not result.ability
     assert result.party.fighter == 2
 
@@ -81,7 +81,7 @@ def testcommander_ability_rerolls_dragon():
         party=struct.Party(fighter=2),
     )
     result = commander_ability(
-        world, randrange, "ability", "dragon", "dragon", "dragon"
+        world, randrange, "ability", ("dragon", "dragon", "dragon")
     )
     assert not result.ability
 

@@ -635,7 +635,7 @@ def test_bait_non_dragon_target():
         treasure=struct.Treasure(own=struct.Artifacts(bait=1)),
     )
     with pytest.raises(DrollError):
-        regular.bait_dragon(w, _UNUSED, "bait", "goblin")
+        regular.bait_dragon(w, _UNUSED, "bait", ("goblin",))
 
 
 def test_regroup_discard_after_quaff():
@@ -690,7 +690,7 @@ def test_regroup_discard_after_elixir1():
     assert post1.party.thief == 0
 
     # Elixir revives a new thief
-    post2 = regular.elixir(post1, None, "elixir", "thief")
+    post2 = regular.elixir(post1, None, "elixir", ("thief",))
     assert post2.regroup.discard.thief == 0
     assert post2.party.thief == 1
 
@@ -718,7 +718,7 @@ def test_regroup_discard_after_elixir2():
     )
 
     # Elixir revives a new thief
-    post1 = regular.elixir(pre, None, "elixir", "thief")
+    post1 = regular.elixir(pre, None, "elixir", ("thief",))
     assert post1.regroup.discard.thief == 1
     assert post1.party.thief == 2
 

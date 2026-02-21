@@ -34,7 +34,7 @@ def testminstrel_ability_rejects_non_dragon():
         party=struct.Party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        minstrel_ability(world, _UNUSED, "ability", "goblin")
+        minstrel_ability(world, _UNUSED, "ability", ("goblin",))
 
 
 def test_bard_champion_defeats_all_plus_additional():

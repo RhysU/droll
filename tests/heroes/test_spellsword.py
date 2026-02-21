@@ -19,7 +19,7 @@ def testspellsword_ability_adds_fighter():
         ability=True,
         party=struct.Party(fighter=1, mage=1),
     )
-    result = spellsword_ability(world, _UNUSED, "ability", "fighter")
+    result = spellsword_ability(world, _UNUSED, "ability", ("fighter",))
     assert result.party.fighter == 2
     assert not result.ability
 
@@ -30,7 +30,7 @@ def testspellsword_ability_adds_mage():
         ability=True,
         party=struct.Party(fighter=1, mage=1),
     )
-    result = spellsword_ability(world, _UNUSED, "ability", "mage")
+    result = spellsword_ability(world, _UNUSED, "ability", ("mage",))
     assert result.party.mage == 2
 
 
@@ -42,7 +42,7 @@ def testspellsword_ability_rejects_invalid_target():
         party=struct.Party(fighter=1, mage=1),
     )
     with pytest.raises(struct.DrollError):
-        spellsword_ability(world, _UNUSED, "ability", "cleric")
+        spellsword_ability(world, _UNUSED, "ability", ("cleric",))
 
 
 def testbattlemage_ability_clears_dungeon():
@@ -75,7 +75,7 @@ def testbattlemage_ability_rejects_target():
         party=struct.Party(fighter=1, mage=1),
     )
     with pytest.raises(struct.DrollError):
-        battlemage_ability(world, _UNUSED, "ability", "goblin")
+        battlemage_ability(world, _UNUSED, "ability", ("goblin",))
 
 
 def test_spellsword_advances_to_battlemage():

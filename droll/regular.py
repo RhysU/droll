@@ -6,8 +6,6 @@
 from dataclasses import replace
 from operator import add
 from collections.abc import Sequence, Set
-from typing import Optional
-
 from .dice import roll_dungeon, roll_party
 from .dungeon import (
     defeated_monsters,
@@ -319,29 +317,28 @@ def defeat_dragon(
 def bait_dragon(
     world: World,
     randrange: RandRange,
-    noun: str,
-    target: Optional[str] = None,
+    command: str,
+    targets: tuple[str, ...] = (),
     *,
     _enemies: Sequence[str] = ("goblin", "skeleton", "ooze"),
     require_treasure: bool = True,
 ) -> World:
     """Consume dragon bait to convert all monsters into dragon dice."""
     # Confirm well-formed request optionally containing a target
-    target = "dragon" if target is None else target
-    if target != "dragon":
-        raise DrollError(f"Cannot {noun} a {target}.")
+    if any(t != "dragon" for t in targets):
+        raise DrollError(f"Can only {command} dragon dice.")
     if require_treasure:
-        world = replace(world, treasure=replace_treasure(world.treasure, noun))
+        world = replace(world, treasure=replace_treasure(world.treasure, command))
 
     # Compute how many new dragons will be produced and remove sources
     dungeon = world.dungeon
-    new_targets = (
+    new_dragons = (
         sum(getattr(dungeon, enemy) for enemy in _enemies)
         if dungeon is not None
         else 0
     )
-    if not new_targets:
-        raise DrollError(f"At least 1 of {_enemies} required for '{noun}'.")
+    if not new_dragons:
+        raise DrollError(f"At least 1 of {_enemies} required for '{command}'.")
 
     # Zero all enemy sources and increment the number of dragons
     return replace(
@@ -349,19 +346,19 @@ def bait_dragon(
         dungeon=replace(
             dungeon,
             **{enemy: 0 for enemy in _enemies},
-            **{target: getattr(dungeon, target) + new_targets},
+            dragon=dungeon.dragon + new_dragons,
         ),
     )
 
 
 def elixir(
-    world: World, randrange: RandRange, noun: str, target: Optional[str] = None
+    world: World, randrange: RandRange, command: str, targets: tuple[str, ...] = ()
 ) -> World:
     """Consume an elixir to add one hero die of any type."""
-    if target is None:
-        raise DrollError(f"Hero required for {noun}.")
+    if not targets:
+        raise DrollError(f"Hero required for {command}.")
     return replace(
         world,
-        treasure=replace_treasure(world.treasure, noun),
-        party=increment_party(world.party, target),
+        treasure=replace_treasure(world.treasure, command),
+        party=increment_party(world.party, targets[0]),
     )
