@@ -111,8 +111,6 @@ def battlemage_ability(
     randrange: struct.RandRange,
     noun: str,
     target: Optional[str] = None,
-    *,
-    _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair."""
     world = _consume_ability(world)

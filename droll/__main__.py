@@ -5,7 +5,6 @@
 
 import argparse
 import random
-import sys
 
 from .display import DisplayMode
 from .game import Game
@@ -48,4 +47,4 @@ def main(args=None) -> None:
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

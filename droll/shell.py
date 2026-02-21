@@ -136,7 +136,7 @@ class Shell(cmd.Cmd):
         elif self._game.randhash() == before.randhash():
             self._undo.append(before)  # Same random state so undo permitted
         else:
-            self._undo.clear()  # Random state mutated so no under permitted
+            self._undo.clear()  # Random state mutated so no undo permitted
 
         if self._game != before:
             self._command_count += -1 if line == "undo" else 1
