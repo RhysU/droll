@@ -60,13 +60,13 @@ def _choose_and_add_hero(
 
 def _convert_one(
     world: struct.World,
-    target: Optional[str],
+    targets: tuple[str, ...],
     source: str,
     destination: str,
 ) -> struct.World:
     """Validate optional target; convert 1 dungeon die to party."""
     world = _consume_ability(world)
-    if target and target != source:
+    if targets and targets[0] != source:
         raise DrollError(f"Ability can only target 1 {source}.")
     return special.convert_dungeon_to_party(
         world, source=source, destination=destination, max_count=1
@@ -75,18 +75,17 @@ def _convert_one(
 
 def _convert_two(
     world: struct.World,
-    target: Optional[str],
-    extra_targets: tuple[str, ...],
+    targets: tuple[str, ...],
     source: str,
     destination: str,
 ) -> struct.World:
     """Validate optional targets; convert up to 2 dungeon dice to party."""
     world = _consume_ability(world)
-    if target and target != source:
+    if targets and targets[0] != source:
         raise DrollError(f"Ability can only target {source}s.")
-    if extra_targets and extra_targets[0] != source:
+    if len(targets) > 1 and targets[1] != source:
         raise DrollError(f"Ability can only target {source}s.")
-    if len(extra_targets) > 1:
+    if len(targets) > 2:
         raise DrollError("At most 2 targets can be changed.")
     return special.convert_dungeon_to_party(
         world, source=source, destination=destination, max_count=2
@@ -148,10 +147,7 @@ def chieftain_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 goblins into thieves, discarding them on regroup."""
-    return _convert_two(
-        world, targets[0] if targets else None, targets[1:],
-        source="goblin", destination="thief",
-    )
+    return _convert_two(world, targets, source="goblin", destination="thief")
 
 
 def commander_ability(
@@ -210,10 +206,7 @@ def halfgoblin_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform 1 goblin into 1 thief, discarding it on regroup."""
-    return _convert_one(
-        world, targets[0] if targets else None,
-        source="goblin", destination="thief",
-    )
+    return _convert_one(world, targets, source="goblin", destination="thief")
 
 
 def knight_ability(
@@ -266,10 +259,7 @@ def necromancer_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 skeletons into fighters, discarding on regroup."""
-    return _convert_two(
-        world, targets[0] if targets else None, targets[1:],
-        source="skeleton", destination="fighter",
-    )
+    return _convert_two(world, targets, source="skeleton", destination="fighter")
 
 
 def occultist_ability(
@@ -279,10 +269,7 @@ def occultist_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it on regroup."""
-    return _convert_one(
-        world, targets[0] if targets else None,
-        source="skeleton", destination="fighter",
-    )
+    return _convert_one(world, targets, source="skeleton", destination="fighter")
 
 
 def paladin_ability(
