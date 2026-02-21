@@ -22,7 +22,7 @@ class TestWorld:
         self.state = random.Random(4)
 
     def test_game_initial(self):
-        """Test initial game state has correct experience, treasure, and reserve."""
+        """Test initial game state has correct experience and treasure."""
         game = world.new_world()
         assert game.experience == 0
         assert sum(struct.field_values(game.treasure.own)) == 0
@@ -145,7 +145,7 @@ class TestWorld:
         assert post.treasure.own.portal == 0
 
     def test_retire_dragon(self):
-        """Test retiring with dragons can use ring or portal, ring preferred."""
+        """Test retiring with dragons uses ring or portal."""
         pre = world.new_world()
         pre = world.delve(pre, dice.roll_party, self.state.randrange)
         pre = replace(
@@ -212,7 +212,7 @@ class TestWorld:
         assert post.depth == pre.depth + 1
 
     def test_descend_monsters(self):
-        """Test descending with monsters or dragons blocks without appropriate treasure."""
+        """Test descending with monsters blocks without treasure."""
         pre = world.new_world()
         pre = world.delve(pre, dice.roll_party, self.state.randrange)
         pre = replace(
@@ -404,7 +404,7 @@ class TestWorld:
             world.retreat(game)
 
     def test_retreat_when_could_retire(self):
-        """Test retreat fails when dungeon is defeated (should retire instead)."""
+        """Test retreat fails when dungeon is defeated."""
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
         game = replace(game, depth=2, dungeon=struct.Dungeon())
@@ -426,7 +426,7 @@ class TestWorld:
         game = world.new_world()
         game = world.delve(game, dice.roll_party, self.state.randrange)
         game = world.descend(game, dice.roll_dungeon, self.state.randrange)
-        # First dungeon at depth 1 should have exactly 1 die (min of depth and 7)
+        # Depth 1 should have exactly 1 die (min of depth and 7)
         assert sum(struct.field_values(game.dungeon)) == 1
 
         # At depth 7+, should have 7 dice
@@ -483,38 +483,38 @@ class TestWorld:
         #                depth  dragons  new_dice
         for depth, dragons, new_dice in [
             # dragons=0: always roll depth dice (all 7 available)
-            ( 1, 0,  1),
-            ( 2, 0,  2),
-            ( 3, 0,  3),
-            ( 4, 0,  4),
-            ( 5, 0,  5),
-            ( 6, 0,  6),
-            ( 7, 0,  7),
-            ( 8, 0,  7),
-            ( 9, 0,  7),
-            (10, 0,  7),
+            (1, 0, 1),
+            (2, 0, 2),
+            (3, 0, 3),
+            (4, 0, 4),
+            (5, 0, 5),
+            (6, 0, 6),
+            (7, 0, 7),
+            (8, 0, 7),
+            (9, 0, 7),
+            (10, 0, 7),
             # dragons=1: min(depth, 6)
-            ( 1, 1,  1),
-            ( 2, 1,  2),
-            ( 3, 1,  3),
-            ( 4, 1,  4),
-            ( 5, 1,  5),
-            ( 6, 1,  6),
-            ( 7, 1,  6),
-            ( 8, 1,  6),
-            ( 9, 1,  6),
-            (10, 1,  6),
+            (1, 1, 1),
+            (2, 1, 2),
+            (3, 1, 3),
+            (4, 1, 4),
+            (5, 1, 5),
+            (6, 1, 6),
+            (7, 1, 6),
+            (8, 1, 6),
+            (9, 1, 6),
+            (10, 1, 6),
             # dragons=2: min(depth, 5)
-            ( 1, 2,  1),
-            ( 2, 2,  2),
-            ( 3, 2,  3),
-            ( 4, 2,  4),
-            ( 5, 2,  5),
-            ( 6, 2,  5),
-            ( 7, 2,  5),
-            ( 8, 2,  5),
-            ( 9, 2,  5),
-            (10, 2,  5),
+            (1, 2, 1),
+            (2, 2, 2),
+            (3, 2, 3),
+            (4, 2, 4),
+            (5, 2, 5),
+            (6, 2, 5),
+            (7, 2, 5),
+            (8, 2, 5),
+            (9, 2, 5),
+            (10, 2, 5),
         ]:
             g = replace(
                 game, depth=depth - 1, dungeon=struct.Dungeon(dragon=dragons)
@@ -524,4 +524,3 @@ class TestWorld:
             assert result.dungeon == struct.Dungeon(
                 goblin=new_dice, dragon=dragons
             ), f"depth={depth}, dragons={dragons}"
-

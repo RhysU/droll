@@ -55,9 +55,7 @@ def test_postcmd_stop_prints_summary():
     """Confirm postcmd prints summary when game ends naturally."""
     from droll.game import GameState
 
-    s = _mechanical_shell(
-        Game(random=random.Random(4), player=Default)
-    )
+    s = _mechanical_shell(Game(random=random.Random(4), player=Default))
     s.preloop()
     with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
         s.postcmd(stop=GameState.STOP, line="retire")
@@ -188,7 +186,7 @@ def test_undo():
 
 
 def test_undo_in_available_commands():
-    """Verify undo appears in available commands only when undo stack is not empty."""
+    """Verify undo appears only when undo stack is not empty."""
     s = _mechanical_shell(Game(random=random.Random(42), player=Default))
     s.preloop()
 
@@ -196,7 +194,7 @@ def test_undo_in_available_commands():
     available = s._available_commands()
     assert "undo" not in available
 
-    # Execute a command that can be undone (ability doesn't change random state)
+    # Execute undoable command (ability doesn't change random state)
     s.onecmd("ability")
 
     # Now undo stack has one item, so "undo" should be available
@@ -239,7 +237,7 @@ def test_quaff_wrong_revive_count_prints_error():
 
 
 def test_command_counter_increments_on_mutation():
-    """Counter increments on state-mutating commands but not on help or errors."""
+    """Counter increments on mutations, not on help or errors."""
     s = _mechanical_shell(Game(random=random.Random(4), player=Default))
     s.preloop()
     assert s._command_count == 0

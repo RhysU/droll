@@ -17,7 +17,6 @@ from .party import increment_party
 from .struct import DrollError
 from .treasure import draw_treasure, replace_treasure
 
-
 __all__ = (
     "default_ability",
     "battlemage_ability",
@@ -267,7 +266,9 @@ def necromancer_ability(
     target: Optional[str] = None,
     *extra_targets: str,
 ) -> struct.World:
-    """Transform up to 2 skeletons into fighters, discarding them on regroup."""
+    """Transform up to 2 skeletons into fighters.
+
+    Discards them on regroup."""
     return _convert_two(
         world, target, extra_targets, source="skeleton", destination="fighter"
     )

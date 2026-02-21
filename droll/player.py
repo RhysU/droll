@@ -146,7 +146,8 @@ def apply(
     prior_own = world.treasure.own
     world = _adjust_phantom_treasures(world, player.artifacts, prior_own, +1)
 
-    # Dispatch: reroll always uses scroll mechanics; everything else is hero-target
+    # Dispatch: reroll always uses scroll mechanics;
+    # everything else is hero-target
     if noun == "reroll":
         world = regular.reroll(world, randrange, "scroll", target, *additional)
     else:

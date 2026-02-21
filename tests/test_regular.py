@@ -36,7 +36,7 @@ class TestRerollParty:
         return randrange
 
     def test_reroll_single_party_die(self):
-        """Rerolling a single party die removes it and re-rolls one party die."""
+        """Rerolling a single party die removes and re-rolls it."""
         # Roll value 0 => fighter
         randrange = self._canned_randrange([0])
         result = regular.reroll(self.world, randrange, "scroll", "fighter")
@@ -84,7 +84,7 @@ class TestRerollParty:
             regular.reroll(self.world, randrange, "scroll", "mage")
 
     def test_reroll_unknown_target_raises(self):
-        """Rerolling a target that is neither dungeon nor party raises DrollError."""
+        """Rerolling an unknown target raises DrollError."""
         randrange = self._canned_randrange([])
         with pytest.raises(DrollError):
             regular.reroll(self.world, randrange, "scroll", "nonexistent")

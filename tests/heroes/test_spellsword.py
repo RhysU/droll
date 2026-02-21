@@ -58,7 +58,7 @@ def testbattlemage_ability_clears_dungeon():
 
 
 def testspellsword_ability_default_target():
-    """Spellsword ability defaults to 'fighter' (first sorted) when no target."""
+    """Spellsword ability defaults to 'fighter' when no target."""
     world = struct.World(
         ability=True,
         party=struct.Party(fighter=1, mage=1),

@@ -166,12 +166,10 @@ class TestPlayer:
     def test_scroll_not_reroll(self):
         """Using 'scroll' as a noun for rerolling raises DrollError (#133)."""
         with pytest.raises(struct.DrollError, match="reroll"):
-            player.apply(
-                player.Default, self.game, None, "scroll", "goblin"
-            )
+            player.apply(player.Default, self.game, None, "scroll", "goblin")
 
 
-# Shorthand for testing completions given that method returns unsorted generator
+# Shorthand: method returns unsorted generator
 def complete(*args):
     """Return sorted list of completions for testing purposes."""
     return list(sorted(player.complete(*args)))
