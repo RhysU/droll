@@ -63,6 +63,28 @@ def test_beguiler_rejects_too_many_targets():
         )
 
 
+def test_enchantress_message_without_target():
+    """Enchantress fails gracefully when no targets supplied."""
+    world = struct.World(
+        ability=True,
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(fighter=1),
+    )
+    with pytest.raises(struct.DrollError):
+        result = enchantress_ability(world, _UNUSED, "ability")
+
+
+def test_beguiler_message_without_target():
+    """Beguiler fails gracefully when no targets supplied."""
+    world = struct.World(
+        ability=True,
+        dungeon=struct.Dungeon(goblin=2, skeleton=1),
+        party=struct.Party(fighter=1),
+    )
+    with pytest.raises(struct.DrollError):
+        result = beguiler_ability(world, _UNUSED, "ability")
+
+
 def test_enchantress_advances_to_beguiler():
     """Enchantress advances to Beguiler at 5+ experience."""
     low_xp = struct.World(experience=4)

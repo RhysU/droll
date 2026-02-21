@@ -129,6 +129,8 @@ def beguiler_ability(
     """Transform at most 2 monsters into 1 potion.
 
     Requires transforming 2 monsters when 2+ monsters available."""
+    if target is None:
+        raise struct.DrollError(f'"{noun}" requires a monster target.')
     world = _consume_ability(world)
     dungeon = world.dungeon
     dungeon = decrement_dungeon(dungeon, target)
