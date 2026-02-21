@@ -4,8 +4,6 @@
 """Ability functions for all heroes."""
 
 from dataclasses import replace
-from typing import Optional
-
 from . import regular, special, struct
 from .dungeon import (
     defeated_monsters,
@@ -46,13 +44,14 @@ def _consume_ability(world: struct.World) -> struct.World:
 def _choose_and_add_hero(
     world: struct.World,
     command: str,
-    target: Optional[str],
+    targets: tuple[str, ...],
     acceptable: frozenset[str],
 ) -> struct.World:
     """Default target to sorted-first acceptable; validate; add one hero."""
     world = _consume_ability(world)
-    if target is None:
-        target = next(iter(sorted(acceptable)))
+    if len(targets) > 1:
+        raise DrollError(f"At most 1 target accepted for {command}.")
+    target = targets[0] if targets else next(iter(sorted(acceptable)))
     if target not in acceptable:
         raise DrollError(f"Target {target} not one of {acceptable}.")
     return replace(world, party=increment_party(world.party, target))
@@ -66,7 +65,9 @@ def _convert_one(
 ) -> struct.World:
     """Validate optional target; convert 1 dungeon die to party."""
     world = _consume_ability(world)
-    if targets and targets[0] != source:
+    if not all(t == source for t in targets):
+        raise DrollError(f"Ability can only target 1 {source}.")
+    if len(targets) > 1:
         raise DrollError(f"Ability can only target 1 {source}.")
     return special.convert_dungeon_to_party(
         world, source=source, destination=destination, max_count=1
@@ -178,9 +179,7 @@ def crusader_ability(
     """Crusader usable as a fighter or a cleric, adding one hero.
 
     Optionally, specify 'fighter' or 'cleric' to select which to choose."""
-    return _choose_and_add_hero(
-        world, command, targets[0] if targets else None, _acceptable_targets
-    )
+    return _choose_and_add_hero(world, command, targets, _acceptable_targets)
 
 
 def enchantress_ability(
@@ -192,6 +191,8 @@ def enchantress_ability(
     """Transform exactly 1 monster into 1 potion."""
     if not targets:
         raise struct.DrollError(f'"{command}" requires a monster target.')
+    if len(targets) > 1:
+        raise struct.DrollError(f'"{command}" accepts only 1 monster target.')
     world = _consume_ability(world)
     dungeon = world.dungeon
     dungeon = decrement_dungeon(dungeon, targets[0])
@@ -247,8 +248,8 @@ def minstrel_ability(
 ) -> struct.World:
     """Discard all dragon dice."""
     world = _consume_ability(world)
-    if targets and targets[0] != "dragon":
-        raise DrollError(f"Can only discard dragon dice, not {targets[0]}.")
+    if not all(t == "dragon" for t in targets):
+        raise DrollError("Can discard only dragon dice.")
     return replace(world, dungeon=eliminate_dungeon(world.dungeon, "dragon"))
 
 
@@ -327,6 +328,4 @@ def spellsword_ability(
     """Spellsword usable as a fighter or a mage, adding one hero to party.
 
     Optionally, specify 'fighter' or 'mage' to select which to choose."""
-    return _choose_and_add_hero(
-        world, command, targets[0] if targets else None, _acceptable_targets
-    )
+    return _choose_and_add_hero(world, command, targets, _acceptable_targets)

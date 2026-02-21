@@ -325,8 +325,8 @@ def bait_dragon(
 ) -> World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target
-    if targets and targets[0] != "dragon":
-        raise DrollError(f"Cannot {command} a {targets[0]}.")
+    if not all(t == "dragon" for t in targets):
+        raise DrollError(f"Can only {command} dragon dice.")
     if require_treasure:
         world = replace(world, treasure=replace_treasure(world.treasure, command))
 
