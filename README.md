@@ -8,8 +8,7 @@ Droll implements [Dungeon Roll](https://boardgamegeek.com/boardgame/138788/dunge
 a product of [Tasty Minstrel Games](http://playtmg.com/).  Droll is
 in no way affiliated with either the game or the publisher.  Go buy their
 excellent game, learn [how to play](https://www.youtube.com/watch?v=PzZ8hUzXBtE)
-it, and then come back here.  Note that this implementation simplifies
-several board game rules; see "How to play" below.
+it, and then come back here.
 
 ## What is implemented?
 
@@ -252,21 +251,21 @@ Dungeon:      None
 
 ## How to play
 
-You get **3 delves** into the dungeon per game.  Each delve proceeds
+You get 3 delves into the dungeon per game.  Each delve proceeds
 as follows:
 
-1. **Roll 7 party dice** producing random fighters, clerics, mages,
+1. Roll 7 party dice producing random fighters, clerics, mages,
    thieves, champions, and scrolls.
-2. **Descend** one depth at a time.  At each depth, new dungeon dice
+2. Descend one depth at a time.  At each depth, new dungeon dice
    appear: goblins, skeletons, ooze, chests, potions, and dragons.
-3. **Use party members** to defeat monsters, open chests, and quaff
+3. Use party members to defeat monsters, open chests, and quaff
    potions.  Monsters must be cleared before opening chests, quaffing
    potions, or descending further.
-4. **Retire** (earn experience equal to your depth) or **retreat**
+4. Retire (earn experience equal to your depth) or retreat
    (earn nothing) to end the delve.
 
-**Combat:** each party member can target any monster, but specialists
-defeat *all* of their favored type while non-specialists defeat *one*:
+Combat: each party member can target any monster, but specialists
+defeat all of their favored type while non-specialists defeat one:
 
 | Hero     | Defeats all | Defeats one each       | Special          |
 |----------|-------------|------------------------|------------------|
@@ -276,28 +275,28 @@ defeat *all* of their favored type while non-specialists defeat *one*:
 | thief    | —           | goblin, skeleton, ooze | opens all chests |
 | champion | all three   | —                      | opens all chests |
 
-**Dragons** accumulate across depths.  At 3 or more, the dragon
+Dragons accumulate across depths.  At 3 or more, the dragon
 blocks progress and must be fought by 3 distinct party members.
 Defeating a dragon earns 1 experience and draws 1 treasure.
 A ring or portal can bypass a blocking dragon automatically.
 
-**Level up:** at 5+ experience your hero gains a new name and
+Level up: at 5+ experience your hero gains a new name and
 upgraded abilities (e.g. Knight becomes DragonSlayer).
 
-**Abilities:** each hero has a once-per-delve special ability.
+Abilities: each hero has a once-per-delve special ability.
 Type `help ability` in-game to see what your hero can do.
 
 ## How does scoring work?
 
-Your score has two components: **experience** and **treasure**.
+Your score has two components: experience and treasure.
 
-**Experience** is earned by retiring from a delve.  When you retire,
+Experience is earned by retiring from a delve.  When you retire,
 you gain experience equal to the depth you reached in the dungeon.
 For example, retiring at depth 5 earns 5 experience points.
 Retreating earns no experience.
 
-**Treasure** is drawn randomly from a shared box whenever you open
-chests.  Each piece of treasure scores **1 point**, with two exceptions:
+Treasure is drawn randomly from a shared box whenever you open
+chests.  Each piece of treasure scores 1 point, with two exceptions:
 
 | Treasure   | Points | Notes                                  |
 |------------|--------|----------------------------------------|
@@ -308,16 +307,16 @@ chests.  Each piece of treasure scores **1 point**, with two exceptions:
 | scroll     | 1      | Usable as a scroll                     |
 | elixir     | 1      | Revive party members                   |
 | bait       | 1      | Lure the dragon                        |
-| portal     | **2**  | Escape the dungeon (town portal)       |
+| portal     | 2      | Escape the dungeon (town portal)       |
 | ring       | 1      | Sneak past a dragon                    |
-| scale      | 1      | But a **pair** of scales scores **4**  |
+| scale      | 1      | But a pair of scales scores 4          |
 
 Town portals are worth 2 points each.  Scales score 1 point each,
-but every *pair* of scales scores 4 rather than 2 (a +2 bonus per pair).
+but every pair of scales scores 4 rather than 2 (a +2 bonus per pair).
 Using a treasure during a delve removes it from your collection and
 reduces your score accordingly.
 
-**Total score = experience + treasure points.**
+Total score = experience + treasure points.
 
 ## Without Installation
 
