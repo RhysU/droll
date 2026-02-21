@@ -105,7 +105,7 @@ def test_commander_fighter_defeats_goblin_plus_additional():
         party=struct.Party(fighter=2),
     )
     result = Commander.party.fighter.goblin(
-        world, _UNUSED, "fighter", "goblin", "skeleton"
+        world, _UNUSED, "fighter", ("goblin", "skeleton")
     )
     assert result.dungeon.goblin == 0
     assert result.dungeon.skeleton == 0
@@ -120,7 +120,7 @@ def test_commander_fighter_defeats_skeleton_plus_additional():
         party=struct.Party(fighter=2),
     )
     result = Commander.party.fighter.skeleton(
-        world, _UNUSED, "fighter", "skeleton", "ooze"
+        world, _UNUSED, "fighter", ("skeleton", "ooze")
     )
     assert result.dungeon.skeleton == 1
     assert result.dungeon.ooze == 0

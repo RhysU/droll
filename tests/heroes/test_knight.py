@@ -49,7 +49,7 @@ def test_dragonslayer_defeats_dragon_with_two_heroes():
         ),
     )
     result = DragonSlayer.party.fighter.dragon(
-        world, randrange, "fighter", "dragon", "mage"
+        world, randrange, "fighter", ("dragon", "mage")
     )
     assert result.dungeon.dragon == 0
     assert result.experience == 1

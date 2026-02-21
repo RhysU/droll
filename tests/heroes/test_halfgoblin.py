@@ -113,7 +113,7 @@ def test_halfgoblin_fighter_chests_potions():
     )
 
     result1 = HalfGoblin.party.fighter.chest(
-        world, randrange, "fighter", "chest"
+        world, randrange, "fighter", ("chest",)
     )
     assert result1.dungeon.chest == 0
     assert result1.dungeon.goblin == 1
@@ -121,7 +121,7 @@ def test_halfgoblin_fighter_chests_potions():
     assert result1.treasure.own.scale == 1
 
     result2 = HalfGoblin.party.fighter.potion(
-        world, randrange, "fighter", "potion", "mage"
+        world, randrange, "fighter", ("potion", "mage")
     )
     assert result2.dungeon.goblin == 1
     assert result2.dungeon.potion == 0

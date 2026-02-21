@@ -3,6 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Type definitions, generally of the struct-like variety."""
 
+from __future__ import annotations
+
 from collections.abc import Callable
 from dataclasses import dataclass, fields
 from typing import Any, Iterator, Optional
@@ -55,12 +57,12 @@ RandRange = Callable[[int, int], int]
 
 @dataclass(frozen=True)
 class Dungeon:
-    goblin: Any = 0
-    skeleton: Any = 0
-    ooze: Any = 0
-    chest: Any = 0
-    potion: Any = 0
-    dragon: Any = 0
+    goblin: int | Command = 0
+    skeleton: int | Command = 0
+    ooze: int | Command = 0
+    chest: int | Command = 0
+    potion: int | Command = 0
+    dragon: int | Command = 0
 
 
 RollDungeon = Callable[[int, RandRange], Dungeon]
@@ -68,12 +70,12 @@ RollDungeon = Callable[[int, RandRange], Dungeon]
 
 @dataclass(frozen=True)
 class Party:
-    fighter: Any = 0
-    cleric: Any = 0
-    mage: Any = 0
-    thief: Any = 0
-    champion: Any = 0
-    scroll: Any = 0
+    fighter: int | Command = 0
+    cleric: int | Command = 0
+    mage: int | Command = 0
+    thief: int | Command = 0
+    champion: int | Command = 0
+    scroll: int | Command = 0
 
 
 # Bookkeeping for operations performed during the regroup phase

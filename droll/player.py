@@ -150,9 +150,8 @@ def apply(
             action_ = getattr(player.party, command)
             if not targets:
                 raise DrollError(f'"{command}" requires a target.')
-            target, *additional = targets
-            action_ = getattr(action_, target)
-            world = action_(world, randrange, command, target, *additional)
+            action_ = getattr(action_, targets[0])
+            world = action_(world, randrange, command, targets)
         except (AttributeError, TypeError) as cause:
             raise DrollError(str(cause)) from cause
 

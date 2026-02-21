@@ -19,7 +19,7 @@ def test_defeats_all_plus_one_additional():
         party=struct.Party(champion=1),
     )
     result = special.defeat_all_plus_additional(
-        w, _UNUSED, "champion", "goblin", "skeleton"
+        w, _UNUSED, "champion", ("goblin", "skeleton")
     )
     assert result.dungeon.goblin == 0
     assert result.dungeon.skeleton == 0
@@ -33,7 +33,7 @@ def test_defeat_all_no_additional_when_cleared():
         party=struct.Party(champion=1),
     )
     result = special.defeat_all_plus_additional(
-        w, _UNUSED, "champion", "goblin"
+        w, _UNUSED, "champion", ("goblin",)
     )
     assert result.dungeon.goblin == 0
 
@@ -49,9 +49,7 @@ def test_defeat_all_rejects_extra_additional():
             w,
             _UNUSED,
             "champion",
-            "goblin",
-            "skeleton",
-            "skeleton",
+            ("goblin", "skeleton", "skeleton"),
         )
 
 
@@ -66,7 +64,7 @@ def test_defeat_all_requires_additional_when_monsters_remain():
             w,
             _UNUSED,
             "champion",
-            "goblin",
+            ("goblin",),
         )
 
 
@@ -77,7 +75,7 @@ def test_defeats_one_plus_one_additional():
         party=struct.Party(champion=1),
     )
     result = special.defeat_one_plus_additional(
-        w, _UNUSED, "champion", "goblin", "skeleton"
+        w, _UNUSED, "champion", ("goblin", "skeleton")
     )
     assert result.dungeon.goblin == 1
     assert result.dungeon.skeleton == 0
@@ -91,7 +89,7 @@ def test_defeat_one_no_additional_when_cleared():
         party=struct.Party(fighter=1),
     )
     result = special.defeat_one_plus_additional(
-        w, _UNUSED, "fighter", "goblin"
+        w, _UNUSED, "fighter", ("goblin",)
     )
     assert result.dungeon.goblin == 0
     assert result.party.fighter == 0
@@ -105,7 +103,7 @@ def test_defeat_one_rejects_additional_when_cleared():
     )
     with pytest.raises(DrollError):
         special.defeat_one_plus_additional(
-            w, _UNUSED, "fighter", "goblin", "skeleton"
+            w, _UNUSED, "fighter", ("goblin", "skeleton")
         )
 
 
@@ -116,7 +114,7 @@ def test_defeat_one_requires_additional_when_monsters_remain():
         party=struct.Party(fighter=1),
     )
     with pytest.raises(DrollError):
-        special.defeat_one_plus_additional(w, _UNUSED, "fighter", "goblin")
+        special.defeat_one_plus_additional(w, _UNUSED, "fighter", ("goblin",))
 
 
 def test_defeat_one_rejects_extra_additional():
@@ -130,9 +128,7 @@ def test_defeat_one_rejects_extra_additional():
             w,
             _UNUSED,
             "champion",
-            "goblin",
-            "skeleton",
-            "ooze",
+            ("goblin", "skeleton", "ooze"),
         )
 
 
@@ -143,7 +139,7 @@ def test_defeat_one_only_decrements_one_of_primary():
         party=struct.Party(champion=1),
     )
     result = special.defeat_one_plus_additional(
-        w, _UNUSED, "champion", "goblin", "skeleton"
+        w, _UNUSED, "champion", ("goblin", "skeleton")
     )
     assert result.dungeon.goblin == 2
     assert result.dungeon.skeleton == 0

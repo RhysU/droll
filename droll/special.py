@@ -43,7 +43,7 @@ def _defeat_plus_additional(
         world=replace(world, party=increment_party(world.party, hero)),
         randrange=randrange,
         hero=hero,
-        target=additional[0],
+        targets=(additional[0],),
     )
 
 
@@ -51,28 +51,28 @@ def defeat_all_plus_additional(
     world: World,
     randrange: RandRange,
     hero: str,
-    target: str,
-    *additional,
+    targets: tuple[str, ...],
 ) -> World:
     """Update world after hero handles all of one target type plus one more."""
+    target, *additional = targets
     world = defeat_all(
-        world=world, randrange=randrange, hero=hero, target=target
+        world=world, randrange=randrange, hero=hero, targets=(target,)
     )
-    return _defeat_plus_additional(world, randrange, hero, additional)
+    return _defeat_plus_additional(world, randrange, hero, tuple(additional))
 
 
 def defeat_one_plus_additional(
     world: World,
     randrange: RandRange,
     hero: str,
-    target: str,
-    *additional,
+    targets: tuple[str, ...],
 ) -> World:
     """Update world after hero handles one target plus one more."""
+    target, *additional = targets
     world = defeat_one(
-        world=world, randrange=randrange, hero=hero, target=target
+        world=world, randrange=randrange, hero=hero, targets=(target,)
     )
-    return _defeat_plus_additional(world, randrange, hero, additional)
+    return _defeat_plus_additional(world, randrange, hero, tuple(additional))
 
 
 def convert_dungeon_to_party(
