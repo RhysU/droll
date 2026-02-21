@@ -83,9 +83,9 @@ def _convert_two(
     """Validate optional targets; convert up to 2 dungeon dice to party."""
     world = _consume_ability(world)
     if targets and targets[0] != source:
-        raise DrollError(f"Ability can only target {source}s.")
+        raise DrollError(f"Ability can only target a {source}.")
     if len(targets) > 1 and targets[1] != source:
-        raise DrollError(f"Ability can only target {source}s.")
+        raise DrollError(f"Ability can only target a {source}.")
     if len(targets) > 2:
         raise DrollError("At most 2 targets can be changed.")
     return special.convert_dungeon_to_party(
