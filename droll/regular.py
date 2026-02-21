@@ -252,11 +252,12 @@ def defeat_dragon_heroes(
     required: int = 3,
     wildcard: Set[str] = frozenset(),
     interchangeable: Set[str] = frozenset(),
-) -> bool:
-    """Have sufficiently many distinct heroes been provided to slay dragon?
+) -> None:
+    """Validate sufficiently many distinct heroes to slay a dragon.
 
     Supports strict distinctness, wildcard heroes (fungible for any other),
     and interchangeable heroes (may substitute for one another).
+    Raises DrollError if validation fails.
     """
     hero_set = {*heroes}
     if hero_set & {*disallowed_heroes}:
@@ -270,7 +271,6 @@ def defeat_dragon_heroes(
         raise DrollError(
             f"Exactly {required} distinct heroes not in {', '.join(heroes)}"
         )
-    return True
 
 
 def defeat_dragon(
@@ -280,15 +280,15 @@ def defeat_dragon(
     target: str,
     *others,
     defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
-    _min_dragon_length: int = 3,
+    _min_dragon_count: int = 3,
 ) -> World:
     """Update world after hero handles a dragon using multiple distinct heroes.
 
     Additional required heroes are specified within variable-length others."""
     # Simple prerequisites for attempting to defeat the dragon
-    if world.dungeon.dragon < _min_dragon_length:
+    if world.dungeon.dragon < _min_dragon_count:
         raise DrollError(
-            f"Enemy {target} only comes at length {_min_dragon_length}."
+            f"Enemy {target} only comes at length {_min_dragon_count}."
         )
     if not defeated_monsters(world.dungeon):
         raise DrollError(
@@ -303,8 +303,7 @@ def defeat_dragon(
         party = decrement_party(party, other)
         regroup = decrement_regroup(regroup, other)
         heroes.append(other)
-    if not defeat_dragon_heroes(*heroes):
-        raise RuntimeError("Unexpected result from defeat_dragon_heroes")
+    defeat_dragon_heroes(*heroes)
 
     # Attempt was successful, so update experience and treasure
     return replace(

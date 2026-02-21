@@ -246,14 +246,14 @@ def test_interchangeable_single_member_absent():
 
 def test_dragon_wildcard_less_interesting_successful_cases():
     """Test valid dragon defeats with wildcard heroes."""
-    assert regular.defeat_dragon_heroes(
+    regular.defeat_dragon_heroes(
         "cleric",
         "thief",
         "mage",
         disallowed_heroes=frozenset(),
         wildcard=frozenset({"scroll"}),
     )
-    assert regular.defeat_dragon_heroes(
+    regular.defeat_dragon_heroes(
         "cleric",
         "thief",
         "fighter",
@@ -320,13 +320,13 @@ def test_dragon_wildcard_more_interesting_failure_cases():
 
 def test_dragon_interchangeable_less_interesting_successful_cases():
     """Test valid dragon defeats with interchangeable heroes."""
-    assert regular.defeat_dragon_heroes(
+    regular.defeat_dragon_heroes(
         "cleric",
         "thief",
         "mage",
         interchangeable=frozenset({"fighter"}),
     )
-    assert regular.defeat_dragon_heroes(
+    regular.defeat_dragon_heroes(
         "cleric",
         "thief",
         "fighter",
