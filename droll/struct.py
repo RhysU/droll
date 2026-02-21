@@ -130,7 +130,7 @@ Ability = Callable[..., World]
 class Player:
     name: Optional[str] = None
     ability: Optional[Ability] = None
-    advance: Optional[Callable] = None  # See Advance type alias below
+    advance: Optional["Advance"] = None
     bait: Optional[Ability] = None
     elixir: Optional[Ability] = None
     roll: Optional[Roll] = None
