@@ -291,6 +291,12 @@ blocks progress and must be fought by 3 distinct party members.
 Defeating a dragon earns 1 experience and draws 1 treasure.
 A ring or portal can bypass a blocking dragon automatically.
 
+Display notation: `name×N` means N dice of that type (e.g.
+`champion×3`).  In the party line, `name~D` or `name×N~D` means
+D of those dice will be discarded at the next regroup—these are
+temporary allies converted from monsters by hero abilities
+(e.g. `thief×2~1` means 2 thieves, 1 temporary).
+
 Level up: at 5+ experience your hero gains a new name and
 upgraded abilities (e.g. Knight becomes DragonSlayer).
 
