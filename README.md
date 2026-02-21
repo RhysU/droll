@@ -254,6 +254,9 @@ Dungeon:      None
 21 DragonSlayer> ^D
 ```
 
+The `--mechanical` flag switches to a legacy single-line display
+format.  The default display uses color when writing to a terminal.
+
 ## How to play
 
 You get 3 delves into the dungeon per game.  Each delve proceeds
@@ -270,6 +273,9 @@ as follows:
    experience equal to your depth.  If monsters remain and you cannot
    defeat them, instead "retreat" but earn nothing.
 
+Undo: you can `undo` a command so long as nothing was rolled or
+drawn since—the game prevents undoing randomized actions.
+
 Combat: each party member can target any monster, but specialists
 defeat all of their favored type while non-specialists defeat one:
 
@@ -285,6 +291,10 @@ defeat all of their favored type while non-specialists defeat one:
 Scrolls cannot target monsters directly.  Instead, spend a scroll
 via `reroll <targets>` to re-roll any dungeon or party dice,
 for example `reroll goblin skeleton` re-rolls those two dice.
+Scroll behavior varies by hero: Enchantress/Beguiler can use a
+scroll offensively against skeletons, Knight converts scrolls to
+champions during party roll, and Mercenary/Commander receives one
+bonus scroll (discarded on regroup).
 
 Dragons accumulate across depths.  At 3 or more, the dragon
 blocks progress and must be fought by 3 distinct party members.
@@ -367,7 +377,7 @@ Total score = experience + treasure points.
 
 ## Without Installation
 
-Clone this repository then run via:
+Requires Python 3.9+.  Clone this repository then run via:
 
 ```
 PYTHONPATH=. python3 -m droll --help
