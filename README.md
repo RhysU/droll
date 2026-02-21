@@ -274,6 +274,11 @@ defeat all of their favored type while non-specialists defeat one:
 | mage     | ooze        | goblin, skeleton       | opens one chest  |
 | thief    | —           | goblin, skeleton, ooze | opens all chests |
 | champion | all three   | —                      | opens all chests |
+| scroll   | —           | —                      | quaffs potions, fights dragons |
+
+Scrolls cannot target monsters directly.  Instead, spend a scroll
+via `reroll <targets>` to re-roll any dungeon or party dice
+(e.g. `reroll goblin skeleton` re-rolls those two dice).
 
 Dragons accumulate across depths.  At 3 or more, the dragon
 blocks progress and must be fought by 3 distinct party members.
