@@ -45,7 +45,7 @@ class Game:
             isinstance(other, Game)
             and self._player == other._player
             and self._world == other._world
-            and self.randhash() == other.randhash()
+            and self._random.getstate() == other._random.getstate()
         )
 
     def __copy__(self):
@@ -65,9 +65,9 @@ class Game:
             f", depth={self._world.depth})"
         )
 
-    def randhash(self) -> int:
-        """Hash of the current random state."""
-        return hash(self._random.getstate())
+    def randstate(self) -> tuple:
+        """The current random state for comparison."""
+        return self._random.getstate()
 
     def _next_delve(self) -> GameState:
         """Either start next delve or complete this game."""
