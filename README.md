@@ -5,9 +5,9 @@ Droll
 ## What is it?
 
 Droll implements [Dungeon Roll](https://boardgamegeek.com/boardgame/138788/dungeon-roll),
-a product of [Tasty Minstrel Games](http://playtmg.com/).  Droll is
-in no way affiliated with either the game or the publisher.  Go buy their
-excellent game, learn [how to play](https://www.youtube.com/watch?v=PzZ8hUzXBtE)
+a product of [Tasty Minstrel Games](https://boardgamegeek.com/boardgamepublisher/9499/tasty-minstrel-games).
+Droll is in no way affiliated with either the game or the publisher.  Go buy
+their excellent game, learn [how to play](https://www.youtube.com/watch?v=PzZ8hUzXBtE)
 it, and then come back here.
 
 ## What is implemented?
