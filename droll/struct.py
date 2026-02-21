@@ -8,6 +8,8 @@ from dataclasses import dataclass, fields
 from typing import Any, Iterator, Optional
 
 __all__ = (
+    "Ability",
+    "Advance",
     "Artifacts",
     "DrollError",
     "Dungeon",
@@ -89,24 +91,6 @@ class Roll:
     party: Optional[RollParty] = None
 
 
-# TODO Add type signature for "ability"
-# TODO Add type signature for "advance"
-# TODO Add type signature for "bait"
-# TODO Add type signature for "elixir"
-
-
-@dataclass(frozen=True)
-class Player:
-    name: Optional[str] = None
-    ability: Optional[Callable] = None
-    advance: Optional[Callable] = None
-    bait: Optional[Callable] = None
-    elixir: Optional[Callable] = None
-    roll: Optional[Roll] = None
-    artifacts: Optional[Party] = None
-    party: Optional[Party] = None
-
-
 @dataclass(frozen=True)
 class Artifacts:
     sword: int = 0
@@ -137,6 +121,24 @@ class World:
     ability: Optional[bool] = None
     regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
+
+
+Ability = Callable[..., World]
+
+
+@dataclass(frozen=True)
+class Player:
+    name: Optional[str] = None
+    ability: Optional[Ability] = None
+    advance: Optional[Callable] = None  # See Advance type alias below
+    bait: Optional[Ability] = None
+    elixir: Optional[Ability] = None
+    roll: Optional[Roll] = None
+    artifacts: Optional[Party] = None
+    party: Optional[Party] = None
+
+
+Advance = Callable[[World], Player]
 
 
 def brief(o: Any) -> str:
