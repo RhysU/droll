@@ -133,7 +133,7 @@ class Shell(cmd.Cmd):
             pass  # Retaining undo operations would break multiple undos
         elif self._game == before:
             pass  # No change in state (e.g. help) so nothing to track
-        elif self._game.randhash() == before.randhash():
+        elif self._game.randstate() == before.randstate():
             self._undo.append(before)  # Same random state so undo permitted
         else:
             self._undo.clear()  # Random state mutated so no undo permitted
@@ -148,7 +148,7 @@ class Shell(cmd.Cmd):
         _no_arguments(line)
         if self._undo:
             # Assertion confirms onecmd(...) processing matches expectations
-            assert self._game.randhash() == self._undo[-1].randhash()
+            assert self._game.randstate() == self._undo[-1].randstate()
             self._game = self._undo.pop()
         else:
             raise DrollError("Cannot undo any prior command(s).")
