@@ -410,6 +410,7 @@ class Shell(cmd.Cmd):
         print("reduces your score accordingly.")
         print()
         print("Total score = experience + treasure points.")
+        print("See 'help treasure' for the full treasure list.")
 
     def help_treasure(self):
         """Display help for the treasure system."""
