@@ -279,7 +279,7 @@ defeat all of their favored type while non-specialists defeat one:
 | mage     | ooze        | goblin, skeleton       | opens one chest  |
 | thief    | —           | goblin, skeleton, ooze | opens all chests |
 | champion | all three   | —                      | opens all chests |
-| scroll   | —           | —                      | quaffs potions, fights dragons |
+| scroll   | —           | —                      | quaffs potions, rerolls dice |
 
 Scrolls cannot target monsters directly.  Instead, spend a scroll
 via `reroll <targets>` to re-roll any dungeon or party dice
