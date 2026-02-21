@@ -337,20 +337,16 @@ upgraded ability and enhanced party interactions:
 | Crusader    | Paladin       | Consume treasure to clear dungeon    | Fighter/Cleric interchangeable          |
 | Enchantress | Beguiler      | Transform up to 2 monsters to potion | Scrolls become offensive combatants     |
 | HalfGoblin  | Chieftain     | Transform up to 2 goblins to thieves | Chests/potions accessible during combat |
-| Knight      | DragonSlayer  | Convert monsters to dragons          | Dragon needs only 2 distinct heroes     |
+| Knight      | DragonSlayer  | *(unchanged)*                        | Dragon needs only 2 distinct heroes     |
 | Mercenary   | Commander     | Reroll any number of dice            | Fighter defeats extra monster per use   |
-| Minstrel    | Bard          | Discard all dragon dice              | Champion defeats extra monster per use  |
+| Minstrel    | Bard          | *(unchanged)*                        | Champion defeats extra monster per use  |
 | Occultist   | Necromancer   | Transform up to 2 skeletons to fighters | Cleric/Mage interchangeable          |
 | Spellsword  | Battlemage    | Discard all monsters, chests, potions | Fighter/Mage interchangeable           |
 
 ## How does scoring work?
 
-Your score has two components: experience and treasure.
-
-Experience is earned by retiring from a delve.  When you retire,
-you gain experience equal to the depth you reached in the dungeon.
-For example, retiring at depth 5 earns 5 experience points.
-Retreating earns no experience.
+Your score has two components: experience (earned by retiring,
+as described above) and treasure.
 
 Treasure is drawn randomly from a shared box whenever you open
 chests.  Each piece of treasure scores 1 point, with two exceptions:
@@ -368,8 +364,6 @@ chests.  Each piece of treasure scores 1 point, with two exceptions:
 | ring       | 1      | Sneak past a dragon                    |
 | scale      | 1      | But a pair of scales scores 4          |
 
-Town portals are worth 2 points each.  Scales score 1 point each,
-but every pair of scales scores 4 rather than 2, a +2 bonus per pair.
 Using a treasure during a delve removes it from your collection and
 reduces your score accordingly.
 
