@@ -325,21 +325,19 @@ def bait_dragon(
 ) -> World:
     """Convert all monster faces into dragon dice."""
     # Confirm well-formed request optionally containing a target
-    target, *_ = targets or (None,)
-    target = "dragon" if target is None else target
-    if target != "dragon":
-        raise DrollError(f"Cannot {command} a {target}.")
+    if targets and targets[0] != "dragon":
+        raise DrollError(f"Cannot {command} a {targets[0]}.")
     if require_treasure:
         world = replace(world, treasure=replace_treasure(world.treasure, command))
 
     # Compute how many new dragons will be produced and remove sources
     dungeon = world.dungeon
-    new_targets = (
+    new_dragons = (
         sum(getattr(dungeon, enemy) for enemy in _enemies)
         if dungeon is not None
         else 0
     )
-    if not new_targets:
+    if not new_dragons:
         raise DrollError(f"At least 1 of {_enemies} required for '{command}'.")
 
     # Zero all enemy sources and increment the number of dragons
@@ -348,7 +346,7 @@ def bait_dragon(
         dungeon=replace(
             dungeon,
             **{enemy: 0 for enemy in _enemies},
-            **{target: getattr(dungeon, target) + new_targets},
+            dragon=dungeon.dragon + new_dragons,
         ),
     )
 
@@ -357,11 +355,10 @@ def elixir(
     world: World, randrange: RandRange, command: str, targets: tuple[str, ...] = ()
 ) -> World:
     """Add one hero die of any requested type."""
-    target, *_ = targets or (None,)
-    if target is None:
+    if not targets:
         raise DrollError(f"Hero required for {command}.")
     return replace(
         world,
         treasure=replace_treasure(world.treasure, command),
-        party=increment_party(world.party, target),
+        party=increment_party(world.party, targets[0]),
     )

@@ -128,16 +128,14 @@ def beguiler_ability(
     """Transform at most 2 monsters into 1 potion.
 
     Requires transforming 2 monsters when 2+ monsters available."""
-    target, *extra_targets = targets or (None,)
     world = _consume_ability(world)
     dungeon = world.dungeon
-    dungeon = decrement_dungeon(dungeon, target)
-    if len(extra_targets) > 1:
+    dungeon = decrement_dungeon(dungeon, targets[0])
+    if len(targets) > 2:
         raise DrollError("At most 2 targets can be changed.")
-    elif len(extra_targets) == 1:
-        dungeon = decrement_dungeon(dungeon, extra_targets[0])
+    elif len(targets) == 2:
+        dungeon = decrement_dungeon(dungeon, targets[1])
     elif not defeated_monsters(dungeon):
-        assert len(extra_targets) == 0
         raise DrollError("2 targets required when 2+ available.")
     dungeon = increment_dungeon(dungeon, "potion")
     return replace(world, dungeon=dungeon)
@@ -150,9 +148,9 @@ def chieftain_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 goblins into thieves, discarding them on regroup."""
-    target, *extra_targets = targets or (None,)
     return _convert_two(
-        world, target, extra_targets, source="goblin", destination="thief"
+        world, targets[0] if targets else None, targets[1:],
+        source="goblin", destination="thief",
     )
 
 
@@ -184,8 +182,9 @@ def crusader_ability(
     """Crusader usable as a fighter or a cleric, adding one hero.
 
     Optionally, specify 'fighter' or 'cleric' to select which to choose."""
-    target, *_ = targets or (None,)
-    return _choose_and_add_hero(world, command, target, _acceptable_targets)
+    return _choose_and_add_hero(
+        world, command, targets[0] if targets else None, _acceptable_targets
+    )
 
 
 def enchantress_ability(
@@ -197,10 +196,9 @@ def enchantress_ability(
     """Transform exactly 1 monster into 1 potion."""
     if not targets:
         raise struct.DrollError(f'"{command}" requires a monster target.')
-    target, *_ = targets
     world = _consume_ability(world)
     dungeon = world.dungeon
-    dungeon = decrement_dungeon(dungeon, target)
+    dungeon = decrement_dungeon(dungeon, targets[0])
     dungeon = increment_dungeon(dungeon, "potion")
     return replace(world, dungeon=dungeon)
 
@@ -212,8 +210,10 @@ def halfgoblin_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform 1 goblin into 1 thief, discarding it on regroup."""
-    target, *_ = targets or (None,)
-    return _convert_one(world, target, source="goblin", destination="thief")
+    return _convert_one(
+        world, targets[0] if targets else None,
+        source="goblin", destination="thief",
+    )
 
 
 def knight_ability(
@@ -253,12 +253,10 @@ def minstrel_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Discard all dragon dice."""
-    target, *_ = targets or (None,)
     world = _consume_ability(world)
-    target = "dragon" if target is None else target
-    if target != "dragon":
-        raise DrollError(f"Can only discard dragon dice, not {target}.")
-    return replace(world, dungeon=eliminate_dungeon(world.dungeon, target))
+    if targets and targets[0] != "dragon":
+        raise DrollError(f"Can only discard dragon dice, not {targets[0]}.")
+    return replace(world, dungeon=eliminate_dungeon(world.dungeon, "dragon"))
 
 
 def necromancer_ability(
@@ -268,9 +266,9 @@ def necromancer_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 skeletons into fighters, discarding on regroup."""
-    target, *extra_targets = targets or (None,)
     return _convert_two(
-        world, target, extra_targets, source="skeleton", destination="fighter"
+        world, targets[0] if targets else None, targets[1:],
+        source="skeleton", destination="fighter",
     )
 
 
@@ -281,9 +279,9 @@ def occultist_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it on regroup."""
-    target, *_ = targets or (None,)
     return _convert_one(
-        world, target, source="skeleton", destination="fighter"
+        world, targets[0] if targets else None,
+        source="skeleton", destination="fighter",
     )
 
 
@@ -297,19 +295,18 @@ def paladin_ability(
 
     Specify consumed treasure as first argument.
     For each potion, add one argument for the hero to revive."""
-    target, *revivable = targets or (None,)
     world = _consume_ability(world)
     # Validate that a treasure was specified
-    if target is None:
+    if not targets:
         raise DrollError(f"Treasure to consume required for {command}.")
 
     # Consume the specified treasure (will error if not possessed)
-    world = replace(world, treasure=replace_treasure(world.treasure, target))
+    world = replace(world, treasure=replace_treasure(world.treasure, targets[0]))
 
     # Validate potion/revivable count before making changes
     if world.dungeon is not None:
         potion_count = world.dungeon.potion
-        if len(revivable) != potion_count:
+        if len(targets) - 1 != potion_count:
             raise DrollError(
                 f"Exactly {potion_count} heroes to revive required."
             )
@@ -322,7 +319,7 @@ def paladin_ability(
 
         # Revive heroes for each potion
         party = world.party
-        for revived in revivable:
+        for revived in targets[1:]:
             party = increment_party(party, revived)
         world = replace(world, party=party)
 
@@ -343,5 +340,6 @@ def spellsword_ability(
     """Spellsword usable as a fighter or a mage, adding one hero to party.
 
     Optionally, specify 'fighter' or 'mage' to select which to choose."""
-    target, *_ = targets or (None,)
-    return _choose_and_add_hero(world, command, target, _acceptable_targets)
+    return _choose_and_add_hero(
+        world, command, targets[0] if targets else None, _acceptable_targets
+    )
