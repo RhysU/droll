@@ -31,7 +31,7 @@ def _format_item(name: str, count: int, discard: int = 0) -> Optional[str]:
         return None
     counted = count > 1 or name in _ALWAYS_COUNT
     if discard:
-        return f"{name}×{count}-{discard}" if counted else f"{name}-{discard}"
+        return f"{name}×{count}~{discard}" if counted else f"{name}~{discard}"
     return f"{name}×{count}" if counted else name
 
 
