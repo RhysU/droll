@@ -321,7 +321,7 @@ class Shell(cmd.Cmd):
     def help_portal(self):
         """Display help for portal treasures."""
         print("Town portals escape the dungeon, worth 2 points each.")
-        print('To use a portal, directly "retire" (consumed automatically).')
+        print('Retiring consumes a portal automatically.')
 
     def help_ring(self):
         """Display help for using rings of invisibility."""
@@ -334,7 +334,7 @@ class Shell(cmd.Cmd):
 
     def help_scroll(self):
         """Display help for using scroll treasures."""
-        print("Scrolls quaff potions or re-roll dice (consuming the scroll):")
+        print("Consume a scroll to quaff potions or re-roll dice:")
         print("""
             scroll potion mage thief    # Drink 2 potions obtaining mage, thief
             reroll skeleton goblin      # Re-roll a skeleton and a goblin
@@ -342,8 +342,8 @@ class Shell(cmd.Cmd):
         print("Scroll behavior varies by hero:")
         print("""
             scroll skeleton             # Enchantress/Beguiler: kill all skeletons
-            (Knight: scrolls become champions during party roll)
-            (Mercenary/Commander: one bonus scroll, discarded on regroup)""")
+            Knight: scrolls become champions during party roll
+            Mercenary/Commander: one bonus scroll, discarded on regroup""")
 
     def help_reroll(self):
         """Display help for the reroll command."""
@@ -402,7 +402,7 @@ class Shell(cmd.Cmd):
         )
         print(
             "but every pair of scales scores 4"
-            " rather than 2 (a +2 bonus per pair)."
+            " rather than 2, a +2 bonus per pair."
         )
         print(
             "Using a treasure during a delve removes"
@@ -428,7 +428,7 @@ class Shell(cmd.Cmd):
             scroll      1   Usable as a scroll
             elixir      1   Revive party members
             bait        1   Lure the dragon
-            portal      2   Escape the dungeon (town portal)
+            portal      2   Town portal to escape the dungeon
             ring        1   Sneak past a dragon
             scale       1   But a pair of scales scores 4
             """)
