@@ -573,7 +573,7 @@ def test_open_one_before_monsters_defeated():
         party=struct.Party(thief=1),
     )
     with pytest.raises(DrollError):
-        regular.open_one(w, _UNUSED, "thief", "chest")
+        regular.open_one(w, _UNUSED, "thief", ("chest",))
 
 
 def test_open_all_before_monsters_defeated():
@@ -583,7 +583,7 @@ def test_open_all_before_monsters_defeated():
         party=struct.Party(thief=1),
     )
     with pytest.raises(DrollError):
-        regular.open_all(w, _UNUSED, "thief", "chest")
+        regular.open_all(w, _UNUSED, "thief", ("chest",))
 
 
 def test_quaff_no_potions():
@@ -593,7 +593,7 @@ def test_quaff_no_potions():
         party=struct.Party(fighter=1),
     )
     with pytest.raises(DrollError):
-        regular.quaff(w, _UNUSED, "fighter", "potion")
+        regular.quaff(w, _UNUSED, "fighter", ("potion",))
 
 
 def test_reroll_no_targets():
@@ -656,7 +656,7 @@ def test_regroup_discard_after_quaff():
         regroup=struct.Regroup(discard=struct.Party(thief=1)),
     )
     # Thief quaffs potion, reviving another thief
-    post = regular.quaff(pre, None, "thief", "potion", "thief")
+    post = regular.quaff(pre, None, "thief", ("potion", "thief"))
     # The marked thief was consumed so the discard counter must drop
     assert post.regroup.discard.thief == 0
     assert post.party.thief == 1
@@ -685,7 +685,7 @@ def test_regroup_discard_after_elixir1():
     )
 
     # Force-discard thief kills the ooze
-    post1 = regular.defeat_one(pre, None, "thief", "ooze")
+    post1 = regular.defeat_one(pre, None, "thief", ("ooze",))
     assert post1.regroup.discard.thief == 0
     assert post1.party.thief == 0
 
@@ -723,7 +723,7 @@ def test_regroup_discard_after_elixir2():
     assert post1.party.thief == 2
 
     # Force-discard thief kills the ooze
-    post2 = regular.defeat_one(post1, None, "thief", "ooze")
+    post2 = regular.defeat_one(post1, None, "thief", ("ooze",))
     assert post2.regroup.discard.thief == 0
     assert post2.party.thief == 1
 

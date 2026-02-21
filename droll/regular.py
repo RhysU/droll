@@ -44,16 +44,17 @@ _PARTY_NAMES = frozenset(field_names(Party))
 
 
 def not_reroll(
-    world: World, randrange: RandRange, hero: str, target: str, *additional
+    world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
 ) -> World:
     """Scrolls cannot target dungeon dice directly; use 'reroll' instead."""
-    raise DrollError(f'Use "reroll {target}" to re-roll with a scroll.')
+    raise DrollError(f'Use "reroll {targets[0]}" to re-roll with a scroll.')
 
 
 def defeat_one(
-    world: World, randrange: RandRange, hero: str, target: str
+    world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
 ) -> World:
     """Update world after hero handles exactly one target."""
+    (target,) = targets
     return replace(
         world,
         dungeon=decrement_dungeon(world.dungeon, target),
@@ -63,9 +64,10 @@ def defeat_one(
 
 
 def defeat_all(
-    world: World, randrange: RandRange, hero: str, target: str
+    world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
 ) -> World:
     """Update world after hero handles all of one type of target."""
+    (target,) = targets
     return replace(
         world,
         dungeon=eliminate_dungeon(world.dungeon, target),
@@ -78,11 +80,12 @@ def open_one(
     world: World,
     randrange: RandRange,
     hero: str,
-    target: str,
+    targets: tuple[str, ...],
     *,
     after_monsters=True,
 ) -> World:
     """Update world after hero opens exactly one chest."""
+    (target,) = targets
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
     return replace(
@@ -98,11 +101,12 @@ def open_all(
     world: World,
     randrange: RandRange,
     hero: str,
-    target: str,
+    targets: tuple[str, ...],
     *,
     after_monsters=True,
 ) -> World:
     """Update world after hero opens all chests."""
+    (target,) = targets
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
     howmany = getattr(world.dungeon, target)
@@ -124,13 +128,14 @@ def quaff(
     world: World,
     randrange: RandRange,
     hero: str,
-    target: str,
-    *revivable,
+    targets: tuple[str, ...],
+    *,
     after_monsters=True,
 ) -> World:
     """Update world after hero quaffs all available potions.
 
     Unlike {defeat,open}_{one,all}(...), heroes to revive are arguments."""
+    target, *revivable = targets
     howmany = getattr(world.dungeon, target)
     if not howmany:
         raise DrollError(f"At least 1 {target} required.")
@@ -275,14 +280,15 @@ def defeat_dragon(
     world: World,
     randrange: RandRange,
     hero: str,
-    target: str,
-    *others,
+    targets: tuple[str, ...],
+    *,
     defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
     _min_dragon_count: int = 3,
 ) -> World:
     """Update world after hero handles a dragon using multiple distinct heroes.
 
-    Additional required heroes are specified within variable-length others."""
+    Additional required heroes are specified within the targets tuple."""
+    target, *others = targets
     # Simple prerequisites for attempting to defeat the dragon
     if world.dungeon.dragon < _min_dragon_count:
         raise DrollError(

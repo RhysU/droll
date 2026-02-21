@@ -45,7 +45,7 @@ def test_bard_champion_defeats_all_plus_additional():
         party=struct.Party(champion=1),
     )
     result = Bard.party.champion.goblin(
-        world, _UNUSED, "champion", "goblin", "skeleton"
+        world, _UNUSED, "champion", ("goblin", "skeleton")
     )
     assert result.dungeon.goblin == 0
     assert result.dungeon.skeleton == 0

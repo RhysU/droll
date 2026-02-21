@@ -238,7 +238,7 @@ def mercenary_ability(
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
     world = replace(world, party=increment_party(world.party, "champion"))
     return special.defeat_one_plus_additional(
-        world, randrange, "champion", *targets
+        world, randrange, "champion", targets
     )
 
 
