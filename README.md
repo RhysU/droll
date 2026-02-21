@@ -12,7 +12,9 @@ it, and then come back here.
 
 ## What is implemented?
 
-A REPL providing the classic game, including tab completion to speed playing.
+An interactive command-line interface for playing the base game
+(no expansions), with tab completion for commands and context-sensitive
+arguments (party members, monsters, treasures).
 All base game heroes are implemented.
 Additionally, a "Default" hero with no special abilities is present.
 
@@ -256,6 +258,7 @@ Dungeon:      None
 
 The `--mechanical` flag switches to a legacy single-line display
 format.  The default display uses color when writing to a terminal.
+Press Ctrl+D to exit at any time.
 
 ## How to play
 
@@ -285,12 +288,14 @@ defeat all of their favored type while non-specialists defeat one:
 | cleric   | skeleton    | goblin, ooze           | opens one chest  |
 | mage     | ooze        | goblin, skeleton       | opens one chest  |
 | thief    | —           | goblin, skeleton, ooze | opens all chests |
-| champion | all three   | —                      | opens all chests |
+| champion | goblin, skeleton, ooze | —             | opens all chests |
 | scroll   | —           | —                      | quaffs potions, rerolls dice |
 
 Scrolls cannot target monsters directly.  Instead, spend a scroll
 via `reroll <targets>` to re-roll any dungeon or party dice,
 for example `reroll goblin skeleton` re-rolls those two dice.
+A scroll can also quaff potions: `scroll potion fighter` returns
+a fighter to your party.
 Scroll behavior varies by hero: Enchantress/Beguiler can use a
 scroll offensively against skeletons, Knight converts scrolls to
 champions during party roll, and Mercenary/Commander receives one
@@ -299,13 +304,17 @@ bonus scroll (discarded on regroup).
 Dragons accumulate across depths.  At 3 or more, the dragon
 blocks progress and must be fought by 3 distinct party members.
 Defeating a dragon earns 1 experience and draws 1 treasure.
-A ring or portal can bypass a blocking dragon automatically.
+A ring lets you ignore a blocking dragon without removing the
+dragon dice.  A portal immediately ends the delve, scoring your
+current depth as experience.
 
 Display notation: `name×N` means N dice of that type (e.g.
 `champion×3`).  In the party line, `name~D` or `name×N~D` means
 D of those dice will be discarded at the next regroup—these are
 temporary allies converted from monsters by hero abilities.
 For example, `thief×2~1` means 2 thieves, 1 temporary.
+The prompt shows the move number and current hero name
+(e.g. `00 Knight>`).
 
 Level up: at 5+ experience your hero gains a new name and
 upgraded abilities, for example Knight becomes DragonSlayer.
@@ -334,14 +343,14 @@ upgraded ability and enhanced party interactions:
 
 | Base        | Advanced      | New ability                          | Party change                            |
 |-------------|---------------|--------------------------------------|-----------------------------------------|
-| Crusader    | Paladin       | Consume treasure to clear dungeon    | Fighter/Cleric interchangeable          |
-| Enchantress | Beguiler      | Transform up to 2 monsters to potion | Scrolls become offensive combatants     |
-| HalfGoblin  | Chieftain     | Transform up to 2 goblins to thieves | Chests/potions accessible during combat |
-| Knight      | DragonSlayer  | *(unchanged)*                        | Dragon needs only 2 distinct heroes     |
-| Mercenary   | Commander     | Reroll any number of dice            | Fighter defeats extra monster per use   |
-| Minstrel    | Bard          | *(unchanged)*                        | Champion defeats extra monster per use  |
-| Occultist   | Necromancer   | Transform up to 2 skeletons to fighters | Cleric/Mage interchangeable          |
-| Spellsword  | Battlemage    | Discard all monsters, chests, potions | Fighter/Mage interchangeable           |
+| Crusader    | Paladin       | Consume treasure to clear dungeon    | Each counts as either fighter or cleric           |
+| Enchantress | Beguiler      | Transform up to 2 monsters to potion | Scrolls target monsters like party members         |
+| HalfGoblin  | Chieftain     | Transform up to 2 goblins to thieves | Open chests/quaff potions before clearing monsters |
+| Knight      | DragonSlayer  | *(unchanged)*                        | Dragon requires only 2 distinct party members      |
+| Mercenary   | Commander     | Reroll any number of dice            | Each fighter use defeats one additional monster     |
+| Minstrel    | Bard          | *(unchanged)*                        | Each champion use defeats one additional monster    |
+| Occultist   | Necromancer   | Transform up to 2 skeletons to fighters | Each counts as either cleric or mage            |
+| Spellsword  | Battlemage    | Discard all monsters, chests, potions | Each counts as either fighter or mage              |
 
 ## How does scoring work?
 
@@ -369,7 +378,7 @@ reduces your score accordingly.
 
 Total score = experience + treasure points.
 
-## Without Installation
+## Quick Start
 
 Requires Python 3.9+.  Clone this repository then run via:
 
