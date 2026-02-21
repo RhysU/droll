@@ -293,10 +293,9 @@ def paladin_ability(
 
     # Validate potion/revivable count before making changes
     if world.dungeon is not None:
-        potion_count = world.dungeon.potion
-        if len(targets) - 1 != potion_count:
+        if len(targets) - 1 != world.dungeon.potion:
             raise DrollError(
-                f"Exactly {potion_count} heroes to revive required."
+                f"Exactly {world.dungeon.potion} heroes to revive required."
             )
 
         # Draw treasure for each chest
