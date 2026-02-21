@@ -333,7 +333,7 @@ class Shell(cmd.Cmd):
 
     def help_scroll(self):
         """Display help for using scroll treasures."""
-        print("Scrolls quaff potions or re-roll dice via 'reroll':")
+        print("Scrolls quaff potions or re-roll dice (consuming the scroll):")
         print("""
             scroll potion mage thief    # Drink 2 potions obtaining mage, thief
             reroll skeleton goblin      # Re-roll a skeleton and a goblin
@@ -347,6 +347,9 @@ class Shell(cmd.Cmd):
     def help_reroll(self):
         """Display help for the reroll command."""
         print(self.do_reroll.__doc__)
+        print()
+        print("Targets can be any dungeon die (goblin, skeleton, ooze,")
+        print("chest, potion) or party die (fighter, cleric, mage, etc.):")
         print("""
             reroll goblin skeleton      # Re-roll a goblin and a skeleton
             reroll fighter              # Re-roll one fighter
