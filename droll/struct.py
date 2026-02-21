@@ -8,7 +8,7 @@ from dataclasses import dataclass, fields
 from typing import Any, Iterator, Optional
 
 __all__ = (
-    "Ability",
+    "Command",
     "Advance",
     "Artifacts",
     "DrollError",
@@ -123,16 +123,16 @@ class World:
     treasure: Treasure = Treasure()
 
 
-Ability = Callable[..., World]
+Command = Callable[[World, RandRange, str, tuple[str, ...]], World]
 
 
 @dataclass(frozen=True)
 class Player:
     name: str
-    ability: Ability
+    ability: Command
     advance: "Advance"
-    bait: Ability
-    elixir: Ability
+    bait: Command
+    elixir: Command
     roll: Roll
     artifacts: Party
     party: Party
