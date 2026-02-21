@@ -33,7 +33,7 @@ def defeated_dungeon(dungeon: Optional[Dungeon]) -> bool:
     )
 
 
-def blocking_dragon(dungeon: Optional[Dungeon]) -> bool:
+def blocking_dragon(dungeon: Dungeon) -> bool:
     """Is a dragon blocking progress to the next level?"""
     return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
 
@@ -48,28 +48,22 @@ def finished_dungeon(dungeon: Optional[Dungeon]) -> bool:
     )
 
 
-def decrement_dungeon(dungeon: Optional[Dungeon], target: str) -> Dungeon:
+def decrement_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
     """Decrease the count of the specified target type by one."""
-    if dungeon is None:
-        raise DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise DrollError(f"At least 1 {target} required in dungeon.")
     return replace(dungeon, **{target: prior_targets - 1})
 
 
-def increment_dungeon(dungeon: Optional[Dungeon], target: str) -> Dungeon:
+def increment_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
     """Increase the count of the specified target type by one."""
-    if dungeon is None:
-        raise DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target, 0)
     return replace(dungeon, **{target: prior_targets + 1})
 
 
-def eliminate_dungeon(dungeon: Optional[Dungeon], target: str) -> Dungeon:
+def eliminate_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
     """Remove all targets of the specified type from the dungeon."""
-    if dungeon is None:
-        raise DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise DrollError(f"At least 1 {target} required in dungeon.")
