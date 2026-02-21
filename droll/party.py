@@ -21,7 +21,7 @@ def decrement_party(party: Optional[Party], hero: str) -> Party:
         raise DrollError("No party currently active.")
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
-        raise DrollError(f"At least 1 {hero} required.")
+        raise DrollError(f"At least 1 {hero} required in party.")
     return replace(party, **{hero: prior_heroes - 1})
 
 

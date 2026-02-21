@@ -252,15 +252,12 @@ class Shell(cmd.Cmd):
                 print(_RESET, end="")
 
     doc_header = "Feasible commands (help <command>):"
-    doc_hero_template = (
-        "Attack monsters, quaff potions, and open chests with a {} like so:"
+    doc_dragon_example = (
+        "        {0} dragon cleric mage      # Attack dragon with party of 3"
     )
-    doc_hero_example = """
-        champion skeleton            # Attack skeleton(s)
-        thief chest                  # Open chest(s)
-        fighter potion mage thief    # Drink 2 potions obtaining mage, thief
-        mage dragon champion cleric  # Attack dragon with party of 3
-    """
+    doc_potion_example = (
+        "        {0} potion mage thief       # Drink 2 potions obtaining mage, thief"
+    )
 
     def help_ability(self):
         """Display help for the ability command."""
@@ -274,13 +271,25 @@ class Shell(cmd.Cmd):
 
     def help_champion(self):
         """Display help for using the champion hero."""
-        print(self.doc_hero_template.format("champion"))
-        print(self.doc_hero_example)
+        print("Champions defeat ALL of any monster type and open ALL chests:")
+        print()
+        print("        champion goblin              # Defeat all goblins")
+        print("        champion skeleton             # Defeat all skeletons")
+        print("        champion ooze                 # Defeat all ooze")
+        print("        champion chest                # Open all chests")
+        print(self.doc_potion_example.format("champion"))
+        print(self.doc_dragon_example.format("champion"))
 
     def help_cleric(self):
         """Display help for using the cleric hero."""
-        print(self.doc_hero_template.format("cleric"))
-        print(self.doc_hero_example)
+        print("Clerics defeat ALL skeletons but only ONE goblin or ooze:")
+        print()
+        print("        cleric skeleton               # Defeat all skeletons")
+        print("        cleric goblin                 # Defeat one goblin")
+        print("        cleric ooze                   # Defeat one ooze")
+        print("        cleric chest                  # Open one chest")
+        print(self.doc_potion_example.format("cleric"))
+        print(self.doc_dragon_example.format("cleric"))
 
     def help_elixir(self):
         """Display help for using elixir treasures."""
@@ -288,13 +297,30 @@ class Shell(cmd.Cmd):
 
     def help_fighter(self):
         """Display help for using the fighter hero."""
-        print(self.doc_hero_template.format("fighter"))
-        print(self.doc_hero_example)
+        print("Fighters defeat ALL goblins but only ONE skeleton or ooze:")
+        print()
+        print("        fighter goblin                # Defeat all goblins")
+        print("        fighter skeleton              # Defeat one skeleton")
+        print("        fighter ooze                  # Defeat one ooze")
+        print("        fighter chest                 # Open one chest")
+        print(self.doc_potion_example.format("fighter"))
+        print(self.doc_dragon_example.format("fighter"))
 
     def help_mage(self):
         """Display help for using the mage hero."""
-        print(self.doc_hero_template.format("mage"))
-        print(self.doc_hero_example)
+        print("Mages defeat ALL ooze but only ONE goblin or skeleton:")
+        print()
+        print("        mage ooze                     # Defeat all ooze")
+        print("        mage goblin                   # Defeat one goblin")
+        print("        mage skeleton                 # Defeat one skeleton")
+        print("        mage chest                    # Open one chest")
+        print(self.doc_potion_example.format("mage"))
+        print(self.doc_dragon_example.format("mage"))
+
+    def help_portal(self):
+        """Display help for portal treasures."""
+        print("Town portals escape the dungeon, worth 2 points each.")
+        print('To use a portal, directly "retire" (consumed automatically).')
 
     def help_ring(self):
         """Display help for using rings of invisibility."""
@@ -340,8 +366,14 @@ class Shell(cmd.Cmd):
 
     def help_thief(self):
         """Display help for using the thief hero."""
-        print(self.doc_hero_template.format("thief"))
-        print(self.doc_hero_example)
+        print("Thieves open ALL chests but only defeat ONE monster at a time:")
+        print()
+        print("        thief chest                   # Open all chests")
+        print("        thief goblin                  # Defeat one goblin")
+        print("        thief skeleton                # Defeat one skeleton")
+        print("        thief ooze                    # Defeat one ooze")
+        print(self.doc_potion_example.format("thief"))
+        print(self.doc_dragon_example.format("thief"))
 
     def help_tools(self):
         """Display help for using tools treasures."""

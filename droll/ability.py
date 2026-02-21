@@ -195,6 +195,8 @@ def enchantress_ability(
     target: Optional[str] = None,
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion."""
+    if target is None:
+        raise struct.DrollError(f'"{noun}" requires a monster target.')
     world = _consume_ability(world)
     dungeon = world.dungeon
     dungeon = decrement_dungeon(dungeon, target)

@@ -8,7 +8,8 @@ Droll implements [Dungeon Roll](https://boardgamegeek.com/boardgame/138788/dunge
 a product of [Tasty Minstrel Games](http://playtmg.com/).  Droll is
 in no way affiliated with either the game or the publisher.  Go buy their
 excellent game, learn [how to play](https://www.youtube.com/watch?v=PzZ8hUzXBtE)
-it, and then come back here.
+it, and then come back here.  Note that this implementation simplifies
+several board game rules; see "How to play" below.
 
 ## What is implemented?
 
@@ -72,12 +73,14 @@ Available: ability retreat
 Party:     fighter×2 cleric mage thief champion×2
 Dungeon:   goblin
 01 Knight> help fighter
-Attack monsters, quaff potions, and open chests with a fighter like so:
+Fighters defeat ALL goblins but only ONE skeleton or ooze:
 
-        champion skeleton            # Attack skeleton(s)
-        thief chest                  # Open chest(s)
-        fighter potion mage thief    # Drink 2 potions obtaining mage, thief
-        mage dragon champion cleric  # Attack dragon with party of 3
+        fighter goblin                # Defeat all goblins
+        fighter skeleton              # Defeat one skeleton
+        fighter ooze                  # Defeat one ooze
+        fighter chest                 # Open one chest
+        fighter potion mage thief     # Drink 2 potions obtaining mage, thief
+        fighter dragon cleric mage    # Attack dragon with party of 3
 
 
 Score 0:   depth 1 in delve 1 with experience 0
@@ -246,6 +249,43 @@ Party:        fighter mage champion×4
 Dungeon:      None
 21 DragonSlayer> ^D
 ```
+
+## How to play
+
+You get **3 delves** into the dungeon per game.  Each delve proceeds
+as follows:
+
+1. **Roll 7 party dice** producing random fighters, clerics, mages,
+   thieves, champions, and scrolls.
+2. **Descend** one depth at a time.  At each depth, new dungeon dice
+   appear: goblins, skeletons, ooze, chests, potions, and dragons.
+3. **Use party members** to defeat monsters, open chests, and quaff
+   potions.  Monsters must be cleared before opening chests, quaffing
+   potions, or descending further.
+4. **Retire** (earn experience equal to your depth) or **retreat**
+   (earn nothing) to end the delve.
+
+**Combat:** each party member can target any monster, but specialists
+defeat *all* of their favored type while non-specialists defeat *one*:
+
+| Hero     | Defeats all | Defeats one each       | Special          |
+|----------|-------------|------------------------|------------------|
+| fighter  | goblin      | skeleton, ooze         | opens one chest  |
+| cleric   | skeleton    | goblin, ooze           | opens one chest  |
+| mage     | ooze        | goblin, skeleton       | opens one chest  |
+| thief    | —           | goblin, skeleton, ooze | opens all chests |
+| champion | all three   | —                      | opens all chests |
+
+**Dragons** accumulate across depths.  At 3 or more, the dragon
+blocks progress and must be fought by 3 distinct party members.
+Defeating a dragon earns 1 experience and draws 1 treasure.
+A ring or portal can bypass a blocking dragon automatically.
+
+**Level up:** at 5+ experience your hero gains a new name and
+upgraded abilities (e.g. Knight becomes DragonSlayer).
+
+**Abilities:** each hero has a once-per-delve special ability.
+Type `help ability` in-game to see what your hero can do.
 
 ## How does scoring work?
 
