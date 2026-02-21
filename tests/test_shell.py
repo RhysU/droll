@@ -118,7 +118,7 @@ def parse_summary_command(text) -> typing.Iterable[typing.Tuple[str, str]]:
         if line.startswith("(delve="):
             summaries.append(line)
         elif line.startswith("("):  # For example, "(Bard  6) descend"
-            command = line[line.index(") ") + 2 :]
+            command = line[line.index(") ") + 2 :]  # noqa: E203
             commands.append(command)
     return zip(summaries, commands)
 
