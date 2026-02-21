@@ -72,9 +72,9 @@ class Shell(cmd.Cmd):
                 summary = summary.replace(
                     "dragon", _RED + "dragon" + _RESET
                 ).replace("None", _GREY + "None" + _RESET)
-            print(summary)
+            print(summary, flush=True)
             if stop:
-                print(self.prompt)
+                print(self.prompt, flush=True)
 
     def _postcmd_legacy(self, stop, line) -> None:
         """Display state using the brief summary format."""
@@ -84,9 +84,9 @@ class Shell(cmd.Cmd):
         )
         print()
         if line != "EOF":
-            print(self._game.summary)
+            print(self._game.summary, flush=True)
             if stop:
-                print(self.prompt)
+                print(self.prompt, flush=True)
 
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
@@ -121,9 +121,9 @@ class Shell(cmd.Cmd):
             if raises:
                 raise
             if self._color:
-                print(_RED, " ".join(e.args), _RESET, sep="")
+                print(_RED, " ".join(e.args), _RESET, sep="", flush=True)
             else:
-                print(*e.args)
+                print(*e.args, flush=True)
             return result
 
         # Retain only undo candidates that disallow cheating.
