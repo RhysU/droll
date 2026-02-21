@@ -62,7 +62,7 @@ def _format_available(available: Sequence[str]) -> str:
 
 def _format_party(
     party: Optional[struct.Party],
-    discard: Optional[struct.Party],
+    discard: struct.Party,
 ) -> Optional[str]:
     """Format party contents, returning None if empty."""
     if party is None or not any(struct.field_values(party)):
