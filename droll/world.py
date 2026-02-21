@@ -170,7 +170,7 @@ def retreat(world: struct.World) -> struct.World:
     if world.depth < 1:
         raise DrollError("Descend at least once prior to retreating.")
     if defeated_dungeon(world.dungeon):
-        raise DrollError("Dungeon is clear; retire instead of retreating.")
+        raise DrollError("No monsters to retreat from; use 'retire' to leave the dungeon.")
 
     # Regroup just prior to retreating
     world = _regroup(world)
