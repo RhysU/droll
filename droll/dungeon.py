@@ -54,7 +54,7 @@ def decrement_dungeon(dungeon: Optional[Dungeon], target: str) -> Dungeon:
         raise DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise DrollError(f"At least 1 {target} required.")
+        raise DrollError(f"At least 1 {target} required in dungeon.")
     return replace(dungeon, **{target: prior_targets - 1})
 
 
@@ -72,5 +72,5 @@ def eliminate_dungeon(dungeon: Optional[Dungeon], target: str) -> Dungeon:
         raise DrollError("No dungeon currently active.")
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
-        raise DrollError(f"At least 1 {target} required.")
+        raise DrollError(f"At least 1 {target} required in dungeon.")
     return replace(dungeon, **{target: 0})
