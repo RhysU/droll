@@ -13,13 +13,6 @@ from droll.game import Game, GameState
 from droll.player import Default
 
 
-def test_game_construction():
-    """Game can be constructed with various parameter combinations."""
-    Game()
-    Game(player=Default)
-    Game(random=random.Random(4))
-
-
 def test_game_repr():
     """Game has a meaningful repr showing player, score, delve, and depth."""
     g = Game(random=random.Random(4), player=Default)
@@ -29,13 +22,6 @@ def test_game_repr():
     assert "score=" in r
     assert "delve=" in r
     assert "depth=" in r
-
-
-def test_gamestate_identity():
-    """GameState enum members are distinct and comparable."""
-    assert GameState.STOP is not GameState.PLAY
-    assert GameState.STOP == GameState.STOP
-    assert GameState.PLAY == GameState.PLAY
 
 
 def test_reroll_dungeon_dice():

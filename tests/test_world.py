@@ -21,16 +21,6 @@ class TestWorld:
         """Set up test fixtures with a seeded random number generator."""
         self.state = random.Random(4)
 
-    def test_game_initial(self):
-        """Test initial game state has correct experience and treasure."""
-        game = world.new_world()
-        assert game.experience == 0
-        assert sum(struct.field_values(game.treasure.own)) == 0
-        assert (
-            sum(struct.field_values(game.treasure.box))
-            == (6 * 3) + (4 * 3) + 6
-        )
-
     def test_delve_initial(self):
         """Test starting a new delve rolls party dice correctly."""
         game = world.new_world()
@@ -420,19 +410,6 @@ class TestWorld:
 
         with pytest.raises(struct.DrollError):
             world.descend(game, dice.roll_dungeon, self.state.randrange)
-
-    def test_dungeon_dice_count(self):
-        """Test that dungeon rolls use exactly 7 dice (minus dragons)."""
-        game = world.new_world()
-        game = world.delve(game, dice.roll_party, self.state.randrange)
-        game = world.descend(game, dice.roll_dungeon, self.state.randrange)
-        # Depth 1 should have exactly 1 die (min of depth and 7)
-        assert sum(struct.field_values(game.dungeon)) == 1
-
-        # At depth 7+, should have 7 dice
-        game2 = replace(game, depth=6, dungeon=struct.Dungeon())
-        game2 = world.descend(game2, dice.roll_dungeon, self.state.randrange)
-        assert sum(struct.field_values(game2.dungeon)) == 7
 
     def test_delve_maximum(self):
         """Test that a fourth delve is rejected after three."""

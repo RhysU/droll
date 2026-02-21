@@ -87,10 +87,6 @@ class TestTreasure:
         """Test sword treasure referred to as 'fighter'."""
         self._helper_artifact("sword", "fighter", "goblin", "ooze")
 
-    def test_sword_via_itself(self):
-        """Test sword treasure referred to as 'sword'."""
-        self._helper_artifact("sword", "fighter", "goblin", "ooze")
-
     def test_talisman(self):
         """Test talisman treasure behaves as cleric."""
         self._helper_artifact("talisman", "cleric", "skeleton", "ooze")
