@@ -128,14 +128,14 @@ Ability = Callable[..., World]
 
 @dataclass(frozen=True)
 class Player:
-    name: Optional[str] = None
-    ability: Optional[Ability] = None
-    advance: Optional["Advance"] = None
-    bait: Optional[Ability] = None
-    elixir: Optional[Ability] = None
-    roll: Optional[Roll] = None
-    artifacts: Optional[Party] = None
-    party: Optional[Party] = None
+    name: str
+    ability: Ability
+    advance: "Advance"
+    bait: Ability
+    elixir: Ability
+    roll: Roll
+    artifacts: Party
+    party: Party
 
 
 Advance = Callable[[World], Player]
