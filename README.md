@@ -317,6 +317,22 @@ Type `help ability` in-game to see what your hero can do.
 | Occultist   | Transform 1 skeleton into fighter| `ability` or `ability skeleton`   | skeleton present        |
 | Spellsword  | Add 1 fighter or mage            | `ability` or `ability mage`       | —                       |
 
+### Level-up progression
+
+At 5+ experience, each hero advances to a stronger form with an
+upgraded ability and enhanced party interactions:
+
+| Base        | Advanced      | New ability                          | Party change                            |
+|-------------|---------------|--------------------------------------|-----------------------------------------|
+| Crusader    | Paladin       | Consume treasure to clear dungeon    | Fighter/Cleric interchangeable          |
+| Enchantress | Beguiler      | Transform up to 2 monsters to potion | Scrolls become offensive combatants     |
+| HalfGoblin  | Chieftain     | Transform up to 2 goblins to thieves | Chests/potions accessible during combat |
+| Knight      | DragonSlayer  | Same (convert monsters to dragons)   | Dragon needs only 2 distinct heroes     |
+| Mercenary   | Commander     | Reroll any number of dice            | Fighter defeats extra monster per use   |
+| Minstrel    | Bard          | Same (discard all dragon dice)       | Champion defeats extra monster per use  |
+| Occultist   | Necromancer   | Transform up to 2 skeletons to fighters | Cleric/Mage interchangeable          |
+| Spellsword  | Battlemage    | Discard all monsters, chests, potions | Fighter/Mage interchangeable           |
+
 ## How does scoring work?
 
 Your score has two components: experience and treasure.
