@@ -27,8 +27,8 @@ def new_world() -> struct.World:
         depth=0,
         experience=0,
         dungeon=None,
-        party=None,
-        ability=None,
+        party=struct.Party(),
+        ability=False,
         regroup=struct.Regroup(),
         treasure=struct.Treasure(
             own=struct.Artifacts(),
