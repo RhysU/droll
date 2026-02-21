@@ -297,6 +297,20 @@ upgraded abilities (e.g. Knight becomes DragonSlayer).
 Abilities: each hero has a once-per-delve special ability.
 Type `help ability` in-game to see what your hero can do.
 
+### Hero abilities
+
+| Hero        | Ability                          | Syntax example                    | Requires                |
+|-------------|----------------------------------|-----------------------------------|-------------------------|
+| Default     | No special ability               | `ability`                         | —                       |
+| Crusader    | Add 1 fighter or cleric          | `ability` or `ability cleric`     | —                       |
+| Enchantress | Transform 1 monster into potion  | `ability goblin`                  | 1 monster target        |
+| HalfGoblin  | Transform 1 goblin into thief    | `ability` or `ability goblin`     | goblin present          |
+| Knight      | Convert all monsters to dragons  | `ability`                         | —                       |
+| Mercenary   | Defeat any 2 monsters            | `ability goblin skeleton`         | 1–2 monster targets     |
+| Minstrel    | Discard all dragon dice          | `ability`                         | —                       |
+| Occultist   | Transform 1 skeleton into fighter| `ability` or `ability skeleton`   | skeleton present        |
+| Spellsword  | Add 1 fighter or mage            | `ability` or `ability mage`       | —                       |
+
 ## How does scoring work?
 
 Your score has two components: experience and treasure.
