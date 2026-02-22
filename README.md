@@ -13,8 +13,9 @@ it, and then come back here.
 ## What is implemented?
 
 An interactive command-line interface for playing the base game
-(no expansions), with tab completion for commands and context-sensitive
-arguments (party members, monsters, treasures).
+without expansions, with tab completion for commands and
+context-sensitive arguments such as party members, monsters,
+and treasures.
 All base game heroes are implemented.
 Additionally, a "Default" hero with no special abilities is present.
 
@@ -26,8 +27,8 @@ the space of 20 minutes.  In 2026, this codebase has been a self-contained
 playspace for LLM-assisted coding.
 
 This game has always seemed like a neat problem to throw into reinforcement
-learning algorithms as (a) the strategy isn't too complicated, (b) the score
-is very straightforward, and (c) there's probabilistic behavior in both the
+learning algorithms as the strategy isn't too complicated, the score
+is very straightforward, and there's probabilistic behavior in both the
 basic die mechanics as well as the expected value of the treasure.  That
 said, I've done such things in neither 2018 nor 2026.
 
@@ -51,21 +52,6 @@ options:
 
 
 $ droll --seed 7 Knight
-
-Score 0:   delve 1 with experience 0
-Treasure:  None
-Available: ability descend
-Party:     fighter×2 cleric mage thief champion×2
-00 Knight> help
-
-Feasible commands (help <command>):
-===================================
-ability  descend
-
-Miscellaneous help topics:
-==========================
-score  treasure
-
 
 Score 0:   delve 1 with experience 0
 Treasure:  None
@@ -195,16 +181,6 @@ Treasure:  elixir sceptre talisman
 Available: descend retire
 Party:     cleric champion
 Dungeon:   dragon×2
-14 Knight> help retreat
-Retreat from the dungeon while monsters remain.
-
-        Automatically starts a new delve or ends game, as suitable.
-
-Score 3:   depth 5 in delve 1 with experience 0
-Treasure:  elixir sceptre talisman
-Available: descend retire
-Party:     cleric champion
-Dungeon:   dragon×2
 14 Knight> retire
 
 Score 8:      delve 2 with experience 5
@@ -299,7 +275,7 @@ a fighter to your party.
 Scroll behavior varies by hero: Enchantress/Beguiler can use a
 scroll offensively against skeletons, Knight converts scrolls to
 champions during party roll, and Mercenary/Commander receives one
-bonus scroll (discarded on regroup).
+bonus scroll, discarded on regroup.
 
 Dragons accumulate across depths.  At 3 or more, the dragon
 blocks progress and must be fought by 3 distinct party members.
@@ -308,19 +284,13 @@ A ring lets you ignore a blocking dragon without removing the
 dragon dice.  A portal immediately ends the delve, scoring your
 current depth as experience.
 
-Display notation: `name×N` means N dice of that type (e.g.
-`champion×3`).  In the party line, `name~D` or `name×N~D` means
+Display notation: `name×N` means N dice of that type, for
+example `champion×3`.  In the party line, `name~D` or `name×N~D` means
 D of those dice will be discarded at the next regroup—these are
 temporary allies converted from monsters by hero abilities.
 For example, `thief×2~1` means 2 thieves, 1 temporary.
-The prompt shows the move number and current hero name
-(e.g. `00 Knight>`).
-
-Level up: at 5+ experience your hero gains a new name and
-upgraded abilities, for example Knight becomes DragonSlayer.
-
-Abilities: each hero has a once-per-delve special ability.
-Type `help ability` in-game to see what your hero can do.
+The prompt shows the move number and current hero name,
+for example `00 Knight>`.
 
 ### Hero abilities
 
@@ -354,8 +324,8 @@ upgraded ability and enhanced party interactions:
 
 ## How does scoring work?
 
-Your score has two components: experience (earned by retiring,
-as described above) and treasure.
+Your score has two components: experience earned by retiring
+and treasure.
 
 Treasure is drawn randomly from a shared box whenever you open
 chests.  Each piece of treasure scores 1 point, with two exceptions:
