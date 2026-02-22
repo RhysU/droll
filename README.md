@@ -249,8 +249,8 @@ as follows:
    potions.  Monsters must be cleared before opening chests, quaffing
    potions, or descending further.
 4. After defeating any monsters, "retire" from the delve to earn
-   experience equal to your depth (you must descend at least once
-   before retiring).  If monsters remain and you cannot defeat them,
+   experience equal to your depth.  You must descend at least once
+   before retiring.  If monsters remain and you cannot defeat them,
    instead "retreat" but earn nothing.
 
 Undo: you can `undo` any command that did not involve rolling or drawing.
