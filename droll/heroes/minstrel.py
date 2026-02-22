@@ -19,7 +19,7 @@ __all__ = (
 # Mage/thief are interchangeable for dragon defeats
 _minstrel_defeat_dragon = partial(
     defeat_dragon,
-    defeat_dragon_heroes=partial(
+    hero_validator=partial(
         defeat_dragon_heroes,
         interchangeable=frozenset({"mage", "thief"}),
     ),
