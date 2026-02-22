@@ -30,7 +30,7 @@ def _knight_roll_party(
 # DragonSlayer only needs 2 distinct heroes instead of 3
 _dragonslayer_defeat_dragon = partial(
     regular.defeat_dragon,
-    defeat_dragon_heroes=partial(regular.defeat_dragon_heroes, required=2),
+    hero_validator=partial(regular.defeat_dragon_heroes, required=2),
 )
 
 # Defined in terms of Default, not Knight, to permit advance(...) closure

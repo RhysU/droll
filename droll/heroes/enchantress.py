@@ -18,7 +18,7 @@ __all__ = (
 # Scrolls act as wildcards for dragon defeats
 _beguiler_defeat_dragon = partial(
     regular.defeat_dragon,
-    defeat_dragon_heroes=partial(
+    hero_validator=partial(
         regular.defeat_dragon_heroes,
         disallowed_heroes=frozenset(),
         wildcard=frozenset({"scroll"}),

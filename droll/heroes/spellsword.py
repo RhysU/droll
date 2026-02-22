@@ -18,7 +18,7 @@ __all__ = (
 # Fighter/mage are interchangeable for dragon defeats
 _spellsword_defeat_dragon = partial(
     regular.defeat_dragon,
-    defeat_dragon_heroes=partial(
+    hero_validator=partial(
         regular.defeat_dragon_heroes,
         interchangeable=frozenset({"fighter", "mage"}),
     ),

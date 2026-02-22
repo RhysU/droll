@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 from operator import add
-from collections.abc import Sequence, Set
+from collections.abc import Callable, Sequence, Set
 from .dice import roll_dungeon, roll_party
 from .dungeon import (
     defeated_monsters,
@@ -288,7 +288,7 @@ def defeat_dragon(
     hero: str,
     targets: tuple[str, ...],
     *,
-    defeat_dragon_heroes=defeat_dragon_heroes,  # What type hint?
+    hero_validator: Callable[..., None] = defeat_dragon_heroes,
     _min_dragon_count: int = 3,
 ) -> World:
     """Update world after hero handles a dragon using multiple distinct heroes.
@@ -314,7 +314,7 @@ def defeat_dragon(
         party = decrement_party(party, other)
         regroup = decrement_regroup(regroup, other)
         heroes.append(other)
-    defeat_dragon_heroes(*heroes)
+    hero_validator(*heroes)
 
     # Attempt was successful, so update experience and treasure
     return replace(

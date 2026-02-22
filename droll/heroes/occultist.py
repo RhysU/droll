@@ -18,7 +18,7 @@ __all__ = (
 # Cleric/mage are interchangeable for dragon defeats
 _occultist_defeat_dragon = partial(
     defeat_dragon,
-    defeat_dragon_heroes=partial(
+    hero_validator=partial(
         defeat_dragon_heroes,
         interchangeable=frozenset({"cleric", "mage"}),
     ),
