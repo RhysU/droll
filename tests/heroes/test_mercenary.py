@@ -22,7 +22,7 @@ def test_mercenary_roll_party_adds_bonus_scroll():
     assert regroup.discard.scroll == 1
 
 
-def testmercenary_ability_defeats_two_monsters():
+def test_mercenary_ability_defeats_two_monsters():
     """Mercenary ability defeats 2 different monsters."""
     world = struct.World(
         ability=True,
@@ -36,7 +36,7 @@ def testmercenary_ability_defeats_two_monsters():
     assert not result.ability
 
 
-def testmercenary_ability_defeats_one_when_only_one():
+def test_mercenary_ability_defeats_one_when_only_one():
     """Mercenary ability defeats 1 monster when only 1 exists."""
     world = struct.World(
         ability=True,
@@ -48,7 +48,7 @@ def testmercenary_ability_defeats_one_when_only_one():
     assert not result.ability
 
 
-def testmercenary_ability_requires_target():
+def test_mercenary_ability_requires_target():
     """Mercenary ability requires at least one target."""
     world = struct.World(
         ability=True,
@@ -59,7 +59,7 @@ def testmercenary_ability_requires_target():
         mercenary_ability(world, _UNUSED, "ability")
 
 
-def testcommander_ability_rerolls_dungeon_dice():
+def test_commander_ability_rerolls_dungeon_dice():
     """Commander ability rerolls dungeon dice."""
     randrange = random.Random(7).randrange
     world = struct.World(
@@ -72,7 +72,7 @@ def testcommander_ability_rerolls_dungeon_dice():
     assert result.party.fighter == 2
 
 
-def testcommander_ability_rerolls_dragon():
+def test_commander_ability_rerolls_dragon():
     """Commander ability can reroll dragon dice."""
     randrange = random.Random(7).randrange
     world = struct.World(
@@ -86,7 +86,7 @@ def testcommander_ability_rerolls_dragon():
     assert not result.ability
 
 
-def testcommander_ability_requires_target():
+def test_commander_ability_requires_target():
     """Commander ability requires at least one target."""
     world = struct.World(
         ability=True,
