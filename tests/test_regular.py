@@ -39,7 +39,7 @@ class TestRerollParty:
         """Rerolling a single party die removes and re-rolls it."""
         # Roll value 0 => fighter
         randrange = self._canned_randrange([0])
-        result = regular.reroll(self.world, randrange, "scroll", "fighter")
+        result = regular.reroll(self.world, randrange, "scroll", ("fighter",))
         # One scroll consumed for the hero cost
         assert result.party.scroll == 1
         # Fighter was removed (2-1=1) then re-rolled as fighter (+1=2)
@@ -52,7 +52,7 @@ class TestRerollParty:
         # Roll values: 0 => fighter, 1 => cleric
         randrange = self._canned_randrange([0, 1])
         result = regular.reroll(
-            self.world, randrange, "scroll", "fighter", "cleric"
+            self.world, randrange, "scroll", ("fighter", "cleric")
         )
         # One scroll consumed
         assert result.party.scroll == 1
@@ -67,7 +67,7 @@ class TestRerollParty:
         # Dungeon roll: value 0 => goblin; Party roll: value 2 => mage
         randrange = self._canned_randrange([0, 2])
         result = regular.reroll(
-            self.world, randrange, "scroll", "goblin", "fighter"
+            self.world, randrange, "scroll", ("goblin", "fighter")
         )
         # One scroll consumed
         assert result.party.scroll == 1
@@ -81,20 +81,20 @@ class TestRerollParty:
         """Rerolling a party die that is not present raises DrollError."""
         randrange = self._canned_randrange([])
         with pytest.raises(DrollError):
-            regular.reroll(self.world, randrange, "scroll", "mage")
+            regular.reroll(self.world, randrange, "scroll", ("mage",))
 
     def test_reroll_unknown_target_raises(self):
         """Rerolling an unknown target raises DrollError."""
         randrange = self._canned_randrange([])
         with pytest.raises(DrollError):
-            regular.reroll(self.world, randrange, "scroll", "nonexistent")
+            regular.reroll(self.world, randrange, "scroll", ("nonexistent",))
 
     def test_reroll_requires_hero_before_rolling(self):
         """A rolled scroll cannot pay the cost of the reroll (issue #105)."""
         w = replace(self.world, party=replace(self.world.party, scroll=0))
         with pytest.raises(DrollError):
             regular.reroll(
-                w, self._canned_randrange([5, 5, 5, 5, 5]), "scroll", "fighter"
+                w, self._canned_randrange([5, 5, 5, 5, 5]), "scroll", ("fighter",)
             )
 
 
@@ -603,7 +603,7 @@ def test_reroll_no_targets():
         party=struct.Party(scroll=1),
     )
     with pytest.raises(DrollError):
-        regular.reroll(w, _UNUSED, "scroll")
+        regular.reroll(w, _UNUSED, "scroll", ())
 
 
 def test_reroll_dragon_disallowed():
@@ -613,7 +613,7 @@ def test_reroll_dragon_disallowed():
         party=struct.Party(scroll=1),
     )
     with pytest.raises(DrollError):
-        regular.reroll(w, _UNUSED, "scroll", "dragon")
+        regular.reroll(w, _UNUSED, "scroll", ("dragon",))
 
 
 def test_interchangeable_disallowed_hero():

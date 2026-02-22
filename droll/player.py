@@ -144,7 +144,7 @@ def apply(
     # Dispatch: reroll always uses scroll mechanics;
     # everything else is hero-target
     if command == "reroll":
-        world = regular.reroll(world, randrange, "scroll", *targets)
+        world = regular.reroll(world, randrange, "scroll", targets)
     else:
         try:
             action_ = getattr(player.party, command)
