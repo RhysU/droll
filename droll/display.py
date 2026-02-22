@@ -88,7 +88,7 @@ def compact_summary(
     """Format the world state in compact multi-line format."""
     # Compute the width for alignment (prompt width)
     prompt = f"{player_name}>"
-    width = max(len(prompt), len("Available:"))
+    width = max(len(prompt), len("Consider:"))
 
     # Build the location line
     if w.depth:
@@ -109,7 +109,7 @@ def compact_summary(
     lines = [
         f"{'Score ' + str(score) + ':':<{width}} {location}",
         f"{'Treasure:':<{width}} {treasure_str}",
-        f"{'Available:':<{width}} {available_str}",
+        f"{'Consider:':<{width}} {available_str}",
         f"{'Party:':<{width}} {party_str}",
     ]
     if dungeon_str:
