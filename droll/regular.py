@@ -47,6 +47,8 @@ def not_reroll(
     world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
 ) -> World:
     """Scrolls cannot target dungeon dice directly; use 'reroll' instead."""
+    if not targets:
+        raise DrollError('Use "reroll" to re-roll with a scroll.')
     raise DrollError(f'Use "reroll {targets[0]}" to re-roll with a scroll.')
 
 
@@ -54,10 +56,11 @@ def defeat_one(
     world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
 ) -> World:
     """Update world after hero handles exactly one target."""
-    (target,) = targets
+    if len(targets) != 1:
+        raise DrollError(f"Exactly 1 target required but {len(targets)} given.")
     return replace(
         world,
-        dungeon=decrement_dungeon(world.dungeon, target),
+        dungeon=decrement_dungeon(world.dungeon, targets[0]),
         party=decrement_party(world.party, hero),
         regroup=decrement_regroup(world.regroup, hero),
     )
@@ -67,10 +70,11 @@ def defeat_all(
     world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
 ) -> World:
     """Update world after hero handles all of one type of target."""
-    (target,) = targets
+    if len(targets) != 1:
+        raise DrollError(f"Exactly 1 target required but {len(targets)} given.")
     return replace(
         world,
-        dungeon=eliminate_dungeon(world.dungeon, target),
+        dungeon=eliminate_dungeon(world.dungeon, targets[0]),
         party=decrement_party(world.party, hero),
         regroup=decrement_regroup(world.regroup, hero),
     )
@@ -85,13 +89,14 @@ def open_one(
     after_monsters=True,
 ) -> World:
     """Update world after hero opens exactly one chest."""
-    (target,) = targets
+    if len(targets) != 1:
+        raise DrollError(f"Exactly 1 target required but {len(targets)} given.")
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
     return replace(
         world,
         treasure=draw_treasure(world.treasure, randrange),
-        dungeon=decrement_dungeon(world.dungeon, target),
+        dungeon=decrement_dungeon(world.dungeon, targets[0]),
         party=decrement_party(world.party, hero),
         regroup=decrement_regroup(world.regroup, hero),
     )
@@ -106,19 +111,20 @@ def open_all(
     after_monsters=True,
 ) -> World:
     """Update world after hero opens all chests."""
-    (target,) = targets
+    if len(targets) != 1:
+        raise DrollError(f"Exactly 1 target required but {len(targets)} given.")
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
-    howmany = getattr(world.dungeon, target)
+    howmany = getattr(world.dungeon, targets[0])
     if not howmany:
-        raise DrollError(f"At least 1 {target} required.")
+        raise DrollError(f"At least 1 {targets[0]} required.")
     treasure = world.treasure
     for _ in range(howmany):
         treasure = draw_treasure(treasure, randrange)
     return replace(
         world,
         treasure=treasure,
-        dungeon=eliminate_dungeon(world.dungeon, target),
+        dungeon=eliminate_dungeon(world.dungeon, targets[0]),
         party=decrement_party(world.party, hero),
         regroup=decrement_regroup(world.regroup, hero),
     )
@@ -135,20 +141,21 @@ def quaff(
     """Update world after hero quaffs all available potions.
 
     Unlike {defeat,open}_{one,all}(...), heroes to revive are arguments."""
-    target, *revivable = targets
-    howmany = getattr(world.dungeon, target)
+    if not targets:
+        raise DrollError("At least 1 target required.")
+    howmany = getattr(world.dungeon, targets[0])
     if not howmany:
-        raise DrollError(f"At least 1 {target} required.")
-    if len(revivable) != howmany:
+        raise DrollError(f"At least 1 {targets[0]} required.")
+    if len(targets) - 1 != howmany:
         raise DrollError(f"Exactly {howmany} heroes to revive required.")
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before quaffing.")
     party = decrement_party(world.party, hero)
-    for revived in revivable:
+    for revived in targets[1:]:
         party = increment_party(party, revived)
     return replace(
         world,
-        dungeon=eliminate_dungeon(world.dungeon, target),
+        dungeon=eliminate_dungeon(world.dungeon, targets[0]),
         party=party,
         regroup=decrement_regroup(world.regroup, hero),
     )
@@ -288,22 +295,23 @@ def defeat_dragon(
     """Update world after hero handles a dragon using multiple distinct heroes.
 
     Additional required heroes are specified within the targets tuple."""
-    target, *others = targets
+    if not targets:
+        raise DrollError("At least 1 target required.")
     # Simple prerequisites for attempting to defeat the dragon
     if world.dungeon.dragon < _min_dragon_count:
         raise DrollError(
-            f"Enemy {target} only comes at length {_min_dragon_count}."
+            f"Enemy {targets[0]} only comes at length {_min_dragon_count}."
         )
     if not defeated_monsters(world.dungeon):
         raise DrollError(
-            f"Enemy {target} only comes after all others defeated."
+            f"Enemy {targets[0]} only comes after all others defeated."
         )
 
     # Confirm required number of distinct heroes available
     party = decrement_party(world.party, hero)
     regroup = decrement_regroup(world.regroup, hero)
     heroes = [hero]
-    for other in others:
+    for other in targets[1:]:
         party = decrement_party(party, other)
         regroup = decrement_regroup(regroup, other)
         heroes.append(other)
@@ -315,7 +323,7 @@ def defeat_dragon(
         treasure=draw_treasure(world.treasure, randrange),
         experience=world.experience + 1,
         party=party,
-        dungeon=eliminate_dungeon(world.dungeon, target),
+        dungeon=eliminate_dungeon(world.dungeon, targets[0]),
         regroup=regroup,
     )
 
