@@ -20,6 +20,7 @@ _GREEN = "\033[92m"
 _RED = "\033[91m"
 _ORANGE = "\033[93m"
 _GREY = "\033[90m"
+_COMMAND = "\033[96m"
 
 
 class Shell(cmd.Cmd):
@@ -69,6 +70,10 @@ class Shell(cmd.Cmd):
                 available,
             )
             if self._color:
+                for cmd in available:
+                    summary = summary.replace(
+                        cmd, _COMMAND + cmd + _RESET
+                    )
                 summary = summary.replace(
                     "dragon", _RED + "dragon" + _RESET
                 ).replace("None", _GREY + "None" + _RESET)

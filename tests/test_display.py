@@ -152,6 +152,6 @@ def test_compact_summary_ending_state():
     result = display.compact_summary(world, "DragonSlayer", 23, [])
     lines = result.split("\n")
     assert "delve 3 with experience 16" in lines[0]
-    assert "Available:" in lines[2]
+    assert "Consider:" in lines[2]
     assert "None" in lines[2]
     assert len(lines) == 4  # No Dungeon line
