@@ -52,15 +52,17 @@ def field_items(
 
 RandRange = Callable[[int, int], int]
 
+Command = Callable[["World", RandRange, str, tuple[str, ...]], "World"]
+
 
 @dataclass(frozen=True)
 class Dungeon:
-    goblin: Union[int, "Command"] = 0
-    skeleton: Union[int, "Command"] = 0
-    ooze: Union[int, "Command"] = 0
-    chest: Union[int, "Command"] = 0
-    potion: Union[int, "Command"] = 0
-    dragon: Union[int, "Command"] = 0
+    goblin: Union[int, Command] = 0
+    skeleton: Union[int, Command] = 0
+    ooze: Union[int, Command] = 0
+    chest: Union[int, Command] = 0
+    potion: Union[int, Command] = 0
+    dragon: Union[int, Command] = 0
 
 
 RollDungeon = Callable[[int, RandRange], Dungeon]
@@ -68,12 +70,12 @@ RollDungeon = Callable[[int, RandRange], Dungeon]
 
 @dataclass(frozen=True)
 class Party:
-    fighter: Union[int, "Command"] = 0
-    cleric: Union[int, "Command"] = 0
-    mage: Union[int, "Command"] = 0
-    thief: Union[int, "Command"] = 0
-    champion: Union[int, "Command"] = 0
-    scroll: Union[int, "Command"] = 0
+    fighter: Union[int, Command] = 0
+    cleric: Union[int, Command] = 0
+    mage: Union[int, Command] = 0
+    thief: Union[int, Command] = 0
+    champion: Union[int, Command] = 0
+    scroll: Union[int, Command] = 0
 
 
 # Bookkeeping for operations performed during the regroup phase
@@ -121,9 +123,6 @@ class World:
     ability: bool = False
     regroup: Regroup = Regroup()
     treasure: Treasure = Treasure()
-
-
-Command = Callable[[World, RandRange, str, tuple[str, ...]], World]
 
 
 @dataclass(frozen=True)
