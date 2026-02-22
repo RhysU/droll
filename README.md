@@ -252,8 +252,7 @@ as follows:
    experience equal to your depth.  If monsters remain and you cannot
    defeat them, instead "retreat" but earn nothing.
 
-Undo: you can `undo` a command so long as nothing was rolled or
-drawn since—the game prevents undoing randomized actions.
+Undo: you can `undo` any command that did not involve rolling or drawing.
 
 Combat: each party member can target any monster type.  Against
 a favored type they defeat all at once; otherwise they defeat one:
