@@ -166,7 +166,7 @@ def commander_ability(
     # Temporarily add a scroll to be consumed by reroll
     world = replace(world, party=increment_party(world.party, "scroll"))
     return regular.reroll(
-        world, randrange, "scroll", *targets, allow_dragon=True
+        world, randrange, "scroll", targets, allow_dragon=True
     )
 
 

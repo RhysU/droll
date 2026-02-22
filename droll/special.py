@@ -43,7 +43,7 @@ def _defeat_plus_additional(
         world=replace(world, party=increment_party(world.party, hero)),
         randrange=randrange,
         hero=hero,
-        targets=(additional[0],),
+        targets=additional,
     )
 
 

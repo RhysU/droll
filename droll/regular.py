@@ -182,15 +182,16 @@ def reroll(
     world: World,
     randrange: RandRange,
     hero: str,
-    *dungeon_or_party,
+    targets: tuple[str, ...],
+    *,
     allow_dragon: bool = False,
 ) -> World:
     """Update world after hero re-rolls dungeon or party dice."""
-    if not dungeon_or_party:
+    if not targets:
         raise DrollError("At least 1 reroll target required.")
 
     dungeon_targets, party_targets = _classify_reroll_targets(
-        dungeon_or_party, allow_dragon
+        targets, allow_dragon
     )
 
     # Decrement hero and regroup BEFORE any dice are rolled to prevent
