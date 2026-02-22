@@ -255,8 +255,8 @@ as follows:
 Undo: you can `undo` a command so long as nothing was rolled or
 drawn since—the game prevents undoing randomized actions.
 
-Combat: each party member can target any monster, but specialists
-defeat all of their favored type while non-specialists defeat one:
+Combat: each party member can target any monster type.  Against
+a favored type they defeat all at once; otherwise they defeat one:
 
 | Hero     | Defeats all | Defeats one each       | Special          |
 |----------|-------------|------------------------|------------------|
