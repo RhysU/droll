@@ -23,15 +23,7 @@ __all__ = (
 def new_world() -> struct.World:
     """Establish a new world independent of a delve/dungeon."""
     return struct.World(
-        delve=0,
-        depth=0,
-        experience=0,
-        dungeon=None,
-        party=struct.Party(),
-        ability=False,
-        regroup=struct.Regroup(),
         treasure=struct.Treasure(
-            own=struct.Artifacts(),
             box=struct.Artifacts(
                 sword=3,
                 talisman=3,
