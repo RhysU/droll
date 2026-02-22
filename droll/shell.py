@@ -91,13 +91,13 @@ class Shell(cmd.Cmd):
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
         # cmd.Cmd.cmdloop stops when postcmd returns truthy
-        stop = stop is GameState.STOP
+        should_stop = stop is GameState.STOP
         if self._display_mode == display.DisplayMode.CURRENT:
-            self._postcmd_current(stop, line)
+            self._postcmd_current(should_stop, line)
         else:
-            self._postcmd_legacy(stop, line)
+            self._postcmd_legacy(should_stop, line)
         print("", end="", flush=True)
-        return stop
+        return should_stop
 
     _AVAILABLE_COMMANDS = frozenset(
         {"ability", "descend", "retire", "retreat", "reroll", "undo"}
