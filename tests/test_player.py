@@ -163,6 +163,16 @@ class TestPlayer:
             goblin=3, skeleton=3, ooze=2, chest=0, potion=2, dragon=2
         )
 
+    def test_unknown_command(self):
+        """Unknown command raises DrollError without exposing internals."""
+        with pytest.raises(struct.DrollError, match='Unknown command "foo"'):
+            player.apply(player.Default, self.game, None, "foo", "goblin")
+
+    def test_unknown_target(self):
+        """Unknown target raises DrollError without exposing internals."""
+        with pytest.raises(struct.DrollError, match='Unknown target "bar"'):
+            player.apply(player.Default, self.game, None, "fighter", "bar")
+
     def test_scroll_not_reroll(self):
         """Using 'scroll' as a noun for rerolling raises DrollError (#133)."""
         with pytest.raises(struct.DrollError, match="reroll"):

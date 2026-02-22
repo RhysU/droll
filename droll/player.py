@@ -146,10 +146,14 @@ def apply(
     if command == "reroll":
         world = regular.reroll(world, randrange, "scroll", targets)
     else:
+        if not hasattr(player.party, command):
+            raise DrollError(f'Unknown command "{command}".')
+        action_ = getattr(player.party, command)
+        if not targets:
+            raise DrollError(f'"{command}" requires a target.')
+        if not hasattr(action_, targets[0]):
+            raise DrollError(f'Unknown target "{targets[0]}".')
         try:
-            action_ = getattr(player.party, command)
-            if not targets:
-                raise DrollError(f'"{command}" requires a target.')
             action_ = getattr(action_, targets[0])
             world = action_(world, randrange, command, targets)
         except (AttributeError, TypeError) as cause:
