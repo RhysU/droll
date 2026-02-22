@@ -54,11 +54,12 @@ def defeat_all_plus_additional(
     targets: tuple[str, ...],
 ) -> World:
     """Update world after hero handles all of one target type plus one more."""
-    target, *additional = targets
+    if not targets:
+        raise DrollError("At least 1 target required.")
     world = defeat_all(
-        world=world, randrange=randrange, hero=hero, targets=(target,)
+        world=world, randrange=randrange, hero=hero, targets=targets[:1]
     )
-    return _defeat_plus_additional(world, randrange, hero, tuple(additional))
+    return _defeat_plus_additional(world, randrange, hero, targets[1:])
 
 
 def defeat_one_plus_additional(
@@ -68,11 +69,12 @@ def defeat_one_plus_additional(
     targets: tuple[str, ...],
 ) -> World:
     """Update world after hero handles one target plus one more."""
-    target, *additional = targets
+    if not targets:
+        raise DrollError("At least 1 target required.")
     world = defeat_one(
-        world=world, randrange=randrange, hero=hero, targets=(target,)
+        world=world, randrange=randrange, hero=hero, targets=targets[:1]
     )
-    return _defeat_plus_additional(world, randrange, hero, tuple(additional))
+    return _defeat_plus_additional(world, randrange, hero, targets[1:])
 
 
 def convert_dungeon_to_party(
