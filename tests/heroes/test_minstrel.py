@@ -13,7 +13,7 @@ from droll.heroes.minstrel import Bard, Minstrel
 _UNUSED = object()
 
 
-def testminstrel_ability_discards_dragons():
+def test_minstrel_ability_discards_dragons():
     """Minstrel/Bard ability discards all dragon dice."""
     world = struct.World(
         ability=True,
@@ -26,7 +26,7 @@ def testminstrel_ability_discards_dragons():
     assert not result.ability
 
 
-def testminstrel_ability_rejects_non_dragon():
+def test_minstrel_ability_rejects_non_dragon():
     """Minstrel/Bard ability only works on dragons."""
     world = struct.World(
         ability=True,

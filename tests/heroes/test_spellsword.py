@@ -13,7 +13,7 @@ from droll.heroes.spellsword import Battlemage, Spellsword
 _UNUSED = object()
 
 
-def testspellsword_ability_adds_fighter():
+def test_spellsword_ability_adds_fighter():
     """Spellsword ability adds a fighter to party."""
     world = struct.World(
         ability=True,
@@ -24,7 +24,7 @@ def testspellsword_ability_adds_fighter():
     assert not result.ability
 
 
-def testspellsword_ability_adds_mage():
+def test_spellsword_ability_adds_mage():
     """Spellsword ability adds a mage to party."""
     world = struct.World(
         ability=True,
@@ -34,7 +34,7 @@ def testspellsword_ability_adds_mage():
     assert result.party.mage == 2
 
 
-def testspellsword_ability_rejects_invalid_target():
+def test_spellsword_ability_rejects_invalid_target():
     """Spellsword ability rejects invalid targets like cleric."""
     world = struct.World(
         ability=True,
@@ -45,7 +45,7 @@ def testspellsword_ability_rejects_invalid_target():
         spellsword_ability(world, _UNUSED, "ability", ("cleric",))
 
 
-def testbattlemage_ability_clears_dungeon():
+def test_battlemage_ability_clears_dungeon():
     """Battlemage ability clears entire dungeon."""
     world = struct.World(
         ability=True,
@@ -57,7 +57,7 @@ def testbattlemage_ability_clears_dungeon():
     assert not result.ability
 
 
-def testspellsword_ability_default_target():
+def test_spellsword_ability_default_target():
     """Spellsword ability defaults to 'fighter' when no target."""
     world = struct.World(
         ability=True,
@@ -67,7 +67,7 @@ def testspellsword_ability_default_target():
     assert result.party.fighter == 2
 
 
-def testbattlemage_ability_rejects_target():
+def test_battlemage_ability_rejects_target():
     """Battlemage ability rejects any target argument."""
     world = struct.World(
         ability=True,

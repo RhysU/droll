@@ -14,7 +14,7 @@ from droll.heroes.crusader import Crusader, Paladin
 _UNUSED = object()
 
 
-def testcrusader_ability_adds_fighter():
+def test_crusader_ability_adds_fighter():
     """Crusader ability adds a fighter to party."""
     world = struct.World(
         ability=True,
@@ -25,7 +25,7 @@ def testcrusader_ability_adds_fighter():
     assert not result.ability
 
 
-def testcrusader_ability_adds_cleric():
+def test_crusader_ability_adds_cleric():
     """Crusader ability adds a cleric to party."""
     world = struct.World(
         ability=True,
@@ -35,7 +35,7 @@ def testcrusader_ability_adds_cleric():
     assert result.party.cleric == 2
 
 
-def testcrusader_ability_rejects_invalid_target():
+def test_crusader_ability_rejects_invalid_target():
     """Crusader ability rejects invalid targets like mage."""
     world = struct.World(
         ability=True,
@@ -53,7 +53,7 @@ def test_crusader_advances_to_paladin():
     assert Crusader.advance(high_xp) == Paladin
 
 
-def testpaladin_ability_clears_dungeon():
+def test_paladin_ability_clears_dungeon():
     """Paladin ability consumes treasure and clears dungeon."""
     world = struct.World(
         ability=True,
@@ -70,7 +70,7 @@ def testpaladin_ability_clears_dungeon():
     assert not result.ability
 
 
-def testpaladin_ability_opens_chests():
+def test_paladin_ability_opens_chests():
     """Paladin ability draws treasure for each chest."""
     randrange = random.Random(4).randrange
     world = struct.World(
@@ -88,7 +88,7 @@ def testpaladin_ability_opens_chests():
     assert post_treasure == pre_treasure - 1 + 2  # -1 consumed, +2 from chests
 
 
-def testpaladin_ability_revives_from_potions():
+def test_paladin_ability_revives_from_potions():
     """Paladin ability revives heroes from potions."""
     world = struct.World(
         ability=True,
@@ -103,7 +103,7 @@ def testpaladin_ability_revives_from_potions():
     assert result.party.thief == 1
 
 
-def testcrusader_ability_default_target():
+def test_crusader_ability_default_target():
     """Crusader ability defaults to 'cleric' (first sorted) when no target."""
     world = struct.World(
         ability=True,
@@ -113,7 +113,7 @@ def testcrusader_ability_default_target():
     assert result.party.cleric == 2
 
 
-def testpaladin_ability_wrong_revivable_count():
+def test_paladin_ability_wrong_revivable_count():
     """Paladin ability rejects wrong number of heroes for potions."""
     world = struct.World(
         ability=True,
@@ -125,7 +125,7 @@ def testpaladin_ability_wrong_revivable_count():
         paladin_ability(world, _UNUSED, "ability", ("elixir", "mage"))
 
 
-def testpaladin_ability_requires_treasure():
+def test_paladin_ability_requires_treasure():
     """Paladin ability fails without specifying treasure."""
     world = struct.World(
         ability=True,
