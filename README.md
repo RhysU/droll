@@ -249,15 +249,16 @@ as follows:
    potions.  Monsters must be cleared before opening chests, quaffing
    potions, or descending further.
 4. After defeating any monsters, "retire" from the delve to earn
-   experience equal to your depth.  If monsters remain and you cannot
-   defeat them, instead "retreat" but earn nothing.
+   experience equal to your depth (you must descend at least once
+   before retiring).  If monsters remain and you cannot defeat them,
+   instead "retreat" but earn nothing.
 
 Undo: you can `undo` any command that did not involve rolling or drawing.
 
 Combat: each party member can target any monster type.  Against
 a favored type they defeat all at once; otherwise they defeat one:
 
-| Hero     | Defeats all | Defeats one each       | Special          |
+| Hero     | Defeats all | Defeats one            | Special          |
 |----------|-------------|------------------------|------------------|
 | fighter  | goblin      | skeleton, ooze         | opens one chest  |
 | cleric   | skeleton    | goblin, ooze           | opens one chest  |
@@ -285,8 +286,10 @@ current depth as experience.
 
 Display notation: `name×N` means N dice of that type, for
 example `champion×3`.  In the party line, `name~D` or `name×N~D` means
-D of those dice will be discarded at the next regroup—these are
-temporary allies converted from monsters by hero abilities.
+D of those dice will be discarded at the next regroup (the
+cleanup phase that occurs when descending, retiring, or
+retreating)—these are temporary allies converted from monsters
+by hero abilities.
 For example, `thief×2~1` means 2 thieves, 1 temporary.
 The prompt shows the move number and current hero name,
 for example `00 Knight>`.
@@ -308,7 +311,9 @@ for example `00 Knight>`.
 ### Level-up progression
 
 At 5+ experience, each hero advances to a stronger form with an
-upgraded ability and enhanced party interactions:
+upgraded ability and enhanced party interactions.  A "Party change"
+of "each counts as either X or Y" means every party member can be
+used as either type in commands:
 
 | Base        | Advanced      | New ability                          | Party change                            |
 |-------------|---------------|--------------------------------------|-----------------------------------------|
@@ -342,8 +347,12 @@ chests.  Each piece of treasure scores 1 point, with two exceptions:
 | ring       | 1      | Sneak past a dragon                    |
 | scale      | 1      | But a pair of scales scores 4          |
 
-Using a treasure during a delve removes it from your collection and
-reduces your score accordingly.
+Treasures are used by typing them as commands, for example
+`sword goblin` (acts as a fighter), `talisman skeleton` (acts
+as a cleric), `tools chest` (acts as a thief), `elixir mage`
+(revives a mage), or `bait` (converts all monsters to dragons).
+Using a treasure during a delve removes it from your collection
+and reduces your score accordingly.
 
 Total score = experience + treasure points.
 
