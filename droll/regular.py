@@ -47,8 +47,6 @@ def not_reroll(
     world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
 ) -> World:
     """Scrolls cannot target dungeon dice directly; use 'reroll' instead."""
-    if not targets:
-        raise DrollError('Use "reroll" to re-roll with a scroll.')
     raise DrollError(f'Use "reroll {targets[0]}" to re-roll with a scroll.')
 
 
