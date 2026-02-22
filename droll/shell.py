@@ -78,10 +78,7 @@ class Shell(cmd.Cmd):
 
     def _postcmd_legacy(self, stop, line) -> None:
         """Display state using the brief summary format."""
-        self.prompt = (
-            f"{self._command_count:02d} {self._game.player_name}"
-            f" {self._game.score:-2d}> "
-        )
+        self.prompt = f"{self._game.player_name}  {self._game.score}> "
         print()
         if line != "EOF":
             print(self._game.summary)
