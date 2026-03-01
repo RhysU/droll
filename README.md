@@ -296,14 +296,14 @@ dragon dice.  A portal immediately ends the delve, scoring your
 current depth as experience.
 
 Display notation: `name×N` means N dice of that type, for
-example `champion×3`.  Dragon dice always show their count
-(e.g., `dragon×1`, `dragon×2`) because tracking dragon
-accumulation is crucial — at 3 or more, they block progress.
+example `champion×3`.  Dragon dice always show their count, like `dragon×1` or
+`dragon×2`, because tracking dragon accumulation is
+crucial — at 3 or more, they block progress.
 In the party line, `name~D` or `name×N~D` means
-D of those dice will be discarded at the next regroup (the
-cleanup phase that occurs when descending, retiring, or
-retreating)—these are temporary allies converted from monsters
-by hero abilities.
+D of those dice will be discarded at the next regroup.
+Regroup is the cleanup phase when descending, retiring, or
+retreating — these temporary dice are allies converted from
+monsters by hero abilities.
 For example, `thief×2~1` means 2 thieves, 1 temporary.
 The prompt shows the move number and current hero name,
 for example `00 Knight>`.
@@ -363,10 +363,10 @@ chests.  Each piece of treasure scores 1 point, with two exceptions:
 | ring       | 1      | Sneak past a dragon                    |
 | scale      | 1      | But a pair of scales scores 4          |
 
-Treasures are used by typing them as commands, for example
-`sword goblin` (acts as a fighter), `talisman skeleton` (acts
-as a cleric), `tools chest` (acts as a thief), `elixir mage`
-(adds a mage), or `bait` (converts all monsters to dragons).
+Treasures are used by typing them as commands.  `sword goblin`
+acts as a fighter, `talisman skeleton` acts as a cleric,
+`tools chest` acts as a thief, `elixir mage` adds a mage,
+and `bait` converts all monsters to dragons.
 Using a treasure during a delve removes it from your collection
 and reduces your score accordingly.
 
