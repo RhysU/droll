@@ -15,12 +15,13 @@ from .struct import DrollError
 
 __all__ = ("Shell",)
 
-_RESET = "\033[0m"
-_PROMPT = "\033[92m"
-_DRAGON = "\033[91m"
-_HELP = "\033[93m"
 _ABSENT = "\033[90m"
 _COMMAND = "\033[96m"
+_DRAGON = "\033[91m"
+_ERROR = _DRAGON
+_HELP = "\033[93m"
+_PROMPT = "\033[92m"
+_RESET = "\033[0m"
 
 
 class Shell(cmd.Cmd):
@@ -132,7 +133,7 @@ class Shell(cmd.Cmd):
             if raises:
                 raise
             if self._color:
-                print(_DRAGON, " ".join(e.args), _RESET, sep="")
+                print(_ERROR, " ".join(e.args), _RESET, sep="")
             else:
                 print(*e.args)
             return result
