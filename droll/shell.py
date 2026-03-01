@@ -70,7 +70,12 @@ class Shell(cmd.Cmd):
                 available,
             )
             if self._color:
-                for cmd in available:
+                feasible = [] if stop else [
+                    name[3:]
+                    for name in self.get_names()
+                    if name.startswith("do_")
+                ]
+                for cmd in feasible:
                     summary = summary.replace(
                         cmd, _COMMAND + cmd + _RESET
                     )
