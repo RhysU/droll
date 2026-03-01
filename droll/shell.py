@@ -345,14 +345,14 @@ class Shell(cmd.Cmd):
         print(textwrap.dedent("""\
             Consume a scroll to quaff potions or re-roll dice:
 
-                        scroll potion mage thief    # Drink 2 potions obtaining mage, thief
-                        reroll skeleton goblin      # Re-roll a skeleton and a goblin
+                    scroll potion mage thief    # Drink 2 potions obtaining mage, thief
+                    reroll skeleton goblin      # Re-roll a skeleton and a goblin
 
             Scroll behavior varies by hero:
 
-                        scroll skeleton             # Enchantress/Beguiler: kill all skeletons
-                        Knight: scrolls become champions during party roll
-                        Mercenary/Commander: one bonus scroll, discarded on regroup"""))
+                    scroll skeleton             # Enchantress/Beguiler: kill all skeletons
+                    Knight: scrolls become champions during party roll
+                    Mercenary/Commander: one bonus scroll, discarded on regroup"""))
 
     def help_reroll(self):
         """Display help for the reroll command."""
@@ -361,8 +361,8 @@ class Shell(cmd.Cmd):
             Targets can be any dungeon die (goblin, skeleton, ooze,
             chest, potion) or party die (fighter, cleric, mage, etc.):
 
-                        reroll goblin skeleton      # Re-roll a goblin and a skeleton
-                        reroll fighter              # Re-roll one fighter"""))
+                    reroll goblin skeleton      # Re-roll a goblin and a skeleton
+                    reroll fighter              # Re-roll one fighter"""))
 
     def help_scale(self):
         """Display help for scale treasures."""
@@ -416,16 +416,16 @@ class Shell(cmd.Cmd):
             Treasure is drawn randomly from a shared box whenever you open
             chests.  Each piece of treasure scores 1 point, with two exceptions:
 
-                        sword       1   Usable as a fighter
-                        talisman    1   Usable as a cleric
-                        sceptre     1   Usable as a mage
-                        tools       1   Usable as a thief
-                        scroll      1   Usable as a scroll
-                        elixir      1   Revive party members
-                        bait        1   Lure the dragon
-                        portal      2   Town portal to escape the dungeon
-                        ring        1   Sneak past a dragon
-                        scale       1   But a pair of scales scores 4"""))
+                    sword       1   Usable as a fighter
+                    talisman    1   Usable as a cleric
+                    sceptre     1   Usable as a mage
+                    tools       1   Usable as a thief
+                    scroll      1   Usable as a scroll
+                    elixir      1   Revive party members
+                    bait        1   Lure the dragon
+                    portal      2   Town portal to escape the dungeon
+                    ring        1   Sneak past a dragon
+                    scale       1   But a pair of scales scores 4"""))
 
 
 def _parse(line: str) -> tuple[str, ...]:
