@@ -62,7 +62,15 @@ class Shell(cmd.Cmd):
             self.prompt = _GREEN + self.prompt + _RESET
         print()
         if line != "EOF":
-            available = [] if stop else self._available_commands()
+            feasible = [] if stop else [
+                name[3:]
+                for name in self.get_names()
+                if name.startswith("do_")
+            ]
+            available = [
+                cmd for cmd in feasible
+                if cmd in self._AVAILABLE_COMMANDS
+            ]
             summary = display.compact_summary(
                 self._game.world,
                 self._game.player_name,
@@ -70,11 +78,6 @@ class Shell(cmd.Cmd):
                 available,
             )
             if self._color:
-                feasible = [] if stop else [
-                    name[3:]
-                    for name in self.get_names()
-                    if name.startswith("do_")
-                ]
                 for cmd in feasible:
                     summary = summary.replace(
                         cmd, _COMMAND + cmd + _RESET
