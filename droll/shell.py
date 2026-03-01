@@ -16,10 +16,10 @@ from .struct import DrollError
 __all__ = ("Shell",)
 
 _RESET = "\033[0m"
-_GREEN = "\033[92m"
-_RED = "\033[91m"
-_ORANGE = "\033[93m"
-_GREY = "\033[90m"
+_PROMPT = "\033[92m"
+_DRAGON = "\033[91m"
+_HELP = "\033[93m"
+_ABSENT = "\033[90m"
 _COMMAND = "\033[96m"
 
 
@@ -59,7 +59,7 @@ class Shell(cmd.Cmd):
         """Display state using the compact summary format."""
         self.prompt = f"{self._command_count:02d} {self._game.player_name}> "
         if self._color:
-            self.prompt = _GREEN + self.prompt + _RESET
+            self.prompt = _PROMPT + self.prompt + _RESET
         print()
         if line != "EOF":
             feasible = [] if stop else [
@@ -83,8 +83,8 @@ class Shell(cmd.Cmd):
                         cmd, _COMMAND + cmd + _RESET
                     )
                 summary = summary.replace(
-                    "dragon", _RED + "dragon" + _RESET
-                ).replace("None", _GREY + "None" + _RESET)
+                    "dragon", _DRAGON + "dragon" + _RESET
+                ).replace("None", _ABSENT + "None" + _RESET)
             print(summary)
             if stop:
                 print(f"\nGame over!  Final score: {self._game.score}")
@@ -132,7 +132,7 @@ class Shell(cmd.Cmd):
             if raises:
                 raise
             if self._color:
-                print(_RED, " ".join(e.args), _RESET, sep="")
+                print(_DRAGON, " ".join(e.args), _RESET, sep="")
             else:
                 print(*e.args)
             return result
@@ -255,7 +255,7 @@ class Shell(cmd.Cmd):
     def do_help(self, arg):
         """List available commands or show help for a specific command."""
         if self._color:
-            print(_ORANGE, end="")
+            print(_HELP, end="")
         try:
             super().do_help(arg)
         finally:
