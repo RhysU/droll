@@ -99,7 +99,7 @@ def default_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """No special ability available (though its consumption is tracked)"""
+    """No special ability."""
     world = _consume_ability(world)
     if targets:
         raise DrollError(f"No targets accepted for {command}.")

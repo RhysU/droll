@@ -36,7 +36,7 @@ said, I've done such things in neither 2018 nor 2026.
 
 ```
 $ droll --help
-usage: droll [-h] [--seed N] [--mechanical]
+usage: droll [-h] [--seed N]
              {Default,Crusader,Enchantress,HalfGoblin,Knight,Mercenary,Minstrel,Occultist,Spellsword}
 
 Command-line version of droll.
@@ -48,20 +48,19 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --seed N              An integer to seed random number generation.
-  --mechanical          Use mechanical display format.
 
 
 $ droll --seed 7 Knight
 
 Score 0:   delve 1 with experience 0
 Treasure:  None
-Available: ability descend
+Consider: ability descend
 Party:     fighter×2 cleric mage thief champion×2
 00 Knight> descend
 
 Score 0:   depth 1 in delve 1 with experience 0
 Treasure:  None
-Available: ability retreat
+Consider: ability retreat
 Party:     fighter×2 cleric mage thief champion×2
 Dungeon:   goblin
 01 Knight> help fighter
@@ -77,42 +76,42 @@ Fighters defeat ALL goblins but only ONE skeleton or ooze:
 
 Score 0:   depth 1 in delve 1 with experience 0
 Treasure:  None
-Available: ability retreat
+Consider: ability retreat
 Party:     fighter×2 cleric mage thief champion×2
 Dungeon:   goblin
 01 Knight> fighter goblin
 
 Score 0:   depth 1 in delve 1 with experience 0
 Treasure:  None
-Available: ability descend retire undo
+Consider: ability descend retire undo
 Party:     fighter cleric mage thief champion×2
 Dungeon:   None
 02 Knight> descend
 
 Score 0:   depth 2 in delve 1 with experience 0
 Treasure:  None
-Available: ability retreat
+Consider: ability retreat
 Party:     fighter cleric mage thief champion×2
 Dungeon:   ooze potion
 03 Knight> mage ooze
 
 Score 0:   depth 2 in delve 1 with experience 0
 Treasure:  None
-Available: ability descend retire undo
+Consider: ability descend retire undo
 Party:     fighter cleric thief champion×2
 Dungeon:   potion
 04 Knight> champion potion mage
 
 Score 0:   depth 2 in delve 1 with experience 0
 Treasure:  None
-Available: ability descend retire undo
+Consider: ability descend retire undo
 Party:     fighter cleric mage thief champion
 Dungeon:   None
 05 Knight> descend
 
 Score 0:   depth 3 in delve 1 with experience 0
 Treasure:  None
-Available: ability retreat
+Consider: ability retreat
 Party:     fighter cleric mage thief champion
 Dungeon:   goblin skeleton potion
 06 Knight> help ability
@@ -122,118 +121,121 @@ Invoke the player's ability.
 
 Score 0:   depth 3 in delve 1 with experience 0
 Treasure:  None
-Available: ability retreat
+Consider: ability retreat
 Party:     fighter cleric mage thief champion
 Dungeon:   goblin skeleton potion
 06 Knight> ability
 
 Score 0:   depth 3 in delve 1 with experience 0
 Treasure:  None
-Available: descend retire undo
+Consider: descend retire undo
 Party:     fighter cleric mage thief champion
 Dungeon:   potion dragon×2
 07 Knight> descend
 
 Score 0:   depth 4 in delve 1 with experience 0
 Treasure:  None
-Available: retreat
+Consider: retreat
 Party:     fighter cleric mage thief champion
 Dungeon:   goblin×2 chest×2 dragon×2
 08 Knight> fighter goblin
 
 Score 0:   depth 4 in delve 1 with experience 0
 Treasure:  None
-Available: descend retire undo
+Consider: descend retire undo
 Party:     cleric mage thief champion
 Dungeon:   chest×2 dragon×2
 09 Knight> thief chest
 
 Score 2:   depth 4 in delve 1 with experience 0
 Treasure:  elixir talisman
-Available: descend retire
+Consider: descend retire
 Party:     cleric mage champion
 Dungeon:   dragon×2
 10 Knight> descend
 
 Score 2:   depth 5 in delve 1 with experience 0
 Treasure:  elixir talisman
-Available: retreat
+Consider: retreat
 Party:     cleric mage champion
 Dungeon:   goblin×2 chest potion×2 dragon×2
 11 Knight> champion goblin
 
 Score 2:   depth 5 in delve 1 with experience 0
 Treasure:  elixir talisman
-Available: descend retire undo
+Consider: descend retire undo
 Party:     cleric mage
 Dungeon:   chest potion×2 dragon×2
 12 Knight> mage potion champion thief
 
 Score 2:   depth 5 in delve 1 with experience 0
 Treasure:  elixir talisman
-Available: descend retire undo
+Consider: descend retire undo
 Party:     cleric thief champion
 Dungeon:   chest dragon×2
 13 Knight> thief chest
 
 Score 3:   depth 5 in delve 1 with experience 0
 Treasure:  elixir sceptre talisman
-Available: descend retire
+Consider: descend retire
 Party:     cleric champion
 Dungeon:   dragon×2
 14 Knight> retire
 
 Score 8:      delve 2 with experience 5
 Treasure:     elixir sceptre talisman
-Available:    ability descend
+Consider:    ability descend
 Party:        fighter cleric champion×5
 15 DragonSlayer> descend
 
 Score 8:      depth 1 in delve 2 with experience 5
 Treasure:     elixir sceptre talisman
-Available:    ability descend retire
+Consider:    ability descend retire
 Party:        fighter cleric champion×5
 Dungeon:      chest
 16 DragonSlayer> champion chest
 
 Score 9:      depth 1 in delve 2 with experience 5
 Treasure:     elixir sceptre talisman×2
-Available:    ability descend retire
+Consider:    ability descend retire
 Party:        fighter cleric champion×4
 Dungeon:      None
 17 DragonSlayer> descend
 
 Score 9:      depth 2 in delve 2 with experience 5
 Treasure:     elixir sceptre talisman×2
-Available:    ability retreat
+Consider:    ability retreat
 Party:        fighter cleric champion×4
 Dungeon:      goblin skeleton
 18 DragonSlayer> talisman goblin
 
 Score 9:      depth 2 in delve 2 with experience 5
 Treasure:     elixir sceptre talisman×2
-Available:    ability retreat undo
+Consider:    ability retreat undo
 Party:        fighter champion×4
 Dungeon:      skeleton
 19 DragonSlayer> sceptre skeleton
 
 Score 8:      depth 2 in delve 2 with experience 5
 Treasure:     elixir talisman×2
-Available:    ability descend retire undo
+Consider:    ability descend retire undo
 Party:        fighter champion×4
 Dungeon:      None
 20 DragonSlayer> elixir mage
 
 Score 7:      depth 2 in delve 2 with experience 5
 Treasure:     talisman×2
-Available:    ability descend retire undo
+Consider:    ability descend retire undo
 Party:        fighter mage champion×4
 Dungeon:      None
 21 DragonSlayer> ^D
 ```
 
-The `--mechanical` flag switches to a legacy single-line display
-format.  The default display uses color when writing to a terminal.
+Beyond the "Consider:" line, party members and treasures in
+your possession are valid commands.  Type "help" to see
+the full list.
+
+The default display uses color when writing to a terminal.
 Press Ctrl+D to exit at any time.
 
 ## How to play
@@ -251,7 +253,8 @@ as follows:
 4. After defeating any monsters, "retire" from the delve to earn
    experience equal to your depth.  You must descend at least once
    before retiring.  If monsters remain and you cannot defeat them,
-   instead "retreat" but earn nothing.
+   instead "retreat" but earn nothing.  When you have no way to
+   defeat the remaining monsters, retreat is your only option.
 
 Undo: you can `undo` any command that did not involve rolling or drawing.
 
@@ -267,11 +270,19 @@ a favored type they defeat all at once; otherwise they defeat one:
 | champion | goblin, skeleton, ooze | —             | opens all chests |
 | scroll   | —           | —                      | quaffs potions, rerolls dice |
 
-Scrolls cannot target monsters directly.  Instead, spend a scroll
-via `reroll <targets>` to re-roll any dungeon or party dice,
-for example `reroll goblin skeleton` re-rolls those two dice.
-A scroll can also quaff potions: `scroll potion fighter` returns
-a fighter to your party.
+Potions: any party member can quaff potions.  The syntax is
+`<drinker> potion <type1> <type2> ...` where you specify one
+die type per potion to recover.  For example,
+`fighter potion mage thief` spends the fighter to drink 2
+potions, adding a mage and thief to your party.  The number
+of recovery targets must equal the number of potions in
+the dungeon.
+
+Scrolls cannot target monsters directly.  The `reroll` command
+consumes one scroll and re-rolls any number of dungeon or party
+dice, for example `reroll goblin skeleton` re-rolls those two
+dice.  A scroll can also quaff potions: `scroll potion fighter`
+adds a fighter to your party.
 Scroll behavior varies by hero: Enchantress/Beguiler can use a
 scroll offensively against skeletons, Knight converts scrolls to
 champions during party roll, and Mercenary/Commander receives one
@@ -285,11 +296,14 @@ dragon dice.  A portal immediately ends the delve, scoring your
 current depth as experience.
 
 Display notation: `name×N` means N dice of that type, for
-example `champion×3`.  In the party line, `name~D` or `name×N~D` means
-D of those dice will be discarded at the next regroup (the
-cleanup phase that occurs when descending, retiring, or
-retreating)—these are temporary allies converted from monsters
-by hero abilities.
+example `champion×3`.  Dragon dice always show their count, like `dragon×1` or
+`dragon×2`, because tracking dragon accumulation is
+crucial — at 3 or more, they block progress.
+In the party line, `name~D` or `name×N~D` means
+D of those dice will be discarded at the next regroup.
+Regroup is the cleanup phase when descending, retiring, or
+retreating — these temporary dice are allies converted from
+monsters by hero abilities.
 For example, `thief×2~1` means 2 thieves, 1 temporary.
 The prompt shows the move number and current hero name,
 for example `00 Knight>`.
@@ -329,7 +343,9 @@ used as either type in commands:
 ## How does scoring work?
 
 Your score has two components: experience earned by retiring
-and treasure.
+and treasure.  Experience accumulates across delves.  For
+example, retiring at depth 5 earns 5 experience; if you then
+retire at depth 3 in the next delve, you have 8 experience total.
 
 Treasure is drawn randomly from a shared box whenever you open
 chests.  Each piece of treasure scores 1 point, with two exceptions:
@@ -341,16 +357,16 @@ chests.  Each piece of treasure scores 1 point, with two exceptions:
 | sceptre    | 1      | Usable as a mage                       |
 | tools      | 1      | Usable as a thief                      |
 | scroll     | 1      | Usable as a scroll                     |
-| elixir     | 1      | Revive party members                   |
+| elixir     | 1      | Add a party member of any type         |
 | bait       | 1      | Lure the dragon                        |
 | portal     | 2      | Town portal to escape the dungeon      |
 | ring       | 1      | Sneak past a dragon                    |
 | scale      | 1      | But a pair of scales scores 4          |
 
-Treasures are used by typing them as commands, for example
-`sword goblin` (acts as a fighter), `talisman skeleton` (acts
-as a cleric), `tools chest` (acts as a thief), `elixir mage`
-(revives a mage), or `bait` (converts all monsters to dragons).
+Treasures are used by typing them as commands.  `sword goblin`
+acts as a fighter, `talisman skeleton` acts as a cleric,
+`tools chest` acts as a thief, `elixir mage` adds a mage,
+and `bait` converts all monsters to dragons.
 Using a treasure during a delve removes it from your collection
 and reduces your score accordingly.
 

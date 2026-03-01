@@ -144,7 +144,7 @@ def retire(world: struct.World) -> struct.World:
         try:
             world = _apply_portal(world)
         except DrollError:
-            raise DrollError("Monsters remain but no portal in hand.")
+            raise DrollError("Monsters remain. Defeat them or 'retreat'.")
     elif blocking_dragon(world.dungeon):
         world = _escape_dragon(world)
 
