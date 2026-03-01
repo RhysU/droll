@@ -282,25 +282,27 @@ class Shell(cmd.Cmd):
 
     def help_champion(self):
         """Display help for using the champion hero."""
-        print("Champions defeat ALL of any monster type and open ALL chests:")
-        print()
-        print("        champion goblin              # Defeat all goblins")
-        print("        champion skeleton             # Defeat all skeletons")
-        print("        champion ooze                 # Defeat all ooze")
-        print("        champion chest                # Open all chests")
-        print(self.doc_potion_example.format("champion"))
-        print(self.doc_dragon_example.format("champion"))
+        print(textwrap.dedent(f"""\
+            Champions defeat ALL of any monster type and open ALL chests:
+
+                    champion goblin              # Defeat all goblins
+                    champion skeleton             # Defeat all skeletons
+                    champion ooze                 # Defeat all ooze
+                    champion chest                # Open all chests
+            {self.doc_potion_example.format("champion")}
+            {self.doc_dragon_example.format("champion")}"""))
 
     def help_cleric(self):
         """Display help for using the cleric hero."""
-        print("Clerics defeat ALL skeletons but only ONE goblin or ooze:")
-        print()
-        print("        cleric skeleton               # Defeat all skeletons")
-        print("        cleric goblin                 # Defeat one goblin")
-        print("        cleric ooze                   # Defeat one ooze")
-        print("        cleric chest                  # Open one chest")
-        print(self.doc_potion_example.format("cleric"))
-        print(self.doc_dragon_example.format("cleric"))
+        print(textwrap.dedent(f"""\
+            Clerics defeat ALL skeletons but only ONE goblin or ooze:
+
+                    cleric skeleton               # Defeat all skeletons
+                    cleric goblin                 # Defeat one goblin
+                    cleric ooze                   # Defeat one ooze
+                    cleric chest                  # Open one chest
+            {self.doc_potion_example.format("cleric")}
+            {self.doc_dragon_example.format("cleric")}"""))
 
     def help_elixir(self):
         """Display help for using elixir treasures."""
@@ -308,35 +310,39 @@ class Shell(cmd.Cmd):
 
     def help_fighter(self):
         """Display help for using the fighter hero."""
-        print("Fighters defeat ALL goblins but only ONE skeleton or ooze:")
-        print()
-        print("        fighter goblin                # Defeat all goblins")
-        print("        fighter skeleton              # Defeat one skeleton")
-        print("        fighter ooze                  # Defeat one ooze")
-        print("        fighter chest                 # Open one chest")
-        print(self.doc_potion_example.format("fighter"))
-        print(self.doc_dragon_example.format("fighter"))
+        print(textwrap.dedent(f"""\
+            Fighters defeat ALL goblins but only ONE skeleton or ooze:
+
+                    fighter goblin                # Defeat all goblins
+                    fighter skeleton              # Defeat one skeleton
+                    fighter ooze                  # Defeat one ooze
+                    fighter chest                 # Open one chest
+            {self.doc_potion_example.format("fighter")}
+            {self.doc_dragon_example.format("fighter")}"""))
 
     def help_mage(self):
         """Display help for using the mage hero."""
-        print("Mages defeat ALL ooze but only ONE goblin or skeleton:")
-        print()
-        print("        mage ooze                     # Defeat all ooze")
-        print("        mage goblin                   # Defeat one goblin")
-        print("        mage skeleton                 # Defeat one skeleton")
-        print("        mage chest                    # Open one chest")
-        print(self.doc_potion_example.format("mage"))
-        print(self.doc_dragon_example.format("mage"))
+        print(textwrap.dedent(f"""\
+            Mages defeat ALL ooze but only ONE goblin or skeleton:
+
+                    mage ooze                     # Defeat all ooze
+                    mage goblin                   # Defeat one goblin
+                    mage skeleton                 # Defeat one skeleton
+                    mage chest                    # Open one chest
+            {self.doc_potion_example.format("mage")}
+            {self.doc_dragon_example.format("mage")}"""))
 
     def help_portal(self):
         """Display help for portal treasures."""
-        print("Town portals escape the dungeon, worth 2 points each.")
-        print('Retiring consumes a portal automatically.')
+        print(textwrap.dedent("""\
+            Town portals escape the dungeon, worth 2 points each.
+            Retiring consumes a portal automatically."""))
 
     def help_ring(self):
         """Display help for using rings of invisibility."""
-        print("""Rings of invisibility sneak past a blocking dragon.""")
-        print("""They are used automatically when descending or retiring.""")
+        print(textwrap.dedent("""\
+            Rings of invisibility sneak past a blocking dragon.
+            They are used automatically when descending or retiring."""))
 
     def help_sceptre(self):
         """Display help for using sceptre treasures."""
@@ -344,27 +350,27 @@ class Shell(cmd.Cmd):
 
     def help_scroll(self):
         """Display help for using scroll treasures."""
-        print("Consume a scroll to quaff potions or re-roll dice:")
-        print("""
-            scroll potion mage thief    # Drink 2 potions obtaining mage, thief
-            reroll skeleton goblin      # Re-roll a skeleton and a goblin
-            """)
-        print("Scroll behavior varies by hero:")
-        print("""
-            scroll skeleton             # Enchantress/Beguiler: kill all skeletons
-            Knight: scrolls become champions during party roll
-            Mercenary/Commander: one bonus scroll, discarded on regroup""")
+        print(textwrap.dedent("""\
+            Consume a scroll to quaff potions or re-roll dice:
+
+                        scroll potion mage thief    # Drink 2 potions obtaining mage, thief
+                        reroll skeleton goblin      # Re-roll a skeleton and a goblin
+
+            Scroll behavior varies by hero:
+
+                        scroll skeleton             # Enchantress/Beguiler: kill all skeletons
+                        Knight: scrolls become champions during party roll
+                        Mercenary/Commander: one bonus scroll, discarded on regroup"""))
 
     def help_reroll(self):
         """Display help for the reroll command."""
         print(self.do_reroll.__doc__)
-        print()
-        print("Targets can be any dungeon die (goblin, skeleton, ooze,")
-        print("chest, potion) or party die (fighter, cleric, mage, etc.):")
-        print("""
-            reroll goblin skeleton      # Re-roll a goblin and a skeleton
-            reroll fighter              # Re-roll one fighter
-            """)
+        print(textwrap.dedent("""
+            Targets can be any dungeon die (goblin, skeleton, ooze,
+            chest, potion) or party die (fighter, cleric, mage, etc.):
+
+                        reroll goblin skeleton      # Re-roll a goblin and a skeleton
+                        reroll fighter              # Re-roll one fighter"""))
 
     def help_scale(self):
         """Display help for scale treasures."""
@@ -380,14 +386,15 @@ class Shell(cmd.Cmd):
 
     def help_thief(self):
         """Display help for using the thief hero."""
-        print("Thieves open ALL chests but only defeat ONE monster at a time:")
-        print()
-        print("        thief chest                   # Open all chests")
-        print("        thief goblin                  # Defeat one goblin")
-        print("        thief skeleton                # Defeat one skeleton")
-        print("        thief ooze                    # Defeat one ooze")
-        print(self.doc_potion_example.format("thief"))
-        print(self.doc_dragon_example.format("thief"))
+        print(textwrap.dedent(f"""\
+            Thieves open ALL chests but only defeat ONE monster at a time:
+
+                    thief chest                   # Open all chests
+                    thief goblin                  # Defeat one goblin
+                    thief skeleton                # Defeat one skeleton
+                    thief ooze                    # Defeat one ooze
+            {self.doc_potion_example.format("thief")}
+            {self.doc_dragon_example.format("thief")}"""))
 
     def help_tools(self):
         """Display help for using tools treasures."""
@@ -395,53 +402,38 @@ class Shell(cmd.Cmd):
 
     def help_score(self):
         """Display help for the scoring system."""
-        print("Your score has two components: experience and treasure.")
-        print()
-        print(
-            "Experience is earned by retiring from a delve.  When you retire,"
-        )
-        print(
-            "you gain experience equal to the depth"
-            " you reached in the dungeon."
-        )
-        print("For example, retiring at depth 5 earns 5 experience points.")
-        print("Retreating earns no experience.")
-        print()
-        print(
-            "Town portals are worth 2 points each.  Scales score 1 point each,"
-        )
-        print(
-            "but every pair of scales scores 4"
-            " rather than 2, a +2 bonus per pair."
-        )
-        print(
-            "Using a treasure during a delve removes"
-            " it from your collection and"
-        )
-        print("reduces your score accordingly.")
-        print()
-        print("Total score = experience + treasure points.")
-        print("See 'help treasure' for the full treasure list.")
+        print(textwrap.dedent("""\
+            Your score has two components: experience and treasure.
+
+            Experience is earned by retiring from a delve.  When you retire,
+            you gain experience equal to the depth you reached in the dungeon.
+            For example, retiring at depth 5 earns 5 experience points.
+            Retreating earns no experience.
+
+            Town portals are worth 2 points each.  Scales score 1 point each,
+            but every pair of scales scores 4 rather than 2, a +2 bonus per pair.
+            Using a treasure during a delve removes it from your collection and
+            reduces your score accordingly.
+
+            Total score = experience + treasure points.
+            See 'help treasure' for the full treasure list."""))
 
     def help_treasure(self):
         """Display help for the treasure system."""
-        print("Treasure is drawn randomly from a shared box whenever you open")
-        print(
-            "chests.  Each piece of treasure scores"
-            " 1 point, with two exceptions:"
-        )
-        print("""
-            sword       1   Usable as a fighter
-            talisman    1   Usable as a cleric
-            sceptre     1   Usable as a mage
-            tools       1   Usable as a thief
-            scroll      1   Usable as a scroll
-            elixir      1   Revive party members
-            bait        1   Lure the dragon
-            portal      2   Town portal to escape the dungeon
-            ring        1   Sneak past a dragon
-            scale       1   But a pair of scales scores 4
-            """)
+        print(textwrap.dedent("""\
+            Treasure is drawn randomly from a shared box whenever you open
+            chests.  Each piece of treasure scores 1 point, with two exceptions:
+
+                        sword       1   Usable as a fighter
+                        talisman    1   Usable as a cleric
+                        sceptre     1   Usable as a mage
+                        tools       1   Usable as a thief
+                        scroll      1   Usable as a scroll
+                        elixir      1   Revive party members
+                        bait        1   Lure the dragon
+                        portal      2   Town portal to escape the dungeon
+                        ring        1   Sneak past a dragon
+                        scale       1   But a pair of scales scores 4"""))
 
 
 def _parse(line: str) -> tuple[str, ...]:
