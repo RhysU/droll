@@ -271,11 +271,19 @@ a favored type they defeat all at once; otherwise they defeat one:
 | champion | goblin, skeleton, ooze | —             | opens all chests |
 | scroll   | —           | —                      | quaffs potions, rerolls dice |
 
-Scrolls cannot target monsters directly.  Instead, spend a scroll
-via `reroll <targets>` to re-roll any dungeon or party dice,
-for example `reroll goblin skeleton` re-rolls those two dice.
-A scroll can also quaff potions: `scroll potion fighter` returns
-a fighter to your party.
+Potions: any party member can quaff potions.  The syntax is
+`<drinker> potion <type1> <type2> ...` where you specify one
+die type per potion to recover.  For example,
+`fighter potion mage thief` spends the fighter to drink 2
+potions, adding a mage and thief to your party.  The number
+of recovery targets must equal the number of potions in
+the dungeon.
+
+Scrolls cannot target monsters directly.  The `reroll` command
+consumes one scroll and re-rolls any number of dungeon or party
+dice, for example `reroll goblin skeleton` re-rolls those two
+dice.  A scroll can also quaff potions: `scroll potion fighter`
+adds a fighter to your party.
 Scroll behavior varies by hero: Enchantress/Beguiler can use a
 scroll offensively against skeletons, Knight converts scrolls to
 champions during party roll, and Mercenary/Commander receives one
