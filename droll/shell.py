@@ -20,6 +20,7 @@ _COMMAND = "\033[96m"
 _DRAGON = "\033[31m"
 _ERROR = "\033[91m"
 _HELP = "\033[93m"
+_MONSTER = "\033[91m"
 _PROMPT = "\033[92m"
 _RESET = "\033[0m"
 
@@ -85,6 +86,12 @@ class Shell(cmd.Cmd):
                     )
                 summary = summary.replace(
                     "dragon", _DRAGON + "dragon" + _RESET
+                ).replace(
+                    "goblin", _MONSTER + "goblin" + _RESET
+                ).replace(
+                    "ooze", _MONSTER + "ooze" + _RESET
+                ).replace(
+                    "skeleton", _MONSTER + "skeleton" + _RESET
                 ).replace("None", _ABSENT + "None" + _RESET)
             print(summary)
             if stop:
