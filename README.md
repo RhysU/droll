@@ -17,7 +17,6 @@ without expansions, with tab completion for commands and
 context-sensitive arguments such as party members, monsters,
 and treasures.
 All base game heroes are implemented.
-Additionally, a "Default" hero with no special abilities is present.
 
 ## Why implement it?
 
@@ -37,12 +36,12 @@ said, I've done such things in neither 2018 nor 2026.
 ```
 $ droll --help
 usage: droll [-h] [--seed N]
-             {Default,Crusader,Enchantress,HalfGoblin,Knight,Mercenary,Minstrel,Occultist,Spellsword}
+             {Crusader,Enchantress,HalfGoblin,Knight,Mercenary,Minstrel,Occultist,Spellsword}
 
 Command-line version of droll.
 
 positional arguments:
-  {Default,Crusader,Enchantress,HalfGoblin,Knight,Mercenary,Minstrel,Occultist,Spellsword}
+  {Crusader,Enchantress,HalfGoblin,Knight,Mercenary,Minstrel,Occultist,Spellsword}
                         Select the hero for this game.
 
 options:
@@ -312,7 +311,6 @@ for example `00 Knight>`.
 
 | Hero        | Ability                          | Syntax example                    | Requires                |
 |-------------|----------------------------------|-----------------------------------|-------------------------|
-| Default     | No special ability               | `ability`                         | —                       |
 | Crusader    | Add 1 fighter or cleric          | `ability` or `ability cleric`     | —                       |
 | Enchantress | Transform 1 monster into potion  | `ability goblin`                  | 1 monster target        |
 | HalfGoblin  | Transform 1 goblin into thief    | `ability` or `ability goblin`     | goblin present          |

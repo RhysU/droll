@@ -5,7 +5,6 @@
 
 from types import MappingProxyType
 
-from ..player import Default
 from .crusader import Crusader, Paladin
 from .enchantress import Beguiler, Enchantress
 from .halfgoblin import Chieftain, HalfGoblin
@@ -37,7 +36,6 @@ __all__ = (
 
 AVAILABLE = MappingProxyType(
     {
-        Default.name: Default,
         Crusader.name: Crusader,
         Enchantress.name: Enchantress,
         HalfGoblin.name: HalfGoblin,
