@@ -253,7 +253,9 @@ as follows:
 4. After defeating any monsters, "retire" from the delve to earn
    experience equal to your depth.  You must descend at least once
    before retiring.  If monsters remain and you cannot defeat them,
-   instead "retreat" but earn nothing.
+   instead "retreat" but earn nothing.  If you cannot defeat the
+   remaining monsters (no usable party members, treasures, scrolls,
+   or abilities), retreat is your only option.
 
 Undo: you can `undo` any command that did not involve rolling or drawing.
 
@@ -287,7 +289,10 @@ dragon dice.  A portal immediately ends the delve, scoring your
 current depth as experience.
 
 Display notation: `name×N` means N dice of that type, for
-example `champion×3`.  In the party line, `name~D` or `name×N~D` means
+example `champion×3`.  Dragon dice always show their count
+(e.g., `dragon×1`, `dragon×2`) because tracking dragon
+accumulation is crucial — at 3 or more, they block progress.
+In the party line, `name~D` or `name×N~D` means
 D of those dice will be discarded at the next regroup (the
 cleanup phase that occurs when descending, retiring, or
 retreating)—these are temporary allies converted from monsters
@@ -331,7 +336,9 @@ used as either type in commands:
 ## How does scoring work?
 
 Your score has two components: experience earned by retiring
-and treasure.
+and treasure.  Experience accumulates across delves.  For
+example, retiring at depth 5 earns 5 experience; if you then
+retire at depth 3 in the next delve, you have 8 experience total.
 
 Treasure is drawn randomly from a shared box whenever you open
 chests.  Each piece of treasure scores 1 point, with two exceptions:
@@ -343,7 +350,7 @@ chests.  Each piece of treasure scores 1 point, with two exceptions:
 | sceptre    | 1      | Usable as a mage                       |
 | tools      | 1      | Usable as a thief                      |
 | scroll     | 1      | Usable as a scroll                     |
-| elixir     | 1      | Revive party members                   |
+| elixir     | 1      | Add a party member of any type         |
 | bait       | 1      | Lure the dragon                        |
 | portal     | 2      | Town portal to escape the dungeon      |
 | ring       | 1      | Sneak past a dragon                    |
@@ -352,7 +359,7 @@ chests.  Each piece of treasure scores 1 point, with two exceptions:
 Treasures are used by typing them as commands, for example
 `sword goblin` (acts as a fighter), `talisman skeleton` (acts
 as a cleric), `tools chest` (acts as a thief), `elixir mage`
-(revives a mage), or `bait` (converts all monsters to dragons).
+(adds a mage), or `bait` (converts all monsters to dragons).
 Using a treasure during a delve removes it from your collection
 and reduces your score accordingly.
 
