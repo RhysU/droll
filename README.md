@@ -253,9 +253,8 @@ as follows:
 4. After defeating any monsters, "retire" from the delve to earn
    experience equal to your depth.  You must descend at least once
    before retiring.  If monsters remain and you cannot defeat them,
-   instead "retreat" but earn nothing.  If you cannot defeat the
-   remaining monsters (no usable party members, treasures, scrolls,
-   or abilities), retreat is your only option.
+   instead "retreat" but earn nothing.  When you have no way to
+   defeat the remaining monsters, retreat is your only option.
 
 Undo: you can `undo` any command that did not involve rolling or drawing.
 
