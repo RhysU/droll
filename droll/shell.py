@@ -79,7 +79,7 @@ class Shell(cmd.Cmd):
                 ).replace("None", _GREY + "None" + _RESET)
             print(summary)
             if stop:
-                print(self.prompt)
+                print(f"\nGame over!  Final score: {self._game.score}")
 
     def _postcmd_legacy(self, stop, line) -> None:
         """Display state using the brief summary format."""
@@ -88,7 +88,7 @@ class Shell(cmd.Cmd):
         if line != "EOF":
             print(self._game.summary)
             if stop:
-                print(self.prompt)
+                print(f"\nGame over!  Final score: {self._game.score}")
 
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""

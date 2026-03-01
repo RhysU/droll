@@ -32,7 +32,7 @@ def main(args=None) -> None:
     parser.add_argument(
         "--mechanical",
         action="store_true",
-        help="Use mechanical display format.",
+        help=argparse.SUPPRESS,
     )
     arguments = parser.parse_args(args)
     g = Game(
