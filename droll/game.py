@@ -166,13 +166,9 @@ class Game:
         """Hypothetical score deltas for retire and retreat."""
         current = self.score
         deltas = {}
-        for name, action in (
-            ("retire", world.retire),
-            ("retreat", world.retreat),
-        ):
+        for name, action in (("retire", world.retire), ("retreat", world.retreat)):
             try:
-                result = action(self._world)
-                deltas[name] = world.score(result) - current
+                deltas[name] = world.score(action(self._world)) - current
             except DrollError:
                 pass
         return deltas

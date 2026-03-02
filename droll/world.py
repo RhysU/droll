@@ -166,7 +166,6 @@ def retreat(world: struct.World) -> struct.World:
     if defeated_dungeon(world.dungeon):
         raise DrollError("No monsters to retreat from; use 'retire' to leave the dungeon.")
 
-    # A town portal permits earning experience even when retreating
     experience = world.experience
     try:
         world = _apply_portal(world)
@@ -174,10 +173,7 @@ def retreat(world: struct.World) -> struct.World:
     except DrollError:
         pass
 
-    # Regroup just prior to retreating
-    world = _regroup(world)
-
-    return replace(world, depth=0, experience=experience, dungeon=None)
+    return replace(_regroup(world), depth=0, experience=experience, dungeon=None)
 
 
 def score(world: struct.World) -> int:

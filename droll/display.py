@@ -60,14 +60,10 @@ def _format_available(
     deltas: Optional[dict[str, int]] = None,
 ) -> str:
     """Format available commands alphabetically, annotating score deltas."""
-
-    def annotate(cmd: str) -> str:
-        if deltas is not None and cmd in deltas:
-            d = deltas[cmd]
-            return f"{cmd}({d:+d})"
-        return cmd
-
-    return " ".join(annotate(cmd) for cmd in sorted(available)) or "None"
+    return " ".join(
+        f"{c}({deltas[c]:+d})" if deltas and c in deltas else c
+        for c in sorted(available)
+    ) or "None"
 
 
 def _format_party(
