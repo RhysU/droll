@@ -5,6 +5,7 @@
 
 from collections.abc import Sequence
 from dataclasses import replace
+from typing import Optional
 
 from . import ability, dice, regular, struct
 from .struct import DrollError
@@ -181,7 +182,7 @@ def apply(
 
 
 def _partify_all(
-    artifacts: dict[str, str | None],
+    artifacts: dict[str, Optional[str]],
     command: str,
     targets: tuple[str, ...],
 ) -> tuple[str, tuple[str, ...]]:
