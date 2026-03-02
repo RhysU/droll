@@ -5,7 +5,7 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass, fields
-from typing import Any, Iterator, Optional, Union
+from typing import Any, Optional, Union
 
 __all__ = (
     "Command",
@@ -33,21 +33,21 @@ class DrollError(Exception):
     """Indicates attempts to take impossible actions."""
 
 
-def field_names(cls_or_instance: Any) -> Iterator[str]:
-    """Yield field names for a dataclass or instance thereof."""
-    return (f.name for f in fields(cls_or_instance))
+def field_names(cls_or_instance: Any) -> tuple[str, ...]:
+    """Return field names for a dataclass or instance thereof."""
+    return tuple(f.name for f in fields(cls_or_instance))
 
 
-def field_values(instance: Any) -> Iterator[Any]:
-    """Yield field values for a dataclass instance."""
-    return (getattr(instance, f.name) for f in fields(instance))
+def field_values(instance: Any) -> tuple[Any, ...]:
+    """Return field values for a dataclass instance."""
+    return tuple(getattr(instance, f.name) for f in fields(instance))
 
 
 def field_items(
     instance: Any,
-) -> Iterator[tuple[str, Any]]:
-    """Yield (name, value) pairs for a dataclass instance."""
-    return ((f.name, getattr(instance, f.name)) for f in fields(instance))
+) -> tuple[tuple[str, Any], ...]:
+    """Return (name, value) pairs for a dataclass instance."""
+    return tuple((f.name, getattr(instance, f.name)) for f in fields(instance))
 
 
 RandRange = Callable[[int, int], int]
@@ -133,7 +133,7 @@ class Player:
     bait: Command
     elixir: Command
     roll: Roll
-    artifacts: Party
+    artifacts: dict[str, Optional[str]]
     party: Party
 
 

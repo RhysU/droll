@@ -9,6 +9,7 @@ from typing import Optional
 from .struct import DrollError, Dungeon, field_values
 
 __all__ = (
+    "DRAGON_BLOCKING_THRESHOLD",
     "blocking_dragon",
     "decrement_dungeon",
     "defeated_dungeon",
@@ -17,6 +18,9 @@ __all__ = (
     "finished_dungeon",
     "increment_dungeon",
 )
+
+# A dragon blocks progress when this many or more dragon dice are present.
+DRAGON_BLOCKING_THRESHOLD = 3
 
 
 def defeated_monsters(dungeon: Optional[Dungeon]) -> bool:
@@ -29,7 +33,7 @@ def defeated_monsters(dungeon: Optional[Dungeon]) -> bool:
 def defeated_dungeon(dungeon: Optional[Dungeon]) -> bool:
     """Are all monsters and any dragon on this dungeon defeated?"""
     return (dungeon is None) or (
-        defeated_monsters(dungeon) and dungeon.dragon < 3
+        defeated_monsters(dungeon) and dungeon.dragon < DRAGON_BLOCKING_THRESHOLD
     )
 
 
