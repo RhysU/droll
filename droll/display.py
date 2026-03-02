@@ -78,12 +78,11 @@ def _format_party(
 
 def _format_dungeon(
     dungeon: Optional[struct.Dungeon],
-) -> Optional[str]:
-    """Format dungeon contents, returning None when empty or absent."""
+) -> str:
+    """Format dungeon contents, always returning a displayable string."""
     if dungeon is None:
-        return None
-    result = _format_items(dungeon)
-    return None if result == "None" else result
+        return "None"
+    return _format_items(dungeon)
 
 
 def compact_summary(
@@ -117,7 +116,6 @@ def compact_summary(
         f"{'Consider:':<{width}} {available_str}",
         f"{'Party:':<{width}} {party_str}",
     ]
-    if dungeon_str:
-        lines.append(f"{'Dungeon:':<{width}} {dungeon_str}")
+    lines.append(f"{'Dungeon:':<{width}} {dungeon_str}")
 
     return "\n".join(lines)
