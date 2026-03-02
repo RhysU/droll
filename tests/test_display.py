@@ -78,7 +78,7 @@ def test_compact_summary_in_dungeon():
     )
     lines = result.split("\n")
     assert len(lines) == 5
-    assert "depth 3 in delve 1 with experience 0" in lines[0]
+    assert "depth 3 in delve 1 with 0xp" in lines[0]
     assert "talisman" in lines[1]
     assert "ability retreat" in lines[2]
     assert "fighter champion" in lines[3]
@@ -144,7 +144,7 @@ def test_compact_summary_cleared_level_10():
     )
     result = display.compact_summary(world, "Beguiler", 24, ["retire"])
     lines = result.split("\n")
-    assert "depth 10 in delve 3 with experience 16" in lines[0]
+    assert "depth 10 in delve 3 with 16xp" in lines[0]
     assert "scale×4 sceptre talisman tools" in lines[1]
     assert "retire" in lines[2]
     assert "champion scroll×2" in lines[3]
@@ -166,7 +166,7 @@ def test_compact_summary_ending_state():
     )
     result = display.compact_summary(world, "DragonSlayer", 23, [])
     lines = result.split("\n")
-    assert "delve 3 with experience 16" in lines[0]
+    assert "delve 3 with 16xp" in lines[0]
     assert "Consider:" in lines[2]
     assert "None" in lines[2]
     assert len(lines) == 4  # No Dungeon line

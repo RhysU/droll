@@ -100,12 +100,9 @@ def compact_summary(
 
     # Build the location line
     if w.depth:
-        location = (
-            f"depth {w.depth} in delve {w.delve}"
-            f" with experience {w.experience}"
-        )
+        location = f"depth {w.depth} in delve {w.delve} with {w.experience}xp"
     else:
-        location = f"delve {w.delve} with experience {w.experience}"
+        location = f"delve {w.delve} with {w.experience}xp"
 
     # Format each component
     treasure_str = _format_treasure(w.treasure.own)
