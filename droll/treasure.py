@@ -46,6 +46,8 @@ def draw_treasure(treasure: Treasure, randrange: RandRange) -> Treasure:
 
 def replace_treasure(treasure: Treasure, item: str) -> Treasure:
     """Replace a single item from the player's own artifacts into the box."""
+    if not hasattr(treasure.own, item):
+        raise DrollError(f"'{item}' is not a valid treasure type.")
     prior_count = getattr(treasure.own, item)
     if not prior_count:
         raise DrollError(f"'{item}' not in player's treasure.")

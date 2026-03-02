@@ -8,6 +8,7 @@ import random
 import pytest
 
 from droll import player, struct, world
+from droll.treasure import replace_treasure
 
 
 class TestTreasure:
@@ -108,3 +109,10 @@ class TestTreasure:
         assert game.treasure.own.tools == 0
         assert game.party.thief == 0
         assert game.dungeon.goblin == 1
+
+
+def test_replace_treasure_invalid_type():
+    """replace_treasure raises DrollError for non-treasure names."""
+    treasure = struct.Treasure(own=struct.Artifacts(sword=1))
+    with pytest.raises(struct.DrollError, match="not a valid treasure type"):
+        replace_treasure(treasure, "cleric")

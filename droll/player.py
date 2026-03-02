@@ -122,20 +122,24 @@ def apply(
 
     Processes hero-like artifacts (i.e. not rings/portals/scales).
     For example, what heroes to revive when quaffing a potion."""
-    # Convert any artifacts in the command into any corresponding hero types
-    command, targets = _partify_all(player.artifacts, command, targets)
-
     # One-off handling of some treasures, with error wrapping to aid usability
     if command == "portal":
         raise DrollError('To use a portal, directly "retire".')
     if command == "ring":
         raise DrollError('To use a ring, directly "descend" or "retire".')
+
+    # Dispatch ability/bait/elixir before artifact-to-hero translation (#181).
+    # These commands define their own target semantics (e.g. paladin_ability
+    # expects a treasure name, not a hero name) so _partify_all is wrong here.
     if command in {"ability", "bait", "elixir"}:
         try:
             action_ = getattr(player, command)
             return action_(world, randrange, command, targets)
         except AttributeError as cause:
             raise DrollError(str(cause)) from cause
+
+    # Convert any artifacts in the command into any corresponding hero types
+    command, targets = _partify_all(player.artifacts, command, targets)
 
     # Temporarily inflate party with treasure-as-hero counts
     prior_own = world.treasure.own
