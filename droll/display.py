@@ -61,7 +61,7 @@ def _format_available(
 ) -> str:
     """Format available commands alphabetically, annotating score deltas."""
     return " ".join(
-        f"{c}({deltas[c]:+d}xp)" if deltas and c in deltas else c
+        f"{c}({deltas[c]:+d} xp)" if deltas and c in deltas else c
         for c in sorted(available)
     ) or "None"
 
@@ -100,9 +100,9 @@ def compact_summary(
 
     # Build the location line
     if w.depth:
-        location = f"depth {w.depth} in delve {w.delve} with {w.experience}xp"
+        location = f"depth {w.depth} in delve {w.delve} with {w.experience} xp"
     else:
-        location = f"delve {w.delve} with {w.experience}xp"
+        location = f"delve {w.delve} with {w.experience} xp"
 
     # Format each component
     treasure_str = _format_treasure(w.treasure.own)
