@@ -5,7 +5,6 @@
 
 from collections.abc import Sequence
 from dataclasses import replace
-from typing import Optional
 
 from . import ability, dice, regular, struct
 from .struct import DrollError
@@ -32,14 +31,14 @@ Default = struct.Player(
     # Behavior at specific lifecycle events?
     roll=struct.Roll(dungeon=dice.roll_dungeon, party=dice.roll_party),
     # How do artifacts map to heroes?
-    artifacts={
-        "fighter": "sword",
-        "cleric": "talisman",
-        "mage": "sceptre",
-        "thief": "tools",
-        "champion": None,
-        "scroll": "scroll",
-    },
+    artifacts=struct.Party(
+        fighter="sword",
+        cleric="talisman",
+        mage="sceptre",
+        thief="tools",
+        champion=None,
+        scroll="scroll",
+    ),
     # What effect does each hero have on each enemy?
     party=struct.Party(
         fighter=struct.Dungeon(
@@ -105,7 +104,7 @@ def _adjust_phantom_treasures(world, artifacts, treasure, sign):
             **{
                 hero: getattr(world.party, hero)
                 + sign * getattr(treasure, artifact)
-                for hero, artifact in artifacts.items()
+                for hero, artifact in struct.field_items(artifacts)
                 if artifact is not None
             },
         ),
@@ -167,7 +166,7 @@ def apply(
     for hero, quantity in struct.field_items(world.party):
         if quantity >= 0:
             continue
-        artifact = player.artifacts[hero]
+        artifact = getattr(player.artifacts, hero)
         for _ in range(-quantity):
             treasure = replace_treasure(treasure, artifact)
         party_updates[hero] = 0
@@ -182,14 +181,14 @@ def apply(
 
 
 def _partify_all(
-    artifacts: dict[str, Optional[str]],
+    artifacts: struct.Party,
     command: str,
     targets: tuple[str, ...],
 ) -> tuple[str, tuple[str, ...]]:
     """Convert any artifact names in command and targets to hero names."""
     reverse = {
         artifact: hero
-        for hero, artifact in artifacts.items()
+        for hero, artifact in struct.field_items(artifacts)
         if artifact is not None
     }
     return (

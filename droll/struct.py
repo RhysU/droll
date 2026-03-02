@@ -70,12 +70,12 @@ RollDungeon = Callable[[int, RandRange], Dungeon]
 
 @dataclass(frozen=True)
 class Party:
-    fighter: Union[int, Command] = 0
-    cleric: Union[int, Command] = 0
-    mage: Union[int, Command] = 0
-    thief: Union[int, Command] = 0
-    champion: Union[int, Command] = 0
-    scroll: Union[int, Command] = 0
+    fighter: Union[int, Command, str, None] = 0
+    cleric: Union[int, Command, str, None] = 0
+    mage: Union[int, Command, str, None] = 0
+    thief: Union[int, Command, str, None] = 0
+    champion: Union[int, Command, str, None] = 0
+    scroll: Union[int, Command, str, None] = 0
 
 
 # Bookkeeping for operations performed during the regroup phase
@@ -133,7 +133,7 @@ class Player:
     bait: Command
     elixir: Command
     roll: Roll
-    artifacts: dict[str, Optional[str]]
+    artifacts: Party
     party: Party
 
 
