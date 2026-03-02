@@ -55,6 +55,7 @@ Score 0:  delve 1 with 0 XP
 Treasure: None
 Consider: descend
 Party:    fighter×2 cleric mage thief champion×2
+Dungeon:  None
 00 Knight> descend
 
 Score 0:  depth 1 in delve 1 with 0 XP
@@ -84,6 +85,7 @@ Score 0:  depth 1 in delve 1 with 0 XP
 Treasure: None
 Consider: descend retire(+1 XP) undo
 Party:    fighter cleric mage thief champion×2
+Dungeon:  None
 02 Knight> descend
 
 Score 0:  depth 2 in delve 1 with 0 XP
@@ -104,6 +106,7 @@ Score 0:  depth 2 in delve 1 with 0 XP
 Treasure: None
 Consider: descend retire(+2 XP) undo
 Party:    fighter cleric mage thief champion
+Dungeon:  None
 05 Knight> descend
 
 Score 0:  depth 3 in delve 1 with 0 XP
@@ -183,6 +186,7 @@ Score 8:      delve 2 with 5 XP
 Treasure:     elixir sceptre talisman
 Consider:     descend
 Party:        fighter cleric champion×5
+Dungeon:      None
 15 DragonSlayer> descend
 
 Score 8:      depth 1 in delve 2 with 5 XP
@@ -196,6 +200,7 @@ Score 9:      depth 1 in delve 2 with 5 XP
 Treasure:     elixir sceptre talisman×2
 Consider:     descend retire(+1 XP)
 Party:        fighter cleric champion×4
+Dungeon:      None
 17 DragonSlayer> descend
 
 Score 9:      depth 2 in delve 2 with 5 XP
@@ -216,12 +221,14 @@ Score 8:      depth 2 in delve 2 with 5 XP
 Treasure:     elixir talisman×2
 Consider:     descend retire(+2 XP) undo
 Party:        fighter champion×4
+Dungeon:      None
 20 DragonSlayer> elixir mage
 
 Score 7:      depth 2 in delve 2 with 5 XP
 Treasure:     talisman×2
 Consider:     descend retire(+2 XP) undo
 Party:        fighter mage champion×4
+Dungeon:      None
 21 DragonSlayer> ^D
 ```
 
