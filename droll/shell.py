@@ -188,12 +188,12 @@ class Shell(cmd.Cmd):
     @functools.wraps(Game.ability)
     def do_ability(self, line) -> GameState:
         """Execute the player's special ability with the given arguments."""
-        return self._game.ability(*_parse(line))
+        return self._game.ability(*_tokenize(line))
 
     @functools.wraps(Game.apply)
     def default(self, line) -> GameState:
         """Handle unknown commands as game actions."""
-        return self._game.apply(*_parse(line))
+        return self._game.apply(*_tokenize(line))
 
     @functools.wraps(Game.descend)
     def do_descend(self, line) -> GameState:
@@ -204,7 +204,7 @@ class Shell(cmd.Cmd):
     @functools.wraps(Game.reroll)
     def do_reroll(self, line) -> GameState:
         """Reroll the specified party or dungeon dice."""
-        return self._game.reroll(*_parse(line))
+        return self._game.reroll(*_tokenize(line))
 
     @functools.wraps(Game.retire)
     def do_retire(self, line) -> GameState:
@@ -226,7 +226,7 @@ class Shell(cmd.Cmd):
         """Provide tab completion suggestions for default commands."""
         # Break line into tokens until and starting from present text
         names = self._game.completenames(
-            text=text, head=_parse(line[:begidx]), tail=_parse(line[begidx:])
+            text=text, head=_tokenize(line[:begidx]), tail=_tokenize(line[begidx:])
         )
         if self._undo and "undo".startswith(text):
             names.append("undo")
@@ -444,12 +444,15 @@ class Shell(cmd.Cmd):
                     scale       1   But a pair of scales scores 4"""))
 
 
-def _parse(line: str) -> tuple[str, ...]:
+def _tokenize(line: str) -> tuple[str, ...]:
     """Split a line into a tuple of whitespace-delimited tokens."""
     return tuple(line.split())
 
 
 def _no_arguments(line: str) -> None:
-    """Raise DrollError if line is non-empty."""
+    """Raise DrollError if line is non-empty.
+
+    Strictness here prevents typos like 'retire goblin' from silently
+    ignoring the extra argument, which would confuse the player."""
     if line:
         raise DrollError("Command accepts no arguments.")

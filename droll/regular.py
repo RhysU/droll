@@ -8,6 +8,7 @@ from operator import add
 from collections.abc import Callable, Sequence, Set
 from .dice import roll_dungeon, roll_party
 from .dungeon import (
+    DRAGON_BLOCKING_THRESHOLD,
     defeated_monsters,
     decrement_dungeon,
     eliminate_dungeon,
@@ -289,7 +290,7 @@ def defeat_dragon(
     targets: tuple[str, ...],
     *,
     hero_validator: Callable[..., None] = defeat_dragon_heroes,
-    _min_dragon_count: int = 3,
+    _min_dragon_count: int = DRAGON_BLOCKING_THRESHOLD,
 ) -> World:
     """Update world after hero handles a dragon using multiple distinct heroes.
 
