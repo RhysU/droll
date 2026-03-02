@@ -166,7 +166,16 @@ class Game:
         """Determine which world-level actions can currently succeed."""
         possible = []
         if self._world.ability:
-            possible.append("ability")
+            try:
+                player.apply(
+                    self._player,
+                    self._world,
+                    lambda start, stop=None: start,
+                    "ability",
+                )
+                possible.append("ability")
+            except DrollError:
+                pass
         for name, action in (
             (
                 "descend",

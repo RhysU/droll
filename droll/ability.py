@@ -53,7 +53,9 @@ def _choose_and_add_hero(
         raise DrollError(f"At most 1 target accepted for {command}.")
     target = targets[0] if targets else next(iter(sorted(acceptable)))
     if target not in acceptable:
-        raise DrollError(f"Target {target} not one of {acceptable}.")
+        raise DrollError(
+            f"Target '{target}' not one of {', '.join(sorted(acceptable))}."
+        )
     return replace(world, party=increment_party(world.party, target))
 
 

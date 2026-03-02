@@ -73,10 +73,11 @@ def _format_party(
 def _format_dungeon(
     dungeon: Optional[struct.Dungeon],
 ) -> Optional[str]:
-    """Format dungeon contents, returning None only if no dungeon exists."""
+    """Format dungeon contents, returning None when empty or absent."""
     if dungeon is None:
         return None
-    return _format_items(dungeon)
+    result = _format_items(dungeon)
+    return None if result == "None" else result
 
 
 def compact_summary(
@@ -84,6 +85,7 @@ def compact_summary(
     player_name: str,
     score: int,
     available: Sequence[str],
+    actions: Sequence[str] = (),
 ) -> str:
     """Format the world state in compact multi-line format."""
     # Compute the width for alignment (prompt width)
@@ -103,6 +105,7 @@ def compact_summary(
     treasure_str = _format_treasure(w.treasure.own)
     party_str = _format_party(w.party, w.regroup.discard)
     available_str = _format_available(available)
+    actions_str = _format_available(actions)
     dungeon_str = _format_dungeon(w.dungeon)
 
     # Build lines with aligned colons
@@ -110,8 +113,10 @@ def compact_summary(
         f"{'Score ' + str(score) + ':':<{width}} {location}",
         f"{'Treasure:':<{width}} {treasure_str}",
         f"{'Consider:':<{width}} {available_str}",
-        f"{'Party:':<{width}} {party_str}",
     ]
+    if actions:
+        lines.append(f"{'Actions:':<{width}} {actions_str}")
+    lines.append(f"{'Party:':<{width}} {party_str}")
     if dungeon_str:
         lines.append(f"{'Dungeon:':<{width}} {dungeon_str}")
 
