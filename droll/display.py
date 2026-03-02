@@ -61,7 +61,7 @@ def _format_available(
 ) -> str:
     """Format available commands alphabetically, annotating score deltas."""
     return " ".join(
-        f"{c}({deltas[c]:+d})" if deltas and c in deltas else c
+        f"{c}({deltas[c]:+d}xp)" if deltas and c in deltas else c
         for c in sorted(available)
     ) or "None"
 

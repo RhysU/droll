@@ -39,7 +39,7 @@ def test_format_available_with_deltas():
     deltas = {"retire": 3, "retreat": 0}
     assert (
         display._format_available(available, deltas)
-        == "ability retire(+3) retreat(+0)"
+        == "ability retire(+3xp) retreat(+0xp)"
     )
 
 
@@ -47,7 +47,7 @@ def test_format_available_negative_delta():
     """Test retire shows negative delta when portal consumed at low depth."""
     available = ["retire", "retreat"]
     deltas = {"retire": -1, "retreat": 0}
-    assert display._format_available(available, deltas) == "retire(-1) retreat(+0)"
+    assert display._format_available(available, deltas) == "retire(-1xp) retreat(+0xp)"
 
 
 def test_format_dungeon_empty():
