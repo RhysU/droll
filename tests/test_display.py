@@ -30,7 +30,24 @@ def test_format_treasure_multiple_items_alphabetized():
 def test_format_available_alphabetized():
     """Test available commands are displayed in alphabetical order."""
     available = ["retreat", "ability", "reroll"]
-    assert display._format_available(available) == "ability reroll retreat(0xp)"
+    assert display._format_available(available) == "ability reroll retreat"
+
+
+def test_format_available_with_deltas():
+    """Test available commands show score deltas when provided."""
+    available = ["retreat", "ability", "retire"]
+    deltas = {"retire": 3, "retreat": 0}
+    assert (
+        display._format_available(available, deltas)
+        == "ability retire(+3) retreat(+0)"
+    )
+
+
+def test_format_available_negative_delta():
+    """Test retire shows negative delta when portal consumed at low depth."""
+    available = ["retire", "retreat"]
+    deltas = {"retire": -1, "retreat": 0}
+    assert display._format_available(available, deltas) == "retire(-1) retreat(+0)"
 
 
 def test_format_dungeon_empty():

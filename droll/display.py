@@ -55,17 +55,19 @@ def _format_treasure(artifacts: struct.Artifacts) -> str:
     return " ".join(filter(None, parts)) or "None"
 
 
-_ANNOTATE = {
-    "retire": "retire(+xp)",
-    "retreat": "retreat(0xp)",
-}
+def _format_available(
+    available: Sequence[str],
+    deltas: Optional[dict[str, int]] = None,
+) -> str:
+    """Format available commands alphabetically, annotating score deltas."""
 
+    def annotate(cmd: str) -> str:
+        if deltas is not None and cmd in deltas:
+            d = deltas[cmd]
+            return f"{cmd}({d:+d})"
+        return cmd
 
-def _format_available(available: Sequence[str]) -> str:
-    """Format available commands alphabetically, annotating retire/retreat."""
-    return " ".join(
-        _ANNOTATE.get(cmd, cmd) for cmd in sorted(available)
-    ) or "None"
+    return " ".join(annotate(cmd) for cmd in sorted(available)) or "None"
 
 
 def _format_party(
@@ -93,6 +95,7 @@ def compact_summary(
     player_name: str,
     score: int,
     available: Sequence[str],
+    deltas: Optional[dict[str, int]] = None,
 ) -> str:
     """Format the world state in compact multi-line format."""
     # Compute the width for alignment (prompt width)
@@ -111,7 +114,7 @@ def compact_summary(
     # Format each component
     treasure_str = _format_treasure(w.treasure.own)
     party_str = _format_party(w.party, w.regroup.discard)
-    available_str = _format_available(available)
+    available_str = _format_available(available, deltas)
     dungeon_str = _format_dungeon(w.dungeon)
 
     # Build lines with aligned colons

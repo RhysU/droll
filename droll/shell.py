@@ -73,11 +73,13 @@ class Shell(cmd.Cmd):
                 cmd for cmd in feasible
                 if cmd in self._AVAILABLE_COMMANDS
             ]
+            deltas = self._game.score_deltas()
             summary = display.compact_summary(
                 self._game.world,
                 self._game.player_name,
                 self._game.score,
                 available,
+                deltas,
             )
             if self._color:
                 for cmd in feasible:
