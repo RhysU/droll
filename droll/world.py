@@ -158,16 +158,26 @@ def retire(world: struct.World) -> struct.World:
 
 
 def retreat(world: struct.World) -> struct.World:
-    """Retreat from the dungeon while monsters remain."""
+    """Retreat from the dungeon while monsters remain.
+
+    A town portal, if available, is consumed to earn experience."""
     if world.depth < 1:
         raise DrollError("Descend at least once prior to retreating.")
     if defeated_dungeon(world.dungeon):
         raise DrollError("No monsters to retreat from; use 'retire' to leave the dungeon.")
 
+    # A town portal permits earning experience even when retreating
+    experience = world.experience
+    try:
+        world = _apply_portal(world)
+        experience += world.depth
+    except DrollError:
+        pass
+
     # Regroup just prior to retreating
     world = _regroup(world)
 
-    return replace(world, depth=0, dungeon=None)
+    return replace(world, depth=0, experience=experience, dungeon=None)
 
 
 def score(world: struct.World) -> int:
