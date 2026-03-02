@@ -89,8 +89,8 @@ RollParty = Callable[[int, RandRange], tuple[Party, Regroup]]
 
 @dataclass(frozen=True)
 class Roll:
-    dungeon: Optional[RollDungeon] = None
-    party: Optional[RollParty] = None
+    dungeon: RollDungeon
+    party: RollParty
 
 
 @dataclass(frozen=True)
