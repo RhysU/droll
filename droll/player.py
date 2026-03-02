@@ -150,7 +150,12 @@ def apply(
             raise DrollError(f'Unknown command "{command}".')
         action_ = getattr(player.party, command)
         if not targets:
-            raise DrollError(f'"{command}" requires a target.')
+            valid = [
+                name for name, _ in struct.field_items(action_)
+                if world.dungeon is not None and getattr(world.dungeon, name, 0)
+            ]
+            hint = f" Available: {', '.join(valid)}." if valid else ""
+            raise DrollError(f'"{command}" requires a target.{hint}')
         if not hasattr(action_, targets[0]):
             raise DrollError(f'Unknown target "{targets[0]}".')
         try:

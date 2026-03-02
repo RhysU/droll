@@ -33,10 +33,27 @@ def test_format_available_alphabetized():
     assert display._format_available(available) == "ability reroll retreat"
 
 
+def test_format_available_with_deltas():
+    """Test available commands show score deltas when provided."""
+    available = ["retreat", "ability", "retire"]
+    deltas = {"retire": 3, "retreat": 0}
+    assert (
+        display._format_available(available, deltas)
+        == "ability retire(+3 XP) retreat(+0 XP)"
+    )
+
+
+def test_format_available_negative_delta():
+    """Test retire shows negative delta when portal consumed at low depth."""
+    available = ["retire", "retreat"]
+    deltas = {"retire": -1, "retreat": 0}
+    assert display._format_available(available, deltas) == "retire(-1 XP) retreat(+0 XP)"
+
+
 def test_format_dungeon_empty():
-    """Test formatting empty dungeon returns 'None' string."""
+    """Test formatting empty dungeon returns None (line omitted)."""
     dungeon = struct.Dungeon()
-    assert display._format_dungeon(dungeon) == "None"
+    assert display._format_dungeon(dungeon) is None
 
 
 def test_format_dungeon_with_monsters():
@@ -61,7 +78,7 @@ def test_compact_summary_in_dungeon():
     )
     lines = result.split("\n")
     assert len(lines) == 5
-    assert "depth 3 in delve 1 with experience 0" in lines[0]
+    assert "depth 3 in delve 1 with 0 XP" in lines[0]
     assert "talisman" in lines[1]
     assert "ability retreat" in lines[2]
     assert "fighter champion" in lines[3]
@@ -93,8 +110,8 @@ def test_compact_summary_long_player_name_alignment():
         assert content_start >= 13
 
 
-def test_compact_summary_dungeon_shown_when_empty():
-    """Test that empty dungeons display 'Dungeon: None' in the summary."""
+def test_compact_summary_dungeon_omitted_when_empty():
+    """Test that empty dungeons omit the Dungeon line from the summary."""
     world = struct.World(
         delve=1,
         depth=1,
@@ -108,9 +125,8 @@ def test_compact_summary_dungeon_shown_when_empty():
         world, "Knight", 0, ["ability", "descend", "retire"]
     )
     lines = result.split("\n")
-    assert len(lines) == 5
-    assert "Dungeon:" in lines[4]
-    assert "None" in lines[4]
+    assert len(lines) == 4
+    assert "Dungeon:" not in result
 
 
 def test_compact_summary_cleared_level_10():
@@ -128,13 +144,12 @@ def test_compact_summary_cleared_level_10():
     )
     result = display.compact_summary(world, "Beguiler", 24, ["retire"])
     lines = result.split("\n")
-    assert "depth 10 in delve 3 with experience 16" in lines[0]
+    assert "depth 10 in delve 3 with 16 XP" in lines[0]
     assert "scale×4 sceptre talisman tools" in lines[1]
     assert "retire" in lines[2]
     assert "champion scroll×2" in lines[3]
-    assert "Dungeon:" in lines[4]
-    assert "None" in lines[4]
-    assert len(lines) == 5
+    assert "Dungeon:" not in result
+    assert len(lines) == 4
 
 
 def test_compact_summary_ending_state():
@@ -151,7 +166,7 @@ def test_compact_summary_ending_state():
     )
     result = display.compact_summary(world, "DragonSlayer", 23, [])
     lines = result.split("\n")
-    assert "delve 3 with experience 16" in lines[0]
+    assert "delve 3 with 16 XP" in lines[0]
     assert "Consider:" in lines[2]
     assert "None" in lines[2]
     assert len(lines) == 4  # No Dungeon line

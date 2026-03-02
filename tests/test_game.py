@@ -148,6 +148,70 @@ def test_completedefault():
     assert "fighter" in results
 
 
+def test_score_deltas_retire_cleared():
+    """score_deltas returns +depth for retire with cleared dungeon."""
+    g = Game(random=random.Random(4), player=Default)
+    g.descend()
+    g._world = replace(g._world, dungeon=struct.Dungeon())
+    deltas = g.score_deltas()
+    assert "retire" in deltas
+    assert deltas["retire"] == g._world.depth
+
+
+def test_score_deltas_retreat_with_monsters():
+    """score_deltas returns 0 for retreat with monsters present."""
+    g = Game(random=random.Random(4), player=Default)
+    g.descend()
+    g._world = replace(g._world, dungeon=struct.Dungeon(goblin=1))
+    deltas = g.score_deltas()
+    assert "retreat" in deltas
+    assert deltas["retreat"] == 0
+
+
+def test_score_deltas_retire_consumes_portal():
+    """score_deltas accounts for portal consumption when monsters remain."""
+    g = Game(random=random.Random(4), player=Default)
+    g.descend()
+    g._world = replace(
+        g._world,
+        depth=1,
+        dungeon=struct.Dungeon(goblin=1),
+        treasure=replace(
+            g._world.treasure, own=replace(g._world.treasure.own, portal=1)
+        ),
+    )
+    deltas = g.score_deltas()
+    assert "retire" in deltas
+    # depth 1 XP gained, but portal worth 2 is consumed: net -1
+    assert deltas["retire"] == -1
+
+
+def test_score_deltas_retire_nonzero():
+    """Retire at depth 5 with cleared dungeon earns +5."""
+    g = Game(random=random.Random(4), player=Default)
+    g.descend()
+    g._world = replace(g._world, depth=5, dungeon=struct.Dungeon())
+    deltas = g.score_deltas()
+    assert deltas["retire"] == 5
+
+
+def test_score_deltas_retreat_nonzero():
+    """Retreat with a portal earns depth XP minus portal cost."""
+    g = Game(random=random.Random(4), player=Default)
+    g.descend()
+    g._world = replace(
+        g._world,
+        depth=5,
+        dungeon=struct.Dungeon(goblin=1),
+        treasure=replace(
+            g._world.treasure, own=replace(g._world.treasure.own, portal=1)
+        ),
+    )
+    deltas = g.score_deltas()
+    # depth 5 XP gained, portal worth 2 consumed: net +3
+    assert deltas["retreat"] == 3
+
+
 def test_next_delve_returns_stop_after_three():
     """Game returns STOP when no more delves remain."""
     g = Game(random=random.Random(4), player=Default)

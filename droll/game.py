@@ -162,11 +162,31 @@ class Game:
         self._world = world.retreat(self._world)
         return self._next_delve()
 
+    def score_deltas(self) -> dict[str, int]:
+        """Hypothetical score deltas for retire and retreat."""
+        current = self.score
+        deltas = {}
+        for name, action in (("retire", world.retire), ("retreat", world.retreat)):
+            try:
+                deltas[name] = world.score(action(self._world)) - current
+            except DrollError:
+                pass
+        return deltas
+
     def _possible_world_actions(self) -> list[str]:
         """Determine which world-level actions can currently succeed."""
         possible = []
         if self._world.ability:
-            possible.append("ability")
+            try:
+                player.apply(
+                    self._player,
+                    self._world,
+                    lambda start, stop=None: start,
+                    "ability",
+                )
+                possible.append("ability")
+            except DrollError:
+                pass
         for name, action in (
             (
                 "descend",

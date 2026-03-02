@@ -55,9 +55,15 @@ def _format_treasure(artifacts: struct.Artifacts) -> str:
     return " ".join(filter(None, parts)) or "None"
 
 
-def _format_available(available: Sequence[str]) -> str:
-    """Format available commands alphabetically."""
-    return " ".join(sorted(available)) or "None"
+def _format_available(
+    available: Sequence[str],
+    deltas: Optional[dict[str, int]] = None,
+) -> str:
+    """Format available commands alphabetically, annotating score deltas."""
+    return " ".join(
+        f"{c}({deltas[c]:+d} XP)" if deltas and c in deltas else c
+        for c in sorted(available)
+    ) or "None"
 
 
 def _format_party(
@@ -73,10 +79,11 @@ def _format_party(
 def _format_dungeon(
     dungeon: Optional[struct.Dungeon],
 ) -> Optional[str]:
-    """Format dungeon contents, returning None only if no dungeon exists."""
+    """Format dungeon contents, returning None when empty or absent."""
     if dungeon is None:
         return None
-    return _format_items(dungeon)
+    result = _format_items(dungeon)
+    return None if result == "None" else result
 
 
 def compact_summary(
@@ -84,6 +91,7 @@ def compact_summary(
     player_name: str,
     score: int,
     available: Sequence[str],
+    deltas: Optional[dict[str, int]] = None,
 ) -> str:
     """Format the world state in compact multi-line format."""
     # Compute the width for alignment (prompt width)
@@ -92,17 +100,14 @@ def compact_summary(
 
     # Build the location line
     if w.depth:
-        location = (
-            f"depth {w.depth} in delve {w.delve}"
-            f" with experience {w.experience}"
-        )
+        location = f"depth {w.depth} in delve {w.delve} with {w.experience} XP"
     else:
-        location = f"delve {w.delve} with experience {w.experience}"
+        location = f"delve {w.delve} with {w.experience} XP"
 
     # Format each component
     treasure_str = _format_treasure(w.treasure.own)
     party_str = _format_party(w.party, w.regroup.discard)
-    available_str = _format_available(available)
+    available_str = _format_available(available, deltas)
     dungeon_str = _format_dungeon(w.dungeon)
 
     # Build lines with aligned colons

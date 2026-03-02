@@ -27,7 +27,7 @@ def _defeat_plus_additional(
     if defeated_monsters(world.dungeon):
         if additional:
             raise DrollError(
-                f"Additional {additional} given but no monsters left."
+                f"Additional target '{additional[0]}' given but no monsters left."
             )
         return world
 

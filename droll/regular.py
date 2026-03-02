@@ -271,7 +271,9 @@ def defeat_dragon_heroes(
     """
     hero_set = {*heroes}
     if hero_set & {*disallowed_heroes}:
-        raise DrollError(f"Heroes {disallowed_heroes} cannot defeat a dragon.")
+        raise DrollError(
+            f"A {', '.join(sorted(disallowed_heroes))} cannot defeat a dragon."
+        )
     if len(heroes) != required:
         raise DrollError(f"Exactly {required} heroes required.")
     n_distinct = distinct_heroes(
@@ -279,7 +281,8 @@ def defeat_dragon_heroes(
     )
     if n_distinct != required:
         raise DrollError(
-            f"Exactly {required} distinct heroes not in {', '.join(heroes)}"
+            f"Exactly {required} distinct heroes required"
+            f" but '{', '.join(heroes)}' has only {n_distinct}."
         )
 
 
@@ -300,7 +303,7 @@ def defeat_dragon(
     # Simple prerequisites for attempting to defeat the dragon
     if world.dungeon.dragon < _min_dragon_count:
         raise DrollError(
-            f"Enemy {targets[0]} only comes at length {_min_dragon_count}."
+            f"At least {_min_dragon_count} dragon dice required to fight."
         )
     if not defeated_monsters(world.dungeon):
         raise DrollError(
@@ -352,7 +355,9 @@ def bait_dragon(
         else 0
     )
     if not new_dragons:
-        raise DrollError(f"At least 1 of {_enemies} required for '{command}'.")
+        raise DrollError(
+            f"At least 1 monster ({', '.join(_enemies)}) required for '{command}'."
+        )
 
     # Zero all enemy sources and increment the number of dragons
     return replace(
