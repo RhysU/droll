@@ -6,7 +6,7 @@
 import random
 import pytest
 
-from droll import struct
+from droll import player, struct
 from droll.ability import crusader_ability, paladin_ability
 from droll.heroes.crusader import Crusader, Paladin
 
@@ -134,3 +134,25 @@ def test_paladin_ability_requires_treasure():
     )
     with pytest.raises(struct.DrollError):
         paladin_ability(world, _UNUSED, "ability")
+
+
+def test_paladin_ability_talisman_via_apply(
+):
+    """Paladin ability with 'talisman' artifact must not be mangled (#181).
+
+    When the user types 'ability talisman', _partify_all() was converting
+    'talisman' to 'cleric' before paladin_ability could consume it as a
+    treasure name, producing "'Artifacts' object has no attribute 'cleric'"."""
+    world = struct.World(
+        ability=True,
+        dungeon=struct.Dungeon(goblin=2, skeleton=1, dragon=1),
+        party=struct.Party(fighter=1, cleric=1),
+        treasure=struct.Treasure(
+            own=struct.Artifacts(talisman=1),
+            box=struct.Artifacts(sword=1),
+        ),
+    )
+    result = player.apply(Paladin, world, _UNUSED, "ability", "talisman")
+    assert sum(struct.field_values(result.dungeon)) == 0
+    assert result.treasure.own.talisman == 0
+    assert not result.ability
