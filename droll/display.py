@@ -55,9 +55,17 @@ def _format_treasure(artifacts: struct.Artifacts) -> str:
     return " ".join(filter(None, parts)) or "None"
 
 
+_ANNOTATE = {
+    "retire": "retire(+xp)",
+    "retreat": "retreat(0xp)",
+}
+
+
 def _format_available(available: Sequence[str]) -> str:
-    """Format available commands alphabetically."""
-    return " ".join(sorted(available)) or "None"
+    """Format available commands alphabetically, annotating retire/retreat."""
+    return " ".join(
+        _ANNOTATE.get(cmd, cmd) for cmd in sorted(available)
+    ) or "None"
 
 
 def _format_party(

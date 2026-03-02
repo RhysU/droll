@@ -30,7 +30,7 @@ def test_format_treasure_multiple_items_alphabetized():
 def test_format_available_alphabetized():
     """Test available commands are displayed in alphabetical order."""
     available = ["retreat", "ability", "reroll"]
-    assert display._format_available(available) == "ability reroll retreat"
+    assert display._format_available(available) == "ability reroll retreat(0xp)"
 
 
 def test_format_dungeon_empty():
