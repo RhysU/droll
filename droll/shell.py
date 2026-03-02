@@ -73,16 +73,11 @@ class Shell(cmd.Cmd):
                 cmd for cmd in feasible
                 if cmd in self._AVAILABLE_COMMANDS
             ]
-            actions = [
-                cmd for cmd in feasible
-                if cmd not in self._AVAILABLE_COMMANDS
-            ]
             summary = display.compact_summary(
                 self._game.world,
                 self._game.player_name,
                 self._game.score,
                 available,
-                actions,
             )
             if self._color:
                 for cmd in feasible:
