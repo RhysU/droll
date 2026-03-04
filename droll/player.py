@@ -126,7 +126,10 @@ def apply(
     if command == "portal":
         raise DrollError('To use a portal, directly "retire".')
     if command == "ring":
-        raise DrollError('To use a ring, directly "descend" or "retire".')
+        raise DrollError(
+            "Rings are consumed automatically when a dragon blocks."
+            ' Just "descend" or "retire".'
+        )
 
     # Dispatch ability/bait/elixir before artifact-to-hero translation (#181).
     # These commands define their own target semantics (e.g. paladin_ability

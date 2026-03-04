@@ -146,7 +146,7 @@ def quaff(
     if not howmany:
         raise DrollError(f"At least 1 {targets[0]} required.")
     if len(targets) - 1 != howmany:
-        raise DrollError(f"Exactly {howmany} heroes to revive required.")
+        raise DrollError(f"Specify exactly {howmany} to revive after 'potion'.")
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before quaffing.")
     party = decrement_party(world.party, hero)
