@@ -190,7 +190,8 @@ Dungeon:  dragon×2
 ── DragonSlayer ──────────────────────────────────
 Convert all monster faces into dragon dice.
 Dragons require only 2 distinct party members to defeat.
-Try: ability · fighter dragon mage
+Try: ability
+Try: fighter dragon mage
 
 Score 8:  delve 2 with 5 XP plus 3 treasure
 Treasure: elixir sceptre talisman
