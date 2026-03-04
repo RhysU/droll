@@ -5,7 +5,14 @@
 
 from dataclasses import replace
 
-from .struct import DrollError, Party, Regroup
+from .struct import DrollError, Party, Regroup, field_names
+
+_PARTY_FIELDS = frozenset(field_names(Party))
+
+
+def _check_party_member(hero: str) -> None:
+    if hero not in _PARTY_FIELDS:
+        raise DrollError(f"Unknown party member '{hero}'.")
 
 __all__ = (
     "decrement_party",
@@ -16,6 +23,7 @@ __all__ = (
 
 def decrement_party(party: Party, hero: str) -> Party:
     """Decrease the count of the specified hero type by one."""
+    _check_party_member(hero)
     prior_heroes = getattr(party, hero)
     if not prior_heroes:
         raise DrollError(f"At least 1 {hero} required in party.")
@@ -24,6 +32,7 @@ def decrement_party(party: Party, hero: str) -> Party:
 
 def decrement_regroup(regroup: Regroup, hero: str) -> Regroup:
     """Decrement the regroup discard counter for hero, if positive."""
+    _check_party_member(hero)
     prior = getattr(regroup.discard, hero, 0)
     return replace(
         regroup, discard=replace(regroup.discard, **{hero: max(0, prior - 1)})
@@ -32,4 +41,5 @@ def decrement_regroup(regroup: Regroup, hero: str) -> Regroup:
 
 def increment_party(party: Party, hero: str) -> Party:
     """Increase the count of the specified hero type by one."""
+    _check_party_member(hero)
     return replace(party, **{hero: getattr(party, hero) + 1})

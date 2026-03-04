@@ -155,7 +155,7 @@ def apply(
     if command == "reroll":
         world = regular.reroll(world, randrange, "scroll", targets)
     else:
-        if not hasattr(player.party, command):
+        if command not in struct.field_names(player.party):
             raise DrollError(f'Unknown command "{command}".')
         action_ = getattr(player.party, command)
         if not targets:
@@ -165,7 +165,7 @@ def apply(
             ]
             hint = f" Available: {', '.join(valid)}." if valid else ""
             raise DrollError(f'"{command}" requires a target.{hint}')
-        if not hasattr(action_, targets[0]):
+        if targets[0] not in struct.field_names(action_):
             raise DrollError(f'Unknown target "{targets[0]}".')
         if world.dungeon is None:
             raise DrollError("You must descend first.")

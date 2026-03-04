@@ -6,7 +6,14 @@
 from dataclasses import replace
 from typing import Optional
 
-from .struct import DrollError, Dungeon, field_values
+from .struct import DrollError, Dungeon, field_names, field_values
+
+_DUNGEON_FIELDS = frozenset(field_names(Dungeon))
+
+
+def _check_dungeon_target(target: str) -> None:
+    if target not in _DUNGEON_FIELDS:
+        raise DrollError(f"Unknown dungeon target '{target}'.")
 
 __all__ = (
     "DRAGON_BLOCKING_THRESHOLD",
@@ -54,6 +61,7 @@ def finished_dungeon(dungeon: Optional[Dungeon]) -> bool:
 
 def decrement_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
     """Decrease the count of the specified target type by one."""
+    _check_dungeon_target(target)
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise DrollError(f"At least 1 {target} required in dungeon.")
@@ -62,12 +70,14 @@ def decrement_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
 
 def increment_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
     """Increase the count of the specified target type by one."""
+    _check_dungeon_target(target)
     prior_targets = getattr(dungeon, target, 0)
     return replace(dungeon, **{target: prior_targets + 1})
 
 
 def eliminate_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
     """Remove all targets of the specified type from the dungeon."""
+    _check_dungeon_target(target)
     prior_targets = getattr(dungeon, target)
     if not prior_targets:
         raise DrollError(f"At least 1 {target} required in dungeon.")
