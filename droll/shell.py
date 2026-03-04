@@ -15,17 +15,6 @@ from .struct import DrollError
 
 __all__ = ("Shell",)
 
-_ABSENT = "\033[90m"
-_COMMAND = "\033[96m"
-_DRAGON = "\033[31m"
-_ERROR = "\033[91m"
-_HELP = "\033[93m"
-_LOOT = "\033[33m"
-_MONSTER = "\033[91m"
-_PROMPT = "\033[92m"
-_RESET = "\033[0m"
-
-
 class Shell(cmd.Cmd):
     """REPL permitting playing a Game via tab-completion shell."""
 
@@ -42,14 +31,22 @@ class Shell(cmd.Cmd):
         self._undo = None
         self._command_count = 0
         self._display_mode = display_mode
-        self._color = (
+        _color = (
             display_mode == display.DisplayMode.CURRENT and sys.stdout.isatty()
         )
+        self._absent = "\033[90m" if _color else ""
+        self._command = "\033[96m" if _color else ""
+        self._dragon = "\033[31m" if _color else ""
+        self._error = "\033[91m" if _color else ""
+        self._help = "\033[93m" if _color else ""
+        self._loot = "\033[33m" if _color else ""
+        self._monster = "\033[91m" if _color else ""
+        self._prompt_color = "\033[92m" if _color else ""
+        self._reset = "\033[0m" if _color else ""
 
     def precmd(self, line: str) -> str:
         """Reset terminal color after user input."""
-        if self._color:
-            print(_RESET, end="")
+        print(self._reset, end="")
         return line
 
     def preloop(self) -> None:
@@ -76,10 +73,7 @@ class Shell(cmd.Cmd):
         # Header rule with embedded name: ── Knight ─────────────...
         prefix = f"\u2500\u2500 {name} "
         rule = prefix + "\u2500" * max(0, 50 - len(prefix))
-        if self._color:
-            print("\n" + _HELP + rule + _RESET)
-        else:
-            print("\n" + rule)
+        print("\n" + self._help + rule + self._reset)
 
         # Description
         for part in desc_parts:
@@ -87,18 +81,14 @@ class Shell(cmd.Cmd):
 
         # One suggestion per line
         for example in examples:
-            if self._color:
-                print(f"Try: {_COMMAND}{example}{_RESET}")
-            else:
-                print(f"Try: {example}")
+            print(f"Try: {self._command}{example}{self._reset}")
 
         print()
 
     def _postcmd_current(self, stop, line) -> None:
         """Display state using the compact summary format."""
         self.prompt = f"{self._command_count:02d} {self._game.player_name}> "
-        if self._color:
-            self.prompt = _PROMPT + self.prompt + _RESET
+        self.prompt = self._prompt_color + self.prompt + self._reset
         print()
         if line != "EOF" and not stop and self._game.world.depth == 0:
             self._print_delve_banner()
@@ -120,24 +110,23 @@ class Shell(cmd.Cmd):
                 available,
                 deltas,
             )
-            if self._color:
-                for cmd in feasible:
-                    summary = summary.replace(
-                        cmd, _COMMAND + cmd + _RESET
-                    )
+            for cmd in feasible:
                 summary = summary.replace(
-                    "dragon", _DRAGON + "dragon" + _RESET
-                ).replace(
-                    "goblin", _MONSTER + "goblin" + _RESET
-                ).replace(
-                    "ooze", _MONSTER + "ooze" + _RESET
-                ).replace(
-                    "skeleton", _MONSTER + "skeleton" + _RESET
-                ).replace(
-                    "chest", _LOOT + "chest" + _RESET
-                ).replace(
-                    "potion", _LOOT + "potion" + _RESET
-                ).replace("None", _ABSENT + "None" + _RESET)
+                    cmd, self._command + cmd + self._reset
+                )
+            summary = summary.replace(
+                "dragon", self._dragon + "dragon" + self._reset
+            ).replace(
+                "goblin", self._monster + "goblin" + self._reset
+            ).replace(
+                "ooze", self._monster + "ooze" + self._reset
+            ).replace(
+                "skeleton", self._monster + "skeleton" + self._reset
+            ).replace(
+                "chest", self._loot + "chest" + self._reset
+            ).replace(
+                "potion", self._loot + "potion" + self._reset
+            ).replace("None", self._absent + "None" + self._reset)
             print(summary)
             if stop:
                 print(f"\nGame over!  Final score: {self._game.score}")
@@ -184,10 +173,7 @@ class Shell(cmd.Cmd):
         except DrollError as e:
             if raises:
                 raise
-            if self._color:
-                print(_ERROR, " ".join(e.args), _RESET, sep="")
-            else:
-                print(*e.args)
+            print(self._error, " ".join(e.args), self._reset, sep="")
             return result
 
         # Retain only undo candidates that disallow cheating.
@@ -307,13 +293,11 @@ class Shell(cmd.Cmd):
 
     def do_help(self, arg):
         """List available commands or show help for a specific command."""
-        if self._color:
-            print(_HELP, end="")
+        print(self._help, end="")
         try:
             super().do_help(arg)
         finally:
-            if self._color:
-                print(_RESET, end="")
+            print(self._reset, end="")
 
     doc_header = "Feasible commands (help <command>):"
     doc_dragon_example = (
