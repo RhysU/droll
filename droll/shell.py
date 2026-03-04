@@ -72,7 +72,7 @@ class Shell(cmd.Cmd):
 
         # Header rule with embedded name: ── Knight ─────────────...
         prefix = f"\u2500\u2500 {name} "
-        rule = prefix + "\u2500" * max(0, 50 - len(prefix))
+        rule = f"{prefix}{'─' * max(0, 50 - len(prefix))}"
         print(f"\n{self._help}{rule}{self._reset}")
 
         # Description
@@ -87,8 +87,7 @@ class Shell(cmd.Cmd):
 
     def _postcmd_current(self, stop, line) -> None:
         """Display state using the compact summary format."""
-        self.prompt = f"{self._command_count:02d} {self._game.player_name}> "
-        self.prompt = f"{self._prompt_color}{self.prompt}{self._reset}"
+        self.prompt = f"{self._prompt_color}{self._command_count:02d} {self._game.player_name}> {self._reset}"
         print()
         if line != "EOF" and not stop and self._game.world.depth == 0:
             self._print_delve_banner()
@@ -173,7 +172,7 @@ class Shell(cmd.Cmd):
         except DrollError as e:
             if raises:
                 raise
-            print(self._error, " ".join(e.args), self._reset, sep="")
+            print(f"{self._error}{' '.join(e.args)}{self._reset}")
             return result
 
         # Retain only undo candidates that disallow cheating.
