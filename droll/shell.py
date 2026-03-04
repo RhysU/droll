@@ -79,9 +79,9 @@ class Shell(cmd.Cmd):
         prefix = f"\u2500\u2500 {name} "
         rule = prefix + "\u2500" * max(0, self._BANNER_WIDTH - len(prefix))
         if self._color:
-            print(_HELP + rule + _RESET)
+            print("\n" + _HELP + rule + _RESET)
         else:
-            print(rule)
+            print("\n" + rule)
 
         # Description
         for part in desc_parts:
@@ -104,8 +104,6 @@ class Shell(cmd.Cmd):
             self.prompt = _PROMPT + self.prompt + _RESET
         print()
         if line != "EOF" and not stop and self._game.world.depth == 0:
-            if self._command_count:
-                print()  # Extra blank line between delves
             self._print_delve_banner()
         if line != "EOF":
             feasible = [] if stop else [
