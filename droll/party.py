@@ -7,18 +7,18 @@ from dataclasses import replace
 
 from .struct import DrollError, Party, Regroup, field_names
 
+__all__ = (
+    "decrement_party",
+    "decrement_regroup",
+    "increment_party",
+)
+
 _PARTY_FIELDS = frozenset(field_names(Party))
 
 
 def _check_party_member(hero: str) -> None:
     if hero not in _PARTY_FIELDS:
         raise DrollError(f"Unknown party member '{hero}'.")
-
-__all__ = (
-    "decrement_party",
-    "decrement_regroup",
-    "increment_party",
-)
 
 
 def decrement_party(party: Party, hero: str) -> Party:

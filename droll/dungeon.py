@@ -8,13 +8,6 @@ from typing import Optional
 
 from .struct import DrollError, Dungeon, field_names, field_values
 
-_DUNGEON_FIELDS = frozenset(field_names(Dungeon))
-
-
-def _check_dungeon_target(target: str) -> None:
-    if target not in _DUNGEON_FIELDS:
-        raise DrollError(f"Unknown dungeon target '{target}'.")
-
 __all__ = (
     "DRAGON_BLOCKING_THRESHOLD",
     "blocking_dragon",
@@ -25,6 +18,13 @@ __all__ = (
     "finished_dungeon",
     "increment_dungeon",
 )
+
+_DUNGEON_FIELDS = frozenset(field_names(Dungeon))
+
+
+def _check_dungeon_target(target: str) -> None:
+    if target not in _DUNGEON_FIELDS:
+        raise DrollError(f"Unknown dungeon target '{target}'.")
 
 # A dragon blocks progress when this many or more dragon dice are present.
 DRAGON_BLOCKING_THRESHOLD = 3
