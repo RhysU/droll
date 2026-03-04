@@ -111,6 +111,76 @@ class TestTreasure:
         assert game.dungeon.goblin == 1
 
 
+class TestPhantomTreasure:
+    """Bug 3: artifact commands must not work without owning the treasure."""
+
+    def setup_method(self):
+        """Fixture with party members but no treasures owned."""
+        self.game = replace(
+            world.new_world(),
+            dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
+            party=struct.Party(*([2] * len(fields(struct.Party)))),
+        )
+
+    def test_sword_without_treasure(self):
+        """Using sword without owning one is rejected."""
+        with pytest.raises(struct.DrollError, match="not in player's treasure"):
+            player.apply(player.Default, self.game, None, "sword", "goblin")
+
+    def test_talisman_without_treasure(self):
+        """Using talisman without owning one is rejected."""
+        with pytest.raises(struct.DrollError, match="not in player's treasure"):
+            player.apply(player.Default, self.game, None, "talisman", "skeleton")
+
+    def test_sceptre_without_treasure(self):
+        """Using sceptre without owning one is rejected."""
+        with pytest.raises(struct.DrollError, match="not in player's treasure"):
+            player.apply(player.Default, self.game, None, "sceptre", "ooze")
+
+    def test_tools_without_treasure(self):
+        """Using tools without owning one is rejected."""
+        with pytest.raises(struct.DrollError, match="not in player's treasure"):
+            player.apply(player.Default, self.game, None, "tools", "goblin")
+
+
+class TestTreasureAsRecoveryType:
+    """Bug 5: treasure names must not be accepted as potion recovery types."""
+
+    def setup_method(self):
+        """Fixture with monsters cleared and potions available."""
+        self.game = replace(
+            world.new_world(),
+            dungeon=struct.Dungeon(potion=2),
+            party=struct.Party(fighter=2, champion=2),
+        )
+
+    def test_sword_rejected_as_recovery(self):
+        """Drinking a potion to recover 'sword' is rejected."""
+        with pytest.raises(struct.DrollError):
+            player.apply(
+                player.Default, self.game, None,
+                "champion", "potion", "sword", "sword",
+            )
+
+    def test_talisman_rejected_as_recovery(self):
+        """Drinking a potion to recover 'talisman' is rejected."""
+        with pytest.raises(struct.DrollError):
+            player.apply(
+                player.Default, self.game, None,
+                "champion", "potion", "talisman", "talisman",
+            )
+
+    def test_valid_recovery_still_works(self):
+        """Drinking a potion with valid party die names still works."""
+        game = player.apply(
+            player.Default, self.game, None,
+            "champion", "potion", "fighter", "mage",
+        )
+        assert game.party.fighter == 3
+        assert game.party.mage == 1
+        assert game.dungeon.potion == 0
+
+
 def test_replace_treasure_invalid_type():
     """replace_treasure raises DrollError for non-treasure names."""
     treasure = struct.Treasure(own=struct.Artifacts(sword=1))
