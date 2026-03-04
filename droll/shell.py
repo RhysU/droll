@@ -128,7 +128,9 @@ class Shell(cmd.Cmd):
             ).replace("None", f"{self._absent}None{self._reset}")
             print(summary)
             if stop:
-                print(f"\nGame over!  Final score: {self._game.score}")
+                prefix = f"\u2500\u2500 Game over!  Final score: {self._game.score} "
+                rule = f"{prefix}{'─' * max(0, 50 - len(prefix))}"
+                print(f"\n{self._help}{rule}{self._reset}")
 
     def _postcmd_legacy(self, stop, line) -> None:
         """Display state using the brief summary format."""
