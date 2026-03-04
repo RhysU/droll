@@ -136,6 +136,8 @@ def apply(
             action_ = getattr(player, command)
             return action_(world, randrange, command, targets)
         except AttributeError as cause:
+            if world.dungeon is None:
+                raise DrollError("You must descend first.") from cause
             raise DrollError(str(cause)) from cause
 
     # Convert any artifacts in the command into any corresponding hero types
@@ -162,6 +164,8 @@ def apply(
             raise DrollError(f'"{command}" requires a target.{hint}')
         if not hasattr(action_, targets[0]):
             raise DrollError(f'Unknown target "{targets[0]}".')
+        if world.dungeon is None:
+            raise DrollError("You must descend first.")
         try:
             action_ = getattr(action_, targets[0])
             world = action_(world, randrange, command, targets)
