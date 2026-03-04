@@ -61,7 +61,7 @@ def _format_available(
 ) -> str:
     """Format available commands alphabetically, annotating score deltas."""
     return " ".join(
-        f"{c}({deltas[c]:+d} XP)" if deltas and c in deltas else c
+        f"{c}({deltas[c]:+d} score)" if deltas and c in deltas else c
         for c in sorted(available)
     ) or "None"
 
@@ -93,15 +93,15 @@ def compact_summary(
     deltas: Optional[dict[str, int]] = None,
 ) -> str:
     """Format the world state in compact multi-line format."""
-    # Compute the width for alignment (prompt width)
-    prompt = f"{player_name}>"
-    width = max(len(prompt), len("Consider:"))
+    # Fixed width based on longest label for consistent alignment
+    width = len("Consider:")
 
-    # Build the location line
+    # Build the location line with score breakdown
+    treasure_score = score - w.experience
     if w.depth:
-        location = f"depth {w.depth} in delve {w.delve} with {w.experience} XP"
+        location = f"depth {w.depth} in delve {w.delve} with {w.experience} XP plus {treasure_score} treasure"
     else:
-        location = f"delve {w.delve} with {w.experience} XP"
+        location = f"delve {w.delve} with {w.experience} XP plus {treasure_score} treasure"
 
     # Format each component
     treasure_str = _format_treasure(w.treasure.own)
