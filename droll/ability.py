@@ -132,11 +132,11 @@ def beguiler_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform at most 2 monsters into 1 potion.
-Requires transforming 2 monsters when 2+ monsters available.
-Scrolls target monsters like party members.
+    Requires transforming 2 monsters when 2+ monsters available.
+    Scrolls target monsters like party members.
 
-    Example: ability goblin skeleton
-    Example: ability goblin"""
+        Example: ability goblin skeleton
+        Example: ability goblin"""
     if not targets:
         raise struct.DrollError(f'"{command}" requires a monster target.')
     world = _consume_ability(world)
@@ -159,9 +159,9 @@ def chieftain_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 goblins into thieves, discarding them on regroup.
-Open chests and quaff potions before clearing monsters.
+    Open chests and quaff potions before clearing monsters.
 
-    Example: ability"""
+        Example: ability"""
     return _convert_two(world, targets, source="goblin", destination="thief")
 
 
@@ -172,12 +172,12 @@ def commander_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice.
-Each fighter defeats one additional monster beyond its usual targets.
-Specify two targets when monsters remain after the first, e.g.
-'fighter goblin skeleton' defeats all goblins and one skeleton.
+    Each fighter defeats one additional monster beyond its usual targets.
+    Specify two targets when monsters remain after the first, e.g.
+    'fighter goblin skeleton' defeats all goblins and one skeleton.
 
-    Example: ability goblin skeleton
-    Example: fighter goblin ooze"""
+        Example: ability goblin skeleton
+        Example: fighter goblin ooze"""
     if not targets:
         raise DrollError(f"At least 1 reroll target required for {command}.")
     world = _consume_ability(world)
@@ -257,10 +257,10 @@ def dragonslayer_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Convert all monster faces into dragon dice.
-Dragons require only 2 distinct party members to defeat.
+    Dragons require only 2 distinct party members to defeat.
 
-    Example: ability
-    Example: fighter dragon mage"""
+        Example: ability
+        Example: fighter dragon mage"""
     return knight_ability(world, randrange, command, targets)
 
 
@@ -305,12 +305,12 @@ def bard_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Discard all dragon dice.
-Each champion defeats one additional monster beyond its usual targets.
-Specify two targets when monsters remain after the first, e.g.
-'champion goblin skeleton' defeats all goblins and one skeleton.
+    Each champion defeats one additional monster beyond its usual targets.
+    Specify two targets when monsters remain after the first, e.g.
+    'champion goblin skeleton' defeats all goblins and one skeleton.
 
-    Example: ability
-    Example: champion goblin ooze"""
+        Example: ability
+        Example: champion goblin ooze"""
     return minstrel_ability(world, randrange, command, targets)
 
 
@@ -321,9 +321,9 @@ def necromancer_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 skeletons into fighters, discarding on regroup.
-Each counts as either cleric or mage.
+    Each counts as either cleric or mage.
 
-    Example: ability"""
+        Example: ability"""
     return _convert_two(world, targets, source="skeleton", destination="fighter")
 
 
@@ -346,12 +346,12 @@ def paladin_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
-Each counts as either fighter or cleric.
-Specify consumed treasure as first argument.
-For each potion, add one argument for the hero to revive.
+    Each counts as either fighter or cleric.
+    Specify consumed treasure as first argument.
+    For each potion, add one argument for the hero to revive.
 
-    Example: ability sword
-    Example: ability talisman mage"""
+        Example: ability sword
+        Example: ability talisman mage"""
     world = _consume_ability(world)
     # Validate that a treasure was specified
     if not targets:

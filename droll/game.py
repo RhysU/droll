@@ -5,6 +5,7 @@
 
 import copy
 import enum
+import inspect
 from typing import Optional, Sequence
 from random import Random
 
@@ -90,7 +91,7 @@ class Game:
     @property
     def ability_doc(self) -> str:
         """The docstring of the current player's ability."""
-        return self._player.ability.__doc__
+        return inspect.cleandoc(self._player.ability.__doc__)
 
     @property
     def bait_doc(self) -> str:

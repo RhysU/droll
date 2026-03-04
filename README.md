@@ -53,7 +53,7 @@ $ droll --seed 7 Knight
 --- Knight ---
     Convert all monster faces into dragon dice.
 
-        Example: ability
+    Example: ability
 
 Score 0:  delve 1 with 0 XP plus 0 treasure
 Treasure: None
@@ -123,7 +123,7 @@ Invoke the player's ability.
 
     Convert all monster faces into dragon dice.
 
-        Example: ability
+    Example: ability
 
 Score 0:  depth 3 in delve 1 with 0 XP plus 0 treasure
 Treasure: None
