@@ -178,6 +178,21 @@ class TestPlayer:
         with pytest.raises(struct.DrollError, match="reroll"):
             player.apply(player.Default, self.game, None, "scroll", "goblin")
 
+    def test_no_dungeon_hero_target(self):
+        """Hero targeting with no dungeon gives user-friendly error."""
+        no_dungeon = replace(self.game, dungeon=None)
+        for hero in struct.field_names(struct.Party):
+            with pytest.raises(struct.DrollError, match="You must descend first"):
+                player.apply(player.Default, no_dungeon, None, hero, "goblin")
+
+    def test_no_dungeon_ability(self):
+        """Ability targeting with no dungeon gives user-friendly error."""
+        from droll.heroes import enchantress
+
+        no_dungeon = replace(self.game, dungeon=None, ability=True)
+        with pytest.raises(struct.DrollError, match="You must descend first"):
+            player.apply(enchantress.Enchantress, no_dungeon, None, "ability", "goblin")
+
 
 # Shorthand: method returns unsorted generator
 def complete(*args):
