@@ -39,7 +39,8 @@ class Shell(cmd.Cmd):
         self._dragon = "\033[31m" if _color else ""
         self._error = "\033[91m" if _color else ""
         self._help = "\033[93m" if _color else ""
-        self._loot = "\033[33m" if _color else ""
+        self._chest = "\033[33m" if _color else ""
+        self._potion = "\033[36m" if _color else ""
         self._monster = "\033[91m" if _color else ""
         self._prompt_color = "\033[92m" if _color else ""
         self._reset = "\033[0m" if _color else ""
@@ -119,13 +120,16 @@ class Shell(cmd.Cmd):
             ).replace(
                 "skeleton", f"{self._monster}skeleton{self._reset}"
             ).replace(
-                "chest", f"{self._loot}chest{self._reset}"
+                "chest", f"{self._chest}chest{self._reset}"
             ).replace(
-                "potion", f"{self._loot}potion{self._reset}"
-            ).replace("None", f"{self._absent}None{self._reset}")
+                "potion", f"{self._potion}potion{self._reset}"
+            ).replace("(empty)", f"{self._absent}(empty){self._reset}")
             print(summary)
             if stop:
-                text = f"Game over!  Final score: {self._game.score}"
+                w = self._game.world
+                xp = w.experience
+                tp = self._game.score - xp
+                text = f"Game over!  Final score: {self._game.score} ({xp} XP + {tp} treasure)"
                 print(f"\n{self._help}{_banner(text)}{self._reset}")
 
     def _postcmd_legacy(self, stop, line) -> None:
@@ -135,7 +139,10 @@ class Shell(cmd.Cmd):
         if line != "EOF":
             print(self._game.summary)
             if stop:
-                print(f"\nGame over!  Final score: {self._game.score}")
+                w = self._game.world
+                xp = w.experience
+                tp = self._game.score - xp
+                print(f"\nGame over!  Final score: {self._game.score} ({xp} XP + {tp} treasure)")
 
     def postcmd(self, stop, line) -> bool:
         """Print game state after each command and final details on exit."""
@@ -267,7 +274,7 @@ class Shell(cmd.Cmd):
 
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
-    _HELP_TOPICS = ("score", "treasure")
+    _HELP_TOPICS = ("dragon", "score", "treasure")
 
     def get_names(self):
         """Compute potential help topics from contextual completions."""
@@ -338,6 +345,27 @@ class Shell(cmd.Cmd):
             {self.doc_potion_example.format("cleric")}
             {self.doc_dragon_example.format("cleric")}"""))
 
+    def help_dragon(self):
+        """Display help for dragon mechanics."""
+        print(textwrap.dedent("""\
+            Dragons accumulate across depths within a single delve.
+            At 3 or more, they block progress and must be defeated.
+
+            To fight a dragon, use any party member plus 2 others:
+
+                    fighter dragon cleric mage  # 3 distinct heroes
+
+            All 3 heroes must be distinct types.  Defeating a dragon
+            earns 1 experience point and draws 1 treasure.
+
+            A ring of invisibility lets you sneak past a blocking
+            dragon (consumed automatically when you descend or retire).
+            A portal clears all remaining monsters and dragons,
+            ending the delve with experience equal to your depth.
+            When blocked, retiring or retreating consumes a portal
+            automatically if available; a ring is preferred over
+            a portal when only a dragon blocks."""))
+
     def help_elixir(self):
         """Display help for using elixir treasures."""
         print(self._game.elixir_doc)
@@ -370,7 +398,9 @@ class Shell(cmd.Cmd):
         """Display help for portal treasures."""
         print(textwrap.dedent("""\
             Town portals escape the dungeon, worth 2 points each.
-            Retiring consumes a portal automatically."""))
+            When monsters or a dragon block your path, retiring or
+            retreating consumes a portal automatically to clear the
+            dungeon and earn experience equal to your depth."""))
 
     def help_ring(self):
         """Display help for using rings of invisibility."""
@@ -388,13 +418,22 @@ class Shell(cmd.Cmd):
             Consume a scroll to quaff potions or re-roll dice:
 
                     scroll potion mage thief    # Drink 2 potions obtaining mage, thief
-                    reroll skeleton goblin      # Re-roll a skeleton and a goblin
+                    reroll skeleton goblin      # Re-roll a skeleton and a goblin"""))
+        name = self._game.player_name
+        if name in ("Enchantress", "Beguiler"):
+            print(textwrap.dedent("""\
 
-            Scroll behavior varies by hero:
+            As Enchantress/Beguiler, scrolls target monsters like party members:
 
-                    scroll skeleton             # Enchantress/Beguiler: kill all skeletons
-                    Knight: scrolls become champions during party roll
-                    Mercenary/Commander: one bonus scroll, discarded on regroup"""))
+                    scroll skeleton             # Kill all skeletons"""))
+        elif name in ("Knight", "DragonSlayer"):
+            print(
+                "\nAs Knight/DragonSlayer, scrolls become champions during party roll."
+            )
+        elif name in ("Mercenary", "Commander"):
+            print(
+                "\nAs Mercenary/Commander, you receive one bonus scroll, discarded on regroup."
+            )
 
     def help_reroll(self):
         """Display help for the reroll command."""
@@ -442,7 +481,8 @@ class Shell(cmd.Cmd):
             Experience is earned by retiring from a delve.  When you retire,
             you gain experience equal to the depth you reached in the dungeon.
             For example, retiring at depth 5 earns 5 experience points.
-            Retreating earns no experience.
+            Retreating normally earns no experience, but if you hold a town
+            portal it is consumed automatically, earning depth as experience.
 
             Town portals are worth 2 points each.  Scales score 1 point each,
             but every pair of scales scores 4 rather than 2, a +2 bonus per pair.

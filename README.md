@@ -53,14 +53,14 @@ Convert all monster faces into dragon dice.
 Try: ability
 
 Score 0:  delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: descend
 Party:    fighter×2 cleric mage thief champion×2
-Dungeon:  None
+Dungeon:  (empty)
 00 Knight> descend
 
 Score 0:  depth 1 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: ability retreat(+0 score)
 Party:    fighter×2 cleric mage thief champion×2
 Dungeon:  goblin
@@ -76,42 +76,42 @@ Fighters defeat ALL goblins but only ONE skeleton or ooze:
 
 
 Score 0:  depth 1 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: ability retreat(+0 score)
 Party:    fighter×2 cleric mage thief champion×2
 Dungeon:  goblin
 01 Knight> fighter goblin
 
 Score 0:  depth 1 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: descend retire(+1 score) undo
 Party:    fighter cleric mage thief champion×2
-Dungeon:  None
+Dungeon:  (empty)
 02 Knight> descend
 
 Score 0:  depth 2 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: ability retreat(+0 score)
 Party:    fighter cleric mage thief champion×2
 Dungeon:  ooze potion
 03 Knight> mage ooze
 
 Score 0:  depth 2 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: descend retire(+2 score) undo
 Party:    fighter cleric thief champion×2
 Dungeon:  potion
 04 Knight> champion potion mage
 
 Score 0:  depth 2 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: descend retire(+2 score) undo
 Party:    fighter cleric mage thief champion
-Dungeon:  None
+Dungeon:  (empty)
 05 Knight> descend
 
 Score 0:  depth 3 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: ability retreat(+0 score)
 Party:    fighter cleric mage thief champion
 Dungeon:  goblin skeleton potion
@@ -123,28 +123,28 @@ Invoke the player's ability.
     Example: ability
 
 Score 0:  depth 3 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: ability retreat(+0 score)
 Party:    fighter cleric mage thief champion
 Dungeon:  goblin skeleton potion
 06 Knight> ability
 
 Score 0:  depth 3 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: descend retire(+3 score) undo
 Party:    fighter cleric mage thief champion
 Dungeon:  potion dragon×2
 07 Knight> descend
 
 Score 0:  depth 4 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: retreat(+0 score)
 Party:    fighter cleric mage thief champion
 Dungeon:  goblin×2 chest×2 dragon×2
 08 Knight> fighter goblin
 
 Score 0:  depth 4 in delve 1 with 0 XP plus 0 treasure
-Treasure: None
+Treasure: (empty)
 Consider: descend retire(+4 score) undo
 Party:    cleric mage thief champion
 Dungeon:  chest×2 dragon×2
@@ -208,7 +208,11 @@ as follows:
 4. After clearing all monsters, "retire" from the delve to earn
    experience equal to your depth.  You must descend at least once
    before retiring.  If monsters remain and you cannot defeat them,
-   you must instead "retreat" and earn nothing.
+   you must instead "retreat" and earn nothing.  However, if you
+   hold a town portal, retreating consumes it automatically to
+   escape, earning experience equal to your depth.  When you have
+   no way to defeat the remaining monsters, retreat is your only
+   option.
 
 Undo: you can `undo` any command that did not involve rolling dice or drawing treasure.
 
@@ -253,7 +257,10 @@ draws 1 treasure.
 Two treasures affect dungeon progress:
 a ring lets you ignore a blocking dragon without removing the
 dragon dice, and a portal immediately ends the delve, earning
-experience equal to your current depth.
+experience equal to your current depth.  When monsters or
+dragons block, retiring or retreating consumes a portal
+automatically if one is available; a ring is preferred over a
+portal when only a dragon blocks.
 
 Display notation:
 

@@ -231,7 +231,7 @@ def test_quaff_wrong_revive_count_prints_error():
         dungeon=struct.Dungeon(potion=1),
     )
     # Quaff 1 potion providing 0 revive targets:
-    # - action.py quaff raises "Exactly 1 heroes to revive required."
+    # - regular.py quaff raises "Specify exactly 1 to revive after 'potion'."
     # - onecmd catches and prints the DrollError
     s.onecmd("fighter potion")
 

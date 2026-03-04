@@ -51,9 +51,9 @@ def test_format_available_negative_delta():
 
 
 def test_format_dungeon_empty():
-    """Test formatting empty dungeon returns 'None'."""
+    """Test formatting empty dungeon returns '(empty)'."""
     dungeon = struct.Dungeon()
-    assert display._format_dungeon(dungeon) == "None"
+    assert display._format_dungeon(dungeon) == "(empty)"
 
 
 def test_format_dungeon_with_monsters():
@@ -131,7 +131,7 @@ def test_compact_summary_dungeon_shown_when_empty():
     lines = result.split("\n")
     assert len(lines) == 5
     assert "Dungeon:" in result
-    assert "None" in lines[4]
+    assert "(empty)" in lines[4]
 
 
 def test_compact_summary_cleared_level_10():
@@ -154,12 +154,12 @@ def test_compact_summary_cleared_level_10():
     assert "retire" in lines[2]
     assert "champion scroll×2" in lines[3]
     assert "Dungeon:" in result
-    assert "None" in lines[4]
+    assert "(empty)" in lines[4]
     assert len(lines) == 5
 
 
 def test_compact_summary_ending_state():
-    """After final delve, Available should show 'None'."""
+    """After final delve, Consider line is omitted when no commands available."""
     world = struct.World(
         delve=3,
         experience=16,
@@ -173,8 +173,7 @@ def test_compact_summary_ending_state():
     result = display.compact_summary(world, "DragonSlayer", 23, [])
     lines = result.split("\n")
     assert "delve 3 with 16 XP plus 7 treasure" in lines[0]
-    assert "Consider:" in lines[2]
-    assert "None" in lines[2]
-    assert len(lines) == 5  # Dungeon line always shown
-    assert "Dungeon:" in lines[4]
-    assert "None" in lines[4]
+    assert "Consider:" not in result
+    assert len(lines) == 4  # No Consider line when no commands
+    assert "Dungeon:" in lines[3]
+    assert "(empty)" in lines[3]

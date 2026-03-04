@@ -44,7 +44,7 @@ def _format_items(counts: Any, discards: Any = None) -> str:
             _format_item(n, getattr(counts, n), getattr(discards, n))
             for n in struct.field_names(counts)
         )
-    return " ".join(filter(None, parts)) or "None"
+    return " ".join(filter(None, parts)) or "(empty)"
 
 
 def _format_treasure(artifacts: struct.Artifacts) -> str:
@@ -52,7 +52,7 @@ def _format_treasure(artifacts: struct.Artifacts) -> str:
     parts = (
         _format_item(n, c) for n, c in sorted(struct.field_items(artifacts))
     )
-    return " ".join(filter(None, parts)) or "None"
+    return " ".join(filter(None, parts)) or "(empty)"
 
 
 def _format_available(
@@ -63,7 +63,7 @@ def _format_available(
     return " ".join(
         f"{c}({deltas[c]:+d} score)" if deltas and c in deltas else c
         for c in sorted(available)
-    ) or "None"
+    ) or "(empty)"
 
 
 def _format_party(
@@ -81,7 +81,7 @@ def _format_dungeon(
 ) -> str:
     """Format dungeon contents, always returning a displayable string."""
     if dungeon is None:
-        return "None"
+        return "(empty)"
     return _format_items(dungeon)
 
 
@@ -113,9 +113,10 @@ def compact_summary(
     lines = [
         f"{'Score ' + str(score) + ':':<{width}} {location}",
         f"{'Treasure:':<{width}} {treasure_str}",
-        f"{'Consider:':<{width}} {available_str}",
-        f"{'Party:':<{width}} {party_str}",
     ]
+    if available:
+        lines.append(f"{'Consider:':<{width}} {available_str}")
+    lines.append(f"{'Party:':<{width}} {party_str}")
     lines.append(f"{'Dungeon:':<{width}} {dungeon_str}")
 
     return "\n".join(lines)
