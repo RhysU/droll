@@ -6,7 +6,7 @@ Droll
 
 Droll implements [Dungeon Roll](https://boardgamegeek.com/boardgame/138788/dungeon-roll),
 a product of [Tasty Minstrel Games](https://boardgamegeek.com/boardgamepublisher/9499/tasty-minstrel-games).
-Droll is in no way affiliated with either the game or the publisher.  Go buy
+Droll is not affiliated with the game or its publisher.  Consider buying
 their excellent game, learn [how to play](https://www.youtube.com/watch?v=PzZ8hUzXBtE)
 it, and then come back here.
 
@@ -14,24 +14,27 @@ it, and then come back here.
 
 An interactive command-line interface for playing the base game
 without expansions, with tab completion for commands and
-context-sensitive arguments such as party members, monsters,
-and treasures.
+arguments that adapt to the current game state (available party
+members, monsters, and treasures).
 All base game heroes are implemented.
 
 ## Why implement it?
 
-In 2018, it seemed like a fun thing to hack on.  Also, I was curious how
-much code was required to capture a game that children will catch onto in
-the space of 20 minutes.  In 2026, this codebase has been a self-contained
+In 2018, it seemed like a fun project.  Also, I was curious how
+much code was required to fully implement a game that children can
+learn in 20 minutes.  In 2026, this codebase has been a self-contained
 playspace for LLM-assisted coding.
 
 This game has always seemed like a neat problem to throw into reinforcement
-learning algorithms as the strategy isn't too complicated, the score
-is very straightforward, and there's probabilistic behavior in both the
-basic die mechanics as well as the expected value of the treasure.  That
-said, I've done such things in neither 2018 nor 2026.
+learning algorithms as the strategy isn't too complicated, the scoring
+rules are very straightforward, and there's probabilistic behavior in both
+the basic die mechanics as well as the expected value of the treasure.
+That said, I haven't pursued that in either 2018 or 2026.
 
 ## What does it look like?
+
+The rules are explained in [How to play](#how-to-play) below;
+here is a taste of gameplay:
 
 ```
 $ droll --help
@@ -243,12 +246,13 @@ Dungeon:  None
 21 DragonSlayer> ^D
 ```
 
-Beyond the "Consider:" line, party members and treasures in
-your possession are valid commands.  Type "help" to see
-the full list.
+In addition to the commands shown on the "Consider:" line,
+party members and treasures in your possession are valid
+commands.  Type "help" to see the full list.
 
 The default display uses color when writing to a terminal.
-Press Ctrl+D to exit at any time.
+Press Ctrl+D (shown as `^D` in the transcript above) to exit
+at any time.
 
 ## How to play
 
@@ -265,10 +269,9 @@ as follows:
 4. After defeating any monsters, "retire" from the delve to earn
    experience equal to your depth.  You must descend at least once
    before retiring.  If monsters remain and you cannot defeat them,
-   instead "retreat" but earn nothing.  When you have no way to
-   defeat the remaining monsters, retreat is your only option.
+   you must instead "retreat" and earn nothing.
 
-Undo: you can `undo` any command that did not involve rolling or drawing.
+Undo: you can `undo` any command that did not involve rolling dice or drawing treasure.
 
 Combat: each party member can target any monster type.  Against
 a favored type they defeat all at once; otherwise they defeat one:
@@ -282,43 +285,49 @@ a favored type they defeat all at once; otherwise they defeat one:
 | champion | goblin, skeleton, ooze | —             | opens all chests |
 | scroll   | —           | —                      | quaffs potions, rerolls dice |
 
-Potions: any party member can quaff potions.  The syntax is
+Potions: party members can quaff potions.  The syntax is
 `<drinker> potion <type1> <type2> ...` where you specify one
 die type per potion to recover.  For example,
 `fighter potion mage thief` spends the fighter to drink 2
 potions, adding a mage and thief to your party.  The number
-of recovery targets must equal the number of potions in
-the dungeon.
+of die types you specify must equal the number of potion dice
+in the dungeon.
 
 Scrolls cannot target monsters directly.  The `reroll` command
 consumes one scroll and re-rolls any number of dungeon or party
 dice, for example `reroll goblin skeleton` re-rolls those two
 dice.  A scroll can also quaff potions: `scroll potion fighter`
 adds a fighter to your party.
-Scroll behavior varies by hero: Enchantress/Beguiler can use a
-scroll offensively against skeletons, Knight converts scrolls to
-champions during party roll, and Mercenary/Commander receives one
+Scroll behavior varies by hero (see
+[Hero abilities](#hero-abilities) below): Enchantress/Beguiler can
+use a scroll offensively against skeletons, Knight converts scrolls
+to champions during party roll, and Mercenary/Commander receives one
 bonus scroll, discarded on regroup.
 
 Dragons accumulate across depths.  At 3 or more, the dragon
-blocks progress and must be fought by 3 distinct party members.
-Defeating a dragon earns 1 experience and draws 1 treasure.
-A ring lets you ignore a blocking dragon without removing the
-dragon dice.  A portal immediately ends the delve, scoring your
-current depth as experience.
+blocks progress and must be fought by 3 party members of
+different types.  Defeating a dragon earns 1 experience and
+draws 1 treasure.
 
-Display notation: `name×N` means N dice of that type, for
-example `champion×3`.  Dragon dice always show their count, like `dragon×1` or
-`dragon×2`, because tracking dragon accumulation is
-crucial — at 3 or more, they block progress.
-In the party line, `name~D` or `name×N~D` means
-D of those dice will be discarded at the next regroup.
-Regroup is the cleanup phase when descending, retiring, or
-retreating — these temporary dice are allies converted from
-monsters by hero abilities.
-For example, `thief×2~1` means 2 thieves, 1 temporary.
-The prompt shows the move number and current hero name,
-for example `00 Knight>`.
+A ring lets you ignore a blocking dragon without removing the
+dragon dice.
+
+A portal immediately ends the delve, scoring your current depth
+as experience.
+
+Display notation:
+
+- `name×N` means N dice of that type, for example `champion×3`.
+- Dragon dice always show their count (e.g. `dragon×1`,
+  `dragon×2`) because at 3 or more they block progress.
+- `name~D` or `name×N~D` in the party line means D of those
+  dice are temporary and will be discarded at the next regroup.
+  Regroup is the cleanup phase when descending, retiring, or
+  retreating — temporary dice are allies converted from monsters
+  by hero abilities.  For example, `thief×2~1` means 2 thieves,
+  1 of which is temporary.
+- The prompt shows the move number and current hero name,
+  for example `00 Knight>`.
 
 ### Hero abilities
 
@@ -336,9 +345,9 @@ for example `00 Knight>`.
 ### Level-up progression
 
 At 5+ experience, each hero advances to a stronger form with an
-upgraded ability and enhanced party interactions.  A "Party change"
-of "each counts as either X or Y" means every party member can be
-used as either type in commands:
+upgraded ability and enhanced party interactions.  In the "Party
+change" column, "interchangeable" means those party types can
+substitute for each other in any command:
 
 | Base        | Advanced      | New ability                          | Party change                            |
 |-------------|---------------|--------------------------------------|-----------------------------------------|
@@ -360,6 +369,7 @@ retire at depth 3 in the next delve, you have 8 experience total.
 
 Treasure is drawn randomly from a shared box whenever you open
 chests.  Each piece of treasure scores 1 point, with two exceptions:
+portal scores 2, and a pair of scales scores 4 total.
 
 | Treasure   | Points | Notes                                  |
 |------------|--------|----------------------------------------|
@@ -372,7 +382,7 @@ chests.  Each piece of treasure scores 1 point, with two exceptions:
 | bait       | 1      | Lure the dragon                        |
 | portal     | 2      | Town portal to escape the dungeon      |
 | ring       | 1      | Sneak past a dragon                    |
-| scale      | 1      | But a pair of scales scores 4          |
+| scale      | 1      | A pair of scales scores 4 total        |
 
 Treasures are used by typing them as commands.  `sword goblin`
 acts as a fighter, `talisman skeleton` acts as a cleric,
@@ -385,17 +395,16 @@ Total score = experience + treasure points.
 
 ## Quick Start
 
-Requires Python 3.9+.  Clone this repository then run via:
+Requires Python 3.9+.  Clone this repository, install, and run:
 
-```
-PYTHONPATH=. python3 -m droll --help
-```
-
-## Installation
-
-Install the package in development mode with:
 ```
 pip install -e .
+droll --help
+```
+
+Or, without installing, run directly:
+```
+PYTHONPATH=. python3 -m droll --help
 ```
 
 ## Testing
