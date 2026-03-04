@@ -143,8 +143,12 @@ def apply(
                 raise DrollError("You must descend first.") from cause
             raise DrollError(str(cause)) from cause
 
-    # Convert any artifacts in the command into any corresponding hero types
-    command, targets = _partify_all(player.artifacts, command, targets)
+    # Reject artifact commands when the player doesn't own the treasure
+    if command in _ARTIFACT_COMMANDS and not getattr(world.treasure.own, command, 0):
+        raise DrollError(f"'{command}' not in player's treasure.")
+
+    # Convert artifact command name into corresponding hero type
+    command = _partify_command(player.artifacts, command)
 
     # Temporarily inflate party with treasure-as-hero counts
     prior_own = world.treasure.own
@@ -196,27 +200,29 @@ def apply(
     return world
 
 
-def _partify_all(
-    artifacts: struct.Party,
-    command: str,
-    targets: tuple[str, ...],
-) -> tuple[str, tuple[str, ...]]:
-    """Convert any artifact names in command and targets to hero names."""
+def _partify_command(artifacts: struct.Party, command: str) -> str:
+    """Convert an artifact name in the command to its hero name."""
     reverse = {
         artifact: hero
         for hero, artifact in struct.field_items(artifacts)
         if artifact is not None
     }
-    return (
-        reverse.get(command, command),
-        tuple(reverse.get(t, t) for t in targets),
-    )
+    return reverse.get(command, command)
 
 
 # Early tokens dominated by items/dice that can be applied/attacked.
 # Later tokens contain mixtures of present and requested items.
 # Attempts to specialize much beyond this seem to quickly go awry.
 # One notable special case is 'elixir' as any party die follows.
+
+# Artifact names that can be used as commands (sword, talisman, etc.).
+# Excludes artifacts whose name matches their hero (e.g. scroll -> scroll),
+# since those are already valid party die commands.
+_ARTIFACT_COMMANDS = frozenset(
+    artifact
+    for hero, artifact in struct.field_items(Default.artifacts)
+    if artifact is not None and artifact != hero
+)
 
 # Treasures excluded from completion because they lack associated commands.
 # Portal and ring are auto-used; scale is for scoring only.
