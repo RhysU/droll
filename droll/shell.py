@@ -73,7 +73,7 @@ class Shell(cmd.Cmd):
         # Header rule with embedded name: ── Knight ─────────────...
         prefix = f"\u2500\u2500 {name} "
         rule = prefix + "\u2500" * max(0, 50 - len(prefix))
-        print("\n" + self._help + rule + self._reset)
+        print(f"\n{self._help}{rule}{self._reset}")
 
         # Description
         for part in desc_parts:
@@ -88,7 +88,7 @@ class Shell(cmd.Cmd):
     def _postcmd_current(self, stop, line) -> None:
         """Display state using the compact summary format."""
         self.prompt = f"{self._command_count:02d} {self._game.player_name}> "
-        self.prompt = self._prompt_color + self.prompt + self._reset
+        self.prompt = f"{self._prompt_color}{self.prompt}{self._reset}"
         print()
         if line != "EOF" and not stop and self._game.world.depth == 0:
             self._print_delve_banner()
@@ -112,21 +112,21 @@ class Shell(cmd.Cmd):
             )
             for cmd in feasible:
                 summary = summary.replace(
-                    cmd, self._command + cmd + self._reset
+                    cmd, f"{self._command}{cmd}{self._reset}"
                 )
             summary = summary.replace(
-                "dragon", self._dragon + "dragon" + self._reset
+                "dragon", f"{self._dragon}dragon{self._reset}"
             ).replace(
-                "goblin", self._monster + "goblin" + self._reset
+                "goblin", f"{self._monster}goblin{self._reset}"
             ).replace(
-                "ooze", self._monster + "ooze" + self._reset
+                "ooze", f"{self._monster}ooze{self._reset}"
             ).replace(
-                "skeleton", self._monster + "skeleton" + self._reset
+                "skeleton", f"{self._monster}skeleton{self._reset}"
             ).replace(
-                "chest", self._loot + "chest" + self._reset
+                "chest", f"{self._loot}chest{self._reset}"
             ).replace(
-                "potion", self._loot + "potion" + self._reset
-            ).replace("None", self._absent + "None" + self._reset)
+                "potion", f"{self._loot}potion{self._reset}"
+            ).replace("None", f"{self._absent}None{self._reset}")
             print(summary)
             if stop:
                 print(f"\nGame over!  Final score: {self._game.score}")
