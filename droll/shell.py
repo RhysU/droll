@@ -70,10 +70,7 @@ class Shell(cmd.Cmd):
             elif stripped:
                 desc_parts.append(stripped)
 
-        # Header rule with embedded name: ── Knight ─────────────...
-        prefix = f"\u2500\u2500 {name} "
-        rule = f"{prefix}{'─' * max(0, 50 - len(prefix))}"
-        print(f"\n{self._help}{rule}{self._reset}")
+        print(f"\n{self._help}{_banner(name)}{self._reset}")
 
         # Description
         for part in desc_parts:
@@ -128,9 +125,8 @@ class Shell(cmd.Cmd):
             ).replace("None", f"{self._absent}None{self._reset}")
             print(summary)
             if stop:
-                prefix = f"\u2500\u2500 Game over!  Final score: {self._game.score} "
-                rule = f"{prefix}{'─' * max(0, 50 - len(prefix))}"
-                print(f"\n{self._help}{rule}{self._reset}")
+                text = f"Game over!  Final score: {self._game.score}"
+                print(f"\n{self._help}{_banner(text)}{self._reset}")
 
     def _postcmd_legacy(self, stop, line) -> None:
         """Display state using the brief summary format."""
@@ -472,6 +468,12 @@ class Shell(cmd.Cmd):
                     portal      2   Town portal to escape the dungeon
                     ring        1   Sneak past a dragon
                     scale       1   But a pair of scales scores 4"""))
+
+
+def _banner(text: str) -> str:
+    """Format text as a horizontal rule: ── text ─────────..."""
+    prefix = f"\u2500\u2500 {text} "
+    return f"{prefix}{'─' * max(0, 50 - len(prefix))}"
 
 
 def _tokenize(line: str) -> tuple[str, ...]:
