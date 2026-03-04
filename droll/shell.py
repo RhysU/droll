@@ -58,8 +58,6 @@ class Shell(cmd.Cmd):
         self._undo = []
         self.postcmd(stop=False, line="")  # Prints initial world state
 
-    _BANNER_WIDTH = 50
-
     def _print_delve_banner(self) -> None:
         """Print hero name and ability at the start of each delve."""
         name = self._game.player_name
@@ -77,7 +75,7 @@ class Shell(cmd.Cmd):
 
         # Header rule with embedded name: ── Knight ─────────────...
         prefix = f"\u2500\u2500 {name} "
-        rule = prefix + "\u2500" * max(0, self._BANNER_WIDTH - len(prefix))
+        rule = prefix + "\u2500" * max(0, 50 - len(prefix))
         if self._color:
             print("\n" + _HELP + rule + _RESET)
         else:
