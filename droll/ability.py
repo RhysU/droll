@@ -321,7 +321,7 @@ def necromancer_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 skeletons into fighters, discarding on regroup.
-    Each counts as either cleric or mage.
+    Heroes cleric and mage are interchangeable.
 
         Example: ability"""
     return _convert_two(world, targets, source="skeleton", destination="fighter")
@@ -346,7 +346,7 @@ def paladin_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
-    Each counts as either fighter or cleric.
+    Heroes fighter and cleric are interchangeable.
     Specify consumed treasure as first argument.
     For each potion, add one argument for the hero to revive.
 
