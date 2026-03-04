@@ -184,61 +184,6 @@ Consider: descend retire(+5 score)
 Party:    cleric champion
 Dungeon:  dragon×2
 14 Knight> retire
-
-── DragonSlayer ──────────────────────────────────
-Convert all monster faces into dragon dice.
-Dragons require only 2 distinct party members to defeat.
-Try: ability
-Try: fighter dragon mage
-
-Score 8:  delve 2 with 5 XP plus 3 treasure
-Treasure: elixir sceptre talisman
-Consider: descend
-Party:    fighter cleric champion×5
-Dungeon:  None
-15 DragonSlayer> descend
-
-Score 8:  depth 1 in delve 2 with 5 XP plus 3 treasure
-Treasure: elixir sceptre talisman
-Consider: descend retire(+1 score)
-Party:    fighter cleric champion×5
-Dungeon:  chest
-16 DragonSlayer> champion chest
-
-Score 9:  depth 1 in delve 2 with 5 XP plus 4 treasure
-Treasure: elixir sceptre talisman×2
-Consider: descend retire(+1 score)
-Party:    fighter cleric champion×4
-Dungeon:  None
-17 DragonSlayer> descend
-
-Score 9:  depth 2 in delve 2 with 5 XP plus 4 treasure
-Treasure: elixir sceptre talisman×2
-Consider: ability retreat(+0 score)
-Party:    fighter cleric champion×4
-Dungeon:  goblin skeleton
-18 DragonSlayer> talisman goblin
-
-Score 9:  depth 2 in delve 2 with 5 XP plus 4 treasure
-Treasure: elixir sceptre talisman×2
-Consider: ability retreat(+0 score) undo
-Party:    fighter champion×4
-Dungeon:  skeleton
-19 DragonSlayer> sceptre skeleton
-
-Score 8:  depth 2 in delve 2 with 5 XP plus 3 treasure
-Treasure: elixir talisman×2
-Consider: descend retire(+2 score) undo
-Party:    fighter champion×4
-Dungeon:  None
-20 DragonSlayer> elixir mage
-
-Score 7:  depth 2 in delve 2 with 5 XP plus 2 treasure
-Treasure: talisman×2
-Consider: descend retire(+2 score) undo
-Party:    fighter mage champion×4
-Dungeon:  None
-21 DragonSlayer> ^D
 ```
 
 In addition to the commands shown on the "Consider:" line,
@@ -246,8 +191,7 @@ party members and treasures in your possession are valid
 commands.  Type "help" to see the full list.
 
 The default display uses color when writing to a terminal.
-Press Ctrl+D (shown as `^D` in the transcript above) to exit
-at any time.
+Press Ctrl+D to exit at any time.
 
 ## How to play
 
