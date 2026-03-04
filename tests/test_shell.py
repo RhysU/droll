@@ -15,7 +15,7 @@ from droll.display import DisplayMode
 from droll.struct import DrollError
 from droll.game import Game
 from droll.player import Default
-from droll.shell import Shell, _RESET
+from droll.shell import Shell
 
 
 def _mechanical_shell(game: Game) -> Shell:
@@ -29,7 +29,7 @@ def test_precmd_emits_reset_when_color_enabled():
     with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
         result = s.precmd("fighter goblin")
     assert result == "fighter goblin"
-    assert fake_out.getvalue() == _RESET
+    assert fake_out.getvalue() == s._reset
 
 
 def test_precmd_emits_nothing_when_color_disabled():
