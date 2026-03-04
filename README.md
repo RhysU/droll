@@ -186,6 +186,7 @@ Consider: descend retire(+5 score)
 Party:    cleric champion
 Dungeon:  dragon×2
 14 Knight> retire
+
 ── DragonSlayer ──────────────────────────────────
 Convert all monster faces into dragon dice.
 Dragons require only 2 distinct party members to defeat.

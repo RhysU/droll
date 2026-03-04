@@ -104,6 +104,8 @@ class Shell(cmd.Cmd):
             self.prompt = _PROMPT + self.prompt + _RESET
         print()
         if line != "EOF" and not stop and self._game.world.depth == 0:
+            if self._command_count:
+                print()  # Extra blank line between delves
             self._print_delve_banner()
         if line != "EOF":
             feasible = [] if stop else [
