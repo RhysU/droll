@@ -359,8 +359,8 @@ class Shell(cmd.Cmd):
             earns 1 experience point and draws 1 treasure.
 
             A ring of invisibility lets you sneak past a blocking
-            dragon (consumed automatically when you descend or retire).
-            A portal clears all remaining monsters and dragons,
+            dragon and is consumed automatically when you descend
+            or retire.  A portal clears all remaining monsters and dragons,
             ending the delve with experience equal to your depth.
             When blocked, retiring or retreating consumes a portal
             automatically if available; a ring is preferred over
