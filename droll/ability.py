@@ -135,8 +135,8 @@ def beguiler_ability(
     Requires transforming 2 monsters when 2+ monsters available.
     Scrolls target monsters like party members.
 
-        Example: ability goblin skeleton
-        Example: ability goblin"""
+    Example: ability goblin skeleton
+    Example: ability goblin"""
     if not targets:
         raise struct.DrollError(f'"{command}" requires a monster target.')
     world = _consume_ability(world)
@@ -161,7 +161,7 @@ def chieftain_ability(
     """Transform up to 2 goblins into thieves, discarding them on regroup.
     Open chests and quaff potions before clearing monsters.
 
-        Example: ability"""
+    Example: ability"""
     return _convert_two(world, targets, source="goblin", destination="thief")
 
 
@@ -176,8 +176,8 @@ def commander_ability(
     Specify two targets when monsters remain after the first, e.g.
     'fighter goblin skeleton' defeats all goblins and one skeleton.
 
-        Example: ability goblin skeleton
-        Example: fighter goblin ooze"""
+    Example: ability goblin skeleton
+    Example: fighter goblin ooze"""
     if not targets:
         raise DrollError(f"At least 1 reroll target required for {command}.")
     world = _consume_ability(world)
@@ -259,8 +259,8 @@ def dragonslayer_ability(
     """Convert all monster faces into dragon dice.
     Dragons require only 2 distinct party members to defeat.
 
-        Example: ability
-        Example: fighter dragon mage"""
+    Example: ability
+    Example: fighter dragon mage"""
     return knight_ability(world, randrange, command, targets)
 
 
@@ -309,8 +309,8 @@ def bard_ability(
     Specify two targets when monsters remain after the first, e.g.
     'champion goblin skeleton' defeats all goblins and one skeleton.
 
-        Example: ability
-        Example: champion goblin ooze"""
+    Example: ability
+    Example: champion goblin ooze"""
     return minstrel_ability(world, randrange, command, targets)
 
 
@@ -323,7 +323,7 @@ def necromancer_ability(
     """Transform up to 2 skeletons into fighters, discarding on regroup.
     Heroes cleric and mage are interchangeable.
 
-        Example: ability"""
+    Example: ability"""
     return _convert_two(world, targets, source="skeleton", destination="fighter")
 
 
@@ -350,8 +350,8 @@ def paladin_ability(
     For each potion, add one argument for the hero to revive.
     Heroes fighter and cleric are interchangeable.
 
-        Example: ability sword
-        Example: ability talisman mage"""
+    Example: ability sword
+    Example: ability talisman mage"""
     world = _consume_ability(world)
     # Validate that a treasure was specified
     if not targets:
