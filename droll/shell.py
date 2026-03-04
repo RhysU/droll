@@ -20,6 +20,7 @@ _COMMAND = "\033[96m"
 _DRAGON = "\033[31m"
 _ERROR = "\033[91m"
 _HELP = "\033[93m"
+_LOOT = "\033[33m"
 _MONSTER = "\033[91m"
 _PROMPT = "\033[92m"
 _RESET = "\033[0m"
@@ -57,12 +58,22 @@ class Shell(cmd.Cmd):
         self._undo = []
         self.postcmd(stop=False, line="")  # Prints initial world state
 
+    def _print_delve_banner(self) -> None:
+        """Print hero name and ability at the start of each delve."""
+        name = self._game.player_name
+        ability_doc = self._game.ability_doc
+        print(f"--- {name} ---")
+        print(textwrap.indent(ability_doc.strip(), "    "))
+        print()
+
     def _postcmd_current(self, stop, line) -> None:
         """Display state using the compact summary format."""
         self.prompt = f"{self._command_count:02d} {self._game.player_name}> "
         if self._color:
             self.prompt = _PROMPT + self.prompt + _RESET
         print()
+        if line != "EOF" and not stop and self._game.world.depth == 0:
+            self._print_delve_banner()
         if line != "EOF":
             feasible = [] if stop else [
                 name[3:]
@@ -94,6 +105,10 @@ class Shell(cmd.Cmd):
                     "ooze", _MONSTER + "ooze" + _RESET
                 ).replace(
                     "skeleton", _MONSTER + "skeleton" + _RESET
+                ).replace(
+                    "chest", _LOOT + "chest" + _RESET
+                ).replace(
+                    "potion", _LOOT + "potion" + _RESET
                 ).replace("None", _ABSENT + "None" + _RESET)
             print(summary)
             if stop:

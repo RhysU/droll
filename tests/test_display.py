@@ -39,7 +39,7 @@ def test_format_available_with_deltas():
     deltas = {"retire": 3, "retreat": 0}
     assert (
         display._format_available(available, deltas)
-        == "ability retire(+3 XP) retreat(+0 XP)"
+        == "ability retire(+3 score) retreat(+0 score)"
     )
 
 
@@ -47,7 +47,7 @@ def test_format_available_negative_delta():
     """Test retire shows negative delta when portal consumed at low depth."""
     available = ["retire", "retreat"]
     deltas = {"retire": -1, "retreat": 0}
-    assert display._format_available(available, deltas) == "retire(-1 XP) retreat(+0 XP)"
+    assert display._format_available(available, deltas) == "retire(-1 score) retreat(+0 score)"
 
 
 def test_format_dungeon_empty():
@@ -78,15 +78,15 @@ def test_compact_summary_in_dungeon():
     )
     lines = result.split("\n")
     assert len(lines) == 5
-    assert "depth 3 in delve 1 with 0 XP" in lines[0]
+    assert "depth 3 in delve 1 with 0 XP plus 1 treasure" in lines[0]
     assert "talisman" in lines[1]
     assert "ability retreat" in lines[2]
     assert "fighter champion" in lines[3]
     assert "goblin skeleton×2 ooze×2" in lines[4]
 
 
-def test_compact_summary_long_player_name_alignment():
-    """Test that long player names maintain proper column alignment."""
+def test_compact_summary_fixed_alignment():
+    """Test that alignment is fixed regardless of player name length."""
     world = struct.World(
         delve=2,
         depth=0,
@@ -96,18 +96,22 @@ def test_compact_summary_long_player_name_alignment():
         ability=True,
         treasure=struct.Treasure(own=struct.Artifacts(talisman=1)),
     )
-    result = display.compact_summary(
-        world, "DragonSlayer", 6, ["ability", "descend"]
-    )
-    lines = result.split("\n")
-    # Check that alignment matches DragonSlayer> width (13 chars)
-    for line in lines:
-        colon_pos = line.index(":")
-        content_start = colon_pos + 1
-        while content_start < len(line) and line[content_start] == " ":
-            content_start += 1
-        # Content should start at same column for all lines
-        assert content_start >= 13
+    # Both short and long hero names should have the same alignment
+    for name in ("Knight", "DragonSlayer"):
+        result = display.compact_summary(
+            world, name, 6, ["ability", "descend"]
+        )
+        lines = result.split("\n")
+        # All content should start at same column (after "Consider:" width)
+        content_starts = []
+        for line in lines:
+            colon_pos = line.index(":")
+            content_start = colon_pos + 1
+            while content_start < len(line) and line[content_start] == " ":
+                content_start += 1
+            content_starts.append(content_start)
+        # All lines should align at the same column
+        assert len(set(content_starts)) == 1, f"Misaligned for {name}: {content_starts}"
 
 
 def test_compact_summary_dungeon_shown_when_empty():
@@ -145,7 +149,7 @@ def test_compact_summary_cleared_level_10():
     )
     result = display.compact_summary(world, "Beguiler", 24, ["retire"])
     lines = result.split("\n")
-    assert "depth 10 in delve 3 with 16 XP" in lines[0]
+    assert "depth 10 in delve 3 with 16 XP plus 8 treasure" in lines[0]
     assert "scale×4 sceptre talisman tools" in lines[1]
     assert "retire" in lines[2]
     assert "champion scroll×2" in lines[3]
@@ -168,7 +172,7 @@ def test_compact_summary_ending_state():
     )
     result = display.compact_summary(world, "DragonSlayer", 23, [])
     lines = result.split("\n")
-    assert "delve 3 with 16 XP" in lines[0]
+    assert "delve 3 with 16 XP plus 7 treasure" in lines[0]
     assert "Consider:" in lines[2]
     assert "None" in lines[2]
     assert len(lines) == 5  # Dungeon line always shown

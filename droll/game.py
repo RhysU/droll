@@ -132,7 +132,7 @@ class Game:
         return GameState.PLAY
 
     def descend(self) -> GameState:
-        """Descend to the next depth (in contrast to retiring/retreating)."""
+        """Enter the dungeon at the start of a delve or go one depth deeper."""
         self._world = world.descend(
             self._world, self._player.roll.dungeon, self._random.randrange
         )

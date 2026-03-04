@@ -7,7 +7,7 @@ from dataclasses import replace
 from functools import partial
 
 from .. import special, struct
-from ..ability import minstrel_ability
+from ..ability import bard_ability, minstrel_ability
 from ..player import Default
 from ..regular import defeat_dragon, defeat_dragon_heroes
 
@@ -59,7 +59,7 @@ _Minstrel_Party = struct.Party(
 Bard = replace(
     Default,
     name="Bard",
-    ability=minstrel_ability,
+    ability=bard_ability,
     advance=(lambda _: Bard),  # Cannot advance further
     party=replace(
         _Minstrel_Party,

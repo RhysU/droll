@@ -7,7 +7,7 @@ from dataclasses import replace
 from functools import partial
 
 from .. import dice, regular, struct
-from ..ability import knight_ability
+from ..ability import dragonslayer_ability, knight_ability
 from ..player import Default
 
 __all__ = (
@@ -37,7 +37,7 @@ _dragonslayer_defeat_dragon = partial(
 DragonSlayer = replace(
     Default,
     name="DragonSlayer",
-    ability=knight_ability,
+    ability=dragonslayer_ability,
     advance=(lambda _: DragonSlayer),
     roll=replace(Default.roll, party=_knight_roll_party),
     party=struct.Party(

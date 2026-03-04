@@ -17,11 +17,13 @@ from .treasure import draw_treasure, replace_treasure
 
 __all__ = (
     "default_ability",
+    "bard_ability",
     "battlemage_ability",
     "beguiler_ability",
     "chieftain_ability",
     "commander_ability",
     "crusader_ability",
+    "dragonslayer_ability",
     "enchantress_ability",
     "halfgoblin_ability",
     "knight_ability",
@@ -114,7 +116,9 @@ def battlemage_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Discard all monsters, chests, potions, and dice in the dragon's lair."""
+    """Discard all monsters, chests, potions, and dice in the dragon's lair.
+
+    Example: ability"""
     world = _consume_ability(world)
     if targets:
         raise DrollError(f"No targets accepted for {command}.")
@@ -128,8 +132,11 @@ def beguiler_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform at most 2 monsters into 1 potion.
+Requires transforming 2 monsters when 2+ monsters available.
+Scrolls target monsters like party members.
 
-    Requires transforming 2 monsters when 2+ monsters available."""
+    Example: ability goblin skeleton
+    Example: ability goblin"""
     if not targets:
         raise struct.DrollError(f'"{command}" requires a monster target.')
     world = _consume_ability(world)
@@ -151,7 +158,10 @@ def chieftain_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Transform up to 2 goblins into thieves, discarding them on regroup."""
+    """Transform up to 2 goblins into thieves, discarding them on regroup.
+Open chests and quaff potions before clearing monsters.
+
+    Example: ability"""
     return _convert_two(world, targets, source="goblin", destination="thief")
 
 
@@ -161,7 +171,13 @@ def commander_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Rerolls any number of Party and Dungeon dice."""
+    """Rerolls any number of Party and Dungeon dice.
+Each fighter defeats one additional monster beyond its usual targets.
+Specify two targets when monsters remain after the first, e.g.
+'fighter goblin skeleton' defeats all goblins and one skeleton.
+
+    Example: ability goblin skeleton
+    Example: fighter goblin ooze"""
     if not targets:
         raise DrollError(f"At least 1 reroll target required for {command}.")
     world = _consume_ability(world)
@@ -180,9 +196,10 @@ def crusader_ability(
     *,
     _acceptable_targets: frozenset[str] = frozenset({"fighter", "cleric"}),
 ) -> struct.World:
-    """Crusader usable as a fighter or a cleric, adding one hero.
+    """Add 1 fighter or cleric to the party.
 
-    Optionally, specify 'fighter' or 'cleric' to select which to choose."""
+    Example: ability
+    Example: ability cleric"""
     return _choose_and_add_hero(world, command, targets, _acceptable_targets)
 
 
@@ -192,7 +209,9 @@ def enchantress_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Transform exactly 1 monster into 1 potion."""
+    """Transform exactly 1 monster into 1 potion.
+
+    Example: ability goblin"""
     if not targets:
         raise struct.DrollError(f'"{command}" requires a monster target.')
     if len(targets) > 1:
@@ -210,7 +229,9 @@ def halfgoblin_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Transform 1 goblin into 1 thief, discarding it on regroup."""
+    """Transform 1 goblin into 1 thief, discarding it on regroup.
+
+    Example: ability"""
     return _convert_one(world, targets, source="goblin", destination="thief")
 
 
@@ -220,11 +241,27 @@ def knight_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Convert all monster faces into dragon dice."""
+    """Convert all monster faces into dragon dice.
+
+    Example: ability"""
     world = _consume_ability(world)
     return regular.bait_dragon(
         world, randrange, command, targets, require_treasure=False
     )
+
+
+def dragonslayer_ability(
+    world: struct.World,
+    randrange: struct.RandRange,
+    command: str,
+    targets: tuple[str, ...] = (),
+) -> struct.World:
+    """Convert all monster faces into dragon dice.
+Dragons require only 2 distinct party members to defeat.
+
+    Example: ability
+    Example: fighter dragon mage"""
+    return knight_ability(world, randrange, command, targets)
 
 
 def mercenary_ability(
@@ -233,7 +270,9 @@ def mercenary_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Defeat any 2 monsters."""
+    """Defeat any 2 monsters.
+
+    Example: ability goblin skeleton"""
     if not targets:
         raise DrollError(f"At least 1 target required for {command}.")
     world = _consume_ability(world)
@@ -250,11 +289,29 @@ def minstrel_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Discard all dragon dice."""
+    """Discard all dragon dice.
+
+    Example: ability"""
     world = _consume_ability(world)
     if any(t != "dragon" for t in targets):
         raise DrollError("Can discard only dragon dice.")
     return replace(world, dungeon=eliminate_dungeon(world.dungeon, "dragon"))
+
+
+def bard_ability(
+    world: struct.World,
+    randrange: struct.RandRange,
+    command: str,
+    targets: tuple[str, ...] = (),
+) -> struct.World:
+    """Discard all dragon dice.
+Each champion defeats one additional monster beyond its usual targets.
+Specify two targets when monsters remain after the first, e.g.
+'champion goblin skeleton' defeats all goblins and one skeleton.
+
+    Example: ability
+    Example: champion goblin ooze"""
+    return minstrel_ability(world, randrange, command, targets)
 
 
 def necromancer_ability(
@@ -263,7 +320,10 @@ def necromancer_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Transform up to 2 skeletons into fighters, discarding on regroup."""
+    """Transform up to 2 skeletons into fighters, discarding on regroup.
+Each counts as either cleric or mage.
+
+    Example: ability"""
     return _convert_two(world, targets, source="skeleton", destination="fighter")
 
 
@@ -273,7 +333,9 @@ def occultist_ability(
     command: str,
     targets: tuple[str, ...] = (),
 ) -> struct.World:
-    """Transform 1 skeleton into 1 fighter, discarding it on regroup."""
+    """Transform 1 skeleton into 1 fighter, discarding it on regroup.
+
+    Example: ability"""
     return _convert_one(world, targets, source="skeleton", destination="fighter")
 
 
@@ -284,9 +346,12 @@ def paladin_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
+Each counts as either fighter or cleric.
+Specify consumed treasure as first argument.
+For each potion, add one argument for the hero to revive.
 
-    Specify consumed treasure as first argument.
-    For each potion, add one argument for the hero to revive."""
+    Example: ability sword
+    Example: ability talisman mage"""
     world = _consume_ability(world)
     # Validate that a treasure was specified
     if not targets:
@@ -328,7 +393,8 @@ def spellsword_ability(
     *,
     _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
 ) -> struct.World:
-    """Spellsword usable as a fighter or a mage, adding one hero to party.
+    """Add 1 fighter or mage to the party.
 
-    Optionally, specify 'fighter' or 'mage' to select which to choose."""
+    Example: ability
+    Example: ability mage"""
     return _choose_and_add_hero(world, command, targets, _acceptable_targets)
