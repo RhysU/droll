@@ -85,13 +85,12 @@ class Shell(cmd.Cmd):
         for part in desc_parts:
             print(part)
 
-        # Compact examples on one line
-        if examples:
-            example_str = " \u00b7 ".join(examples)
+        # One suggestion per line
+        for example in examples:
             if self._color:
-                print(f"Try: {_COMMAND}{example_str}{_RESET}")
+                print(f"Try: {_COMMAND}{example}{_RESET}")
             else:
-                print(f"Try: {example_str}")
+                print(f"Try: {example}")
 
         print()
 
