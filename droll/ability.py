@@ -346,9 +346,9 @@ def paladin_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
-    Heroes fighter and cleric are interchangeable.
     Specify consumed treasure as first argument.
     For each potion, add one argument for the hero to revive.
+    Heroes fighter and cleric are interchangeable.
 
         Example: ability sword
         Example: ability talisman mage"""
