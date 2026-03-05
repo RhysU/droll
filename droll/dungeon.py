@@ -4,7 +4,6 @@
 """Functionality associated with dungeon state and dungeon mechanics."""
 
 from dataclasses import replace
-from typing import Optional
 
 from .struct import DrollError, Dungeon, field_names, field_values
 
@@ -30,14 +29,14 @@ def _check_dungeon_target(target: str) -> None:
 DRAGON_BLOCKING_THRESHOLD = 3
 
 
-def defeated_monsters(dungeon: Optional[Dungeon]) -> bool:
+def defeated_monsters(dungeon: Dungeon | None) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""
     return (dungeon is None) or (
         dungeon.goblin + dungeon.skeleton + dungeon.ooze
     ) == 0
 
 
-def defeated_dungeon(dungeon: Optional[Dungeon]) -> bool:
+def defeated_dungeon(dungeon: Dungeon | None) -> bool:
     """Are all monsters and any dragon on this dungeon defeated?"""
     return (dungeon is None) or (
         defeated_monsters(dungeon) and dungeon.dragon < DRAGON_BLOCKING_THRESHOLD
@@ -49,7 +48,7 @@ def blocking_dragon(dungeon: Dungeon) -> bool:
     return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
 
 
-def finished_dungeon(dungeon: Optional[Dungeon]) -> bool:
+def finished_dungeon(dungeon: Dungeon | None) -> bool:
     """Has the player exhausted all possible actions for this dungeon?
 
     In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
