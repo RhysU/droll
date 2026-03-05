@@ -6,6 +6,7 @@
 from dataclasses import replace
 from operator import add
 from collections.abc import Callable, Sequence, Set
+from typing import Union
 from .dice import roll_dungeon, roll_party
 from .dungeon import (
     DRAGON_BLOCKING_THRESHOLD,
@@ -41,7 +42,7 @@ __all__ = (
 
 
 def not_reroll(
-    world: World, randrange: RandRange, hero: Party, targets: tuple[Dungeon | Party, ...]
+    world: World, randrange: RandRange, hero: Party, targets: tuple[Union[Dungeon, Party], ...]
 ) -> World:
     """Scrolls cannot target dungeon dice directly; use 'reroll' instead."""
     raise DrollError(f'Use "reroll {targets[0].value}" to re-roll with a scroll.')
@@ -129,7 +130,7 @@ def quaff(
     world: World,
     randrange: RandRange,
     hero: Party,
-    targets: tuple[Dungeon | Party, ...],
+    targets: tuple[Union[Dungeon, Party], ...],
     *,
     after_monsters=True,
 ) -> World:
@@ -157,7 +158,7 @@ def quaff(
 
 
 def _classify_reroll_targets(
-    dungeon_or_party: tuple[Dungeon | Party, ...],
+    dungeon_or_party: tuple[Union[Dungeon, Party], ...],
     allow_dragon: bool,
 ) -> tuple[list[Dungeon], list[Party]]:
     """Classify reroll targets into dungeon and party lists."""
@@ -179,7 +180,7 @@ def reroll(
     world: World,
     randrange: RandRange,
     hero: Party,
-    targets: tuple[Dungeon | Party, ...],
+    targets: tuple[Union[Dungeon, Party], ...],
     *,
     allow_dragon: bool = False,
 ) -> World:
@@ -278,7 +279,7 @@ def defeat_dragon(
     world: World,
     randrange: RandRange,
     hero: Party,
-    targets: tuple[Dungeon | Party, ...],
+    targets: tuple[Union[Dungeon, Party], ...],
     *,
     hero_validator: Callable[..., None] = defeat_dragon_heroes,
     _min_dragon_count: int = DRAGON_BLOCKING_THRESHOLD,
@@ -322,8 +323,8 @@ def defeat_dragon(
 def bait_dragon(
     world: World,
     randrange: RandRange,
-    command: Dungeon | Party,
-    targets: tuple[Dungeon | Party, ...] = (),
+    command: Union[Dungeon, Party],
+    targets: tuple[Union[Dungeon, Party], ...] = (),
     *,
     _enemies: Sequence[Dungeon] = (Dungeon.GOBLIN, Dungeon.SKELETON, Dungeon.OOZE),
     require_treasure: bool = True,
@@ -360,7 +361,7 @@ def bait_dragon(
 
 
 def elixir(
-    world: World, randrange: RandRange, command: Dungeon | Party, targets: tuple[Dungeon | Party, ...] = ()
+    world: World, randrange: RandRange, command: Union[Dungeon, Party], targets: tuple[Union[Dungeon, Party], ...] = ()
 ) -> World:
     """Consume an elixir to add one hero die of any type."""
     if not targets:

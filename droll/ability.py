@@ -4,6 +4,7 @@
 """Ability functions for all heroes."""
 
 from dataclasses import replace
+from typing import Union
 from . import regular, special, struct
 from .dungeon import (
     defeated_monsters,
@@ -46,7 +47,7 @@ def _consume_ability(world: struct.World) -> struct.World:
 def _choose_and_add_hero(
     world: struct.World,
     command: Action,
-    targets: tuple[Dungeon | Party, ...],
+    targets: tuple[Union[Dungeon, Party], ...],
     acceptable: frozenset[Party],
 ) -> struct.World:
     """Default target to sorted-first acceptable; validate; add one hero."""
@@ -63,7 +64,7 @@ def _choose_and_add_hero(
 
 def _convert_one(
     world: struct.World,
-    targets: tuple[Dungeon | Party, ...],
+    targets: tuple[Union[Dungeon, Party], ...],
     source: Dungeon,
     destination: Party,
 ) -> struct.World:
@@ -80,7 +81,7 @@ def _convert_one(
 
 def _convert_two(
     world: struct.World,
-    targets: tuple[Dungeon | Party, ...],
+    targets: tuple[Union[Dungeon, Party], ...],
     source: Dungeon,
     destination: Party,
 ) -> struct.World:
@@ -101,7 +102,7 @@ def default_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """No special ability."""
     world = _consume_ability(world)
@@ -114,7 +115,7 @@ def battlemage_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair.
 
@@ -129,7 +130,7 @@ def beguiler_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Transform at most 2 monsters into 1 potion.
     Requires transforming 2 monsters when 2+ monsters available.
@@ -156,7 +157,7 @@ def chieftain_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Transform up to 2 goblins into thieves, discarding them on regroup.
     Open chests and quaff potions before clearing monsters.
@@ -169,7 +170,7 @@ def commander_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice.
     Each fighter defeats one additional monster beyond its usual targets.
@@ -192,7 +193,7 @@ def crusader_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
     *,
     _acceptable_targets: frozenset[Party] = frozenset({Party.FIGHTER, Party.CLERIC}),
 ) -> struct.World:
@@ -207,7 +208,7 @@ def enchantress_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion.
 
@@ -227,7 +228,7 @@ def halfgoblin_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Transform 1 goblin into 1 thief, discarding it on regroup.
 
@@ -239,7 +240,7 @@ def knight_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Convert all monster faces into dragon dice.
 
@@ -254,7 +255,7 @@ def dragonslayer_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Convert all monster faces into dragon dice.
     Dragons require only 2 distinct party members to defeat.
@@ -268,7 +269,7 @@ def mercenary_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Defeat any 2 monsters.
 
@@ -287,7 +288,7 @@ def minstrel_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Discard all dragon dice.
 
@@ -302,7 +303,7 @@ def bard_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Discard all dragon dice.
     Each champion defeats one additional monster beyond its usual targets.
@@ -318,7 +319,7 @@ def necromancer_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Transform up to 2 skeletons into fighters, discarding on regroup.
     Heroes cleric and mage are interchangeable.
@@ -331,7 +332,7 @@ def occultist_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it on regroup.
 
@@ -343,7 +344,7 @@ def paladin_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
     Specify consumed treasure as first argument.
@@ -390,7 +391,7 @@ def spellsword_ability(
     world: struct.World,
     randrange: struct.RandRange,
     command: Action,
-    targets: tuple[Dungeon | Party, ...] = (),
+    targets: tuple[Union[Dungeon, Party], ...] = (),
     *,
     _acceptable_targets: frozenset[Party] = frozenset({Party.FIGHTER, Party.MAGE}),
 ) -> struct.World:

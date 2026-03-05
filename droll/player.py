@@ -5,6 +5,7 @@
 
 from collections.abc import Sequence
 from dataclasses import replace
+from typing import Union
 
 from . import ability, dice, regular, struct
 from .struct import (
@@ -115,7 +116,7 @@ def _adjust_phantom_treasures(world, artifacts, treasure, sign):
     )
 
 
-def _parse_token(token: str) -> Dungeon | Party | Artifact | Action:
+def _parse_token(token: str) -> Union[Dungeon, Party, Artifact, Action]:
     """Convert a string token to the appropriate enum."""
     # Try Action first (ability, bait, elixir, reroll)
     try:
