@@ -3,10 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality associated with dungeon state and dungeon mechanics."""
 
-from dataclasses import replace
 from typing import Optional
 
-from .struct import DrollError, Dungeon, field_names, field_values
+from .struct import DrollError, Dungeon, DungeonState, frozen
 
 __all__ = (
     "DRAGON_BLOCKING_THRESHOLD",
@@ -19,66 +18,55 @@ __all__ = (
     "increment_dungeon",
 )
 
-_DUNGEON_FIELDS = frozenset(field_names(Dungeon))
-
-
-def _check_dungeon_target(target: str) -> None:
-    if target not in _DUNGEON_FIELDS:
-        raise DrollError(f"Unknown dungeon target '{target}'.")
-
 # A dragon blocks progress when this many or more dragon dice are present.
 DRAGON_BLOCKING_THRESHOLD = 3
 
 
-def defeated_monsters(dungeon: Optional[Dungeon]) -> bool:
+def defeated_monsters(dungeon: Optional[DungeonState]) -> bool:
     """Are all non-dragon monsters on this dungeon defeated?"""
     return (dungeon is None) or (
-        dungeon.goblin + dungeon.skeleton + dungeon.ooze
+        dungeon[Dungeon.GOBLIN] + dungeon[Dungeon.SKELETON] + dungeon[Dungeon.OOZE]
     ) == 0
 
 
-def defeated_dungeon(dungeon: Optional[Dungeon]) -> bool:
+def defeated_dungeon(dungeon: Optional[DungeonState]) -> bool:
     """Are all monsters and any dragon on this dungeon defeated?"""
     return (dungeon is None) or (
-        defeated_monsters(dungeon) and dungeon.dragon < DRAGON_BLOCKING_THRESHOLD
+        defeated_monsters(dungeon) and dungeon[Dungeon.DRAGON] < DRAGON_BLOCKING_THRESHOLD
     )
 
 
-def blocking_dragon(dungeon: Dungeon) -> bool:
+def blocking_dragon(dungeon: DungeonState) -> bool:
     """Is a dragon blocking progress to the next level?"""
     return defeated_monsters(dungeon) and not defeated_dungeon(dungeon)
 
 
-def finished_dungeon(dungeon: Optional[Dungeon]) -> bool:
+def finished_dungeon(dungeon: Optional[DungeonState]) -> bool:
     """Has the player exhausted all possible actions for this dungeon?
 
     In contrast to defeated_dungeon(...), returns True if chests/etc remain."""
     return (dungeon is None) or (
-        (sum(field_values(dungeon)) - dungeon.dragon == 0)
+        (sum(dungeon.values()) - dungeon[Dungeon.DRAGON] == 0)
         and not blocking_dragon(dungeon)
     )
 
 
-def decrement_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
+def decrement_dungeon(dungeon: DungeonState, target: Dungeon) -> DungeonState:
     """Decrease the count of the specified target type by one."""
-    _check_dungeon_target(target)
-    prior_targets = getattr(dungeon, target)
+    prior_targets = dungeon[target]
     if not prior_targets:
-        raise DrollError(f"At least 1 {target} required in dungeon.")
-    return replace(dungeon, **{target: prior_targets - 1})
+        raise DrollError(f"At least 1 {target.value} required in dungeon.")
+    return frozen({**dungeon, target: prior_targets - 1})
 
 
-def increment_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
+def increment_dungeon(dungeon: DungeonState, target: Dungeon) -> DungeonState:
     """Increase the count of the specified target type by one."""
-    _check_dungeon_target(target)
-    prior_targets = getattr(dungeon, target, 0)
-    return replace(dungeon, **{target: prior_targets + 1})
+    return frozen({**dungeon, target: dungeon[target] + 1})
 
 
-def eliminate_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
+def eliminate_dungeon(dungeon: DungeonState, target: Dungeon) -> DungeonState:
     """Remove all targets of the specified type from the dungeon."""
-    _check_dungeon_target(target)
-    prior_targets = getattr(dungeon, target)
+    prior_targets = dungeon[target]
     if not prior_targets:
-        raise DrollError(f"At least 1 {target} required in dungeon.")
-    return replace(dungeon, **{target: 0})
+        raise DrollError(f"At least 1 {target.value} required in dungeon.")
+    return frozen({**dungeon, target: 0})

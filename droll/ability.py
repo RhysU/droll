@@ -12,7 +12,7 @@ from .dungeon import (
     increment_dungeon,
 )
 from .party import increment_party
-from .struct import DrollError
+from .struct import Action, Artifact, Dungeon, DrollError, Party
 from .treasure import draw_treasure, replace_treasure
 
 __all__ = (
@@ -45,34 +45,34 @@ def _consume_ability(world: struct.World) -> struct.World:
 
 def _choose_and_add_hero(
     world: struct.World,
-    command: str,
-    targets: tuple[str, ...],
-    acceptable: frozenset[str],
+    command: Action,
+    targets: tuple[Dungeon | Party, ...],
+    acceptable: frozenset[Party],
 ) -> struct.World:
     """Default target to sorted-first acceptable; validate; add one hero."""
     world = _consume_ability(world)
     if len(targets) > 1:
-        raise DrollError(f"At most 1 target accepted for {command}.")
-    target = targets[0] if targets else next(iter(sorted(acceptable)))
+        raise DrollError(f"At most 1 target accepted for {command.value}.")
+    target = targets[0] if targets else next(iter(sorted(acceptable, key=lambda p: p.value)))
     if target not in acceptable:
         raise DrollError(
-            f"Target '{target}' not one of {', '.join(sorted(acceptable))}."
+            f"Target '{target.value}' not one of {', '.join(sorted(p.value for p in acceptable))}."
         )
     return replace(world, party=increment_party(world.party, target))
 
 
 def _convert_one(
     world: struct.World,
-    targets: tuple[str, ...],
-    source: str,
-    destination: str,
+    targets: tuple[Dungeon | Party, ...],
+    source: Dungeon,
+    destination: Party,
 ) -> struct.World:
     """Validate optional target; convert 1 dungeon die to party."""
     world = _consume_ability(world)
-    if any(t != source for t in targets):
-        raise DrollError(f"Ability can only target 1 {source}.")
+    if any(t is not source for t in targets):
+        raise DrollError(f"Ability can only target 1 {source.value}.")
     if len(targets) > 1:
-        raise DrollError(f"Ability can only target 1 {source}.")
+        raise DrollError(f"Ability can only target 1 {source.value}.")
     return special.convert_dungeon_to_party(
         world, source=source, destination=destination, max_count=1
     )
@@ -80,16 +80,16 @@ def _convert_one(
 
 def _convert_two(
     world: struct.World,
-    targets: tuple[str, ...],
-    source: str,
-    destination: str,
+    targets: tuple[Dungeon | Party, ...],
+    source: Dungeon,
+    destination: Party,
 ) -> struct.World:
     """Validate optional targets; convert up to 2 dungeon dice to party."""
     world = _consume_ability(world)
-    if targets and targets[0] != source:
-        raise DrollError(f"Ability can only target a {source}.")
-    if len(targets) > 1 and targets[1] != source:
-        raise DrollError(f"Ability can only target a {source}.")
+    if targets and targets[0] is not source:
+        raise DrollError(f"Ability can only target a {source.value}.")
+    if len(targets) > 1 and targets[1] is not source:
+        raise DrollError(f"Ability can only target a {source.value}.")
     if len(targets) > 2:
         raise DrollError("At most 2 targets can be changed.")
     return special.convert_dungeon_to_party(
@@ -100,36 +100,36 @@ def _convert_two(
 def default_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """No special ability."""
     world = _consume_ability(world)
     if targets:
-        raise DrollError(f"No targets accepted for {command}.")
+        raise DrollError(f"No targets accepted for {command.value}.")
     return world
 
 
 def battlemage_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Discard all monsters, chests, potions, and dice in the dragon's lair.
 
     Example: ability"""
     world = _consume_ability(world)
     if targets:
-        raise DrollError(f"No targets accepted for {command}.")
-    return replace(world, dungeon=struct.Dungeon())
+        raise DrollError(f"No targets accepted for {command.value}.")
+    return replace(world, dungeon=struct.empty_dungeon())
 
 
 def beguiler_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Transform at most 2 monsters into 1 potion.
     Requires transforming 2 monsters when 2+ monsters available.
@@ -138,7 +138,7 @@ def beguiler_ability(
     Example: ability goblin skeleton
     Example: ability goblin"""
     if not targets:
-        raise struct.DrollError(f'"{command}" requires a monster target.')
+        raise struct.DrollError(f'"{command.value}" requires a monster target.')
     world = _consume_ability(world)
     dungeon = world.dungeon
     dungeon = decrement_dungeon(dungeon, targets[0])
@@ -148,28 +148,28 @@ def beguiler_ability(
         dungeon = decrement_dungeon(dungeon, targets[1])
     elif not defeated_monsters(dungeon):
         raise DrollError("2 targets required when 2+ available.")
-    dungeon = increment_dungeon(dungeon, "potion")
+    dungeon = increment_dungeon(dungeon, Dungeon.POTION)
     return replace(world, dungeon=dungeon)
 
 
 def chieftain_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Transform up to 2 goblins into thieves, discarding them on regroup.
     Open chests and quaff potions before clearing monsters.
 
     Example: ability"""
-    return _convert_two(world, targets, source="goblin", destination="thief")
+    return _convert_two(world, targets, source=Dungeon.GOBLIN, destination=Party.THIEF)
 
 
 def commander_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Rerolls any number of Party and Dungeon dice.
     Each fighter defeats one additional monster beyond its usual targets.
@@ -179,22 +179,22 @@ def commander_ability(
     Example: ability goblin skeleton
     Example: fighter goblin ooze"""
     if not targets:
-        raise DrollError(f"At least 1 reroll target required for {command}.")
+        raise DrollError(f"At least 1 reroll target required for {command.value}.")
     world = _consume_ability(world)
     # Temporarily add a scroll to be consumed by reroll
-    world = replace(world, party=increment_party(world.party, "scroll"))
+    world = replace(world, party=increment_party(world.party, Party.SCROLL))
     return regular.reroll(
-        world, randrange, "scroll", targets, allow_dragon=True
+        world, randrange, Party.SCROLL, targets, allow_dragon=True
     )
 
 
 def crusader_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
     *,
-    _acceptable_targets: frozenset[str] = frozenset({"fighter", "cleric"}),
+    _acceptable_targets: frozenset[Party] = frozenset({Party.FIGHTER, Party.CLERIC}),
 ) -> struct.World:
     """Add 1 fighter or cleric to the party.
 
@@ -206,40 +206,40 @@ def crusader_ability(
 def enchantress_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Transform exactly 1 monster into 1 potion.
 
     Example: ability goblin"""
     if not targets:
-        raise struct.DrollError(f'"{command}" requires a monster target.')
+        raise struct.DrollError(f'"{command.value}" requires a monster target.')
     if len(targets) > 1:
-        raise struct.DrollError(f'"{command}" accepts only 1 monster target.')
+        raise struct.DrollError(f'"{command.value}" accepts only 1 monster target.')
     world = _consume_ability(world)
     dungeon = world.dungeon
     dungeon = decrement_dungeon(dungeon, targets[0])
-    dungeon = increment_dungeon(dungeon, "potion")
+    dungeon = increment_dungeon(dungeon, Dungeon.POTION)
     return replace(world, dungeon=dungeon)
 
 
 def halfgoblin_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Transform 1 goblin into 1 thief, discarding it on regroup.
 
     Example: ability"""
-    return _convert_one(world, targets, source="goblin", destination="thief")
+    return _convert_one(world, targets, source=Dungeon.GOBLIN, destination=Party.THIEF)
 
 
 def knight_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Convert all monster faces into dragon dice.
 
@@ -253,8 +253,8 @@ def knight_ability(
 def dragonslayer_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Convert all monster faces into dragon dice.
     Dragons require only 2 distinct party members to defeat.
@@ -267,42 +267,42 @@ def dragonslayer_ability(
 def mercenary_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Defeat any 2 monsters.
 
     Example: ability goblin skeleton"""
     if not targets:
-        raise DrollError(f"At least 1 target required for {command}.")
+        raise DrollError(f"At least 1 target required for {command.value}.")
     world = _consume_ability(world)
     # Temporarily add a champion to be consumed by defeat_one_plus_additional
-    world = replace(world, party=increment_party(world.party, "champion"))
+    world = replace(world, party=increment_party(world.party, Party.CHAMPION))
     return special.defeat_one_plus_additional(
-        world, randrange, "champion", targets
+        world, randrange, Party.CHAMPION, targets
     )
 
 
 def minstrel_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Discard all dragon dice.
 
     Example: ability"""
     world = _consume_ability(world)
-    if any(t != "dragon" for t in targets):
+    if any(t is not Dungeon.DRAGON for t in targets):
         raise DrollError("Can discard only dragon dice.")
-    return replace(world, dungeon=eliminate_dungeon(world.dungeon, "dragon"))
+    return replace(world, dungeon=eliminate_dungeon(world.dungeon, Dungeon.DRAGON))
 
 
 def bard_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Discard all dragon dice.
     Each champion defeats one additional monster beyond its usual targets.
@@ -317,33 +317,33 @@ def bard_ability(
 def necromancer_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Transform up to 2 skeletons into fighters, discarding on regroup.
     Heroes cleric and mage are interchangeable.
 
     Example: ability"""
-    return _convert_two(world, targets, source="skeleton", destination="fighter")
+    return _convert_two(world, targets, source=Dungeon.SKELETON, destination=Party.FIGHTER)
 
 
 def occultist_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Transform 1 skeleton into 1 fighter, discarding it on regroup.
 
     Example: ability"""
-    return _convert_one(world, targets, source="skeleton", destination="fighter")
+    return _convert_one(world, targets, source=Dungeon.SKELETON, destination=Party.FIGHTER)
 
 
 def paladin_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
 ) -> struct.World:
     """Consume treasure to clear dungeon, open chests, and quaff potions.
     Specify consumed treasure as first argument.
@@ -355,21 +355,22 @@ def paladin_ability(
     world = _consume_ability(world)
     # Validate that a treasure was specified
     if not targets:
-        raise DrollError(f"Treasure to consume required for {command}.")
+        raise DrollError(f"Treasure to consume required for {command.value}.")
 
     # Consume the specified treasure (will error if not possessed)
+    # targets[0] is an Artifact enum for paladin
     world = replace(world, treasure=replace_treasure(world.treasure, targets[0]))
 
     # Validate potion/revivable count before making changes
     if world.dungeon is not None:
-        if len(targets) - 1 != world.dungeon.potion:
+        if len(targets) - 1 != world.dungeon[Dungeon.POTION]:
             raise DrollError(
-                f"Exactly {world.dungeon.potion} heroes to revive required."
+                f"Exactly {world.dungeon[Dungeon.POTION]} heroes to revive required."
             )
 
         # Draw treasure for each chest
         treasure = world.treasure
-        for _ in range(world.dungeon.chest):
+        for _ in range(world.dungeon[Dungeon.CHEST]):
             treasure = draw_treasure(treasure, randrange)
         world = replace(world, treasure=treasure)
 
@@ -380,7 +381,7 @@ def paladin_ability(
         world = replace(world, party=party)
 
     # Clear the entire dungeon (all monsters, chests, potions, dragons)
-    world = replace(world, dungeon=struct.Dungeon())
+    world = replace(world, dungeon=struct.empty_dungeon())
 
     return world
 
@@ -388,10 +389,10 @@ def paladin_ability(
 def spellsword_ability(
     world: struct.World,
     randrange: struct.RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Action,
+    targets: tuple[Dungeon | Party, ...] = (),
     *,
-    _acceptable_targets: frozenset[str] = frozenset({"fighter", "mage"}),
+    _acceptable_targets: frozenset[Party] = frozenset({Party.FIGHTER, Party.MAGE}),
 ) -> struct.World:
     """Add 1 fighter or mage to the party.
 

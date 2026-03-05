@@ -3,10 +3,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Compact display formatting for the experimental CLI mode."""
 
-from enum import Enum
+import enum
 from typing import Any, Optional, Sequence
 
 from . import struct
+from .struct import Dungeon
 
 __all__ = (
     "DisplayMode",
@@ -14,7 +15,7 @@ __all__ = (
 )
 
 
-class DisplayMode(Enum):
+class DisplayMode(enum.Enum):
     """Display mode for the droll CLI."""
 
     CURRENT = "current"
@@ -22,35 +23,35 @@ class DisplayMode(Enum):
 
 
 # Dragons always show count (tracking them is crucial to gameplay)
-_ALWAYS_COUNT = frozenset({"dragon"})
+_ALWAYS_COUNT = frozenset({Dungeon.DRAGON})
 
 
 def _format_item(name: str, count: int, discard: int = 0) -> Optional[str]:
     """Format a single item, returning None if count is zero."""
     if not count:
         return None
-    counted = count > 1 or name in _ALWAYS_COUNT
+    counted = count > 1 or name in {d.value for d in _ALWAYS_COUNT}
     if discard:
         return f"{name}×{count}~{discard}" if counted else f"{name}~{discard}"
     return f"{name}×{count}" if counted else name
 
 
-def _format_items(counts: Any, discards: Any = None) -> str:
-    """Format dataclass fields as 'name' or 'name×N' or 'name×N-M'."""
+def _format_mapping(counts: Any, discards: Any = None) -> str:
+    """Format mapping fields as 'name' or 'name×N' or 'name×N-M'."""
     if discards is None:
-        parts = (_format_item(n, c) for n, c in struct.field_items(counts))
+        parts = (_format_item(k.value, v) for k, v in counts.items())
     else:
         parts = (
-            _format_item(n, getattr(counts, n), getattr(discards, n))
-            for n in struct.field_names(counts)
+            _format_item(k.value, counts[k], discards[k])
+            for k in counts
         )
     return " ".join(filter(None, parts)) or "(empty)"
 
 
-def _format_treasure(artifacts: struct.Artifacts) -> str:
+def _format_treasure(artifacts: struct.ArtifactCounts) -> str:
     """Format treasure alphabetically."""
     parts = (
-        _format_item(n, c) for n, c in sorted(struct.field_items(artifacts))
+        _format_item(k.value, v) for k, v in sorted(artifacts.items(), key=lambda kv: kv[0].value)
     )
     return " ".join(filter(None, parts)) or "(empty)"
 
@@ -67,22 +68,22 @@ def _format_available(
 
 
 def _format_party(
-    party: struct.Party,
-    discard: struct.Party,
+    party: struct.PartyState,
+    discard: struct.PartyState,
 ) -> Optional[str]:
     """Format party contents, returning None if empty."""
-    if not any(struct.field_values(party)):
+    if not any(party.values()):
         return None
-    return _format_items(counts=party, discards=discard)
+    return _format_mapping(counts=party, discards=discard)
 
 
 def _format_dungeon(
-    dungeon: Optional[struct.Dungeon],
+    dungeon: Optional[struct.DungeonState],
 ) -> str:
     """Format dungeon contents, always returning a displayable string."""
     if dungeon is None:
         return "(empty)"
-    return _format_items(dungeon)
+    return _format_mapping(dungeon)
 
 
 def compact_summary(
@@ -120,3 +121,7 @@ def compact_summary(
     lines.append(f"{'Dungeon:':<{width}} {dungeon_str}")
 
     return "\n".join(lines)
+
+
+# Keep old names as aliases for backward compatibility in tests
+_format_items = _format_mapping

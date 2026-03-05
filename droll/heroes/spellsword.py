@@ -9,6 +9,7 @@ from functools import partial
 from .. import regular
 from ..ability import battlemage_ability, spellsword_ability
 from ..player import Default
+from ..struct import Dungeon, Party, frozen
 
 __all__ = (
     "Battlemage",
@@ -20,7 +21,7 @@ _spellsword_defeat_dragon = partial(
     regular.defeat_dragon,
     hero_validator=partial(
         regular.defeat_dragon_heroes,
-        interchangeable=frozenset({"fighter", "mage"}),
+        interchangeable=frozenset({Party.FIGHTER, Party.MAGE}),
     ),
 )
 
@@ -31,35 +32,34 @@ Battlemage = replace(
     name="Battlemage",
     ability=battlemage_ability,
     advance=(lambda _: Battlemage),
-    party=replace(
-        Default.party,
-        fighter=replace(
-            Default.party.fighter,
-            dragon=_spellsword_defeat_dragon,
-            ooze=Default.party.mage.ooze,
-        ),
-        cleric=replace(
-            Default.party.cleric,
-            dragon=_spellsword_defeat_dragon,
-        ),
-        mage=replace(
-            Default.party.mage,
-            dragon=_spellsword_defeat_dragon,
-            goblin=Default.party.fighter.goblin,
-        ),
-        thief=replace(
-            Default.party.thief,
-            dragon=_spellsword_defeat_dragon,
-        ),
-        champion=replace(
-            Default.party.champion,
-            dragon=_spellsword_defeat_dragon,
-        ),
-        scroll=replace(
-            Default.party.scroll,
-            dragon=_spellsword_defeat_dragon,
-        ),
-    ),
+    party=frozen({
+        Party.FIGHTER: frozen({
+            **Default.party[Party.FIGHTER],
+            Dungeon.DRAGON: _spellsword_defeat_dragon,
+            Dungeon.OOZE: Default.party[Party.MAGE][Dungeon.OOZE],
+        }),
+        Party.CLERIC: frozen({
+            **Default.party[Party.CLERIC],
+            Dungeon.DRAGON: _spellsword_defeat_dragon,
+        }),
+        Party.MAGE: frozen({
+            **Default.party[Party.MAGE],
+            Dungeon.DRAGON: _spellsword_defeat_dragon,
+            Dungeon.GOBLIN: Default.party[Party.FIGHTER][Dungeon.GOBLIN],
+        }),
+        Party.THIEF: frozen({
+            **Default.party[Party.THIEF],
+            Dungeon.DRAGON: _spellsword_defeat_dragon,
+        }),
+        Party.CHAMPION: frozen({
+            **Default.party[Party.CHAMPION],
+            Dungeon.DRAGON: _spellsword_defeat_dragon,
+        }),
+        Party.SCROLL: frozen({
+            **Default.party[Party.SCROLL],
+            Dungeon.DRAGON: _spellsword_defeat_dragon,
+        }),
+    }),
 )
 
 # Defined after Battlemage to permit advance(...) closure

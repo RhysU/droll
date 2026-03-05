@@ -9,6 +9,7 @@ import pytest
 from droll import player, struct
 from droll.ability import crusader_ability, paladin_ability
 from droll.heroes.crusader import Crusader, Paladin
+from droll.struct import Action, Artifact, Dungeon, Party, make_dungeon, make_party, make_artifacts
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -18,10 +19,10 @@ def test_crusader_ability_adds_fighter():
     """Crusader ability adds a fighter to party."""
     world = struct.World(
         ability=True,
-        party=struct.Party(fighter=1, cleric=1),
+        party=make_party(fighter=1, cleric=1),
     )
-    result = crusader_ability(world, _UNUSED, "ability", ("fighter",))
-    assert result.party.fighter == 2
+    result = crusader_ability(world, _UNUSED, Action.ABILITY, (Party.FIGHTER,))
+    assert result.party[Party.FIGHTER] == 2
     assert not result.ability
 
 
@@ -29,20 +30,20 @@ def test_crusader_ability_adds_cleric():
     """Crusader ability adds a cleric to party."""
     world = struct.World(
         ability=True,
-        party=struct.Party(fighter=1, cleric=1),
+        party=make_party(fighter=1, cleric=1),
     )
-    result = crusader_ability(world, _UNUSED, "ability", ("cleric",))
-    assert result.party.cleric == 2
+    result = crusader_ability(world, _UNUSED, Action.ABILITY, (Party.CLERIC,))
+    assert result.party[Party.CLERIC] == 2
 
 
 def test_crusader_ability_rejects_invalid_target():
     """Crusader ability rejects invalid targets like mage."""
     world = struct.World(
         ability=True,
-        party=struct.Party(fighter=1, cleric=1),
+        party=make_party(fighter=1, cleric=1),
     )
     with pytest.raises(struct.DrollError):
-        crusader_ability(world, _UNUSED, "ability", ("mage",))
+        crusader_ability(world, _UNUSED, Action.ABILITY, (Party.MAGE,))
 
 
 def test_crusader_advances_to_paladin():
@@ -57,16 +58,16 @@ def test_paladin_ability_clears_dungeon():
     """Paladin ability consumes treasure and clears dungeon."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1, dragon=1),
-        party=struct.Party(fighter=1, cleric=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1, dragon=1),
+        party=make_party(fighter=1, cleric=1),
         treasure=struct.Treasure(
-            own=struct.Artifacts(elixir=1),
-            box=struct.Artifacts(sword=1, talisman=1),
+            own=make_artifacts(elixir=1),
+            box=make_artifacts(sword=1, talisman=1),
         ),
     )
-    result = paladin_ability(world, _UNUSED, "ability", ("elixir",))
-    assert sum(struct.field_values(result.dungeon)) == 0
-    assert result.treasure.own.elixir == 0
+    result = paladin_ability(world, _UNUSED, Action.ABILITY, (Artifact.ELIXIR,))
+    assert sum(result.dungeon.values()) == 0
+    assert result.treasure.own[Artifact.ELIXIR] == 0
     assert not result.ability
 
 
@@ -75,16 +76,16 @@ def test_paladin_ability_opens_chests():
     randrange = random.Random(4).randrange
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(chest=2),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(chest=2),
+        party=make_party(fighter=1),
         treasure=struct.Treasure(
-            own=struct.Artifacts(bait=1),
-            box=struct.Artifacts(sword=1, talisman=1, sceptre=1),
+            own=make_artifacts(bait=1),
+            box=make_artifacts(sword=1, talisman=1, sceptre=1),
         ),
     )
-    pre_treasure = sum(struct.field_values(world.treasure.own))
-    result = paladin_ability(world, randrange, "ability", ("bait",))
-    post_treasure = sum(struct.field_values(result.treasure.own))
+    pre_treasure = sum(world.treasure.own.values())
+    result = paladin_ability(world, randrange, Action.ABILITY, (Artifact.BAIT,))
+    post_treasure = sum(result.treasure.own.values())
     assert post_treasure == pre_treasure - 1 + 2  # -1 consumed, +2 from chests
 
 
@@ -92,48 +93,48 @@ def test_paladin_ability_revives_from_potions():
     """Paladin ability revives heroes from potions."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(potion=2),
-        party=struct.Party(fighter=1),
-        treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
+        dungeon=make_dungeon(potion=2),
+        party=make_party(fighter=1),
+        treasure=struct.Treasure(own=make_artifacts(elixir=1)),
     )
     result = paladin_ability(
-        world, _UNUSED, "ability", ("elixir", "mage", "thief")
+        world, _UNUSED, Action.ABILITY, (Artifact.ELIXIR, Party.MAGE, Party.THIEF)
     )
-    assert result.party.mage == 1
-    assert result.party.thief == 1
+    assert result.party[Party.MAGE] == 1
+    assert result.party[Party.THIEF] == 1
 
 
 def test_crusader_ability_default_target():
     """Crusader ability defaults to 'cleric' (first sorted) when no target."""
     world = struct.World(
         ability=True,
-        party=struct.Party(fighter=1, cleric=1),
+        party=make_party(fighter=1, cleric=1),
     )
-    result = crusader_ability(world, _UNUSED, "ability")
-    assert result.party.cleric == 2
+    result = crusader_ability(world, _UNUSED, Action.ABILITY)
+    assert result.party[Party.CLERIC] == 2
 
 
 def test_paladin_ability_wrong_revivable_count():
     """Paladin ability rejects wrong number of heroes for potions."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(potion=2),
-        party=struct.Party(fighter=1),
-        treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
+        dungeon=make_dungeon(potion=2),
+        party=make_party(fighter=1),
+        treasure=struct.Treasure(own=make_artifacts(elixir=1)),
     )
     with pytest.raises(struct.DrollError):
-        paladin_ability(world, _UNUSED, "ability", ("elixir", "mage"))
+        paladin_ability(world, _UNUSED, Action.ABILITY, (Artifact.ELIXIR, Party.MAGE))
 
 
 def test_paladin_ability_requires_treasure():
     """Paladin ability fails without specifying treasure."""
     world = struct.World(
         ability=True,
-        party=struct.Party(fighter=1),
-        treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
+        party=make_party(fighter=1),
+        treasure=struct.Treasure(own=make_artifacts(elixir=1)),
     )
     with pytest.raises(struct.DrollError):
-        paladin_ability(world, _UNUSED, "ability")
+        paladin_ability(world, _UNUSED, Action.ABILITY)
 
 
 def test_paladin_ability_talisman_via_apply(
@@ -145,14 +146,14 @@ def test_paladin_ability_talisman_via_apply(
     treasure name, producing "'Artifacts' object has no attribute 'cleric'"."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1, dragon=1),
-        party=struct.Party(fighter=1, cleric=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1, dragon=1),
+        party=make_party(fighter=1, cleric=1),
         treasure=struct.Treasure(
-            own=struct.Artifacts(talisman=1),
-            box=struct.Artifacts(sword=1),
+            own=make_artifacts(talisman=1),
+            box=make_artifacts(sword=1),
         ),
     )
     result = player.apply(Paladin, world, _UNUSED, "ability", "talisman")
-    assert sum(struct.field_values(result.dungeon)) == 0
-    assert result.treasure.own.talisman == 0
+    assert sum(result.dungeon.values()) == 0
+    assert result.treasure.own[Artifact.TALISMAN] == 0
     assert not result.ability

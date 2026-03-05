@@ -6,10 +6,11 @@
 from dataclasses import replace
 from functools import partial
 
-from .. import special, struct
+from .. import special
 from ..ability import bard_ability, minstrel_ability
 from ..player import Default
 from ..regular import defeat_dragon, defeat_dragon_heroes
+from ..struct import Dungeon, Party, frozen
 
 __all__ = (
     "Bard",
@@ -21,39 +22,39 @@ _minstrel_defeat_dragon = partial(
     defeat_dragon,
     hero_validator=partial(
         defeat_dragon_heroes,
-        interchangeable=frozenset({"mage", "thief"}),
+        interchangeable=frozenset({Party.MAGE, Party.THIEF}),
     ),
 )
 
 # Building block: dragon defeat + mage/thief interchangeability in combat
-_Minstrel_Party = struct.Party(
-    fighter=replace(
-        Default.party.fighter,
-        dragon=_minstrel_defeat_dragon,
-    ),
-    cleric=replace(
-        Default.party.cleric,
-        dragon=_minstrel_defeat_dragon,
-    ),
-    mage=replace(
-        Default.party.mage,
-        chest=Default.party.thief.chest,
-        dragon=_minstrel_defeat_dragon,
-    ),
-    thief=replace(
-        Default.party.thief,
-        dragon=_minstrel_defeat_dragon,
-        ooze=Default.party.mage.ooze,
-    ),
-    champion=replace(
-        Default.party.champion,
-        dragon=_minstrel_defeat_dragon,
-    ),
-    scroll=replace(
-        Default.party.scroll,
-        dragon=_minstrel_defeat_dragon,
-    ),
-)
+_minstrel_party = frozen({
+    Party.FIGHTER: frozen({
+        **Default.party[Party.FIGHTER],
+        Dungeon.DRAGON: _minstrel_defeat_dragon,
+    }),
+    Party.CLERIC: frozen({
+        **Default.party[Party.CLERIC],
+        Dungeon.DRAGON: _minstrel_defeat_dragon,
+    }),
+    Party.MAGE: frozen({
+        **Default.party[Party.MAGE],
+        Dungeon.CHEST: Default.party[Party.THIEF][Dungeon.CHEST],
+        Dungeon.DRAGON: _minstrel_defeat_dragon,
+    }),
+    Party.THIEF: frozen({
+        **Default.party[Party.THIEF],
+        Dungeon.DRAGON: _minstrel_defeat_dragon,
+        Dungeon.OOZE: Default.party[Party.MAGE][Dungeon.OOZE],
+    }),
+    Party.CHAMPION: frozen({
+        **Default.party[Party.CHAMPION],
+        Dungeon.DRAGON: _minstrel_defeat_dragon,
+    }),
+    Party.SCROLL: frozen({
+        **Default.party[Party.SCROLL],
+        Dungeon.DRAGON: _minstrel_defeat_dragon,
+    }),
+})
 
 # Defined in terms of Default, not Minstrel, to permit advance(...) closure
 Bard = replace(
@@ -61,16 +62,16 @@ Bard = replace(
     name="Bard",
     ability=bard_ability,
     advance=(lambda _: Bard),  # Cannot advance further
-    party=replace(
-        _Minstrel_Party,
-        champion=replace(
-            _Minstrel_Party.champion,
+    party=frozen({
+        **_minstrel_party,
+        Party.CHAMPION: frozen({
+            **_minstrel_party[Party.CHAMPION],
             # Champions defeat one additional monster when attacking monsters
-            goblin=special.defeat_all_plus_additional,
-            skeleton=special.defeat_all_plus_additional,
-            ooze=special.defeat_all_plus_additional,
-        ),
-    ),
+            Dungeon.GOBLIN: special.defeat_all_plus_additional,
+            Dungeon.SKELETON: special.defeat_all_plus_additional,
+            Dungeon.OOZE: special.defeat_all_plus_additional,
+        }),
+    }),
 )
 
 # Defined after Bard to permit advance(...) closure
@@ -79,5 +80,5 @@ Minstrel = replace(
     name="Minstrel",
     ability=minstrel_ability,
     advance=(lambda world: Minstrel if world.experience < 5 else Bard),
-    party=_Minstrel_Party,
+    party=_minstrel_party,
 )

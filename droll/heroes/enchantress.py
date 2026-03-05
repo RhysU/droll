@@ -6,9 +6,10 @@
 from dataclasses import replace
 from functools import partial
 
-from .. import regular, struct
+from .. import regular
 from ..ability import beguiler_ability, enchantress_ability
 from ..player import Default
+from ..struct import Dungeon, Party, frozen
 
 __all__ = (
     "Beguiler",
@@ -21,7 +22,7 @@ _beguiler_defeat_dragon = partial(
     hero_validator=partial(
         regular.defeat_dragon_heroes,
         disallowed_heroes=frozenset(),
-        wildcard=frozenset({"scroll"}),
+        wildcard=frozenset({Party.SCROLL}),
     ),
 )
 
@@ -31,18 +32,18 @@ Beguiler = replace(
     name="Beguiler",
     ability=beguiler_ability,
     advance=(lambda _: Beguiler),
-    party=replace(
-        Default.party,
+    party=frozen({
+        **Default.party,
         # Scrolls act offensively (defeat enemies, not re-roll)
-        scroll=struct.Dungeon(
-            goblin=regular.defeat_all,
-            skeleton=regular.defeat_all,
-            ooze=regular.defeat_all,
-            chest=regular.open_all,
-            potion=regular.quaff,
-            dragon=_beguiler_defeat_dragon,
-        ),
-    ),
+        Party.SCROLL: frozen({
+            Dungeon.GOBLIN: regular.defeat_all,
+            Dungeon.SKELETON: regular.defeat_all,
+            Dungeon.OOZE: regular.defeat_all,
+            Dungeon.CHEST: regular.open_all,
+            Dungeon.POTION: regular.quaff,
+            Dungeon.DRAGON: _beguiler_defeat_dragon,
+        }),
+    }),
 )
 
 # Defined after Beguiler to permit advance(...) closure

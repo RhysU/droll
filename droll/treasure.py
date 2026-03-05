@@ -6,12 +6,12 @@
 from dataclasses import replace
 
 from .struct import (
-    Artifacts,
+    Artifact,
+    ArtifactCounts,
     DrollError,
     RandRange,
     Treasure,
-    field_items,
-    field_values,
+    frozen,
 )
 
 __all__ = (
@@ -20,17 +20,17 @@ __all__ = (
 )
 
 
-def _draw(box: Artifacts, randrange: RandRange) -> str:
+def _draw(box: ArtifactCounts, randrange: RandRange) -> Artifact:
     """Draw a random treasure from the box, weighted by counts."""
-    total = sum(field_values(box))
+    total = sum(box.values())
     if not total:
         raise DrollError("No items remaining in the box")
     choice = randrange(0, total)
     cumulative = 0
-    for name, count in field_items(box):
+    for artifact, count in box.items():
         cumulative += count
         if choice < cumulative:
-            return name
+            return artifact
     raise RuntimeError("Unreachable")
 
 
@@ -39,20 +39,20 @@ def draw_treasure(treasure: Treasure, randrange: RandRange) -> Treasure:
     drawn = _draw(box=treasure.box, randrange=randrange)
     return replace(
         treasure,
-        own=replace(treasure.own, **{drawn: getattr(treasure.own, drawn) + 1}),
-        box=replace(treasure.box, **{drawn: getattr(treasure.box, drawn) - 1}),
+        own=frozen({**treasure.own, drawn: treasure.own[drawn] + 1}),
+        box=frozen({**treasure.box, drawn: treasure.box[drawn] - 1}),
     )
 
 
-def replace_treasure(treasure: Treasure, item: str) -> Treasure:
+def replace_treasure(treasure: Treasure, item: Artifact) -> Treasure:
     """Replace a single item from the player's own artifacts into the box."""
-    if not hasattr(treasure.own, item):
-        raise DrollError(f"'{item}' is not a valid treasure type.")
-    prior_count = getattr(treasure.own, item)
+    if item not in treasure.own:
+        raise DrollError(f"'{item.value}' is not a valid treasure type.")
+    prior_count = treasure.own[item]
     if not prior_count:
-        raise DrollError(f"'{item}' not in player's treasure.")
+        raise DrollError(f"'{item.value}' not in player's treasure.")
     return replace(
         treasure,
-        own=replace(treasure.own, **{item: prior_count - 1}),
-        box=replace(treasure.box, **{item: getattr(treasure.box, item) + 1}),
+        own=frozen({**treasure.own, item: prior_count - 1}),
+        box=frozen({**treasure.box, item: treasure.box[item] + 1}),
     )

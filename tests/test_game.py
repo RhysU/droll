@@ -7,7 +7,7 @@ from dataclasses import replace
 import random
 import pytest
 
-from droll import struct
+from droll.struct import Artifact, Dungeon, Party, make_dungeon, make_party, frozen
 from droll.struct import DrollError
 from droll.game import Game, GameState
 from droll.player import Default
@@ -32,13 +32,13 @@ def test_reroll_dungeon_dice():
     g._world = replace(
         g._world,
         depth=1,
-        party=replace(g._world.party, scroll=1),
-        dungeon=struct.Dungeon(goblin=2),
+        party=frozen({**g._world.party, Party.SCROLL: 1}),
+        dungeon=make_dungeon(goblin=2),
     )
-    pre_scroll = g._world.party.scroll
+    pre_scroll = g._world.party[Party.SCROLL]
     g.reroll("goblin")
     # Scroll consumed, dungeon rerolled
-    assert g._world.party.scroll == pre_scroll - 1
+    assert g._world.party[Party.SCROLL] == pre_scroll - 1
 
 
 def test_reroll_portion():
@@ -49,13 +49,13 @@ def test_reroll_portion():
     g._world = replace(
         g._world,
         depth=1,
-        party=replace(g._world.party, scroll=1),
-        dungeon=struct.Dungeon(potion=2),
+        party=frozen({**g._world.party, Party.SCROLL: 1}),
+        dungeon=make_dungeon(potion=2),
     )
-    pre_scroll = g._world.party.scroll
+    pre_scroll = g._world.party[Party.SCROLL]
     g.reroll("potion")
     # Scroll consumed, dungeon rerolled
-    assert g._world.party.scroll == pre_scroll - 1
+    assert g._world.party[Party.SCROLL] == pre_scroll - 1
 
 
 def test_reroll_multiple_targets():
@@ -65,11 +65,11 @@ def test_reroll_multiple_targets():
     g._world = replace(
         g._world,
         depth=1,
-        party=replace(g._world.party, scroll=1),
-        dungeon=struct.Dungeon(goblin=1, skeleton=1),
+        party=frozen({**g._world.party, Party.SCROLL: 1}),
+        dungeon=make_dungeon(goblin=1, skeleton=1),
     )
     g.reroll("goblin", "skeleton")
-    assert g._world.party.scroll == 0
+    assert g._world.party[Party.SCROLL] == 0
 
 
 def test_apply_portal_directly_fails():
@@ -79,7 +79,7 @@ def test_apply_portal_directly_fails():
     g._world = replace(
         g._world,
         treasure=replace(
-            g._world.treasure, own=replace(g._world.treasure.own, portal=1)
+            g._world.treasure, own=frozen({**g._world.treasure.own, Artifact.PORTAL: 1})
         ),
     )
     with pytest.raises(DrollError):
@@ -93,7 +93,7 @@ def test_apply_ring_directly_fails():
     g._world = replace(
         g._world,
         treasure=replace(
-            g._world.treasure, own=replace(g._world.treasure.own, ring=1)
+            g._world.treasure, own=frozen({**g._world.treasure.own, Artifact.RING: 1})
         ),
     )
     with pytest.raises(DrollError):
@@ -105,7 +105,7 @@ def test_retreat():
     g = Game(random=random.Random(4), player=Default)
     g.descend()
     # Place a monster so retreat is valid (can't retreat from cleared dungeon)
-    g._world = replace(g._world, dungeon=struct.Dungeon(goblin=1))
+    g._world = replace(g._world, dungeon=make_dungeon(goblin=1))
     result = g.retreat()
     assert result == GameState.PLAY
     # After retreat, a new delve should have started
@@ -119,7 +119,7 @@ def test_completenames():
     g.descend()
 
     # With monsters: retreat is possible, retire is not
-    g._world = replace(g._world, dungeon=struct.Dungeon(goblin=1))
+    g._world = replace(g._world, dungeon=make_dungeon(goblin=1))
     names = g.completenames(text="", head=[], tail=[])
     assert "ability" in names
     assert "retreat" in names
@@ -130,7 +130,7 @@ def test_completenames():
     )
 
     # With cleared dungeon: retire is possible
-    g._world = replace(g._world, dungeon=struct.Dungeon())
+    g._world = replace(g._world, dungeon=make_dungeon())
     names = g.completenames(text="", head=[], tail=[])
     assert "retire" in names
 
@@ -141,8 +141,8 @@ def test_completedefault():
     g.descend()
     g._world = replace(
         g._world,
-        dungeon=struct.Dungeon(goblin=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=1),
+        party=make_party(fighter=1),
     )
     results = g.completedefault(text="fi", head=[], tail=[])
     assert "fighter" in results
@@ -152,7 +152,7 @@ def test_score_deltas_retire_cleared():
     """score_deltas returns +depth for retire with cleared dungeon."""
     g = Game(random=random.Random(4), player=Default)
     g.descend()
-    g._world = replace(g._world, dungeon=struct.Dungeon())
+    g._world = replace(g._world, dungeon=make_dungeon())
     deltas = g.score_deltas()
     assert "retire" in deltas
     assert deltas["retire"] == g._world.depth
@@ -162,7 +162,7 @@ def test_score_deltas_retreat_with_monsters():
     """score_deltas returns 0 for retreat with monsters present."""
     g = Game(random=random.Random(4), player=Default)
     g.descend()
-    g._world = replace(g._world, dungeon=struct.Dungeon(goblin=1))
+    g._world = replace(g._world, dungeon=make_dungeon(goblin=1))
     deltas = g.score_deltas()
     assert "retreat" in deltas
     assert deltas["retreat"] == 0
@@ -175,9 +175,9 @@ def test_score_deltas_retire_consumes_portal():
     g._world = replace(
         g._world,
         depth=1,
-        dungeon=struct.Dungeon(goblin=1),
+        dungeon=make_dungeon(goblin=1),
         treasure=replace(
-            g._world.treasure, own=replace(g._world.treasure.own, portal=1)
+            g._world.treasure, own=frozen({**g._world.treasure.own, Artifact.PORTAL: 1})
         ),
     )
     deltas = g.score_deltas()
@@ -190,7 +190,7 @@ def test_score_deltas_retire_nonzero():
     """Retire at depth 5 with cleared dungeon earns +5."""
     g = Game(random=random.Random(4), player=Default)
     g.descend()
-    g._world = replace(g._world, depth=5, dungeon=struct.Dungeon())
+    g._world = replace(g._world, depth=5, dungeon=make_dungeon())
     deltas = g.score_deltas()
     assert deltas["retire"] == 5
 
@@ -202,9 +202,9 @@ def test_score_deltas_retreat_nonzero():
     g._world = replace(
         g._world,
         depth=5,
-        dungeon=struct.Dungeon(goblin=1),
+        dungeon=make_dungeon(goblin=1),
         treasure=replace(
-            g._world.treasure, own=replace(g._world.treasure.own, portal=1)
+            g._world.treasure, own=frozen({**g._world.treasure.own, Artifact.PORTAL: 1})
         ),
     )
     deltas = g.score_deltas()
@@ -218,11 +218,11 @@ def test_next_delve_returns_stop_after_three():
     # Play through 3 delves by retiring from each
     for _ in range(2):
         g.descend()
-        g._world = replace(g._world, dungeon=struct.Dungeon())
+        g._world = replace(g._world, dungeon=make_dungeon())
         result = g.retire()
         assert result == GameState.PLAY
     # Third delve: retire should trigger STOP
     g.descend()
-    g._world = replace(g._world, dungeon=struct.Dungeon())
+    g._world = replace(g._world, dungeon=make_dungeon())
     result = g.retire()
     assert result == GameState.STOP

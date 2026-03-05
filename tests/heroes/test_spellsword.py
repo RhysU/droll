@@ -8,6 +8,7 @@ import pytest
 from droll import struct
 from droll.ability import battlemage_ability, spellsword_ability
 from droll.heroes.spellsword import Battlemage, Spellsword
+from droll.struct import Action, Dungeon, Party, make_dungeon, make_party
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -17,10 +18,10 @@ def test_spellsword_ability_adds_fighter():
     """Spellsword ability adds a fighter to party."""
     world = struct.World(
         ability=True,
-        party=struct.Party(fighter=1, mage=1),
+        party=make_party(fighter=1, mage=1),
     )
-    result = spellsword_ability(world, _UNUSED, "ability", ("fighter",))
-    assert result.party.fighter == 2
+    result = spellsword_ability(world, _UNUSED, Action.ABILITY, (Party.FIGHTER,))
+    assert result.party[Party.FIGHTER] == 2
     assert not result.ability
 
 
@@ -28,32 +29,32 @@ def test_spellsword_ability_adds_mage():
     """Spellsword ability adds a mage to party."""
     world = struct.World(
         ability=True,
-        party=struct.Party(fighter=1, mage=1),
+        party=make_party(fighter=1, mage=1),
     )
-    result = spellsword_ability(world, _UNUSED, "ability", ("mage",))
-    assert result.party.mage == 2
+    result = spellsword_ability(world, _UNUSED, Action.ABILITY, (Party.MAGE,))
+    assert result.party[Party.MAGE] == 2
 
 
 def test_spellsword_ability_rejects_invalid_target():
     """Spellsword ability rejects invalid targets like cleric."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(),
-        party=struct.Party(fighter=1, mage=1),
+        dungeon=make_dungeon(),
+        party=make_party(fighter=1, mage=1),
     )
     with pytest.raises(struct.DrollError):
-        spellsword_ability(world, _UNUSED, "ability", ("cleric",))
+        spellsword_ability(world, _UNUSED, Action.ABILITY, (Party.CLERIC,))
 
 
 def test_battlemage_ability_clears_dungeon():
     """Battlemage ability clears entire dungeon."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, chest=1, potion=1, dragon=2),
-        party=struct.Party(fighter=1, mage=1),
+        dungeon=make_dungeon(goblin=2, chest=1, potion=1, dragon=2),
+        party=make_party(fighter=1, mage=1),
     )
-    result = battlemage_ability(world, _UNUSED, "ability")
-    assert sum(struct.field_values(result.dungeon)) == 0
+    result = battlemage_ability(world, _UNUSED, Action.ABILITY)
+    assert sum(result.dungeon.values()) == 0
     assert not result.ability
 
 
@@ -61,21 +62,21 @@ def test_spellsword_ability_default_target():
     """Spellsword ability defaults to 'fighter' when no target."""
     world = struct.World(
         ability=True,
-        party=struct.Party(fighter=1, mage=1),
+        party=make_party(fighter=1, mage=1),
     )
-    result = spellsword_ability(world, _UNUSED, "ability")
-    assert result.party.fighter == 2
+    result = spellsword_ability(world, _UNUSED, Action.ABILITY)
+    assert result.party[Party.FIGHTER] == 2
 
 
 def test_battlemage_ability_rejects_target():
     """Battlemage ability rejects any target argument."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=1),
-        party=struct.Party(fighter=1, mage=1),
+        dungeon=make_dungeon(goblin=1),
+        party=make_party(fighter=1, mage=1),
     )
     with pytest.raises(struct.DrollError):
-        battlemage_ability(world, _UNUSED, "ability", ("goblin",))
+        battlemage_ability(world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN,))
 
 
 def test_spellsword_advances_to_battlemage():

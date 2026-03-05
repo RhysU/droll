@@ -7,7 +7,7 @@ from dataclasses import replace
 
 from . import struct
 from .dungeon import blocking_dragon, defeated_dungeon, defeated_monsters
-from .struct import DrollError
+from .struct import Artifact, Dungeon, DrollError, Party, frozen
 from .treasure import replace_treasure
 
 __all__ = (
@@ -24,18 +24,18 @@ def new_world() -> struct.World:
     """Establish a new world independent of a delve/dungeon."""
     return struct.World(
         treasure=struct.Treasure(
-            box=struct.Artifacts(
-                sword=3,
-                talisman=3,
-                sceptre=3,
-                tools=3,
-                scroll=3,
-                elixir=3,
-                bait=4,
-                portal=4,
-                ring=4,
-                scale=6,
-            ),
+            box=frozen({
+                Artifact.SWORD: 3,
+                Artifact.TALISMAN: 3,
+                Artifact.SCEPTRE: 3,
+                Artifact.TOOLS: 3,
+                Artifact.SCROLL: 3,
+                Artifact.ELIXIR: 3,
+                Artifact.BAIT: 4,
+                Artifact.PORTAL: 4,
+                Artifact.RING: 4,
+                Artifact.SCALE: 6,
+            }),
         ),
     )
 
@@ -66,18 +66,12 @@ def delve(
 
 def _regroup(world: struct.World) -> struct.World:
     """The regroup phase occurs when descending, retiring, or retreating."""
-    # Possibly discard dice as dictated by, e.g., Half-Goblin ability
-    # Suppose the player must use, say, 2 fighter dice or lose during regroup
-    # Then, we decrement the fighters in the party by the discard count
-    # where decrementing never takes the allotted result below 0 fighters
     return replace(
         world,
-        party=struct.Party(
-            **{
-                name: max(0, getattr(world.party, name, 0) - count)
-                for name, count in struct.field_items(world.regroup.discard)
-            }
-        ),
+        party=frozen({
+            p: max(0, world.party[p] - world.regroup.discard[p])
+            for p in Party
+        }),
         regroup=struct.Regroup(),
     )
 
@@ -111,13 +105,13 @@ def descend(
     next_depth = world.depth + 1
     if next_depth > _max_depth:
         raise DrollError(f"Maximum depth is {_max_depth}.")
-    prior_dragons = 0 if world.dungeon is None else world.dungeon.dragon
+    prior_dragons = 0 if world.dungeon is None else world.dungeon[Dungeon.DRAGON]
     new_dice = max(1, min(_dungeon_dice - prior_dragons, next_depth))
     rolled = roll_dungeon(new_dice, randrange)
     return replace(
         world,
         depth=next_depth,
-        dungeon=replace(rolled, dragon=rolled.dragon + prior_dragons),
+        dungeon=frozen({**rolled, Dungeon.DRAGON: rolled[Dungeon.DRAGON] + prior_dragons}),
     )
 
 
@@ -180,31 +174,27 @@ def score(world: struct.World) -> int:
     """Compute the present score for the world, including all treasure."""
     return (
         world.experience
-        + sum(
-            struct.field_values(world.treasure.own)
-        )  # Each piece of treasure is +1 point
-        + world.treasure.own.portal  # Portals are +1 extra (2 total each)
-        + 2 * (world.treasure.own.scale // 2)  # Pairs of scales are +2 extra
+        + sum(world.treasure.own.values())
+        + world.treasure.own[Artifact.PORTAL]  # Portals are +1 extra (2 total each)
+        + 2 * (world.treasure.own[Artifact.SCALE] // 2)  # Pairs of scales are +2 extra
     )
 
 
-def _apply_ring(world: struct.World, *, noun: str = "ring") -> struct.World:
+def _apply_ring(world: struct.World) -> struct.World:
     """Attempt to use a ring of invisibility towards sneaking past a dragon."""
     if not blocking_dragon(world.dungeon):
-        raise DrollError(f"A dragon must be present to use a {noun}.")
-    world = replace(world, treasure=replace_treasure(world.treasure, noun))
-    return replace(world, dungeon=replace(world.dungeon, dragon=0))
+        raise DrollError("A dragon must be present to use a ring.")
+    world = replace(world, treasure=replace_treasure(world.treasure, Artifact.RING))
+    return replace(world, dungeon=frozen({**world.dungeon, Dungeon.DRAGON: 0}))
 
 
-def _apply_portal(
-    world: struct.World, *, noun: str = "portal"
-) -> struct.World:
+def _apply_portal(world: struct.World) -> struct.World:
     """Attempt to use a town portal towards retiring to town."""
     # No need to reset monsters/dragon as dungeon will be wholly replaced
     if defeated_dungeon(world.dungeon):
-        raise DrollError(f"No need to apply {noun} when dungeon clear.")
+        raise DrollError("No need to apply portal when dungeon clear.")
     return replace(
         world,
-        treasure=replace_treasure(world.treasure, "portal"),
-        dungeon=struct.Dungeon(),
+        treasure=replace_treasure(world.treasure, Artifact.PORTAL),
+        dungeon=struct.empty_dungeon(),
     )

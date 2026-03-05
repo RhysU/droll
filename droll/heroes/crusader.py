@@ -6,9 +6,10 @@
 from dataclasses import replace
 from functools import partial
 
-from .. import regular, struct
+from .. import regular
 from ..ability import crusader_ability, paladin_ability
 from ..player import Default
+from ..struct import Dungeon, Party, frozen
 
 __all__ = (
     "Crusader",
@@ -20,7 +21,7 @@ _crusader_defeat_dragon = partial(
     regular.defeat_dragon,
     hero_validator=partial(
         regular.defeat_dragon_heroes,
-        interchangeable=frozenset({"fighter", "cleric"}),
+        interchangeable=frozenset({Party.FIGHTER, Party.CLERIC}),
     ),
 )
 
@@ -30,34 +31,34 @@ Paladin = replace(
     name="Paladin",
     ability=paladin_ability,
     advance=(lambda _: Paladin),
-    party=struct.Party(
-        fighter=replace(
-            Default.party.fighter,
-            dragon=_crusader_defeat_dragon,
-            skeleton=Default.party.cleric.skeleton,
-        ),
-        cleric=replace(
-            Default.party.cleric,
-            dragon=_crusader_defeat_dragon,
-            goblin=Default.party.fighter.goblin,
-        ),
-        mage=replace(
-            Default.party.mage,
-            dragon=_crusader_defeat_dragon,
-        ),
-        thief=replace(
-            Default.party.thief,
-            dragon=_crusader_defeat_dragon,
-        ),
-        champion=replace(
-            Default.party.champion,
-            dragon=_crusader_defeat_dragon,
-        ),
-        scroll=replace(
-            Default.party.scroll,
-            dragon=_crusader_defeat_dragon,
-        ),
-    ),
+    party=frozen({
+        Party.FIGHTER: frozen({
+            **Default.party[Party.FIGHTER],
+            Dungeon.DRAGON: _crusader_defeat_dragon,
+            Dungeon.SKELETON: Default.party[Party.CLERIC][Dungeon.SKELETON],
+        }),
+        Party.CLERIC: frozen({
+            **Default.party[Party.CLERIC],
+            Dungeon.DRAGON: _crusader_defeat_dragon,
+            Dungeon.GOBLIN: Default.party[Party.FIGHTER][Dungeon.GOBLIN],
+        }),
+        Party.MAGE: frozen({
+            **Default.party[Party.MAGE],
+            Dungeon.DRAGON: _crusader_defeat_dragon,
+        }),
+        Party.THIEF: frozen({
+            **Default.party[Party.THIEF],
+            Dungeon.DRAGON: _crusader_defeat_dragon,
+        }),
+        Party.CHAMPION: frozen({
+            **Default.party[Party.CHAMPION],
+            Dungeon.DRAGON: _crusader_defeat_dragon,
+        }),
+        Party.SCROLL: frozen({
+            **Default.party[Party.SCROLL],
+            Dungeon.DRAGON: _crusader_defeat_dragon,
+        }),
+    }),
 )
 
 # Defined after Paladin to permit advance(...) closure

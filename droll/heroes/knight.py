@@ -6,9 +6,10 @@
 from dataclasses import replace
 from functools import partial
 
-from .. import dice, regular, struct
+from .. import dice, regular
 from ..ability import dragonslayer_ability, knight_ability
 from ..player import Default
+from ..struct import Dungeon, Party, RandRange, PartyState, Regroup, frozen
 
 __all__ = (
     "DragonSlayer",
@@ -17,12 +18,12 @@ __all__ = (
 
 
 def _knight_roll_party(
-    count: int, randrange: struct.RandRange
-) -> tuple[struct.Party, struct.Regroup]:
+    count: int, randrange: RandRange
+) -> tuple[PartyState, Regroup]:
     """Roll a new Party, changing all Scrolls into Champions."""
     default, regroup = dice.roll_party(dice=count, randrange=randrange)
     return (
-        replace(default, scroll=0, champion=default.champion + default.scroll),
+        frozen({**default, Party.SCROLL: 0, Party.CHAMPION: default[Party.CHAMPION] + default[Party.SCROLL]}),
         regroup,
     )
 
@@ -40,32 +41,32 @@ DragonSlayer = replace(
     ability=dragonslayer_ability,
     advance=(lambda _: DragonSlayer),
     roll=replace(Default.roll, party=_knight_roll_party),
-    party=struct.Party(
-        fighter=replace(
-            Default.party.fighter,
-            dragon=_dragonslayer_defeat_dragon,
-        ),
-        cleric=replace(
-            Default.party.cleric,
-            dragon=_dragonslayer_defeat_dragon,
-        ),
-        mage=replace(
-            Default.party.mage,
-            dragon=_dragonslayer_defeat_dragon,
-        ),
-        thief=replace(
-            Default.party.thief,
-            dragon=_dragonslayer_defeat_dragon,
-        ),
-        champion=replace(
-            Default.party.champion,
-            dragon=_dragonslayer_defeat_dragon,
-        ),
-        scroll=replace(
-            Default.party.scroll,
-            dragon=_dragonslayer_defeat_dragon,
-        ),
-    ),
+    party=frozen({
+        Party.FIGHTER: frozen({
+            **Default.party[Party.FIGHTER],
+            Dungeon.DRAGON: _dragonslayer_defeat_dragon,
+        }),
+        Party.CLERIC: frozen({
+            **Default.party[Party.CLERIC],
+            Dungeon.DRAGON: _dragonslayer_defeat_dragon,
+        }),
+        Party.MAGE: frozen({
+            **Default.party[Party.MAGE],
+            Dungeon.DRAGON: _dragonslayer_defeat_dragon,
+        }),
+        Party.THIEF: frozen({
+            **Default.party[Party.THIEF],
+            Dungeon.DRAGON: _dragonslayer_defeat_dragon,
+        }),
+        Party.CHAMPION: frozen({
+            **Default.party[Party.CHAMPION],
+            Dungeon.DRAGON: _dragonslayer_defeat_dragon,
+        }),
+        Party.SCROLL: frozen({
+            **Default.party[Party.SCROLL],
+            Dungeon.DRAGON: _dragonslayer_defeat_dragon,
+        }),
+    }),
 )
 
 # Defined after DragonSlayer to permit advance(...) closure

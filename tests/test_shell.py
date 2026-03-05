@@ -10,8 +10,8 @@ import pytest
 from dataclasses import replace
 from unittest.mock import patch
 
-from droll import struct
 from droll.display import DisplayMode
+from droll.struct import Dungeon, Party, make_dungeon, make_party
 from droll.struct import DrollError
 from droll.game import Game
 from droll.player import Default
@@ -78,7 +78,7 @@ def test_shell_retreat():
     s.preloop()
     s.onecmd("descend")
     # Need a monster present so retreat is valid
-    s._game._world = replace(s._game._world, dungeon=struct.Dungeon(goblin=1))
+    s._game._world = replace(s._game._world, dungeon=make_dungeon(goblin=1))
     s.onecmd("retreat")
 
 
@@ -157,7 +157,7 @@ def test_undo():
     onecmd("descend")
 
     # (delve=1, depth=2, dungeon=(goblin=2), ...)
-    assert s._game._world.dungeon.goblin == 2
+    assert s._game._world.dungeon[Dungeon.GOBLIN] == 2
     with pytest.raises(DrollError):
         onecmd("undo")
     onecmd("thief goblin")
@@ -168,9 +168,9 @@ def test_undo():
     onecmd("descend")
 
     # (delve=1, depth=3, dungeon=(ooze=1, chest=1, potion=1), ...)
-    assert s._game._world.dungeon.ooze == 1
-    assert s._game._world.dungeon.chest == 1
-    assert s._game._world.dungeon.potion == 1
+    assert s._game._world.dungeon[Dungeon.OOZE] == 1
+    assert s._game._world.dungeon[Dungeon.CHEST] == 1
+    assert s._game._world.dungeon[Dungeon.POTION] == 1
     with pytest.raises(DrollError):
         onecmd("undo")
     onecmd("cleric ooze")
@@ -228,7 +228,7 @@ def test_quaff_wrong_revive_count_prints_error():
     # Replace dungeon with a single potion and no monsters
     s._game._world = replace(
         s._game._world,
-        dungeon=struct.Dungeon(potion=1),
+        dungeon=make_dungeon(potion=1),
     )
     # Quaff 1 potion providing 0 revive targets:
     # - regular.py quaff raises "Specify exactly 1 to revive after 'potion'."
@@ -263,7 +263,7 @@ def test_command_counter_increments_on_mutation():
 
     # Two successful undos in a row each decrement
     s._game._world = replace(
-        s._game._world, dungeon=struct.Dungeon(goblin=1, ooze=1)
+        s._game._world, dungeon=make_dungeon(goblin=1, ooze=1)
     )
     s.onecmd("fighter goblin")  # count -> 2; undo stack: [before_1st]
     assert s._command_count == 2

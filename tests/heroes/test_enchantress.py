@@ -8,6 +8,7 @@ import pytest
 from droll import struct
 from droll.ability import beguiler_ability, enchantress_ability
 from droll.heroes.enchantress import Beguiler, Enchantress
+from droll.struct import Action, Dungeon, Party, make_dungeon, make_party
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -17,12 +18,12 @@ def test_enchantress_transforms_monster_to_potion():
     """Enchantress transforms 1 monster into 1 potion."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
-    result = enchantress_ability(world, _UNUSED, "ability", ("goblin",))
-    assert result.dungeon.goblin == 1
-    assert result.dungeon.potion == 1
+    result = enchantress_ability(world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN,))
+    assert result.dungeon[Dungeon.GOBLIN] == 1
+    assert result.dungeon[Dungeon.POTION] == 1
     assert not result.ability
 
 
@@ -30,36 +31,36 @@ def test_beguiler_transforms_two_monsters():
     """Beguiler transforms 2 monsters into 1 potion when available."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
-    result = beguiler_ability(world, _UNUSED, "ability", ("goblin", "skeleton"))
-    assert result.dungeon.goblin == 1
-    assert result.dungeon.skeleton == 0
-    assert result.dungeon.potion == 1
+    result = beguiler_ability(world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN, Dungeon.SKELETON))
+    assert result.dungeon[Dungeon.GOBLIN] == 1
+    assert result.dungeon[Dungeon.SKELETON] == 0
+    assert result.dungeon[Dungeon.POTION] == 1
 
 
 def test_beguiler_requires_two_when_available():
     """Beguiler must transform 2 monsters when 2+ available."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        beguiler_ability(world, _UNUSED, "ability", ("goblin",))
+        beguiler_ability(world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN,))
 
 
 def test_beguiler_rejects_too_many_targets():
     """Beguiler rejects more than 2 targets."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
         beguiler_ability(
-            world, _UNUSED, "ability", ("goblin", "skeleton", "goblin")
+            world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN, Dungeon.SKELETON, Dungeon.GOBLIN)
         )
 
 
@@ -67,22 +68,22 @@ def test_enchantress_message_without_target():
     """Enchantress fails gracefully when no targets supplied."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        result = enchantress_ability(world, _UNUSED, "ability")
+        result = enchantress_ability(world, _UNUSED, Action.ABILITY)
 
 
 def test_beguiler_message_without_target():
     """Beguiler fails gracefully when no targets supplied."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        result = beguiler_ability(world, _UNUSED, "ability")
+        result = beguiler_ability(world, _UNUSED, Action.ABILITY)
 
 
 def test_enchantress_advances_to_beguiler():

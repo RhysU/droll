@@ -9,6 +9,7 @@ import pytest
 from droll import struct
 from droll.ability import chieftain_ability, halfgoblin_ability
 from droll.heroes.halfgoblin import Chieftain, HalfGoblin
+from droll.struct import Action, Artifact, Dungeon, Party, make_dungeon, make_party, make_artifacts
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -18,13 +19,13 @@ def test_halfgoblin_transforms_goblin_to_thief():
     """HalfGoblin transforms 1 goblin into 1 thief."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
-    result = halfgoblin_ability(world, _UNUSED, "ability", ("goblin",))
+    result = halfgoblin_ability(world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN,))
     # Discard during subsequent regroup phase tested elsewhere
-    assert result.dungeon.goblin == 1
-    assert result.party.thief == 1
+    assert result.dungeon[Dungeon.GOBLIN] == 1
+    assert result.party[Party.THIEF] == 1
     assert not result.ability
 
 
@@ -32,60 +33,60 @@ def test_chieftain_transforms_two_monsters():
     """Chieftain transforms 2 goblins into 2 thieves when available."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
-    result = chieftain_ability(world, _UNUSED, "ability", ("goblin", "goblin"))
+    result = chieftain_ability(world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN, Dungeon.GOBLIN))
     # Discard during subsequent regroup phase tested elsewhere
-    assert result.dungeon.goblin == 0
-    assert result.dungeon.skeleton == 1
-    assert result.party.thief == 2
+    assert result.dungeon[Dungeon.GOBLIN] == 0
+    assert result.dungeon[Dungeon.SKELETON] == 1
+    assert result.party[Party.THIEF] == 2
 
 
 def test_chieftain_transforms_one_monster():
     """Chieftain transforms 1 goblin into 1 thief when 1 available."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=1, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=1, skeleton=1),
+        party=make_party(fighter=1),
     )
     result = chieftain_ability(
         world,
         _UNUSED,
-        "ability",
-        ("goblin",),
+        Action.ABILITY,
+        (Dungeon.GOBLIN,),
     )
     # Discard during subsequent regroup phase tested elsewhere
-    assert result.dungeon.goblin == 0
-    assert result.dungeon.skeleton == 1
-    assert result.party.thief == 1
+    assert result.dungeon[Dungeon.GOBLIN] == 0
+    assert result.dungeon[Dungeon.SKELETON] == 1
+    assert result.party[Party.THIEF] == 1
 
 
 def test_halfgoblin_rejects_non_goblin():
     """HalfGoblin ability rejects non-goblin targets."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=1, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=1, skeleton=1),
+        party=make_party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        halfgoblin_ability(world, _UNUSED, "ability", ("skeleton",))
+        halfgoblin_ability(world, _UNUSED, Action.ABILITY, (Dungeon.SKELETON,))
 
 
 def test_chieftain_rejects_non_goblin_targets():
     """Chieftain rejects non-goblin, extra, and excess targets."""
     world = struct.World(
         ability=True,
-        dungeon=struct.Dungeon(goblin=2, skeleton=1),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(goblin=2, skeleton=1),
+        party=make_party(fighter=1),
     )
     with pytest.raises(struct.DrollError):
-        chieftain_ability(world, _UNUSED, "ability", ("skeleton",))
+        chieftain_ability(world, _UNUSED, Action.ABILITY, (Dungeon.SKELETON,))
     with pytest.raises(struct.DrollError):
-        chieftain_ability(world, _UNUSED, "ability", ("goblin", "skeleton"))
+        chieftain_ability(world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN, Dungeon.SKELETON))
     with pytest.raises(struct.DrollError):
         chieftain_ability(
-            world, _UNUSED, "ability", ("goblin", "goblin", "goblin")
+            world, _UNUSED, Action.ABILITY, (Dungeon.GOBLIN, Dungeon.GOBLIN, Dungeon.GOBLIN)
         )
 
 
@@ -104,26 +105,26 @@ def test_halfgoblin_fighter_chests_potions():
         delve=1,
         depth=1,
         ability=True,
-        dungeon=struct.Dungeon(goblin=1, chest=1, potion=1),
-        party=struct.Party(fighter=5),
+        dungeon=make_dungeon(goblin=1, chest=1, potion=1),
+        party=make_party(fighter=5),
         treasure=struct.Treasure(
-            own=struct.Artifacts(),
-            box=struct.Artifacts(scale=1),
+            own=make_artifacts(),
+            box=make_artifacts(scale=1),
         ),
     )
 
-    result1 = HalfGoblin.party.fighter.chest(
-        world, randrange, "fighter", ("chest",)
+    result1 = HalfGoblin.party[Party.FIGHTER][Dungeon.CHEST](
+        world, randrange, Party.FIGHTER, (Dungeon.CHEST,)
     )
-    assert result1.dungeon.chest == 0
-    assert result1.dungeon.goblin == 1
-    assert result1.party.fighter == 4
-    assert result1.treasure.own.scale == 1
+    assert result1.dungeon[Dungeon.CHEST] == 0
+    assert result1.dungeon[Dungeon.GOBLIN] == 1
+    assert result1.party[Party.FIGHTER] == 4
+    assert result1.treasure.own[Artifact.SCALE] == 1
 
-    result2 = HalfGoblin.party.fighter.potion(
-        world, randrange, "fighter", ("potion", "mage")
+    result2 = HalfGoblin.party[Party.FIGHTER][Dungeon.POTION](
+        world, randrange, Party.FIGHTER, (Dungeon.POTION, Party.MAGE)
     )
-    assert result2.dungeon.goblin == 1
-    assert result2.dungeon.potion == 0
-    assert result2.party.fighter == 4
-    assert result2.party.mage == 1
+    assert result2.dungeon[Dungeon.GOBLIN] == 1
+    assert result2.dungeon[Dungeon.POTION] == 0
+    assert result2.party[Party.FIGHTER] == 4
+    assert result2.party[Party.MAGE] == 1

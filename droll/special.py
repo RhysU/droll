@@ -3,12 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Functionality for hero-specific special actions."""
 
-from dataclasses import replace
-
 from .dungeon import defeated_monsters
 from .party import increment_party
 from .regular import defeat_all, defeat_one
-from .struct import DrollError, RandRange, World
+from .struct import Dungeon, DrollError, Party, RandRange, World, frozen
 
 __all__ = (
     "convert_dungeon_to_party",
@@ -20,14 +18,15 @@ __all__ = (
 def _defeat_plus_additional(
     world: World,
     randrange: RandRange,
-    hero: str,
+    hero: Party,
     additional: tuple,
 ) -> World:
     """After the initial defeat, optionally defeat one additional monster."""
+    from dataclasses import replace as dc_replace
     if defeated_monsters(world.dungeon):
         if additional:
             raise DrollError(
-                f"Additional target '{additional[0]}' given but no monsters left."
+                f"Additional target '{additional[0].value}' given but no monsters left."
             )
         return world
 
@@ -40,7 +39,7 @@ def _defeat_plus_additional(
         )
 
     return defeat_one(
-        world=replace(world, party=increment_party(world.party, hero)),
+        world=dc_replace(world, party=increment_party(world.party, hero)),
         randrange=randrange,
         hero=hero,
         targets=additional,
@@ -50,8 +49,8 @@ def _defeat_plus_additional(
 def defeat_all_plus_additional(
     world: World,
     randrange: RandRange,
-    hero: str,
-    targets: tuple[str, ...],
+    hero: Party,
+    targets: tuple[Dungeon, ...],
 ) -> World:
     """Update world after hero handles all of one target type plus one more."""
     if not targets:
@@ -65,8 +64,8 @@ def defeat_all_plus_additional(
 def defeat_one_plus_additional(
     world: World,
     randrange: RandRange,
-    hero: str,
-    targets: tuple[str, ...],
+    hero: Party,
+    targets: tuple[Dungeon, ...],
 ) -> World:
     """Update world after hero handles one target plus one more."""
     if not targets:
@@ -79,34 +78,26 @@ def defeat_one_plus_additional(
 
 def convert_dungeon_to_party(
     world: World,
-    source: str,
-    destination: str,
+    source: Dungeon,
+    destination: Party,
     max_count: int,
 ) -> World:
     """Convert dungeon dice into party dice with regroup discard.
 
     Converts min(available, max_count) of source into destination."""
-    count = min(getattr(world.dungeon, source), max_count)
+    from dataclasses import replace
+    count = min(world.dungeon[source], max_count)
     if count < 1:
-        raise DrollError(f"No {source} in dungeon to convert.")
+        raise DrollError(f"No {source.value} in dungeon to convert.")
     return replace(
         world,
-        dungeon=replace(
-            world.dungeon,
-            **{source: getattr(world.dungeon, source) - count},
-        ),
-        party=replace(
-            world.party,
-            **{destination: getattr(world.party, destination) + count},
-        ),
+        dungeon=frozen({**world.dungeon, source: world.dungeon[source] - count}),
+        party=frozen({**world.party, destination: world.party[destination] + count}),
         regroup=replace(
             world.regroup,
-            discard=replace(
-                world.regroup.discard,
-                **{
-                    destination: getattr(world.regroup.discard, destination)
-                    + count
-                },
-            ),
+            discard=frozen({
+                **world.regroup.discard,
+                destination: world.regroup.discard[destination] + count,
+            }),
         ),
     )

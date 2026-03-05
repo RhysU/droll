@@ -5,23 +5,24 @@
 
 from droll import display
 from droll import struct
+from droll.struct import Dungeon, Party, Artifact, make_dungeon, make_party, make_artifacts
 
 
 def test_format_items_multiple_items():
     """Test formatting party with multiple quantities uses × notation."""
-    party = struct.Party(fighter=2, cleric=1, mage=3)
+    party = make_party(fighter=2, cleric=1, mage=3)
     assert display._format_items(party) == "fighter×2 cleric mage×3"
 
 
 def test_format_items_dragon_always_shows_count():
     """Test that dragons always display with count, even when singular."""
-    dungeon = struct.Dungeon(dragon=1)
+    dungeon = make_dungeon(dragon=1)
     assert display._format_items(dungeon) == "dragon×1"
 
 
 def test_format_treasure_multiple_items_alphabetized():
     """Test multiple treasure items are alphabetized and use × notation."""
-    artifacts = struct.Artifacts(scale=4, sceptre=1, talisman=1, tools=1)
+    artifacts = make_artifacts(scale=4, sceptre=1, talisman=1, tools=1)
     assert (
         display._format_treasure(artifacts) == "scale×4 sceptre talisman tools"
     )
@@ -52,13 +53,13 @@ def test_format_available_negative_delta():
 
 def test_format_dungeon_empty():
     """Test formatting empty dungeon returns '(empty)'."""
-    dungeon = struct.Dungeon()
+    dungeon = make_dungeon()
     assert display._format_dungeon(dungeon) == "(empty)"
 
 
 def test_format_dungeon_with_monsters():
     """Test formatting dungeon with monsters."""
-    dungeon = struct.Dungeon(goblin=1, skeleton=2)
+    dungeon = make_dungeon(goblin=1, skeleton=2)
     assert display._format_dungeon(dungeon) == "goblin skeleton×2"
 
 
@@ -68,10 +69,10 @@ def test_compact_summary_in_dungeon():
         delve=1,
         depth=3,
         experience=0,
-        dungeon=struct.Dungeon(goblin=1, skeleton=2, ooze=2),
-        party=struct.Party(fighter=1, champion=1),
+        dungeon=make_dungeon(goblin=1, skeleton=2, ooze=2),
+        party=make_party(fighter=1, champion=1),
         ability=True,
-        treasure=struct.Treasure(own=struct.Artifacts(talisman=1)),
+        treasure=struct.Treasure(own=make_artifacts(talisman=1)),
     )
     result = display.compact_summary(
         world, "Default", 1, ["ability", "retreat"]
@@ -92,9 +93,9 @@ def test_compact_summary_fixed_alignment():
         depth=0,
         experience=5,
         dungeon=None,
-        party=struct.Party(fighter=1, cleric=2, mage=3, champion=1),
+        party=make_party(fighter=1, cleric=2, mage=3, champion=1),
         ability=True,
-        treasure=struct.Treasure(own=struct.Artifacts(talisman=1)),
+        treasure=struct.Treasure(own=make_artifacts(talisman=1)),
     )
     # Both short and long hero names should have the same alignment
     for name in ("Knight", "DragonSlayer"):
@@ -120,10 +121,10 @@ def test_compact_summary_dungeon_shown_when_empty():
         delve=1,
         depth=1,
         experience=0,
-        dungeon=struct.Dungeon(),
-        party=struct.Party(fighter=1, cleric=1),
+        dungeon=make_dungeon(),
+        party=make_party(fighter=1, cleric=1),
         ability=True,
-        treasure=struct.Treasure(own=struct.Artifacts()),
+        treasure=struct.Treasure(own=make_artifacts()),
     )
     result = display.compact_summary(
         world, "Knight", 0, ["ability", "descend", "retire"]
@@ -140,11 +141,11 @@ def test_compact_summary_cleared_level_10():
         delve=3,
         depth=10,
         experience=16,
-        dungeon=struct.Dungeon(),
-        party=struct.Party(champion=1, scroll=2),
+        dungeon=make_dungeon(),
+        party=make_party(champion=1, scroll=2),
         ability=False,
         treasure=struct.Treasure(
-            own=struct.Artifacts(scale=4, sceptre=1, talisman=1, tools=1)
+            own=make_artifacts(scale=4, sceptre=1, talisman=1, tools=1)
         ),
     )
     result = display.compact_summary(world, "Beguiler", 24, ["retire"])
@@ -164,10 +165,10 @@ def test_compact_summary_ending_state():
         delve=3,
         experience=16,
         dungeon=None,
-        party=struct.Party(champion=1),
+        party=make_party(champion=1),
         ability=False,
         treasure=struct.Treasure(
-            own=struct.Artifacts(scroll=1, elixir=1, bait=2, portal=1, scale=1)
+            own=make_artifacts(scroll=1, elixir=1, bait=2, portal=1, scale=1)
         ),
     )
     result = display.compact_summary(world, "DragonSlayer", 23, [])

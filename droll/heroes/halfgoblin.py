@@ -9,6 +9,7 @@ from functools import partial
 from .. import regular
 from ..ability import chieftain_ability, halfgoblin_ability
 from ..player import Default
+from ..struct import Dungeon, Party, frozen
 
 __all__ = (
     "Chieftain",
@@ -35,38 +36,37 @@ Chieftain = replace(
     name="Chieftain",
     ability=chieftain_ability,
     advance=(lambda _: Chieftain),
-    party=replace(
-        Default.party,
-        fighter=replace(
-            Default.party.fighter,
-            chest=_halfgoblin_open_one,
-            potion=_halfgoblin_quaff,
-        ),
-        cleric=replace(
-            Default.party.cleric,
-            chest=_halfgoblin_open_one,
-            potion=_halfgoblin_quaff,
-        ),
-        mage=replace(
-            Default.party.mage,
-            chest=_halfgoblin_open_one,
-            potion=_halfgoblin_quaff,
-        ),
-        thief=replace(
-            Default.party.thief,
-            chest=_halfgoblin_open_all,
-            potion=_halfgoblin_quaff,
-        ),
-        champion=replace(
-            Default.party.champion,
-            chest=_halfgoblin_open_all,
-            potion=_halfgoblin_quaff,
-        ),
-        scroll=replace(
-            Default.party.scroll,
-            potion=_halfgoblin_quaff,
-        ),
-    ),
+    party=frozen({
+        Party.FIGHTER: frozen({
+            **Default.party[Party.FIGHTER],
+            Dungeon.CHEST: _halfgoblin_open_one,
+            Dungeon.POTION: _halfgoblin_quaff,
+        }),
+        Party.CLERIC: frozen({
+            **Default.party[Party.CLERIC],
+            Dungeon.CHEST: _halfgoblin_open_one,
+            Dungeon.POTION: _halfgoblin_quaff,
+        }),
+        Party.MAGE: frozen({
+            **Default.party[Party.MAGE],
+            Dungeon.CHEST: _halfgoblin_open_one,
+            Dungeon.POTION: _halfgoblin_quaff,
+        }),
+        Party.THIEF: frozen({
+            **Default.party[Party.THIEF],
+            Dungeon.CHEST: _halfgoblin_open_all,
+            Dungeon.POTION: _halfgoblin_quaff,
+        }),
+        Party.CHAMPION: frozen({
+            **Default.party[Party.CHAMPION],
+            Dungeon.CHEST: _halfgoblin_open_all,
+            Dungeon.POTION: _halfgoblin_quaff,
+        }),
+        Party.SCROLL: frozen({
+            **Default.party[Party.SCROLL],
+            Dungeon.POTION: _halfgoblin_quaff,
+        }),
+    }),
 )
 
 # Defined after Chieftain to permit advance(...) closure

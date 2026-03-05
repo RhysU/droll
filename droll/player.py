@@ -7,7 +7,14 @@ from collections.abc import Sequence
 from dataclasses import replace
 
 from . import ability, dice, regular, struct
-from .struct import DrollError
+from .struct import (
+    Action,
+    Artifact,
+    Dungeon,
+    DrollError,
+    Party,
+    frozen,
+)
 from .treasure import replace_treasure
 
 __all__ = (
@@ -31,67 +38,67 @@ Default = struct.Player(
     # Behavior at specific lifecycle events?
     roll=struct.Roll(dungeon=dice.roll_dungeon, party=dice.roll_party),
     # How do artifacts map to heroes?
-    artifacts=struct.Party(
-        fighter="sword",
-        cleric="talisman",
-        mage="sceptre",
-        thief="tools",
-        champion=None,
-        scroll="scroll",
-    ),
+    artifacts=frozen({
+        Party.FIGHTER: Artifact.SWORD,
+        Party.CLERIC: Artifact.TALISMAN,
+        Party.MAGE: Artifact.SCEPTRE,
+        Party.THIEF: Artifact.TOOLS,
+        Party.CHAMPION: None,
+        Party.SCROLL: Artifact.SCROLL,
+    }),
     # What effect does each hero have on each enemy?
-    party=struct.Party(
-        fighter=struct.Dungeon(
-            goblin=regular.defeat_all,
-            skeleton=regular.defeat_one,
-            ooze=regular.defeat_one,
-            chest=regular.open_one,
-            potion=regular.quaff,
-            dragon=regular.defeat_dragon,
-        ),
-        cleric=struct.Dungeon(
-            goblin=regular.defeat_one,
-            skeleton=regular.defeat_all,
-            ooze=regular.defeat_one,
-            chest=regular.open_one,
-            potion=regular.quaff,
-            dragon=regular.defeat_dragon,
-        ),
-        mage=struct.Dungeon(
-            goblin=regular.defeat_one,
-            skeleton=regular.defeat_one,
-            ooze=regular.defeat_all,
-            chest=regular.open_one,
-            potion=regular.quaff,
-            dragon=regular.defeat_dragon,
-        ),
-        thief=struct.Dungeon(
-            goblin=regular.defeat_one,
-            skeleton=regular.defeat_one,
-            ooze=regular.defeat_one,
-            chest=regular.open_all,
-            potion=regular.quaff,
-            dragon=regular.defeat_dragon,
-        ),
-        champion=struct.Dungeon(
-            goblin=regular.defeat_all,
-            skeleton=regular.defeat_all,
-            ooze=regular.defeat_all,
-            chest=regular.open_all,
-            potion=regular.quaff,
-            dragon=regular.defeat_dragon,
-        ),
+    party=frozen({
+        Party.FIGHTER: frozen({
+            Dungeon.GOBLIN: regular.defeat_all,
+            Dungeon.SKELETON: regular.defeat_one,
+            Dungeon.OOZE: regular.defeat_one,
+            Dungeon.CHEST: regular.open_one,
+            Dungeon.POTION: regular.quaff,
+            Dungeon.DRAGON: regular.defeat_dragon,
+        }),
+        Party.CLERIC: frozen({
+            Dungeon.GOBLIN: regular.defeat_one,
+            Dungeon.SKELETON: regular.defeat_all,
+            Dungeon.OOZE: regular.defeat_one,
+            Dungeon.CHEST: regular.open_one,
+            Dungeon.POTION: regular.quaff,
+            Dungeon.DRAGON: regular.defeat_dragon,
+        }),
+        Party.MAGE: frozen({
+            Dungeon.GOBLIN: regular.defeat_one,
+            Dungeon.SKELETON: regular.defeat_one,
+            Dungeon.OOZE: regular.defeat_all,
+            Dungeon.CHEST: regular.open_one,
+            Dungeon.POTION: regular.quaff,
+            Dungeon.DRAGON: regular.defeat_dragon,
+        }),
+        Party.THIEF: frozen({
+            Dungeon.GOBLIN: regular.defeat_one,
+            Dungeon.SKELETON: regular.defeat_one,
+            Dungeon.OOZE: regular.defeat_one,
+            Dungeon.CHEST: regular.open_all,
+            Dungeon.POTION: regular.quaff,
+            Dungeon.DRAGON: regular.defeat_dragon,
+        }),
+        Party.CHAMPION: frozen({
+            Dungeon.GOBLIN: regular.defeat_all,
+            Dungeon.SKELETON: regular.defeat_all,
+            Dungeon.OOZE: regular.defeat_all,
+            Dungeon.CHEST: regular.open_all,
+            Dungeon.POTION: regular.quaff,
+            Dungeon.DRAGON: regular.defeat_dragon,
+        }),
         # Scrolls re-roll via the 'reroll' command (see issue #133).
         # Using 'scroll' as a noun targets only quaff and dragon.
-        scroll=struct.Dungeon(
-            goblin=regular.not_reroll,
-            skeleton=regular.not_reroll,
-            ooze=regular.not_reroll,
-            chest=regular.not_reroll,
-            potion=regular.quaff,
-            dragon=regular.defeat_dragon,
-        ),
-    ),
+        Party.SCROLL: frozen({
+            Dungeon.GOBLIN: regular.not_reroll,
+            Dungeon.SKELETON: regular.not_reroll,
+            Dungeon.OOZE: regular.not_reroll,
+            Dungeon.CHEST: regular.not_reroll,
+            Dungeon.POTION: regular.quaff,
+            Dungeon.DRAGON: regular.defeat_dragon,
+        }),
+    }),
 )
 
 
@@ -99,16 +106,38 @@ def _adjust_phantom_treasures(world, artifacts, treasure, sign):
     """Add (+1) or remove (-1) treasure counts as phantom party members."""
     return replace(
         world,
-        party=replace(
-            world.party,
-            **{
-                hero: getattr(world.party, hero)
-                + sign * getattr(treasure, artifact)
-                for hero, artifact in struct.field_items(artifacts)
-                if artifact is not None
-            },
-        ),
+        party=frozen({
+            hero: world.party[hero] + (
+                sign * treasure[artifact] if artifact is not None else 0
+            )
+            for hero, artifact in artifacts.items()
+        }),
     )
+
+
+def _parse_token(token: str) -> Dungeon | Party | Artifact | Action:
+    """Convert a string token to the appropriate enum."""
+    # Try Action first (ability, bait, elixir, reroll)
+    try:
+        return Action(token)
+    except ValueError:
+        pass
+    # Try Party
+    try:
+        return Party(token)
+    except ValueError:
+        pass
+    # Try Dungeon
+    try:
+        return Dungeon(token)
+    except ValueError:
+        pass
+    # Try Artifact
+    try:
+        return Artifact(token)
+    except ValueError:
+        pass
+    raise DrollError(f'Unknown token "{token}".')
 
 
 def apply(
@@ -131,24 +160,38 @@ def apply(
             ' Just "descend" or "retire".'
         )
 
+    # Parse command token
+    cmd_enum = _parse_token(command)
+
     # Dispatch ability/bait/elixir before artifact-to-hero translation (#181).
     # These commands define their own target semantics (e.g. paladin_ability
     # expects a treasure name, not a hero name) so _partify_all is wrong here.
-    if command in {"ability", "bait", "elixir"}:
+    if isinstance(cmd_enum, Action) and cmd_enum in {Action.ABILITY, Action.BAIT, Action.ELIXIR}:
         try:
-            action_ = getattr(player, command)
-            return action_(world, randrange, command, targets)
-        except AttributeError as cause:
+            if cmd_enum is Action.ABILITY:
+                action_ = player.ability
+            elif cmd_enum is Action.BAIT:
+                action_ = player.bait
+            else:
+                action_ = player.elixir
+            # Parse targets: for ability, paladin expects Artifact targets
+            parsed_targets = tuple(_parse_token(t) for t in targets)
+            return action_(world, randrange, cmd_enum, parsed_targets)
+        except (AttributeError, TypeError, KeyError) as cause:
             if world.dungeon is None:
                 raise DrollError("You must descend first.") from cause
             raise DrollError(str(cause)) from cause
 
     # Reject artifact commands when the player doesn't own the treasure
-    if command in _ARTIFACT_COMMANDS and not getattr(world.treasure.own, command, 0):
-        raise DrollError(f"'{command}' not in player's treasure.")
+    if isinstance(cmd_enum, Artifact) and cmd_enum not in {Artifact.SCROLL}:
+        if not world.treasure.own.get(cmd_enum, 0):
+            raise DrollError(f"'{cmd_enum.value}' not in player's treasure.")
 
     # Convert artifact command name into corresponding hero type
-    command = _partify_command(player.artifacts, command)
+    hero = _partify_command(player.artifacts, cmd_enum)
+
+    # Parse targets
+    parsed_targets = tuple(_parse_token(t) for t in targets)
 
     # Temporarily inflate party with treasure-as-hero counts
     prior_own = world.treasure.own
@@ -156,111 +199,110 @@ def apply(
 
     # Dispatch: reroll always uses scroll mechanics;
     # everything else is hero-target
-    if command == "reroll":
-        world = regular.reroll(world, randrange, "scroll", targets)
+    if isinstance(cmd_enum, Action) and cmd_enum is Action.REROLL:
+        world = regular.reroll(world, randrange, Party.SCROLL, parsed_targets)
     else:
-        if command not in struct.field_names(player.party):
+        if hero not in player.party:
             raise DrollError(f'Unknown command "{command}".')
-        action_ = getattr(player.party, command)
-        if not targets:
+        hero_actions = player.party[hero]
+        if not parsed_targets:
             valid = [
-                name for name, _ in struct.field_items(action_)
-                if world.dungeon is not None and getattr(world.dungeon, name, 0)
+                d.value for d in Dungeon
+                if world.dungeon is not None and world.dungeon.get(d, 0)
             ]
             hint = f" Available: {', '.join(valid)}." if valid else ""
             raise DrollError(f'"{command}" requires a target.{hint}')
-        if targets[0] not in struct.field_names(action_):
+        target0 = parsed_targets[0]
+        if target0 not in hero_actions:
             raise DrollError(f'Unknown target "{targets[0]}".')
         if world.dungeon is None:
             raise DrollError("You must descend first.")
         try:
-            action_ = getattr(action_, targets[0])
-            world = action_(world, randrange, command, targets)
-        except (AttributeError, TypeError) as cause:
+            action_ = hero_actions[target0]
+            world = action_(world, randrange, hero, parsed_targets)
+        except (AttributeError, TypeError, KeyError) as cause:
             raise DrollError(str(cause)) from cause
 
     # Undo phantom inflation, then consume treasure for any artifacts spent
     world = _adjust_phantom_treasures(world, player.artifacts, prior_own, -1)
     treasure = world.treasure
     party_updates = {}
-    for hero, quantity in struct.field_items(world.party):
+    for hero_member, quantity in world.party.items():
         if quantity >= 0:
             continue
-        artifact = getattr(player.artifacts, hero)
+        artifact = player.artifacts[hero_member]
         for _ in range(-quantity):
             treasure = replace_treasure(treasure, artifact)
-        party_updates[hero] = 0
+        party_updates[hero_member] = 0
     if party_updates:
         world = replace(
             world,
-            party=replace(world.party, **party_updates),
+            party=frozen({**world.party, **party_updates}),
             treasure=treasure,
         )
 
     return world
 
 
-def _partify_command(artifacts: struct.Party, command: str) -> str:
-    """Convert an artifact name in the command to its hero name."""
-    reverse = {
-        artifact: hero
-        for hero, artifact in struct.field_items(artifacts)
-        if artifact is not None
-    }
-    return reverse.get(command, command)
+def _partify_command(artifacts: struct.ArtifactMapping, command) -> Party:
+    """Convert an artifact enum to its hero (Party) enum, or pass through."""
+    if isinstance(command, Party):
+        return command
+    if isinstance(command, Artifact):
+        # Reverse lookup: artifact -> hero
+        for hero, artifact in artifacts.items():
+            if artifact is command:
+                return hero
+    if isinstance(command, Action) and command is Action.REROLL:
+        return Party.SCROLL
+    # If it's already a Party enum, return it
+    raise DrollError(f'Unknown command "{command.value if hasattr(command, "value") else command}".')
 
-
-# Early tokens dominated by items/dice that can be applied/attacked.
-# Later tokens contain mixtures of present and requested items.
-# Attempts to specialize much beyond this seem to quickly go awry.
-# One notable special case is 'elixir' as any party die follows.
 
 # Artifact names that can be used as commands (sword, talisman, etc.).
 # Excludes artifacts whose name matches their hero (e.g. scroll -> scroll),
 # since those are already valid party die commands.
 _ARTIFACT_COMMANDS = frozenset(
     artifact
-    for hero, artifact in struct.field_items(Default.artifacts)
-    if artifact is not None and artifact != hero
+    for hero, artifact in Default.artifacts.items()
+    if artifact is not None and artifact.value != hero.value
 )
 
 # Treasures excluded from completion because they lack associated commands.
 # Portal and ring are auto-used; scale is for scoring only.
-_TREASURE_NO_COMMAND = frozenset({"portal", "ring", "scale"})
+_TREASURE_NO_COMMAND = frozenset({Artifact.PORTAL, Artifact.RING, Artifact.SCALE})
 
 
 def _available_nouns(world: struct.World) -> set[str]:
     """Candidate nouns (position 0): available party members and treasures."""
-    candidates = {
-        key
-        for source in (world.party, world.treasure.own)
-        if source is not None
-        for key, value in struct.field_items(source)
-        if value and key not in _TREASURE_NO_COMMAND
-    }
-    if "scroll" in candidates:
+    candidates = set()
+    for hero, count in world.party.items():
+        if count:
+            candidates.add(hero.value)
+    for artifact, count in world.treasure.own.items():
+        if count and artifact not in _TREASURE_NO_COMMAND:
+            candidates.add(artifact.value)
+    if Party.SCROLL.value in candidates:
         candidates.add("reroll")
     return candidates
 
 
 def _available_targets(world: struct.World) -> set[str]:
     """Candidate targets (position 1): available party and dungeon dice."""
-    return {
-        key
-        for source in (world.party, world.dungeon)
-        if source is not None
-        for key, value in struct.field_items(source)
-        if value
-    }
+    candidates = set()
+    for p, count in world.party.items():
+        if count:
+            candidates.add(p.value)
+    if world.dungeon is not None:
+        for d, count in world.dungeon.items():
+            if count:
+                candidates.add(d.value)
+    return candidates
 
 
 def _all_dice_names() -> set[str]:
     """All possible party and dungeon field names (position 2+)."""
-    return {
-        key
-        for source in (struct.Party, struct.Dungeon)
-        for key in struct.field_names(source)
-    }
+    return {p.value for p in Party} | {d.value for d in Dungeon}
 
 
 def complete(
@@ -273,7 +315,7 @@ def complete(
     if position == 0:
         candidates = _available_nouns(world)
     elif position == 1 and tokens[0] == "elixir":
-        candidates = set(struct.field_names(struct.Party))
+        candidates = {p.value for p in Party}
     elif position == 1:
         candidates = _available_targets(world)
     else:

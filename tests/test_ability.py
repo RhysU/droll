@@ -7,6 +7,7 @@ import pytest
 
 from droll import struct
 from droll.ability import default_ability
+from droll.struct import Action
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -16,11 +17,11 @@ def test_consume_ability_when_unavailable():
     """Cannot consume ability that is already used."""
     w = struct.World(ability=False)
     with pytest.raises(struct.DrollError):
-        default_ability(w, _UNUSED, "ability")
+        default_ability(w, _UNUSED, Action.ABILITY)
 
 
 def test_default_ability_rejects_target():
     """Default ability rejects any target."""
     w = struct.World(ability=True)
     with pytest.raises(struct.DrollError):
-        default_ability(w, _UNUSED, "ability", ("fighter",))
+        default_ability(w, _UNUSED, Action.ABILITY, (struct.Party.FIGHTER,))

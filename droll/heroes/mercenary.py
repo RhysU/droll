@@ -5,9 +5,10 @@
 
 from dataclasses import replace
 
-from .. import dice, special, struct
+from .. import dice, special
 from ..ability import commander_ability, mercenary_ability
 from ..player import Default
+from ..struct import Dungeon, Party, RandRange, PartyState, Regroup, frozen
 
 __all__ = (
     "Commander",
@@ -16,13 +17,13 @@ __all__ = (
 
 
 def _mercenary_roll_party(
-    count: int, randrange: struct.RandRange
-) -> tuple[struct.Party, struct.Regroup]:
+    count: int, randrange: RandRange
+) -> tuple[PartyState, Regroup]:
     """Roll a new Party, adding one bonus scroll discarded on regroup."""
     party, regroup = dice.roll_party(dice=count, randrange=randrange)
     return (
-        replace(party, scroll=party.scroll + 1),
-        replace(regroup, discard=replace(regroup.discard, scroll=1)),
+        frozen({**party, Party.SCROLL: party[Party.SCROLL] + 1}),
+        replace(regroup, discard=frozen({**regroup.discard, Party.SCROLL: 1})),
     )
 
 
@@ -33,15 +34,15 @@ Commander = replace(
     ability=commander_ability,
     advance=(lambda _: Commander),
     roll=replace(Default.roll, party=_mercenary_roll_party),
-    party=replace(
-        Default.party,
-        fighter=replace(
-            Default.party.fighter,
-            goblin=special.defeat_all_plus_additional,
-            skeleton=special.defeat_one_plus_additional,
-            ooze=special.defeat_one_plus_additional,
-        ),
-    ),
+    party=frozen({
+        **Default.party,
+        Party.FIGHTER: frozen({
+            **Default.party[Party.FIGHTER],
+            Dungeon.GOBLIN: special.defeat_all_plus_additional,
+            Dungeon.SKELETON: special.defeat_one_plus_additional,
+            Dungeon.OOZE: special.defeat_one_plus_additional,
+        }),
+    }),
 )
 
 # Defined after Commander to permit advance(...) closure

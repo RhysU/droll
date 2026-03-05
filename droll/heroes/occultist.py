@@ -9,6 +9,7 @@ from functools import partial
 from ..ability import necromancer_ability, occultist_ability
 from ..player import Default
 from ..regular import defeat_dragon, defeat_dragon_heroes
+from ..struct import Dungeon, Party, frozen
 
 __all__ = (
     "Necromancer",
@@ -20,7 +21,7 @@ _occultist_defeat_dragon = partial(
     defeat_dragon,
     hero_validator=partial(
         defeat_dragon_heroes,
-        interchangeable=frozenset({"cleric", "mage"}),
+        interchangeable=frozenset({Party.CLERIC, Party.MAGE}),
     ),
 )
 
@@ -30,35 +31,34 @@ Necromancer = replace(
     name="Necromancer",
     ability=necromancer_ability,
     advance=(lambda _: Necromancer),
-    party=replace(
-        Default.party,
-        fighter=replace(
-            Default.party.fighter,
-            dragon=_occultist_defeat_dragon,
-        ),
-        cleric=replace(
-            Default.party.cleric,
-            dragon=_occultist_defeat_dragon,
-            ooze=Default.party.mage.ooze,
-        ),
-        mage=replace(
-            Default.party.mage,
-            dragon=_occultist_defeat_dragon,
-            skeleton=Default.party.cleric.skeleton,
-        ),
-        thief=replace(
-            Default.party.thief,
-            dragon=_occultist_defeat_dragon,
-        ),
-        champion=replace(
-            Default.party.champion,
-            dragon=_occultist_defeat_dragon,
-        ),
-        scroll=replace(
-            Default.party.scroll,
-            dragon=_occultist_defeat_dragon,
-        ),
-    ),
+    party=frozen({
+        Party.FIGHTER: frozen({
+            **Default.party[Party.FIGHTER],
+            Dungeon.DRAGON: _occultist_defeat_dragon,
+        }),
+        Party.CLERIC: frozen({
+            **Default.party[Party.CLERIC],
+            Dungeon.DRAGON: _occultist_defeat_dragon,
+            Dungeon.OOZE: Default.party[Party.MAGE][Dungeon.OOZE],
+        }),
+        Party.MAGE: frozen({
+            **Default.party[Party.MAGE],
+            Dungeon.DRAGON: _occultist_defeat_dragon,
+            Dungeon.SKELETON: Default.party[Party.CLERIC][Dungeon.SKELETON],
+        }),
+        Party.THIEF: frozen({
+            **Default.party[Party.THIEF],
+            Dungeon.DRAGON: _occultist_defeat_dragon,
+        }),
+        Party.CHAMPION: frozen({
+            **Default.party[Party.CHAMPION],
+            Dungeon.DRAGON: _occultist_defeat_dragon,
+        }),
+        Party.SCROLL: frozen({
+            **Default.party[Party.SCROLL],
+            Dungeon.DRAGON: _occultist_defeat_dragon,
+        }),
+    }),
 )
 
 # Defined after Necromancer to permit advance(...) closure

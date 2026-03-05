@@ -20,8 +20,7 @@ from .struct import (
     Party,
     RandRange,
     World,
-    field_names,
-    field_values,
+    frozen,
 )
 from .treasure import draw_treasure, replace_treasure
 
@@ -40,19 +39,16 @@ __all__ = (
     "reroll",
 )
 
-_DUNGEON_NAMES = frozenset(field_names(Dungeon))
-_PARTY_NAMES = frozenset(field_names(Party))
-
 
 def not_reroll(
-    world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
+    world: World, randrange: RandRange, hero: Party, targets: tuple[Dungeon | Party, ...]
 ) -> World:
     """Scrolls cannot target dungeon dice directly; use 'reroll' instead."""
-    raise DrollError(f'Use "reroll {targets[0]}" to re-roll with a scroll.')
+    raise DrollError(f'Use "reroll {targets[0].value}" to re-roll with a scroll.')
 
 
 def defeat_one(
-    world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
+    world: World, randrange: RandRange, hero: Party, targets: tuple[Dungeon, ...]
 ) -> World:
     """Update world after hero handles exactly one target."""
     if len(targets) != 1:
@@ -66,7 +62,7 @@ def defeat_one(
 
 
 def defeat_all(
-    world: World, randrange: RandRange, hero: str, targets: tuple[str, ...]
+    world: World, randrange: RandRange, hero: Party, targets: tuple[Dungeon, ...]
 ) -> World:
     """Update world after hero handles all of one type of target."""
     if len(targets) != 1:
@@ -82,8 +78,8 @@ def defeat_all(
 def open_one(
     world: World,
     randrange: RandRange,
-    hero: str,
-    targets: tuple[str, ...],
+    hero: Party,
+    targets: tuple[Dungeon, ...],
     *,
     after_monsters=True,
 ) -> World:
@@ -104,8 +100,8 @@ def open_one(
 def open_all(
     world: World,
     randrange: RandRange,
-    hero: str,
-    targets: tuple[str, ...],
+    hero: Party,
+    targets: tuple[Dungeon, ...],
     *,
     after_monsters=True,
 ) -> World:
@@ -114,9 +110,9 @@ def open_all(
         raise DrollError(f"Exactly 1 target required but {len(targets)} given.")
     if after_monsters and not defeated_monsters(world.dungeon):
         raise DrollError("Monsters must be defeated before opening.")
-    howmany = getattr(world.dungeon, targets[0])
+    howmany = world.dungeon[targets[0]]
     if not howmany:
-        raise DrollError(f"At least 1 {targets[0]} required.")
+        raise DrollError(f"At least 1 {targets[0].value} required.")
     treasure = world.treasure
     for _ in range(howmany):
         treasure = draw_treasure(treasure, randrange)
@@ -132,8 +128,8 @@ def open_all(
 def quaff(
     world: World,
     randrange: RandRange,
-    hero: str,
-    targets: tuple[str, ...],
+    hero: Party,
+    targets: tuple[Dungeon | Party, ...],
     *,
     after_monsters=True,
 ) -> World:
@@ -142,9 +138,9 @@ def quaff(
     Unlike {defeat,open}_{one,all}(...), heroes to revive are arguments."""
     if not targets:
         raise DrollError("At least 1 target required.")
-    howmany = getattr(world.dungeon, targets[0])
+    howmany = world.dungeon[targets[0]]
     if not howmany:
-        raise DrollError(f"At least 1 {targets[0]} required.")
+        raise DrollError(f"At least 1 {targets[0].value} required.")
     if len(targets) - 1 != howmany:
         raise DrollError(f"Specify exactly {howmany} to revive after 'potion'.")
     if after_monsters and not defeated_monsters(world.dungeon):
@@ -161,18 +157,18 @@ def quaff(
 
 
 def _classify_reroll_targets(
-    dungeon_or_party: tuple[str, ...],
+    dungeon_or_party: tuple[Dungeon | Party, ...],
     allow_dragon: bool,
-) -> tuple[list[str], list[str]]:
+) -> tuple[list[Dungeon], list[Party]]:
     """Classify reroll targets into dungeon and party lists."""
     dungeon_targets = []
     party_targets = []
     for target in dungeon_or_party:
-        if not allow_dragon and target == "dragon":
-            raise DrollError(f"{target} cannot be re-rolled.")
-        if target in _DUNGEON_NAMES:
+        if isinstance(target, Dungeon):
+            if not allow_dragon and target is Dungeon.DRAGON:
+                raise DrollError(f"{target.value} cannot be re-rolled.")
             dungeon_targets.append(target)
-        elif target in _PARTY_NAMES:
+        elif isinstance(target, Party):
             party_targets.append(target)
         else:
             raise DrollError(f"{target} cannot be re-rolled.")
@@ -182,8 +178,8 @@ def _classify_reroll_targets(
 def reroll(
     world: World,
     randrange: RandRange,
-    hero: str,
-    targets: tuple[str, ...],
+    hero: Party,
+    targets: tuple[Dungeon | Party, ...],
     *,
     allow_dragon: bool = False,
 ) -> World:
@@ -207,25 +203,17 @@ def reroll(
         increased = roll_dungeon(
             dice=len(dungeon_targets), randrange=randrange
         )
-        dungeon = Dungeon(
-            *map(
-                add,
-                field_values(dungeon),
-                field_values(increased),
-            )
-        )
+        dungeon = frozen({
+            d: dungeon[d] + increased[d] for d in Dungeon
+        })
 
     if party_targets:
         for target in party_targets:
             party = decrement_party(party, target)
         increased, _ = roll_party(dice=len(party_targets), randrange=randrange)
-        party = Party(
-            *map(
-                add,
-                field_values(party),
-                field_values(increased),
-            )
-        )
+        party = frozen({
+            p: party[p] + increased[p] for p in Party
+        })
 
     return replace(
         world,
@@ -236,10 +224,10 @@ def reroll(
 
 
 def distinct_heroes(
-    heroes: Sequence[str],
+    heroes: Sequence[Party],
     *,
-    wildcard: Set[str] = frozenset(),
-    interchangeable: Set[str] = frozenset(),
+    wildcard: Set[Party] = frozenset(),
+    interchangeable: Set[Party] = frozenset(),
 ) -> int:
     """How many distinct heroes does the given list represent?
 
@@ -257,11 +245,11 @@ def distinct_heroes(
 
 
 def defeat_dragon_heroes(
-    *heroes,
-    disallowed_heroes: Set[str] = frozenset({"scroll"}),
+    *heroes: Party,
+    disallowed_heroes: Set[Party] = frozenset({Party.SCROLL}),
     required: int = 3,
-    wildcard: Set[str] = frozenset(),
-    interchangeable: Set[str] = frozenset(),
+    wildcard: Set[Party] = frozenset(),
+    interchangeable: Set[Party] = frozenset(),
 ) -> None:
     """Validate sufficiently many distinct heroes to slay a dragon.
 
@@ -272,7 +260,7 @@ def defeat_dragon_heroes(
     hero_set = {*heroes}
     if hero_set & {*disallowed_heroes}:
         raise DrollError(
-            f"A {', '.join(sorted(disallowed_heroes))} cannot defeat a dragon."
+            f"A {', '.join(sorted(h.value for h in disallowed_heroes))} cannot defeat a dragon."
         )
     if len(heroes) != required:
         raise DrollError(f"Exactly {required} heroes required.")
@@ -282,15 +270,15 @@ def defeat_dragon_heroes(
     if n_distinct != required:
         raise DrollError(
             f"Exactly {required} distinct heroes required"
-            f" but '{', '.join(heroes)}' has only {n_distinct}."
+            f" but '{', '.join(h.value for h in heroes)}' has only {n_distinct}."
         )
 
 
 def defeat_dragon(
     world: World,
     randrange: RandRange,
-    hero: str,
-    targets: tuple[str, ...],
+    hero: Party,
+    targets: tuple[Dungeon | Party, ...],
     *,
     hero_validator: Callable[..., None] = defeat_dragon_heroes,
     _min_dragon_count: int = DRAGON_BLOCKING_THRESHOLD,
@@ -301,13 +289,13 @@ def defeat_dragon(
     if not targets:
         raise DrollError("At least 1 target required.")
     # Simple prerequisites for attempting to defeat the dragon
-    if world.dungeon.dragon < _min_dragon_count:
+    if world.dungeon[Dungeon.DRAGON] < _min_dragon_count:
         raise DrollError(
             f"At least {_min_dragon_count} dragon dice required to fight."
         )
     if not defeated_monsters(world.dungeon):
         raise DrollError(
-            f"Enemy {targets[0]} only comes after all others defeated."
+            f"Enemy {targets[0].value} only comes after all others defeated."
         )
 
     # Confirm required number of distinct heroes available
@@ -334,50 +322,52 @@ def defeat_dragon(
 def bait_dragon(
     world: World,
     randrange: RandRange,
-    command: str,
-    targets: tuple[str, ...] = (),
+    command: Dungeon | Party,
+    targets: tuple[Dungeon | Party, ...] = (),
     *,
-    _enemies: Sequence[str] = ("goblin", "skeleton", "ooze"),
+    _enemies: Sequence[Dungeon] = (Dungeon.GOBLIN, Dungeon.SKELETON, Dungeon.OOZE),
     require_treasure: bool = True,
 ) -> World:
     """Consume dragon bait to convert all monsters into dragon dice."""
     # Confirm well-formed request optionally containing a target
-    if any(t != "dragon" for t in targets):
-        raise DrollError(f"Can only {command} dragon dice.")
+    if any(t is not Dungeon.DRAGON for t in targets):
+        raise DrollError(f"Can only {command.value if hasattr(command, 'value') else command} dragon dice.")
     if require_treasure:
-        world = replace(world, treasure=replace_treasure(world.treasure, command))
+        from .struct import Artifact
+        world = replace(world, treasure=replace_treasure(world.treasure, Artifact(command.value if hasattr(command, 'value') else command)))
 
     # Compute how many new dragons will be produced and remove sources
     dungeon = world.dungeon
     new_dragons = (
-        sum(getattr(dungeon, enemy) for enemy in _enemies)
+        sum(dungeon[enemy] for enemy in _enemies)
         if dungeon is not None
         else 0
     )
     if not new_dragons:
         raise DrollError(
-            f"At least 1 monster ({', '.join(_enemies)}) required for '{command}'."
+            f"At least 1 monster ({', '.join(e.value for e in _enemies)}) required for '{command.value if hasattr(command, 'value') else command}'."
         )
 
     # Zero all enemy sources and increment the number of dragons
     return replace(
         world,
-        dungeon=replace(
-            dungeon,
+        dungeon=frozen({
+            **dungeon,
             **{enemy: 0 for enemy in _enemies},
-            dragon=dungeon.dragon + new_dragons,
-        ),
+            Dungeon.DRAGON: dungeon[Dungeon.DRAGON] + new_dragons,
+        }),
     )
 
 
 def elixir(
-    world: World, randrange: RandRange, command: str, targets: tuple[str, ...] = ()
+    world: World, randrange: RandRange, command: Dungeon | Party, targets: tuple[Dungeon | Party, ...] = ()
 ) -> World:
     """Consume an elixir to add one hero die of any type."""
     if not targets:
-        raise DrollError(f"Hero required for {command}.")
+        raise DrollError(f"Hero required for {command.value if hasattr(command, 'value') else command}.")
+    from .struct import Artifact
     return replace(
         world,
-        treasure=replace_treasure(world.treasure, command),
+        treasure=replace_treasure(world.treasure, Artifact(command.value if hasattr(command, 'value') else command)),
         party=increment_party(world.party, targets[0]),
     )

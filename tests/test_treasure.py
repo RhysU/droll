@@ -3,11 +3,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Testing of world-to-world transitions stemming from using treasure."""
 
-from dataclasses import fields, replace
+from dataclasses import replace
 import random
 import pytest
 
 from droll import player, struct, world
+from droll.struct import Artifact, Dungeon, Party, make_dungeon, make_party, make_artifacts, all_dungeon, all_party
 from droll.treasure import replace_treasure
 
 
@@ -17,8 +18,8 @@ class TestTreasure:
         """Fixture with a game containing dungeon items but no party."""
         self.game = replace(
             world.new_world(),
-            dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
-            party=struct.Party(),
+            dungeon=all_dungeon(2),
+            party=make_party(),
         )
         self.randrange = random.Random(4).randrange
 
@@ -28,14 +29,14 @@ class TestTreasure:
             self.game,
             treasure=replace(
                 self.game.treasure,
-                own=replace(self.game.treasure.own, elixir=1),
+                own=make_artifacts(elixir=1),
             ),
         )
         game = player.apply(
             player.Default, game, self.randrange, "elixir", "cleric"
         )
-        assert game.party.cleric == 1
-        assert game.treasure.own.elixir == 0
+        assert game.party[Party.CLERIC] == 1
+        assert game.treasure.own[Artifact.ELIXIR] == 0
 
         with pytest.raises(struct.DrollError):
             player.apply(
@@ -47,17 +48,17 @@ class TestTreasure:
         game = replace(
             self.game,
             treasure=replace(
-                self.game.treasure, own=replace(self.game.treasure.own, bait=2)
+                self.game.treasure, own=make_artifacts(bait=2)
             ),
         )
         game = player.apply(
             player.Default, game, self.randrange, "bait", "dragon"
         )
-        assert game.treasure.own.bait == 1
-        assert game.dungeon.goblin == 0
-        assert game.dungeon.skeleton == 0
-        assert game.dungeon.ooze == 0
-        assert game.dungeon.dragon == 8
+        assert game.treasure.own[Artifact.BAIT] == 1
+        assert game.dungeon[Dungeon.GOBLIN] == 0
+        assert game.dungeon[Dungeon.SKELETON] == 0
+        assert game.dungeon[Dungeon.OOZE] == 0
+        assert game.dungeon[Dungeon.DRAGON] == 8
 
         with pytest.raises(struct.DrollError):
             player.apply(player.Default, game, self.randrange, "bait")
@@ -68,18 +69,18 @@ class TestTreasure:
             self.game,
             treasure=replace(
                 self.game.treasure,
-                own=replace(self.game.treasure.own, **{artifact: 2}),
+                own=make_artifacts(**{artifact: 2}),
             ),
         )
         game = player.apply(player.Default, game, None, artifact, specialty)
-        assert getattr(game.treasure.own, artifact) == 1
-        assert getattr(game.party, hero) == 0
-        assert getattr(game.dungeon, specialty) == 0
+        assert game.treasure.own[Artifact(artifact)] == 1
+        assert game.party[Party(hero)] == 0
+        assert game.dungeon[Dungeon(specialty)] == 0
 
         game = player.apply(player.Default, game, None, artifact, other)
-        assert getattr(game.treasure.own, artifact) == 0
-        assert getattr(game.party, hero) == 0
-        assert getattr(game.dungeon, other) == 1
+        assert game.treasure.own[Artifact(artifact)] == 0
+        assert game.party[Party(hero)] == 0
+        assert game.dungeon[Dungeon(other)] == 1
 
         with pytest.raises(struct.DrollError):
             player.apply(player.Default, game, None, artifact, other)
@@ -102,13 +103,13 @@ class TestTreasure:
             self.game,
             treasure=replace(
                 self.game.treasure,
-                own=replace(self.game.treasure.own, tools=1),
+                own=make_artifacts(tools=1),
             ),
         )
         game = player.apply(player.Default, game, None, "tools", "goblin")
-        assert game.treasure.own.tools == 0
-        assert game.party.thief == 0
-        assert game.dungeon.goblin == 1
+        assert game.treasure.own[Artifact.TOOLS] == 0
+        assert game.party[Party.THIEF] == 0
+        assert game.dungeon[Dungeon.GOBLIN] == 1
 
 
 class TestPhantomTreasure:
@@ -118,8 +119,8 @@ class TestPhantomTreasure:
         """Fixture with party members but no treasures owned."""
         self.game = replace(
             world.new_world(),
-            dungeon=struct.Dungeon(*([2] * len(fields(struct.Dungeon)))),
-            party=struct.Party(*([2] * len(fields(struct.Party)))),
+            dungeon=all_dungeon(2),
+            party=all_party(2),
         )
 
     def test_sword_without_treasure(self):
@@ -150,8 +151,8 @@ class TestTreasureAsRecoveryType:
         """Fixture with monsters cleared and potions available."""
         self.game = replace(
             world.new_world(),
-            dungeon=struct.Dungeon(potion=2),
-            party=struct.Party(fighter=2, champion=2),
+            dungeon=make_dungeon(potion=2),
+            party=make_party(fighter=2, champion=2),
         )
 
     def test_sword_rejected_as_recovery(self):
@@ -176,13 +177,12 @@ class TestTreasureAsRecoveryType:
             player.Default, self.game, None,
             "champion", "potion", "fighter", "mage",
         )
-        assert game.party.fighter == 3
-        assert game.party.mage == 1
-        assert game.dungeon.potion == 0
+        assert game.party[Party.FIGHTER] == 3
+        assert game.party[Party.MAGE] == 1
+        assert game.dungeon[Dungeon.POTION] == 0
 
 
 def test_replace_treasure_invalid_type():
-    """replace_treasure raises DrollError for non-treasure names."""
-    treasure = struct.Treasure(own=struct.Artifacts(sword=1))
-    with pytest.raises(struct.DrollError, match="not a valid treasure type"):
-        replace_treasure(treasure, "cleric")
+    """Non-treasure names cannot be converted to Artifact enum."""
+    with pytest.raises(ValueError):
+        Artifact("cleric")

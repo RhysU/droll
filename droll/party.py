@@ -5,7 +5,7 @@
 
 from dataclasses import replace
 
-from .struct import DrollError, Party, Regroup, field_names
+from .struct import DrollError, Party, PartyState, Regroup, frozen
 
 __all__ = (
     "decrement_party",
@@ -13,33 +13,23 @@ __all__ = (
     "increment_party",
 )
 
-_PARTY_FIELDS = frozenset(field_names(Party))
 
-
-def _check_party_member(hero: str) -> None:
-    if hero not in _PARTY_FIELDS:
-        raise DrollError(f"Unknown party member '{hero}'.")
-
-
-def decrement_party(party: Party, hero: str) -> Party:
+def decrement_party(party: PartyState, hero: Party) -> PartyState:
     """Decrease the count of the specified hero type by one."""
-    _check_party_member(hero)
-    prior_heroes = getattr(party, hero)
+    prior_heroes = party[hero]
     if not prior_heroes:
-        raise DrollError(f"At least 1 {hero} required in party.")
-    return replace(party, **{hero: prior_heroes - 1})
+        raise DrollError(f"At least 1 {hero.value} required in party.")
+    return frozen({**party, hero: prior_heroes - 1})
 
 
-def decrement_regroup(regroup: Regroup, hero: str) -> Regroup:
+def decrement_regroup(regroup: Regroup, hero: Party) -> Regroup:
     """Decrement the regroup discard counter for hero, if positive."""
-    _check_party_member(hero)
-    prior = getattr(regroup.discard, hero, 0)
+    prior = regroup.discard[hero]
     return replace(
-        regroup, discard=replace(regroup.discard, **{hero: max(0, prior - 1)})
+        regroup, discard=frozen({**regroup.discard, hero: max(0, prior - 1)})
     )
 
 
-def increment_party(party: Party, hero: str) -> Party:
+def increment_party(party: PartyState, hero: Party) -> PartyState:
     """Increase the count of the specified hero type by one."""
-    _check_party_member(hero)
-    return replace(party, **{hero: getattr(party, hero) + 1})
+    return frozen({**party, hero: party[hero] + 1})

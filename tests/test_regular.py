@@ -3,13 +3,25 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Tests for regular module helpers."""
 
-from dataclasses import fields, replace
+from dataclasses import replace
 import random
 import pytest
 
 from droll import dice, heroes, player, regular, struct, world
 from droll.dungeon import decrement_dungeon, eliminate_dungeon
-from droll.struct import DrollError
+from droll.struct import (
+    Action,
+    Artifact,
+    Dungeon,
+    DrollError,
+    Party,
+    make_dungeon,
+    make_party,
+    make_artifacts,
+    all_dungeon,
+    all_party,
+    frozen,
+)
 
 # Known to be unused because it would raise NameErrors on any use
 _UNUSED = object()
@@ -22,8 +34,8 @@ class TestRerollParty:
         """Fixture with a world containing known dungeon and party dice."""
         self.world = replace(
             world.new_world(),
-            dungeon=struct.Dungeon(goblin=2, skeleton=1),
-            party=struct.Party(fighter=2, cleric=1, scroll=2),
+            dungeon=make_dungeon(goblin=2, skeleton=1),
+            party=make_party(fighter=2, cleric=1, scroll=2),
         )
 
     def _canned_randrange(self, sequence):
@@ -39,11 +51,11 @@ class TestRerollParty:
         """Rerolling a single party die removes and re-rolls it."""
         # Roll value 0 => fighter
         randrange = self._canned_randrange([0])
-        result = regular.reroll(self.world, randrange, "scroll", ("fighter",))
+        result = regular.reroll(self.world, randrange, Party.SCROLL, (Party.FIGHTER,))
         # One scroll consumed for the hero cost
-        assert result.party.scroll == 1
+        assert result.party[Party.SCROLL] == 1
         # Fighter was removed (2-1=1) then re-rolled as fighter (+1=2)
-        assert result.party.fighter == 2
+        assert result.party[Party.FIGHTER] == 2
         # Dungeon unchanged
         assert result.dungeon == self.world.dungeon
 
@@ -52,13 +64,13 @@ class TestRerollParty:
         # Roll values: 0 => fighter, 1 => cleric
         randrange = self._canned_randrange([0, 1])
         result = regular.reroll(
-            self.world, randrange, "scroll", ("fighter", "cleric")
+            self.world, randrange, Party.SCROLL, (Party.FIGHTER, Party.CLERIC)
         )
         # One scroll consumed
-        assert result.party.scroll == 1
+        assert result.party[Party.SCROLL] == 1
         # fighter: 2 - 1 + 1(rolled) = 2; cleric: 1 - 1 + 1(rolled) = 1
-        assert result.party.fighter == 2
-        assert result.party.cleric == 1
+        assert result.party[Party.FIGHTER] == 2
+        assert result.party[Party.CLERIC] == 1
         # Dungeon unchanged
         assert result.dungeon == self.world.dungeon
 
@@ -67,50 +79,44 @@ class TestRerollParty:
         # Dungeon roll: value 0 => goblin; Party roll: value 2 => mage
         randrange = self._canned_randrange([0, 2])
         result = regular.reroll(
-            self.world, randrange, "scroll", ("goblin", "fighter")
+            self.world, randrange, Party.SCROLL, (Dungeon.GOBLIN, Party.FIGHTER)
         )
         # One scroll consumed
-        assert result.party.scroll == 1
+        assert result.party[Party.SCROLL] == 1
         # Dungeon: goblin was 2, removed 1, re-rolled as goblin (+1) => 2
-        assert result.dungeon.goblin == 2
+        assert result.dungeon[Dungeon.GOBLIN] == 2
         # Party: fighter was 2, removed 1, re-rolled as mage (+1)
-        assert result.party.fighter == 1
-        assert result.party.mage == 1
+        assert result.party[Party.FIGHTER] == 1
+        assert result.party[Party.MAGE] == 1
 
     def test_reroll_party_die_not_present_raises(self):
         """Rerolling a party die that is not present raises DrollError."""
         randrange = self._canned_randrange([])
         with pytest.raises(DrollError):
-            regular.reroll(self.world, randrange, "scroll", ("mage",))
-
-    def test_reroll_unknown_target_raises(self):
-        """Rerolling an unknown target raises DrollError."""
-        randrange = self._canned_randrange([])
-        with pytest.raises(DrollError):
-            regular.reroll(self.world, randrange, "scroll", ("nonexistent",))
+            regular.reroll(self.world, randrange, Party.SCROLL, (Party.MAGE,))
 
     def test_reroll_requires_hero_before_rolling(self):
         """A rolled scroll cannot pay the cost of the reroll (issue #105)."""
-        w = replace(self.world, party=replace(self.world.party, scroll=0))
+        w = replace(self.world, party=frozen({**self.world.party, Party.SCROLL: 0}))
         with pytest.raises(DrollError):
             regular.reroll(
-                w, self._canned_randrange([5, 5, 5, 5, 5]), "scroll", ("fighter",)
+                w, self._canned_randrange([5, 5, 5, 5, 5]), Party.SCROLL, (Party.FIGHTER,)
             )
 
 
 def test_all_distinct_no_options():
     """All different heroes are fully distinct."""
-    assert regular.distinct_heroes(["fighter", "cleric", "mage"]) == 3
+    assert regular.distinct_heroes([Party.FIGHTER, Party.CLERIC, Party.MAGE]) == 3
 
 
 def test_duplicates_reduce_count():
     """Duplicate heroes reduce distinct count."""
-    assert regular.distinct_heroes(["fighter", "fighter", "mage"]) == 2
+    assert regular.distinct_heroes([Party.FIGHTER, Party.FIGHTER, Party.MAGE]) == 2
 
 
 def test_all_same():
     """All identical heroes yield 1."""
-    assert regular.distinct_heroes(["fighter", "fighter", "fighter"]) == 1
+    assert regular.distinct_heroes([Party.FIGHTER, Party.FIGHTER, Party.FIGHTER]) == 1
 
 
 def test_empty():
@@ -120,15 +126,15 @@ def test_empty():
 
 def test_single():
     """Single hero is 1 distinct."""
-    assert regular.distinct_heroes(["mage"]) == 1
+    assert regular.distinct_heroes([Party.MAGE]) == 1
 
 
 def test_wildcard_adds_one_each():
     """Each wildcard counts as a distinct hero."""
     assert (
         regular.distinct_heroes(
-            ["cleric", "thief", "scroll"],
-            wildcard=frozenset({"scroll"}),
+            [Party.CLERIC, Party.THIEF, Party.SCROLL],
+            wildcard=frozenset({Party.SCROLL}),
         )
         == 3
     )
@@ -138,8 +144,8 @@ def test_multiple_wildcards():
     """Multiple wildcards each contribute 1."""
     assert (
         regular.distinct_heroes(
-            ["fighter", "scroll", "scroll"],
-            wildcard=frozenset({"scroll"}),
+            [Party.FIGHTER, Party.SCROLL, Party.SCROLL],
+            wildcard=frozenset({Party.SCROLL}),
         )
         == 3
     )
@@ -149,8 +155,8 @@ def test_all_wildcards():
     """All wildcards still count as distinct."""
     assert (
         regular.distinct_heroes(
-            ["scroll", "scroll", "scroll"],
-            wildcard=frozenset({"scroll"}),
+            [Party.SCROLL, Party.SCROLL, Party.SCROLL],
+            wildcard=frozenset({Party.SCROLL}),
         )
         == 3
     )
@@ -160,8 +166,8 @@ def test_wildcard_does_not_help_duplicates():
     """Wildcards don't fix duplicate non-wildcards."""
     assert (
         regular.distinct_heroes(
-            ["mage", "mage", "scroll"],
-            wildcard=frozenset({"scroll"}),
+            [Party.MAGE, Party.MAGE, Party.SCROLL],
+            wildcard=frozenset({Party.SCROLL}),
         )
         == 2
     )
@@ -171,8 +177,8 @@ def test_interchangeable_two_from_pool():
     """Two interchangeable heroes contribute 2 distinct."""
     assert (
         regular.distinct_heroes(
-            ["fighter", "cleric", "mage"],
-            interchangeable=frozenset({"fighter", "cleric"}),
+            [Party.FIGHTER, Party.CLERIC, Party.MAGE],
+            interchangeable=frozenset({Party.FIGHTER, Party.CLERIC}),
         )
         == 3
     )
@@ -182,8 +188,8 @@ def test_interchangeable_capped_by_pool_size():
     """Interchangeable contribution capped at pool size."""
     assert (
         regular.distinct_heroes(
-            ["mage", "mage", "mage"],
-            interchangeable=frozenset({"mage", "fighter"}),
+            [Party.MAGE, Party.MAGE, Party.MAGE],
+            interchangeable=frozenset({Party.MAGE, Party.FIGHTER}),
         )
         == 2
     )
@@ -193,8 +199,8 @@ def test_interchangeable_all_same_type():
     """All same type from a 2-member pool still capped at 2."""
     assert (
         regular.distinct_heroes(
-            ["fighter", "fighter", "fighter"],
-            interchangeable=frozenset({"mage", "fighter"}),
+            [Party.FIGHTER, Party.FIGHTER, Party.FIGHTER],
+            interchangeable=frozenset({Party.MAGE, Party.FIGHTER}),
         )
         == 2
     )
@@ -204,8 +210,8 @@ def test_interchangeable_mixed_overflow():
     """Mixed interchangeable heroes exceeding pool size."""
     assert (
         regular.distinct_heroes(
-            ["fighter", "mage", "mage"],
-            interchangeable=frozenset({"mage", "fighter"}),
+            [Party.FIGHTER, Party.MAGE, Party.MAGE],
+            interchangeable=frozenset({Party.MAGE, Party.FIGHTER}),
         )
         == 2
     )
@@ -215,8 +221,8 @@ def test_interchangeable_with_regular():
     """Interchangeable heroes + distinct regular hero."""
     assert (
         regular.distinct_heroes(
-            ["fighter", "cleric", "thief"],
-            interchangeable=frozenset({"fighter", "cleric"}),
+            [Party.FIGHTER, Party.CLERIC, Party.THIEF],
+            interchangeable=frozenset({Party.FIGHTER, Party.CLERIC}),
         )
         == 3
     )
@@ -226,8 +232,8 @@ def test_interchangeable_single_member_present():
     """One hero from interchangeable set contributes 1."""
     assert (
         regular.distinct_heroes(
-            ["cleric", "thief", "fighter"],
-            interchangeable=frozenset({"fighter"}),
+            [Party.CLERIC, Party.THIEF, Party.FIGHTER],
+            interchangeable=frozenset({Party.FIGHTER}),
         )
         == 3
     )
@@ -237,8 +243,8 @@ def test_interchangeable_single_member_absent():
     """No heroes from interchangeable set contribute 0 from pool."""
     assert (
         regular.distinct_heroes(
-            ["cleric", "thief", "mage"],
-            interchangeable=frozenset({"fighter"}),
+            [Party.CLERIC, Party.THIEF, Party.MAGE],
+            interchangeable=frozenset({Party.FIGHTER}),
         )
         == 3
     )
@@ -247,18 +253,18 @@ def test_interchangeable_single_member_absent():
 def test_dragon_wildcard_less_interesting_successful_cases():
     """Test valid dragon defeats with wildcard heroes."""
     regular.defeat_dragon_heroes(
-        "cleric",
-        "thief",
-        "mage",
+        Party.CLERIC,
+        Party.THIEF,
+        Party.MAGE,
         disallowed_heroes=frozenset(),
-        wildcard=frozenset({"scroll"}),
+        wildcard=frozenset({Party.SCROLL}),
     )
     regular.defeat_dragon_heroes(
-        "cleric",
-        "thief",
-        "fighter",
+        Party.CLERIC,
+        Party.THIEF,
+        Party.FIGHTER,
         disallowed_heroes=frozenset(),
-        wildcard=frozenset({"scroll"}),
+        wildcard=frozenset({Party.SCROLL}),
     )
 
 
@@ -266,35 +272,35 @@ def test_dragon_wildcard_less_interesting_failure_cases():
     """Test invalid dragon defeats with wildcard heroes."""
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric",
-            "thief",
+            Party.CLERIC,
+            Party.THIEF,
             disallowed_heroes=frozenset(),
-            wildcard=frozenset({"scroll"}),
+            wildcard=frozenset({Party.SCROLL}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric",
-            "fighter",
+            Party.CLERIC,
+            Party.FIGHTER,
             disallowed_heroes=frozenset(),
-            wildcard=frozenset({"fighter"}),
+            wildcard=frozenset({Party.FIGHTER}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric",
-            "thief",
-            "champion",
-            "mage",
+            Party.CLERIC,
+            Party.THIEF,
+            Party.CHAMPION,
+            Party.MAGE,
             disallowed_heroes=frozenset(),
-            wildcard=frozenset({"fighter"}),
+            wildcard=frozenset({Party.FIGHTER}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric",
-            "thief",
-            "champion",
-            "fighter",
+            Party.CLERIC,
+            Party.THIEF,
+            Party.CHAMPION,
+            Party.FIGHTER,
             disallowed_heroes=frozenset(),
-            wildcard=frozenset({"fighter"}),
+            wildcard=frozenset({Party.FIGHTER}),
         )
 
 
@@ -302,35 +308,35 @@ def test_dragon_wildcard_more_interesting_failure_cases():
     """Test invalid dragon defeats with multiple wildcard heroes."""
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "mage",
-            "mage",
-            "scroll",
+            Party.MAGE,
+            Party.MAGE,
+            Party.SCROLL,
             disallowed_heroes=frozenset(),
-            wildcard=frozenset({"scroll"}),
+            wildcard=frozenset({Party.SCROLL}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "fighter",
-            "fighter",
-            "fighter",
+            Party.FIGHTER,
+            Party.FIGHTER,
+            Party.FIGHTER,
             disallowed_heroes=frozenset(),
-            wildcard=frozenset({"mage"}),
+            wildcard=frozenset({Party.MAGE}),
         )
 
 
 def test_dragon_interchangeable_less_interesting_successful_cases():
     """Test valid dragon defeats with interchangeable heroes."""
     regular.defeat_dragon_heroes(
-        "cleric",
-        "thief",
-        "mage",
-        interchangeable=frozenset({"fighter"}),
+        Party.CLERIC,
+        Party.THIEF,
+        Party.MAGE,
+        interchangeable=frozenset({Party.FIGHTER}),
     )
     regular.defeat_dragon_heroes(
-        "cleric",
-        "thief",
-        "fighter",
-        interchangeable=frozenset({"fighter"}),
+        Party.CLERIC,
+        Party.THIEF,
+        Party.FIGHTER,
+        interchangeable=frozenset({Party.FIGHTER}),
     )
 
 
@@ -338,31 +344,31 @@ def test_dragon_interchangeable_less_interesting_failure_cases():
     """Test invalid dragon defeats with interchangeable heroes."""
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric",
-            "thief",
-            interchangeable=frozenset({"fighter"}),
+            Party.CLERIC,
+            Party.THIEF,
+            interchangeable=frozenset({Party.FIGHTER}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric",
-            "fighter",
-            interchangeable=frozenset({"fighter"}),
+            Party.CLERIC,
+            Party.FIGHTER,
+            interchangeable=frozenset({Party.FIGHTER}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric",
-            "thief",
-            "champion",
-            "mage",
-            interchangeable=frozenset({"fighter"}),
+            Party.CLERIC,
+            Party.THIEF,
+            Party.CHAMPION,
+            Party.MAGE,
+            interchangeable=frozenset({Party.FIGHTER}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "cleric",
-            "thief",
-            "champion",
-            "fighter",
-            interchangeable=frozenset({"fighter"}),
+            Party.CLERIC,
+            Party.THIEF,
+            Party.CHAMPION,
+            Party.FIGHTER,
+            interchangeable=frozenset({Party.FIGHTER}),
         )
 
 
@@ -370,31 +376,31 @@ def test_dragon_interchangeable_more_interesting_failure_cases():
     """Invalid dragon defeats with multiple interchangeable hero types."""
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "mage",
-            "mage",
-            "mage",
-            interchangeable=frozenset({"mage", "fighter"}),
+            Party.MAGE,
+            Party.MAGE,
+            Party.MAGE,
+            interchangeable=frozenset({Party.MAGE, Party.FIGHTER}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "fighter",
-            "fighter",
-            "fighter",
-            interchangeable=frozenset({"mage", "fighter"}),
+            Party.FIGHTER,
+            Party.FIGHTER,
+            Party.FIGHTER,
+            interchangeable=frozenset({Party.MAGE, Party.FIGHTER}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "fighter",
-            "mage",
-            "mage",
-            interchangeable=frozenset({"mage", "fighter"}),
+            Party.FIGHTER,
+            Party.MAGE,
+            Party.MAGE,
+            interchangeable=frozenset({Party.MAGE, Party.FIGHTER}),
         )
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "mage",
-            "fighter",
-            "fighter",
-            interchangeable=frozenset({"mage", "fighter"}),
+            Party.MAGE,
+            Party.FIGHTER,
+            Party.FIGHTER,
+            interchangeable=frozenset({Party.MAGE, Party.FIGHTER}),
         )
 
 
@@ -404,10 +410,10 @@ class TestDragon:
         """Set up fixture for a game containing dragons and party members."""
         self.game = replace(
             world.new_world(),
-            dungeon=struct.Dungeon(
+            dungeon=make_dungeon(
                 goblin=0, skeleton=0, ooze=0, chest=1, potion=2, dragon=3
             ),
-            party=struct.Party(*([2] * len(fields(struct.Party)))),
+            party=all_party(2),
         )
         self.randrange = random.Random(4).randrange
 
@@ -422,12 +428,12 @@ class TestDragon:
             "cleric",
             "mage",
         )
-        assert game.party.fighter == 1
-        assert game.party.cleric == 1
-        assert game.party.mage == 1
-        assert game.dungeon.dragon == 0
+        assert game.party[Party.FIGHTER] == 1
+        assert game.party[Party.CLERIC] == 1
+        assert game.party[Party.MAGE] == 1
+        assert game.dungeon[Dungeon.DRAGON] == 0
         assert game.experience == 1
-        assert sum(struct.field_values(game.treasure.own)) == 1
+        assert sum(game.treasure.own.values()) == 1
 
     def test_treasure_slot1(self):
         """Sword treasure can substitute for fighter in dragon combat."""
@@ -435,10 +441,10 @@ class TestDragon:
             self.game,
             treasure=replace(
                 self.game.treasure,
-                own=replace(self.game.treasure.own, sword=7),
+                own=frozen({**self.game.treasure.own, Artifact.SWORD: 7}),
             ),
         )
-        game = replace(game, party=replace(game.party, fighter=0))
+        game = replace(game, party=frozen({**game.party, Party.FIGHTER: 0}))
         game = player.apply(
             player.Default,
             game,
@@ -448,17 +454,20 @@ class TestDragon:
             "cleric",
             "mage",
         )
-        assert game.treasure.own.sword == 6
-        assert game.party.fighter == 0
-        assert game.party.cleric == 1
-        assert game.party.mage == 1
-        assert game.dungeon.dragon == 0
+        assert game.treasure.own[Artifact.SWORD] == 6
+        assert game.party[Party.FIGHTER] == 0
+        assert game.party[Party.CLERIC] == 1
+        assert game.party[Party.MAGE] == 1
+        assert game.dungeon[Dungeon.DRAGON] == 0
         assert game.experience == 1
-        assert sum(struct.field_values(game.treasure.own)) == 7
+        assert sum(game.treasure.own.values()) == 7
 
     def test_monsters_remain(self):
         """Dragon cannot be attacked while monsters remain in dungeon."""
-        game = replace(self.game, dungeon=replace(self.game.dungeon, goblin=1))
+        game = replace(
+            self.game,
+            dungeon=frozen({**self.game.dungeon, Dungeon.GOBLIN: 1}),
+        )
         with pytest.raises(DrollError):
             player.apply(
                 player.Default,
@@ -554,88 +563,88 @@ class TestDragon:
 
 def test_decrement_dungeon_zero_target():
     """Cannot decrement a dungeon target that is already zero."""
-    dungeon = struct.Dungeon(goblin=0, skeleton=1)
+    dungeon = make_dungeon(goblin=0, skeleton=1)
     with pytest.raises(DrollError):
-        decrement_dungeon(dungeon, "goblin")
+        decrement_dungeon(dungeon, Dungeon.GOBLIN)
 
 
 def test_eliminate_dungeon_zero_target():
     """Cannot eliminate a dungeon target that is already zero."""
-    dungeon = struct.Dungeon(goblin=0, skeleton=1)
+    dungeon = make_dungeon(goblin=0, skeleton=1)
     with pytest.raises(DrollError):
-        eliminate_dungeon(dungeon, "goblin")
+        eliminate_dungeon(dungeon, Dungeon.GOBLIN)
 
 
 def test_open_one_before_monsters_defeated():
     """Cannot open chests while monsters remain."""
     w = struct.World(
-        dungeon=struct.Dungeon(goblin=1, chest=1),
-        party=struct.Party(thief=1),
+        dungeon=make_dungeon(goblin=1, chest=1),
+        party=make_party(thief=1),
     )
     with pytest.raises(DrollError):
-        regular.open_one(w, _UNUSED, "thief", ("chest",))
+        regular.open_one(w, _UNUSED, Party.THIEF, (Dungeon.CHEST,))
 
 
 def test_open_all_before_monsters_defeated():
     """Cannot open all chests while monsters remain."""
     w = struct.World(
-        dungeon=struct.Dungeon(goblin=1, chest=2),
-        party=struct.Party(thief=1),
+        dungeon=make_dungeon(goblin=1, chest=2),
+        party=make_party(thief=1),
     )
     with pytest.raises(DrollError):
-        regular.open_all(w, _UNUSED, "thief", ("chest",))
+        regular.open_all(w, _UNUSED, Party.THIEF, (Dungeon.CHEST,))
 
 
 def test_quaff_no_potions():
     """Cannot quaff when no potions are available."""
     w = struct.World(
-        dungeon=struct.Dungeon(potion=0),
-        party=struct.Party(fighter=1),
+        dungeon=make_dungeon(potion=0),
+        party=make_party(fighter=1),
     )
     with pytest.raises(DrollError):
-        regular.quaff(w, _UNUSED, "fighter", ("potion",))
+        regular.quaff(w, _UNUSED, Party.FIGHTER, (Dungeon.POTION,))
 
 
 def test_reroll_no_targets():
     """Reroll requires at least one target."""
     w = struct.World(
-        dungeon=struct.Dungeon(goblin=1),
-        party=struct.Party(scroll=1),
+        dungeon=make_dungeon(goblin=1),
+        party=make_party(scroll=1),
     )
     with pytest.raises(DrollError):
-        regular.reroll(w, _UNUSED, "scroll", ())
+        regular.reroll(w, _UNUSED, Party.SCROLL, ())
 
 
 def test_reroll_dragon_disallowed():
     """Cannot reroll dragon dice by default."""
     w = struct.World(
-        dungeon=struct.Dungeon(dragon=3),
-        party=struct.Party(scroll=1),
+        dungeon=make_dungeon(dragon=3),
+        party=make_party(scroll=1),
     )
     with pytest.raises(DrollError):
-        regular.reroll(w, _UNUSED, "scroll", ("dragon",))
+        regular.reroll(w, _UNUSED, Party.SCROLL, (Dungeon.DRAGON,))
 
 
 def test_interchangeable_disallowed_hero():
     """Scrolls cannot defeat a dragon via interchangeable heroes."""
     with pytest.raises(DrollError):
         regular.defeat_dragon_heroes(
-            "scroll",
-            "fighter",
-            "thief",
-            interchangeable=frozenset({"fighter", "mage"}),
+            Party.SCROLL,
+            Party.FIGHTER,
+            Party.THIEF,
+            interchangeable=frozenset({Party.FIGHTER, Party.MAGE}),
         )
 
 
 def test_bait_non_dragon_target():
     """Bait can only target dragons."""
     w = struct.World(
-        dungeon=struct.Dungeon(goblin=1),
-        party=struct.Party(fighter=1),
-        treasure=struct.Treasure(own=struct.Artifacts(bait=1)),
+        dungeon=make_dungeon(goblin=1),
+        party=make_party(fighter=1),
+        treasure=struct.Treasure(own=make_artifacts(bait=1)),
     )
     with pytest.raises(DrollError):
-        regular.bait_dragon(w, _UNUSED, "bait", ("goblin",))
+        regular.bait_dragon(w, _UNUSED, Action.BAIT, (Dungeon.GOBLIN,))
 
 
 def test_regroup_discard_after_quaff():
@@ -651,15 +660,15 @@ def test_regroup_discard_after_quaff():
         depth=1,
         experience=0,
         ability=False,
-        dungeon=struct.Dungeon(potion=1),
-        party=struct.Party(thief=1),
-        regroup=struct.Regroup(discard=struct.Party(thief=1)),
+        dungeon=make_dungeon(potion=1),
+        party=make_party(thief=1),
+        regroup=struct.Regroup(discard=make_party(thief=1)),
     )
     # Thief quaffs potion, reviving another thief
-    post = regular.quaff(pre, None, "thief", ("potion", "thief"))
+    post = regular.quaff(pre, None, Party.THIEF, (Dungeon.POTION, Party.THIEF))
     # The marked thief was consumed so the discard counter must drop
-    assert post.regroup.discard.thief == 0
-    assert post.party.thief == 1
+    assert post.regroup.discard[Party.THIEF] == 0
+    assert post.party[Party.THIEF] == 1
 
     # After descending the revived thief must survive regroup
     descended = world.descend(
@@ -667,7 +676,7 @@ def test_regroup_discard_after_quaff():
         dice.roll_dungeon,
         random.Random(4).randrange,
     )
-    assert descended.party.thief == 1
+    assert descended.party[Party.THIEF] == 1
 
 
 def test_regroup_discard_after_elixir1():
@@ -678,21 +687,21 @@ def test_regroup_discard_after_elixir1():
         depth=1,
         experience=0,
         ability=False,
-        dungeon=struct.Dungeon(ooze=1),
-        party=struct.Party(thief=1),
-        regroup=struct.Regroup(discard=struct.Party(thief=1)),
-        treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
+        dungeon=make_dungeon(ooze=1),
+        party=make_party(thief=1),
+        regroup=struct.Regroup(discard=make_party(thief=1)),
+        treasure=struct.Treasure(own=make_artifacts(elixir=1)),
     )
 
     # Force-discard thief kills the ooze
-    post1 = regular.defeat_one(pre, None, "thief", ("ooze",))
-    assert post1.regroup.discard.thief == 0
-    assert post1.party.thief == 0
+    post1 = regular.defeat_one(pre, None, Party.THIEF, (Dungeon.OOZE,))
+    assert post1.regroup.discard[Party.THIEF] == 0
+    assert post1.party[Party.THIEF] == 0
 
     # Elixir revives a new thief
-    post2 = regular.elixir(post1, None, "elixir", ("thief",))
-    assert post2.regroup.discard.thief == 0
-    assert post2.party.thief == 1
+    post2 = regular.elixir(post1, None, Action.ELIXIR, (Party.THIEF,))
+    assert post2.regroup.discard[Party.THIEF] == 0
+    assert post2.party[Party.THIEF] == 1
 
     # After descending the revived thief must survive regroup
     descended = world.descend(
@@ -700,7 +709,7 @@ def test_regroup_discard_after_elixir1():
         dice.roll_dungeon,
         random.Random(4).randrange,
     )
-    assert descended.party.thief == 1
+    assert descended.party[Party.THIEF] == 1
 
 
 def test_regroup_discard_after_elixir2():
@@ -711,21 +720,21 @@ def test_regroup_discard_after_elixir2():
         depth=1,
         experience=0,
         ability=False,
-        dungeon=struct.Dungeon(ooze=1),
-        party=struct.Party(thief=1),
-        regroup=struct.Regroup(discard=struct.Party(thief=1)),
-        treasure=struct.Treasure(own=struct.Artifacts(elixir=1)),
+        dungeon=make_dungeon(ooze=1),
+        party=make_party(thief=1),
+        regroup=struct.Regroup(discard=make_party(thief=1)),
+        treasure=struct.Treasure(own=make_artifacts(elixir=1)),
     )
 
     # Elixir revives a new thief
-    post1 = regular.elixir(pre, None, "elixir", ("thief",))
-    assert post1.regroup.discard.thief == 1
-    assert post1.party.thief == 2
+    post1 = regular.elixir(pre, None, Action.ELIXIR, (Party.THIEF,))
+    assert post1.regroup.discard[Party.THIEF] == 1
+    assert post1.party[Party.THIEF] == 2
 
     # Force-discard thief kills the ooze
-    post2 = regular.defeat_one(post1, None, "thief", ("ooze",))
-    assert post2.regroup.discard.thief == 0
-    assert post2.party.thief == 1
+    post2 = regular.defeat_one(post1, None, Party.THIEF, (Dungeon.OOZE,))
+    assert post2.regroup.discard[Party.THIEF] == 0
+    assert post2.party[Party.THIEF] == 1
 
     # After descending the revived thief must survive regroup
     descended = world.descend(
@@ -733,4 +742,4 @@ def test_regroup_discard_after_elixir2():
         dice.roll_dungeon,
         random.Random(4).randrange,
     )
-    assert descended.party.thief == 1
+    assert descended.party[Party.THIEF] == 1
