@@ -3,8 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """Compact display formatting for the experimental CLI mode."""
 
+from collections.abc import Sequence
 from enum import Enum
-from typing import Any, Optional, Sequence
+from typing import Any
 
 from . import struct
 
@@ -25,7 +26,7 @@ class DisplayMode(Enum):
 _ALWAYS_COUNT = frozenset({"dragon"})
 
 
-def _format_item(name: str, count: int, discard: int = 0) -> Optional[str]:
+def _format_item(name: str, count: int, discard: int = 0) -> str | None:
     """Format a single item, returning None if count is zero."""
     if not count:
         return None
@@ -57,7 +58,7 @@ def _format_treasure(artifacts: struct.Artifacts) -> str:
 
 def _format_available(
     available: Sequence[str],
-    deltas: Optional[dict[str, int]] = None,
+    deltas: dict[str, int] | None = None,
 ) -> str:
     """Format available commands alphabetically, annotating score deltas."""
     return " ".join(
@@ -69,7 +70,7 @@ def _format_available(
 def _format_party(
     party: struct.Party,
     discard: struct.Party,
-) -> Optional[str]:
+) -> str | None:
     """Format party contents, returning None if empty."""
     if not any(struct.field_values(party)):
         return None
@@ -77,7 +78,7 @@ def _format_party(
 
 
 def _format_dungeon(
-    dungeon: Optional[struct.Dungeon],
+    dungeon: struct.Dungeon | None,
 ) -> str:
     """Format dungeon contents, always returning a displayable string."""
     if dungeon is None:
@@ -90,7 +91,7 @@ def compact_summary(
     player_name: str,
     score: int,
     available: Sequence[str],
-    deltas: Optional[dict[str, int]] = None,
+    deltas: dict[str, int] | None = None,
 ) -> str:
     """Format the world state in compact multi-line format."""
     # Fixed width based on longest label for consistent alignment

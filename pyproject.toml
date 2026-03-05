@@ -10,7 +10,7 @@ authors = [
 ]
 description = "Implementation of game mechanics for Dungeon Roll"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 classifiers = [
     "Programming Language :: Python :: 3",
 ]

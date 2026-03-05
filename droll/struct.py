@@ -5,7 +5,7 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass, fields
-from typing import Any, Optional, Union
+from typing import Any
 
 __all__ = (
     "Command",
@@ -57,12 +57,12 @@ Command = Callable[["World", RandRange, str, tuple[str, ...]], "World"]
 
 @dataclass(frozen=True)
 class Dungeon:
-    goblin: Union[int, Command] = 0
-    skeleton: Union[int, Command] = 0
-    ooze: Union[int, Command] = 0
-    chest: Union[int, Command] = 0
-    potion: Union[int, Command] = 0
-    dragon: Union[int, Command] = 0
+    goblin: int | Command = 0
+    skeleton: int | Command = 0
+    ooze: int | Command = 0
+    chest: int | Command = 0
+    potion: int | Command = 0
+    dragon: int | Command = 0
 
 
 RollDungeon = Callable[[int, RandRange], Dungeon]
@@ -70,12 +70,12 @@ RollDungeon = Callable[[int, RandRange], Dungeon]
 
 @dataclass(frozen=True)
 class Party:
-    fighter: Union[int, Command, str, None] = 0
-    cleric: Union[int, Command, str, None] = 0
-    mage: Union[int, Command, str, None] = 0
-    thief: Union[int, Command, str, None] = 0
-    champion: Union[int, Command, str, None] = 0
-    scroll: Union[int, Command, str, None] = 0
+    fighter: int | Command | str | None = 0
+    cleric: int | Command | str | None = 0
+    mage: int | Command | str | None = 0
+    thief: int | Command | str | None = 0
+    champion: int | Command | str | None = 0
+    scroll: int | Command | str | None = 0
 
 
 # Bookkeeping for operations performed during the regroup phase
@@ -118,7 +118,7 @@ class World:
     delve: int = 0
     depth: int = 0
     experience: int = 0
-    dungeon: Optional[Dungeon] = None
+    dungeon: Dungeon | None = None
     party: Party = Party()
     ability: bool = False
     regroup: Regroup = Regroup()
