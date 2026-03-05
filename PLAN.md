@@ -1,660 +1,191 @@
-# Plan: Replace Literal Strings with Enums and Overloaded Dataclasses with Typed Dicts
+# Plan: Strings → Enums, Overloaded Dataclasses → Typed Frozen Mappings
 
-## Problem Statement
+## Problem
 
-Throughout the codebase, a small number of literal string values—representing
-party members, dungeon faces, artifacts, and special commands—are passed as
-plain `str` from the shell layer all the way into the game engine.
+Literal strings (`"fighter"`, `"goblin"`, `"sword"`, …) flow from the shell
+into the engine with no static checking.  Three dataclasses (`Dungeon`,
+`Party`, `Artifacts`) serve as map-like containers with imprecise unions
+(`Party` fields are `Union[int, Command, str, None]` to cover three unrelated
+roles).
 
-Compounding this, three dataclasses (`Dungeon`, `Party`, `Artifacts`) are each
-used as map-like containers but with imprecise type annotations.  `Party` is
-the worst offender: its field type is `Union[int, Command, str, None]` because
-the same dataclass serves three completely different roles.  `Dungeon` has
-`Union[int, Command]` for the same reason (two roles).  These unions make
-static analysis nearly useless and hide semantic errors.
-
-## Proposed Enums
-
-### `Dungeon` enum — the six dungeon die faces
+## Enums
 
 ```python
-class Dungeon(enum.Enum):
-    GOBLIN = "goblin"
-    SKELETON = "skeleton"
-    OOZE = "ooze"
-    CHEST = "chest"
-    POTION = "potion"
-    DRAGON = "dragon"
-```
+class Dungeon(enum.Enum):                    # replaces Dungeon dataclass name
+    GOBLIN = "goblin";  SKELETON = "skeleton";  OOZE = "ooze"
+    CHEST = "chest";    POTION = "potion";      DRAGON = "dragon"
 
-### `Party` enum — the six party die faces
+class Party(enum.Enum):                      # replaces Party dataclass name
+    FIGHTER = "fighter"; CLERIC = "cleric"; MAGE = "mage"
+    THIEF = "thief";     CHAMPION = "champion"; SCROLL = "scroll"
 
-```python
-class Party(enum.Enum):
-    FIGHTER = "fighter"
-    CLERIC = "cleric"
-    MAGE = "mage"
-    THIEF = "thief"
-    CHAMPION = "champion"
-    SCROLL = "scroll"
-```
-
-### `Artifact` — the ten treasure/artifact types
-
-```python
 class Artifact(enum.Enum):
-    SWORD = "sword"
-    TALISMAN = "talisman"
-    SCEPTRE = "sceptre"
-    TOOLS = "tools"
-    SCROLL = "scroll"
-    ELIXIR = "elixir"
-    BAIT = "bait"
-    PORTAL = "portal"
-    RING = "ring"
-    SCALE = "scale"
-```
+    SWORD = "sword";   TALISMAN = "talisman"; SCEPTRE = "sceptre"
+    TOOLS = "tools";   SCROLL = "scroll";     ELIXIR = "elixir"
+    BAIT = "bait";     PORTAL = "portal";     RING = "ring";  SCALE = "scale"
 
-### `Action` — the special command verbs that aren't heroes
-
-```python
 class Action(enum.Enum):
-    ABILITY = "ability"
-    BAIT = "bait"
-    ELIXIR = "elixir"
-    REROLL = "reroll"
+    ABILITY = "ability"; BAIT = "bait"; ELIXIR = "elixir"; REROLL = "reroll"
 ```
 
-## Dataclass → Dict Type Replacement Table
-
-The key observation is that `Party`, `Dungeon`, and `Artifacts` are each used
-as map-like containers.  Today they share a single dataclass definition despite
-serving fundamentally different roles with different value types.  With enums as
-keys, each role becomes a distinct, precisely-typed dict:
-
-| Current Type | Role / Context | Current Field Annotation | New Type Alias | Used In |
-|---|---|---|---|---|
-| `Dungeon` | Die counts on a dungeon level | `Union[int, Command]` (only `int` at runtime) | `DungeonState = dict[Dungeon, int]` | `World.dungeon`, `dice.roll_dungeon()`, `dungeon.py` functions |
-| `Dungeon` | Per-hero dispatch: what action does this hero take against each dungeon face? | `Union[int, Command]` (only `Command` at runtime) | `HeroActions = dict[Dungeon, Command]` | Nested inside `Player.party` values (e.g. `Default.party[Party.FIGHTER]`) |
-| `Party` | Die counts of heroes in the current party | `Union[int, Command, str, None]` (only `int` at runtime) | `PartyState = dict[Party, int]` | `World.party`, `Regroup.discard`, `dice.roll_party()`, `party.py` functions |
-| `Party` | Full dispatch table: for each hero, what does it do to each dungeon face? | `Union[int, Command, str, None]` (only `HeroActions`/`Dungeon` at runtime) | `PartyActions = dict[Party, HeroActions]` | `Player.party` — the two-level dispatch table |
-| `Party` | Which artifact corresponds to each hero? | `Union[int, Command, str, None]` (only `Optional[str]` at runtime) | `ArtifactMapping = dict[Party, Optional[Artifact]]` | `Player.artifacts` |
-| `Artifacts` | Counts of each treasure type (in hand or in box) | `int` | `ArtifactCounts = dict[Artifact, int]` | `Treasure.own`, `Treasure.box`, `world.py` scoring |
-
-### What the type aliases look like in `struct.py`
-
-Runtime containers use `types.MappingProxyType` to preserve the frozen
-semantics of the dataclasses they replace.  Type annotations use
-`Mapping[K, V]` from `collections.abc` (read-only interface).
+## Type Aliases (annotations use `Mapping`; runtime is `MappingProxyType`)
 
 ```python
 from collections.abc import Mapping
 from types import MappingProxyType
 
-# State containers (runtime values are always int)
-DungeonState   = Mapping[Dungeon, int]
-PartyState     = Mapping[Party, int]
-ArtifactCounts = Mapping[Artifact, int]
-
-# Dispatch containers (runtime values are always Command)
-HeroActions    = Mapping[Dungeon, Command]
-PartyActions   = Mapping[Party, HeroActions]
-
-# Mapping container
-ArtifactMapping = Mapping[Party, Optional[Artifact]]
-```
-
-Annotations say `Mapping` (read-only contract); factories return
-`MappingProxyType` (enforced at runtime).  A thin `frozen()` helper
-wraps construction:
-
-```python
 def frozen(d: dict) -> MappingProxyType:
-    """Wrap a dict as an immutable MappingProxyType."""
     return MappingProxyType(d)
+
+DungeonState    = Mapping[Dungeon, int]                 # was Dungeon dataclass (int fields)
+PartyState      = Mapping[Party, int]                   # was Party dataclass (int fields)
+ArtifactCounts  = Mapping[Artifact, int]                # was Artifacts dataclass
+HeroActions     = Mapping[Dungeon, Command]             # was Dungeon dataclass (Command fields)
+PartyActions    = Mapping[Party, HeroActions]            # was Party dataclass (Dungeon-of-Command fields)
+ArtifactMapping = Mapping[Party, Optional[Artifact]]    # was Party dataclass (str|None fields)
+
+Command = Callable[[World, RandRange, Party, tuple[Dungeon | Party, ...]], World]
+RollDungeon = Callable[[int, RandRange], DungeonState]
+RollParty   = Callable[[int, RandRange], tuple[PartyState, Regroup]]
 ```
 
-### Updated `Player`, `World`, `Treasure`, `Regroup`
+`frozen=True` on surviving dataclasses prevents field reassignment;
+`MappingProxyType` prevents mutation of mapping contents — together matching
+the old frozen-dataclass depth of immutability.
 
-Note: `frozen=True` on the dataclasses prevents reassignment of the fields
-themselves (e.g. `world.party = ...` raises `FrozenInstanceError`).
-`MappingProxyType` on the mapping values prevents mutation of the
-containers (e.g. `world.party[Party.FIGHTER] = 99` raises `TypeError`).
-Together they provide the same depth of immutability as the old frozen
-dataclasses.
+## Dataclass Replacement Table
+
+| Old Type | Role | Old Field Type | New Alias | Primary Sites |
+|---|---|---|---|---|
+| `Dungeon` dc | die counts | `Union[int,Command]` → `int` | `DungeonState` | `World.dungeon`, `dungeon.py`, `dice.py` |
+| `Dungeon` dc | hero dispatch | `Union[int,Command]` → `Command` | `HeroActions` | nested in `Player.party` values |
+| `Party` dc | die counts | `Union[int,Command,str,None]` → `int` | `PartyState` | `World.party`, `Regroup.discard`, `party.py` |
+| `Party` dc | full dispatch | → `HeroActions` | `PartyActions` | `Player.party` |
+| `Party` dc | artifact map | → `Optional[str]` | `ArtifactMapping` | `Player.artifacts` |
+| `Artifacts` dc | treasure counts | `int` | `ArtifactCounts` | `Treasure.own`, `Treasure.box` |
+
+## Access Pattern Migration
+
+| Before | After |
+|---|---|
+| `getattr(dungeon, target)` | `dungeon[target]` |
+| `replace(dungeon, **{target: v})` | `frozen({**dungeon, target: v})` |
+| `field_items(dungeon)` / `field_values(d)` | `dungeon.items()` / `d.values()` |
+| `len(fields(Dungeon))` | `len(Dungeon)` |
+| `_check_dungeon_target(t)` | _(deleted — enum type enforces)_ |
+| `dungeon.goblin` | `dungeon[Dungeon.GOBLIN]` |
+| `Dungeon(*_roll(...))` | `frozen(dict(zip(Dungeon, _roll(...))))` |
+| `struct.Dungeon()` | `empty_dungeon()` |
+| `replace(Default.party.fighter, dragon=fn)` | `frozen({**Default.party[Party.FIGHTER], Dungeon.DRAGON: fn})` |
+| `Default.party.cleric.skeleton` | `Default.party[Party.CLERIC][Dungeon.SKELETON]` |
+| `hasattr(treasure.own, item)` | `item in treasure.own` |
+
+## Updated Surviving Dataclasses
 
 ```python
 @dataclass(frozen=True)
 class Treasure:
-    own: ArtifactCounts    # was Artifacts; runtime: MappingProxyType
-    box: ArtifactCounts    # was Artifacts; runtime: MappingProxyType
+    own: ArtifactCounts;  box: ArtifactCounts
 
 @dataclass(frozen=True)
 class Regroup:
-    discard: PartyState    # was Party; runtime: MappingProxyType
+    discard: PartyState
 
 @dataclass(frozen=True)
 class World:
-    delve: int = 0
-    depth: int = 0
-    experience: int = 0
-    dungeon: Optional[DungeonState] = None   # runtime: MappingProxyType | None
-    party: PartyState = ...                   # runtime: MappingProxyType
-    ability: bool = False
-    regroup: Regroup = ...
-    treasure: Treasure = ...
+    delve: int = 0;  depth: int = 0;  experience: int = 0
+    dungeon: Optional[DungeonState] = None;  party: PartyState = ...
+    ability: bool = False;  regroup: Regroup = ...;  treasure: Treasure = ...
 
 @dataclass(frozen=True)
 class Player:
-    name: str
-    ability: Command
-    advance: Advance
-    bait: Command
-    elixir: Command
-    roll: Roll
-    artifacts: ArtifactMapping    # runtime: MappingProxyType
-    party: PartyActions           # runtime: MappingProxyType of MappingProxyType
+    name: str;  ability: Command;  advance: Advance
+    bait: Command;  elixir: Command;  roll: Roll
+    artifacts: ArtifactMapping;  party: PartyActions
 ```
 
-### Updated `Command` Signature
+## `brief()` Update
 
 ```python
-# Before
-Command = Callable[[World, RandRange, str, tuple[str, ...]], World]
-
-# After
-Command = Callable[[World, RandRange, Party, tuple[Dungeon | Party, ...]], World]
-```
-
-The `str` that was `hero` becomes `Party`.  The `tuple[str, ...]` that was
-`targets` becomes `tuple[Dungeon | Party, ...]` (targets can be
-dungeon faces to attack, or party die names for reroll/quaff).
-
-## What Changes in the Access Patterns
-
-### `getattr`/`replace` → dict `[]`/`{**d, k: v}`
-
-Every `getattr(obj, name)` / `replace(obj, **{name: val})` on these six types
-becomes a plain dict lookup / dict spread:
-
-```python
-# Before (dungeon.py)
-def decrement_dungeon(dungeon: Dungeon, target: str) -> Dungeon:
-    _check_dungeon_target(target)
-    prior = getattr(dungeon, target)
-    return replace(dungeon, **{target: prior - 1})
-
-# After
-def decrement_dungeon(dungeon: DungeonState, target: Dungeon) -> DungeonState:
-    prior = dungeon[target]
-    if not prior:
-        raise DrollError(f"At least 1 {target.value} required in dungeon.")
-    return frozen({**dungeon, target: prior - 1})
-```
-
-```python
-# Before (party.py)
-def increment_party(party: Party, hero: str) -> Party:
-    _check_party_member(hero)
-    return replace(party, **{hero: getattr(party, hero) + 1})
-
-# After
-def increment_party(party: PartyState, hero: Party) -> PartyState:
-    return frozen({**party, hero: party[hero] + 1})
-```
-
-### `field_names`/`field_values`/`field_items` → dict methods
-
-```python
-# Before
-for name, count in field_items(dungeon): ...
-sum(field_values(dungeon))
-
-# After
-for face, count in dungeon.items(): ...
-sum(dungeon.values())
-```
-
-### `_check_*` validation functions → deleted
-
-`_check_dungeon_target`, `_check_party_member`, `_DUNGEON_FIELDS`,
-`_PARTY_FIELDS` all become unnecessary — the enum type enforces membership.
-
-### Hero definitions use dict literals instead of `replace()`
-
-```python
-# Before (knight.py)
-DragonSlayer = replace(Default, ...,
-    party=struct.Party(
-        fighter=replace(Default.party.fighter, dragon=_dragonslayer_defeat_dragon),
-        ...
-    ))
-
-# After
-DragonSlayer = replace(Default, ...,
-    party=frozen({
-        Party.FIGHTER: frozen({**Default.party[Party.FIGHTER],
-                                  Dungeon.DRAGON: _dragonslayer_defeat_dragon}),
-        ...
-    }))
-```
-
-### `Dungeon()` as empty → factory helper
-
-```python
-# Before
-struct.Dungeon()  # all zeros
-
-# After
-empty_dungeon()   # returns frozen({face: 0 for face in Dungeon})
-```
-
-### Constructor patterns with `*list` unpacking
-
-```python
-# Before (dice.py)
-Dungeon(*_roll(dice, 0, 6, randrange))
-
-# After
-frozen(dict(zip(Dungeon, _roll(dice, 0, 6, randrange))))
-```
-
-## Detailed Per-File Impact
-
-### `struct.py`
-- Add `from types import MappingProxyType` and `from collections.abc import Mapping`
-- Add `frozen()` helper wrapping `MappingProxyType`
-- Add four enums and six type aliases (using `Mapping[K, V]`)
-- Remove the old `Dungeon`, `Party`, `Artifacts` dataclasses (their names
-  are now reused by the `Dungeon`, `Party`, `Artifact` enums)
-- Add factory helpers: `empty_dungeon() -> DungeonState`,
-  `empty_party() -> PartyState`, `empty_artifacts() -> ArtifactCounts`
-  (each returns `frozen({...})`)
-- Update `Treasure` fields: `own: ArtifactCounts`, `box: ArtifactCounts`
-- Update `Regroup.discard: PartyState`
-- Update `World.dungeon: Optional[DungeonState]`, `World.party: PartyState`
-- Update `Player.artifacts: ArtifactMapping`, `Player.party: PartyActions`
-- Update `Command` signature
-- Replace `field_names`/`field_values`/`field_items` usages on the removed
-  types with dict `.keys()`/`.values()`/`.items()` (callers migrate too)
-- Keep `brief()` working via duck typing on dict `.items()`
-
-### `dungeon.py`
-- Param `target: str` → `target: Dungeon` in all functions
-- Return `Dungeon` → `DungeonState` (i.e. `dict[Dungeon, int]`)
-- Delete `_DUNGEON_FIELDS`, `_check_dungeon_target`
-- `getattr(dungeon, target)` → `dungeon[target]`
-- `replace(dungeon, **{target: v})` → `frozen({**dungeon, target: v})`
-- Direct access `dungeon.goblin` → `dungeon[Dungeon.GOBLIN]`
-- `field_values(dungeon)` → `dungeon.values()`
-
-### `party.py`
-- Param `hero: str` → `hero: Party` in all functions
-- Return `Party` → `PartyState`
-- Delete `_PARTY_FIELDS`, `_check_party_member`
-- Same `getattr`→`[]` and `replace`→`frozen({**d})` migration as `dungeon.py`
-
-### `treasure.py`
-- `_draw` returns `Artifact` instead of `str`
-- `replace_treasure` param `item: str` → `item: Artifact`
-- `field_items(box)` → `box.items()`
-- `field_values(box)` → `box.values()`
-- `getattr(treasure.own, drawn)` → `treasure.own[drawn]`
-- `replace(treasure.own, **{drawn: v})` → `frozen({**treasure.own, drawn: v})`
-  (but `Treasure` itself stays a dataclass, so its `replace` stays)
-
-### `regular.py`
-- All `Command`-signature functions: `hero: str` → `hero: Party`,
-  `targets: tuple[str, ...]` → `tuple[Dungeon | Party, ...]`
-- `_DUNGEON_NAMES`, `_PARTY_NAMES` frozensets → deleted (use `isinstance`
-  checks or enum type)
-- `_classify_reroll_targets`: check `isinstance(t, Dungeon)` vs
-  `isinstance(t, Party)`
-- `bait_dragon`: `_enemies` becomes `tuple[Dungeon, ...]`
-- `defeat_dragon_heroes`: `disallowed_heroes` becomes `frozenset[Party]`
-- `elixir`: `targets[0]` is already `Party`
-- String literals like `"potion"` → `Dungeon.POTION`, `"scroll"` →
-  `Party.SCROLL`, etc.
-
-### `special.py`
-- Same `Command` signature updates as `regular.py`
-- `convert_dungeon_to_party`: `source: str` → `source: Dungeon`,
-  `destination: str` → `destination: Party`
-- `getattr(world.dungeon, source)` → `world.dungeon[source]`
-
-### `ability.py`
-- All ability functions: `command: str` → `command: Action`,
-  `targets: tuple[str, ...]` → typed tuple
-- `_choose_and_add_hero`: `acceptable: frozenset[str]` →
-  `frozenset[Party]`
-- `_convert_one`/`_convert_two`: `source: str` → `Dungeon`,
-  `destination: str` → `Party`
-- Literal strings like `increment_dungeon(dungeon, "potion")` →
-  `increment_dungeon(dungeon, Dungeon.POTION)`
-- `increment_party(world.party, "scroll")` →
-  `increment_party(world.party, Party.SCROLL)`
-
-### `player.py`
-- `Default.artifacts` becomes `ArtifactMapping`:
-  `{Party.FIGHTER: Artifact.SWORD, ..., Party.CHAMPION: None, ...}`
-- `Default.party` becomes `PartyActions`:
-  `{Party.FIGHTER: {Dungeon.GOBLIN: defeat_all, ...}, ...}`
-- `apply()`: `command: str` becomes a union or is pre-parsed into the
-  appropriate enum type by the caller; dispatch uses enum comparisons
-- `_partify_command`: `Artifact` → `Party` reverse lookup
-- `_ARTIFACT_COMMANDS`: `frozenset[Artifact]`
-- `_TREASURE_NO_COMMAND`: `frozenset[Artifact]`
-- `complete()`: returns `Sequence[str]` (for the shell), but internally
-  works with enum `.value` strings
-- `_available_nouns`/`_available_targets`: iterate `.items()` on dicts
-  instead of `field_items()`
-- `_adjust_phantom_treasures`: iterates `artifacts.items()` instead of
-  `field_items(artifacts)`
-
-### `world.py`
-- `new_world()`: `Artifacts(sword=3, ...)` →
-  `{Artifact.SWORD: 3, ...}`
-- `_regroup()`: `Party(**{name: max(...)})` →
-  `{die: max(0, world.party[die] - world.regroup.discard[die]) for die in Party}`
-- `descend()`: `replace(rolled, dragon=...)` → `{**rolled, Dungeon.DRAGON: ...}`
-- `_apply_ring`/`_apply_portal`: `noun: str = "ring"` →
-  `noun: Artifact = Artifact.RING`
-- `score()`: `field_values(world.treasure.own)` → `world.treasure.own.values()`
-- `world.treasure.own.portal` → `world.treasure.own[Artifact.PORTAL]`
-- `world.treasure.own.scale` → `world.treasure.own[Artifact.SCALE]`
-
-### `display.py`
-- `_format_items`: `field_items(counts)` → `counts.items()`
-- `_format_treasure`: `field_items(artifacts)` → `artifacts.items()`
-- `field_values(party)` → `party.values()`
-- Item names in output use `face.value` / `die.value` for display strings
-- `_ALWAYS_COUNT = frozenset({Dungeon.DRAGON})`
-
-### `dice.py`
-- `roll_dungeon` returns `DungeonState` instead of `Dungeon`
-- `roll_party` returns `PartyState` instead of `Party`
-- `Dungeon(*_roll(...))` → `dict(zip(Dungeon, _roll(...)))`
-- `Party(*_roll(...))` → `dict(zip(Party, _roll(...)))`
-- `len(fields(Dungeon))` → `len(Dungeon)` (enum length)
-- `len(fields(Party))` → `len(Party)`
-
-### `game.py`
-- `Game.ability()`: passes `Action.ABILITY` instead of `"ability"`
-- `Game.reroll()`: passes `Action.REROLL` instead of `"reroll"`
-- `Game.apply()`: tokenized strings arrive from shell; parsing happens
-  in `player.apply()` or the caller converts first
-- `_possible_world_actions()`: `"ability"` → `Action.ABILITY` etc.
-- `score_deltas()`: no enum changes (returns `dict[str, int]` for display)
-
-### `shell.py`
-- `_tokenize` stays string-based (it's the raw user input boundary)
-- `do_ability`, `default`, `do_reroll` pass raw strings into `Game`
-  methods, which forward to `player.apply()` where conversion happens
-- Alternatively: conversion at the shell boundary via a `_parse_token`
-  function
-- Tab completion operates on `.value` strings throughout
-- `_AVAILABLE_COMMANDS` stays as `frozenset[str]` (UI concern)
-
-### Hero files (`droll/heroes/*.py`)
-- All `struct.Party(fighter=struct.Dungeon(...), ...)` constructions →
-  `{Party.FIGHTER: {Dungeon.GOBLIN: defeat_all, ...}, ...}`
-- `replace(Default.party.fighter, dragon=...)` →
-  `frozen({**Default.party[Party.FIGHTER], Dungeon.DRAGON: ...})`
-- `replace(Default.party, fighter=..., cleric=...)` →
-  `frozen({**Default.party, Party.FIGHTER: ..., Party.CLERIC: ...})`
-- `Default.party.cleric.skeleton` → `Default.party[Party.CLERIC][Dungeon.SKELETON]`
-- `frozenset({"fighter", "cleric"})` → `frozenset({Party.FIGHTER, Party.CLERIC})`
-
-### Test files
-- Every `struct.Dungeon(goblin=1, ...)` → `{Dungeon.GOBLIN: 1, ...}`
-  (or use `{**empty_dungeon(), Dungeon.GOBLIN: 1}`)
-- Every `struct.Party(fighter=2, ...)` → same pattern with `Party`
-- Every `struct.Artifacts(sword=1, ...)` → same pattern with `Artifact`
-- Direct field access `game.dungeon.goblin` → `game.dungeon[Dungeon.GOBLIN]`
-- Direct field access `game.party.fighter` → `game.party[Party.FIGHTER]`
-
-## Implementation Steps
-
-### Step 1: Define enums and type aliases in `struct.py`
-
-Add `Dungeon`, `Party`, `Artifact`, `Action` plus all six
-type aliases.  Add `empty_dungeon()`, `empty_party()`, `empty_artifacts()`
-factory helpers.  Keep the old dataclasses temporarily.  Tests still pass.
-
-### Step 2: Migrate `Artifacts` → `ArtifactCounts`
-
-This is the simplest migration — `Artifacts` has only one role (`int` fields).
-- Replace `Artifacts` dataclass with `ArtifactCounts = dict[Artifact, int]`
-- Update `Treasure.own` and `Treasure.box` field types
-- Update `treasure.py`: `field_items` → `.items()`, `getattr` → `[]`,
-  `replace(own, **{k: v})` → `{**own, k: v}`
-- Update `world.py`: `new_world()` construction, `score()` access
-- Update `display.py`: `_format_treasure`
-- Update `player.py`: `_ARTIFACT_COMMANDS`, `_TREASURE_NO_COMMAND`,
-  `_available_nouns` treasure iteration
-- Update tests
-- Run tests
-
-### Step 3: Migrate `Dungeon` state → `DungeonState`
-
-Replace the `Dungeon` dataclass's state role (counting die faces) with
-`DungeonState = dict[Dungeon, int]`.
-- Update `dungeon.py`: all functions take/return `DungeonState`, delete
-  `_check_dungeon_target` and `_DUNGEON_FIELDS`
-- Update `World.dungeon: Optional[DungeonState]`
-- Update `dice.py`: `roll_dungeon` returns `DungeonState`
-- Update `regular.py`, `special.py`, `ability.py`: all dungeon state access
-- Update `world.py`: `descend()`, `_regroup()`, `new_world()`
-- Update tests
-- Run tests
-
-### Step 4: Migrate `Party` state → `PartyState`
-
-Replace the `Party` dataclass's counting role with
-`PartyState = dict[Party, int]`.
-- Update `party.py`: all functions take/return `PartyState`, delete
-  `_check_party_member` and `_PARTY_FIELDS`
-- Update `World.party: PartyState`, `Regroup.discard: PartyState`
-- Update `dice.py`: `roll_party` returns `PartyState`
-- Update `regular.py`, `special.py`, `ability.py`: all party state access
-- Update `player.py`: `_adjust_phantom_treasures`, `apply()` party iteration
-- Update `world.py`: `_regroup()`
-- Update tests
-- Run tests
-
-### Step 5: Migrate `Dungeon` dispatch → `HeroActions`, and `Party` dispatch → `PartyActions`
-
-These two are tightly coupled (a `PartyActions` is a dict of `HeroActions`).
-- Define `HeroActions = dict[Dungeon, Command]`
-- Define `PartyActions = dict[Party, HeroActions]`
-- Remove the old `Dungeon` and `Party` dataclasses entirely (names now belong to enums)
-- Update `Player.party: PartyActions`
-- Update `player.py:apply()`: `getattr(player.party, command)` →
-  `player.party[command]`, `getattr(action_, targets[0])` →
-  `action_[targets[0]]`
-- Update all hero files: `struct.Party(fighter=struct.Dungeon(...), ...)` →
-  dict literals; `replace(Default.party.fighter, ...)` → dict spread
-- Update tests
-- Run tests
-
-### Step 6: Migrate `Party` artifact mapping → `ArtifactMapping`
-
-- Define `ArtifactMapping = dict[Party, Optional[Artifact]]`
-- Update `Player.artifacts: ArtifactMapping`
-- Update `player.py`: `Default.artifacts` construction,
-  `_partify_command`, `_adjust_phantom_treasures`, `_ARTIFACT_COMMANDS`
-- Update tests
-- Run tests
-
-### Step 7: Update `Command` signature and action functions
-
-- Update `Command = Callable[[World, RandRange, Party, tuple[...]], World]`
-- Update every function that matches the `Command` signature (`defeat_one`,
-  `defeat_all`, `open_one`, `open_all`, `quaff`, `reroll`, `defeat_dragon`,
-  `bait_dragon`, `elixir`, all ability functions, all special functions)
-- Update `player.py:apply()` to pass typed values
-- Update tests
-- Run tests
-
-### Step 8: Port `game.py`, `shell.py`, and the boundary layer
-
-- `game.py`: pass `Action.ABILITY` / `Action.REROLL` instead of
-  string literals
-- `shell.py`: add `_parse_token` to convert user input strings → enum at
-  the boundary; or let `player.apply` handle the conversion
-- Tab completion returns `.value` strings
-- Update tests
-- Run tests
-
-### Step 9: Clean up
-
-- Remove any remaining `field_names`/`field_values`/`field_items` usage
-  that operated on the now-deleted dataclasses
-- Remove helper functions in `struct.py` if no longer needed
-- Verify `brief()` works on the remaining dataclasses (`World`, `Treasure`,
-  `Regroup`, `Player`, `Roll`)
-- Run full test suite
-- Verify shell interaction and tab completion unchanged
-
-## Cross-Cutting Concerns
-
-### `brief()` must handle both dicts and surviving dataclasses
-
-`brief()` in `struct.py` recursively formats nested structures using
-`field_names()` / `field_values()`, which call `dataclasses.fields()`.
-After migration, `World.dungeon` will be a `dict` (or `None`), and
-`World.party` will be a `dict`.  When `brief()` recurses into these, it
-must detect dicts and use `.items()` instead of `fields()`.
-
-```python
-from collections.abc import Mapping
-
 def brief(o: Any) -> str:
-    if isinstance(o, Mapping):
-        keyvalues = [f"{k.value if hasattr(k, 'value') else k}={brief(v)}"
-                     for k, v in o.items() if v]
-        return f"({', '.join(keyvalues)})"
+    if isinstance(o, Mapping):                             # catches MappingProxyType
+        kv = [f"{k.value}={brief(v)}" for k, v in o.items() if v]
+        return f"({', '.join(kv)})"
     try:
-        names = field_names(o)
-        values = field_values(o)
+        names, values = field_names(o), field_values(o)
     except TypeError:
         return str(o)
-    keyvalues = [f"{f}={brief(v)}" for f, v in zip(names, values) if v]
-    return f"({', '.join(keyvalues)})"
+    return f"({', '.join(f'{f}={brief(v)}' for f, v in zip(names, values) if v)})"
 ```
 
-Note: `isinstance(o, Mapping)` catches both plain `dict` and
-`MappingProxyType`, since `MappingProxyType` implements `Mapping`.
+## Per-File Impact
 
-### `field_names` / `field_values` / `field_items` helpers survive but shrink in scope
+- **`struct.py`** — add enums, type aliases, `frozen()`, `empty_*()` factories;
+  remove `Dungeon`/`Party`/`Artifacts` dataclasses; update `Command`,
+  `RollDungeon`, `RollParty`, `Treasure`, `Regroup`, `World`, `Player`; update `brief()`
+- **`dungeon.py`** — `target: str` → `Dungeon`; return `DungeonState`;
+  delete `_check_dungeon_target`/`_DUNGEON_FIELDS`; `getattr`→`[]`, `replace`→`frozen({**d})`
+- **`party.py`** — `hero: str` → `Party`; return `PartyState`;
+  delete `_check_party_member`/`_PARTY_FIELDS`; same accessor migration
+- **`treasure.py`** — `_draw` returns `Artifact`; `replace_treasure` takes `Artifact`;
+  `field_items`→`.items()`, `hasattr`→`in`, `getattr`→`[]`
+- **`regular.py`** — `hero: str`→`Party`, `targets: tuple[str,...]`→`tuple[Dungeon|Party,...]`;
+  delete `_DUNGEON_NAMES`/`_PARTY_NAMES`; `_classify_reroll_targets` uses `isinstance`;
+  `"potion"`→`Dungeon.POTION`, `"scroll"`→`Party.SCROLL`, etc.
+- **`special.py`** — `source: str`→`Dungeon`, `destination: str`→`Party`;
+  `getattr`→`[]`
+- **`ability.py`** — `command: str`→`Action`; `acceptable: frozenset[str]`→`frozenset[Party]`;
+  `"potion"`→`Dungeon.POTION`, `"scroll"`→`Party.SCROLL`
+- **`player.py`** — `Default.artifacts`/`Default.party` become dict literals;
+  `apply()` dispatches on enums; `_partify_command`: `Artifact`→`Party` lookup;
+  `_ARTIFACT_COMMANDS`/`_TREASURE_NO_COMMAND`: `frozenset[Artifact]`;
+  `complete()` returns `.value` strings
+- **`world.py`** — `Artifacts(sword=3,...)`→`frozen({Artifact.SWORD: 3,...})`;
+  `.portal`→`[Artifact.PORTAL]`; `_apply_ring`/`_apply_portal` take `Artifact`;
+  `field_values`→`.values()`
+- **`display.py`** — `field_items`→`.items()`, `field_values`→`.values()`;
+  names via `.value`; `_ALWAYS_COUNT = frozenset({Dungeon.DRAGON})`
+- **`dice.py`** — returns `DungeonState`/`PartyState`;
+  `frozen(dict(zip(Dungeon, _roll(...))))`;
+  `len(fields(X))`→`len(X)`
+- **`game.py`** — `"ability"`→`Action.ABILITY`, `"reroll"`→`Action.REROLL`
+- **`shell.py`** — `_tokenize` stays string-based; add `_parse_token` str→enum
+  at the boundary; tab completion uses `.value`
+- **`heroes/*.py`** (all 8) — `struct.Party(fighter=struct.Dungeon(...),...)`→
+  `frozen({Party.FIGHTER: frozen({Dungeon.GOBLIN: defeat_all,...}),...})`;
+  `replace(Default.party.X, Y=fn)`→`frozen({**Default.party[X], Y: fn})`;
+  `frozenset({"fighter","cleric"})`→`frozenset({Party.FIGHTER, Party.CLERIC})`
+- **Tests** — `struct.Dungeon(goblin=1)`→`{**empty_dungeon(), Dungeon.GOBLIN: 1}`;
+  `.goblin`→`[Dungeon.GOBLIN]`; same for `Party`/`Artifacts`
 
-These helpers remain useful for the surviving dataclasses (`World`,
-`Treasure`, `Regroup`, `Player`, `Roll`).  But they are no longer called
-on `Dungeon`, `Party`, or `Artifacts` — those callers migrate to dict
-`.keys()` / `.values()` / `.items()`.  The helpers themselves don't change;
-only their call sites do.
+## `field_names`/`field_values`/`field_items`
 
-Callers that used them on the removed types:
+Survive for remaining dataclasses (`World`, `Treasure`, `Regroup`, `Player`,
+`Roll`).  All calls on removed types migrate to `.keys()`/`.values()`/`.items()`.
 
-| Caller | Was | Becomes |
-|---|---|---|
-| `dice.py`: `len(fields(Dungeon))` | dataclass field count | `len(Dungeon)` |
-| `dice.py`: `len(fields(Party))` | dataclass field count | `len(Party)` |
-| `dungeon.py`: `field_names(Dungeon)` | frozenset of names | deleted (enum membership) |
-| `dungeon.py`: `field_values(dungeon)` | sum of values | `dungeon.values()` |
-| `party.py`: `field_names(Party)` | frozenset of names | deleted (enum membership) |
-| `regular.py`: `field_names(Dungeon)` / `field_names(Party)` | frozensets | deleted |
-| `regular.py`: `field_values(dungeon)` / `field_values(party)` | for map/add | `.values()` |
-| `treasure.py`: `field_items(box)` / `field_values(box)` | iteration | `.items()` / `.values()` |
-| `player.py`: `field_items(artifacts)` | iteration | `.items()` |
-| `player.py`: `field_items(action_)` | iteration | `.items()` |
-| `player.py`: `field_names(player.party)` | membership check | `in player.party` |
-| `player.py`: `field_names(action_)` | membership check | `in action_` |
-| `player.py`: `field_names(struct.Party)` / `field_names(struct.Dungeon)` | completion | `Party` / `Dungeon` members |
-| `display.py`: `field_items(counts)` / `field_values(party)` | formatting | `.items()` / `.values()` |
-| `world.py`: `field_values(world.treasure.own)` | scoring | `.values()` |
-| `world.py`: `field_items(world.regroup.discard)` | regroup | `.items()` |
-| Tests: `len(fields(struct.Dungeon))` / `len(fields(struct.Party))` | construction | `len(Dungeon)` / `len(Party)` |
+## Steps
 
-### `RollDungeon` and `RollParty` type aliases need updating
+1. **Define enums + aliases** in `struct.py`. Add `frozen()`, `empty_*()`.
+   Keep old dataclasses temporarily. Tests pass.
+2. **`Artifacts` → `ArtifactCounts`** — `treasure.py`, `world.py`, `display.py`,
+   `player.py`, tests.
+3. **`Dungeon` state → `DungeonState`** — `dungeon.py`, `dice.py`, `World.dungeon`,
+   `regular.py`, `special.py`, `ability.py`, `world.py`, tests.
+4. **`Party` state → `PartyState`** — `party.py`, `dice.py`, `World.party`,
+   `Regroup.discard`, `regular.py`, `special.py`, `ability.py`, `player.py`,
+   `world.py`, tests.
+5. **Dispatch → `HeroActions`/`PartyActions`** — remove old `Dungeon`/`Party`
+   dataclasses; update `Player.party`, `player.py:apply()`, all 8 hero files, tests.
+6. **`ArtifactMapping`** — `Player.artifacts`, `player.py`, tests.
+7. **`Command` signature** — all action functions, ability functions, `player.py:apply()`, tests.
+8. **Boundary layer** — `game.py` (enum literals), `shell.py` (`_parse_token`), tests.
+9. **Clean up** — remove stale helpers, verify `brief()`, full test suite, shell smoke test.
 
-```python
-# Before
-RollDungeon = Callable[[int, RandRange], Dungeon]
-RollParty = Callable[[int, RandRange], tuple[Party, Regroup]]
+## Risk
 
-# After
-RollDungeon = Callable[[int, RandRange], DungeonState]
-RollParty = Callable[[int, RandRange], tuple[PartyState, Regroup]]
-```
-
-### `hasattr()` in `treasure.py` → `in` operator
-
-Line 49: `if not hasattr(treasure.own, item):` becomes
-`if item not in treasure.own:` — a natural dict idiom.
-
-### Frozen dict semantics — `MappingProxyType`
-
-`Dungeon` and `Party` are frozen dataclasses today.  To preserve the same
-runtime immutability, all six mapping types use `types.MappingProxyType`
-from the stdlib.  This is a zero-dependency read-only view over a `dict`:
-
-```python
-from types import MappingProxyType
-
-proxy = MappingProxyType({Dungeon.GOBLIN: 2})
-proxy[Dungeon.GOBLIN]          # 2 — reads work
-proxy[Dungeon.GOBLIN] = 99     # TypeError — mutation blocked
-```
-
-The "update" idiom builds a new plain `dict` via spread, then re-wraps:
-
-```python
-frozen({**proxy, Dungeon.GOBLIN: 0})
-# → MappingProxyType({Dungeon.GOBLIN: 0, ...})
-```
-
-This pairs with frozen dataclasses: `World(frozen=True)` prevents field
-reassignment, and `MappingProxyType` prevents mutation of the mapping
-values.  Together they provide the same depth of immutability as the
-original nested frozen dataclasses.
-
-Type annotations use `Mapping[K, V]` (the abstract read-only interface
-from `collections.abc`), so function signatures express the read-only
-contract without mentioning `MappingProxyType` directly.
-
-### All 8 hero files need migration
-
-The plan's Step 5 must cover all hero files:
-- `enchantress.py` (Enchantress/Beguiler)
-- `crusader.py` (Crusader/Paladin)
-- `halfgoblin.py` (HalfGoblin/Chieftain)
-- `knight.py` (Knight/DragonSlayer)
-- `mercenary.py` (Mercenary/Commander)
-- `minstrel.py` (Minstrel/Bard)
-- `occultist.py` (Occultist/Necromancer)
-- `spellsword.py` (Spellsword/Battlemage)
-
-Each uses `replace(Default.party.X, ...)` and/or `struct.Party(X=struct.Dungeon(...))`
-patterns that must become dict literals / dict spreads.
-
-## Risk Assessment
-
-- **Low risk:** `Artifacts` → `ArtifactCounts` (Step 2) is purely mechanical
-  — one role, one type, every field is `int`.
-- **Medium risk:** `Dungeon`/`Party` state migrations (Steps 3–4) touch many
-  files but each `getattr`→`[]` change is mechanical.
-- **Higher risk:** Dispatch table migration (Step 5) changes how hero files
-  build their action tables.  The `replace(Default.party.fighter, dragon=...)`
-  pattern becomes `{**Default.party[Party.FIGHTER], Dungeon.DRAGON: ...}`.
-  This is more verbose but precisely typed.  Must test all 8 hero variants.
-- **Medium risk:** `Command` signature (Step 7) touches every action function.
-  Doing it late means intermediate steps have a mixed `str`/`enum` period.
-- **`brief()` breakage:** If not handled in Step 1, `brief(world)` will
-  produce ugly `str(dict)` output for dungeon/party sub-objects.  Must be
-  addressed early (Step 1 or 2).
-- **Frozen semantics:** `MappingProxyType` preserves the same runtime
-  immutability as frozen dataclasses.  The `frozen()` helper adds one
-  function call per construction, which is negligible.
-- **Boundary clarity:** The shell is the only place raw user strings enter.
-  Converting there (Step 8) means the engine interior speaks enums throughout.
+- **Low:** Step 2 (`Artifacts`) — single role, mechanical.
+- **Medium:** Steps 3–4 (state dicts) — many files, but each change is `getattr`→`[]`.
+- **Higher:** Step 5 (dispatch) — all 8 hero files change construction patterns.
+- **Medium:** Step 7 (`Command` sig) — touches every action function.
+- **`brief()`** — must handle `Mapping` early (Step 1) to avoid ugly output.
+- **Frozen semantics** — `MappingProxyType` preserves immutability; `frozen()` cost negligible.
