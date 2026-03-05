@@ -55,7 +55,7 @@ RandRange = Callable[[int, int], int]
 Command = Callable[["World", RandRange, str, tuple[str, ...]], "World"]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Dungeon:
     goblin: int | Command = 0
     skeleton: int | Command = 0
@@ -68,7 +68,7 @@ class Dungeon:
 RollDungeon = Callable[[int, RandRange], Dungeon]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Party:
     fighter: int | Command | str | None = 0
     cleric: int | Command | str | None = 0
@@ -79,7 +79,7 @@ class Party:
 
 
 # Bookkeeping for operations performed during the regroup phase
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Regroup:
     discard: Party = Party()  # Discard N party dice in regroup phase
 
@@ -87,13 +87,13 @@ class Regroup:
 RollParty = Callable[[int, RandRange], tuple[Party, Regroup]]
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Roll:
     dungeon: RollDungeon
     party: RollParty
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Artifacts:
     sword: int = 0
     talisman: int = 0
@@ -107,13 +107,13 @@ class Artifacts:
     scale: int = 0
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Treasure:
     own: Artifacts = Artifacts()
     box: Artifacts = Artifacts()
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class World:
     delve: int = 0
     depth: int = 0
@@ -125,7 +125,7 @@ class World:
     treasure: Treasure = Treasure()
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Player:
     name: str
     ability: Command
