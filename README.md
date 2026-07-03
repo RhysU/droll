@@ -28,8 +28,7 @@ That said, I haven't pursued that in either 2018 or 2026.
 Droll is an interactive command-line interface for playing the base
 game without expansions.  All base game heroes are implemented.
 Tab completion is available for commands and arguments, adapting to
-the current game state.  The rules are explained in
-[How to play](#how-to-play) below; here is a taste of gameplay:
+the current game state.  Here is a taste of the gameplay as a Knight:
 
 ```
 $ droll --help
