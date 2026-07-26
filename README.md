@@ -245,7 +245,7 @@ adds a fighter to your party.
 
 Scroll behavior varies by hero (see
 [Hero abilities](#hero-abilities) below): Enchantress/Beguiler can
-use a scroll offensively against skeletons, Knight converts scrolls
+use a scroll as any companion, Knight converts scrolls
 to champions during party roll, and Mercenary/Commander receives one
 bonus scroll, discarded on regroup.
 
@@ -299,7 +299,7 @@ other entries describe different mechanical bonuses:
 | Base        | Advanced      | New ability                          | Party change                            |
 |-------------|---------------|--------------------------------------|-----------------------------------------|
 | Crusader    | Paladin       | Consume treasure to clear dungeon    | Heroes fighter and cleric are interchangeable           |
-| Enchantress | Beguiler      | Transform up to 2 monsters to potion | Scrolls target monsters like party members         |
+| Enchantress | Beguiler      | Transform up to 2 monsters to potion | *(unchanged)*                                      |
 | HalfGoblin  | Chieftain     | Transform up to 2 goblins to thieves | Open chests/quaff potions before clearing monsters |
 | Knight      | DragonSlayer  | *(unchanged)*                        | Dragon requires only 2 party members of different types |
 | Mercenary   | Commander     | Reroll any number of dice            | Each fighter defeats one additional monster         |

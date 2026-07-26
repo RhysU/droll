@@ -423,9 +423,10 @@ class Shell(cmd.Cmd):
         if name in ("Enchantress", "Beguiler"):
             print(textwrap.dedent("""\
 
-            As Enchantress/Beguiler, scrolls target monsters like party members:
+            As Enchantress/Beguiler, scrolls may be used as any companion:
 
-                    scroll skeleton             # Kill all skeletons"""))
+                    scroll goblin               # Defeat all goblins
+                    scroll skeleton             # Defeat all skeletons"""))
         elif name in ("Knight", "DragonSlayer"):
             print(
                 "\nAs Knight/DragonSlayer, scrolls become champions during party roll."
