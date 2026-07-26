@@ -133,7 +133,6 @@ def beguiler_ability(
 ) -> struct.World:
     """Transform at most 2 monsters into 1 potion.
     Requires transforming 2 monsters when 2+ monsters available.
-    Scrolls target monsters like party members.
 
     Example: ability goblin skeleton
     Example: ability goblin"""
