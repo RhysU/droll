@@ -320,7 +320,6 @@ def necromancer_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 skeletons into fighters, discarding on regroup.
-    Heroes cleric and mage are interchangeable.
 
     Example: ability"""
     return _convert_two(world, targets, source="skeleton", destination="fighter")
