@@ -158,7 +158,6 @@ def chieftain_ability(
     targets: tuple[str, ...] = (),
 ) -> struct.World:
     """Transform up to 2 goblins into thieves, discarding them on regroup.
-    Open chests and quaff potions before clearing monsters.
 
     Example: ability"""
     return _convert_two(world, targets, source="goblin", destination="thief")
