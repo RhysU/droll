@@ -292,20 +292,22 @@ Display notation:
 ### Level-up progression
 
 At 5+ experience, each hero advances to a stronger form with an
-upgraded ability and a party change.  "Interchangeable" means
-those party types can substitute for each other in any command;
-other entries describe different mechanical bonuses:
+upgraded ability.  The "Specialty" column lists passive bonuses
+shared by both the base and advanced forms.  "Interchangeable"
+means those party types can substitute for each other in any
+command; other entries describe different mechanical bonuses.
+The "Party upgrade" column lists bonuses gained only at level-up:
 
-| Base        | Advanced      | New ability                          | Party change                            |
-|-------------|---------------|--------------------------------------|-----------------------------------------|
-| Crusader    | Paladin       | Consume treasure to clear dungeon    | Heroes fighter and cleric are interchangeable           |
-| Enchantress | Beguiler      | Transform up to 2 monsters to potion | *(unchanged)*                                      |
-| HalfGoblin  | Chieftain     | Transform up to 2 goblins to thieves | Open chests/quaff potions before clearing monsters |
-| Knight      | DragonSlayer  | *(unchanged)*                        | Dragon requires only 2 party members of different types |
-| Mercenary   | Commander     | Reroll any number of dice            | Each fighter defeats one additional monster         |
-| Minstrel    | Bard          | *(unchanged)*                        | Each champion defeats one additional monster        |
-| Occultist   | Necromancer   | Transform up to 2 skeletons to fighters | Heroes cleric and mage are interchangeable            |
-| Spellsword  | Battlemage    | Discard all monsters, chests, potions | Heroes fighter and mage are interchangeable              |
+| Base        | Advanced      | New ability                          | Specialty                                          | Party upgrade                                           |
+|-------------|---------------|--------------------------------------|----------------------------------------------------|---------------------------------------------------------|
+| Crusader    | Paladin       | Consume treasure to clear dungeon    | Heroes fighter and cleric are interchangeable      | —                                                       |
+| Enchantress | Beguiler      | Transform up to 2 monsters to potion | —                                                  | —                                                       |
+| HalfGoblin  | Chieftain     | Transform up to 2 goblins to thieves | Open chests/quaff potions before clearing monsters  | —                                                       |
+| Knight      | DragonSlayer  | *(unchanged)*                        | —                                                  | Dragon requires only 2 party members of different types |
+| Mercenary   | Commander     | Reroll any number of dice            | —                                                  | Each fighter defeats one additional monster              |
+| Minstrel    | Bard          | *(unchanged)*                        | Thieves and mages are interchangeable              | Each champion defeats one additional monster             |
+| Occultist   | Necromancer   | Transform up to 2 skeletons to fighters | Heroes cleric and mage are interchangeable      | —                                                       |
+| Spellsword  | Battlemage    | Discard all monsters, chests, potions | Heroes fighter and mage are interchangeable        | —                                                       |
 
 ## How does scoring work?
 
