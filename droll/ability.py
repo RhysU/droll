@@ -346,7 +346,6 @@ def paladin_ability(
     """Consume treasure to clear dungeon, open chests, and quaff potions.
     Specify consumed treasure as first argument.
     For each potion, add one argument for the hero to revive.
-    Heroes fighter and cleric are interchangeable.
 
     Example: ability sword
     Example: ability talisman mage"""
