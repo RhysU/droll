@@ -255,7 +255,7 @@ different types.  Defeating a dragon earns 1 experience and
 draws 1 treasure.
 
 Two treasures affect dungeon progress:
-a ring lets you ignore a blocking dragon without removing the
+a ring lets you sneak past a blocking dragon, removing all
 dragon dice, and a portal immediately ends the delve, earning
 experience equal to your current depth.  When monsters or
 dragons block, retiring or retreating consumes a portal
