@@ -110,9 +110,7 @@ def test_shell_help():
     s.help_treasure()
 
 
-@pytest.mark.parametrize(
-    "topic", ["chest", "dragon", "goblin", "ooze", "potion", "skeleton"]
-)
+@pytest.mark.parametrize("topic", struct.field_names(struct.Dungeon))
 def test_shell_help_dungeon(topic):
     """Confirm dungeon help defers to hero-specific rules."""
     s = _mechanical_shell(Game())
