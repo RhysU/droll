@@ -274,7 +274,16 @@ class Shell(cmd.Cmd):
 
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
-    _HELP_TOPICS = ("dragon", "score", "treasure")
+    _HELP_TOPICS = (
+        "chest",
+        "dragon",
+        "goblin",
+        "ooze",
+        "potion",
+        "score",
+        "skeleton",
+        "treasure",
+    )
 
     def get_names(self):
         """Compute potential help topics from contextual completions."""
@@ -310,6 +319,7 @@ class Shell(cmd.Cmd):
     doc_potion_example = (
         "        {0} potion mage thief       # Drink 2 potions obtaining mage, thief"
     )
+    doc_hero_rules = "Your hero may change these rules per 'help ability'."
 
     def help_ability(self):
         """Display help for the ability command."""
@@ -333,6 +343,19 @@ class Shell(cmd.Cmd):
             {self.doc_potion_example.format("champion")}
             {self.doc_dragon_example.format("champion")}"""))
 
+    def help_chest(self):
+        """Display help for opening chests."""
+        print(textwrap.dedent(f"""\
+            Chests usually open to ALL thieves or champions but only ONE
+            fighter, cleric, or mage:
+
+                    thief chest                 # Use a thief
+                    champion chest              # Use a champion
+                    fighter chest               # Use a fighter
+                    tools chest                 # Tools behave like thieves
+
+            {self.doc_hero_rules}"""))
+
     def help_cleric(self):
         """Display help for using the cleric hero."""
         print(textwrap.dedent(f"""\
@@ -347,24 +370,21 @@ class Shell(cmd.Cmd):
 
     def help_dragon(self):
         """Display help for dragon mechanics."""
-        print(textwrap.dedent("""\
-            Dragons accumulate across depths within a single delve.
-            At 3 or more, they block progress and must be defeated.
+        print(textwrap.dedent(f"""\
+            Dragons accumulate across depths within a single delve.  At 3 or
+            more, they prevent descending or retiring.
 
-            To fight a dragon, use any party member plus 2 others:
+            Dragons usually fall to 3 distinct heroes after defeating all
+            monsters:
 
-                    fighter dragon cleric mage  # 3 distinct heroes
+                    fighter dragon cleric mage  # Use 3 distinct heroes
+                    champion dragon thief mage  # Champions count as 1 hero
 
-            All 3 heroes must be distinct types.  Defeating a dragon
-            earns 1 experience point and draws 1 treasure.
+            Scrolls cannot fight dragons.  Defeating a dragon earns 1
+            experience point and draws 1 treasure.  See 'help ring' and
+            'help portal' for escaping dragons.
 
-            A ring of invisibility lets you sneak past a blocking
-            dragon and is consumed automatically when you descend
-            or retire.  A portal clears all remaining monsters and dragons,
-            ending the delve with experience equal to your depth.
-            When blocked, retiring or retreating consumes a portal
-            automatically if available; a ring is preferred over
-            a portal when only a dragon blocks."""))
+            {self.doc_hero_rules}"""))
 
     def help_elixir(self):
         """Display help for using elixir treasures."""
@@ -382,6 +402,19 @@ class Shell(cmd.Cmd):
             {self.doc_potion_example.format("fighter")}
             {self.doc_dragon_example.format("fighter")}"""))
 
+    def help_goblin(self):
+        """Display help for defeating goblins."""
+        print(textwrap.dedent(f"""\
+            Goblins usually fall to ALL fighters or champions but only ONE
+            cleric, mage, or thief:
+
+                    fighter goblin              # Use a fighter
+                    champion goblin             # Use a champion
+                    cleric goblin               # Use a cleric
+                    sword goblin                # Swords behave like fighters
+
+            {self.doc_hero_rules}"""))
+
     def help_mage(self):
         """Display help for using the mage hero."""
         print(textwrap.dedent(f"""\
@@ -394,6 +427,19 @@ class Shell(cmd.Cmd):
             {self.doc_potion_example.format("mage")}
             {self.doc_dragon_example.format("mage")}"""))
 
+    def help_ooze(self):
+        """Display help for defeating ooze."""
+        print(textwrap.dedent(f"""\
+            Ooze usually falls to ALL mages or champions but only ONE fighter,
+            cleric, or thief:
+
+                    mage ooze                   # Use a mage
+                    champion ooze               # Use a champion
+                    fighter ooze                # Use a fighter
+                    sceptre ooze                # Sceptres behave like mages
+
+            {self.doc_hero_rules}"""))
+
     def help_portal(self):
         """Display help for portal treasures."""
         print(textwrap.dedent("""\
@@ -402,11 +448,23 @@ class Shell(cmd.Cmd):
             retreating consumes a portal automatically to clear the
             dungeon and earn experience equal to your depth."""))
 
+    def help_potion(self):
+        """Display help for quaffing potions."""
+        print(textwrap.dedent(f"""\
+            Potions usually fall to ONE hero or scroll after defeating all
+            monsters.  Name ONE hero to revive per potion:
+
+                    scroll potion mage thief    # Use a scroll
+                    fighter potion cleric       # Use a fighter
+
+            {self.doc_hero_rules}"""))
+
     def help_ring(self):
         """Display help for using rings of invisibility."""
         print(textwrap.dedent("""\
             Rings of invisibility sneak past a blocking dragon.
-            They are used automatically when descending or retiring."""))
+            Descending or retiring uses one automatically.
+            Retiring uses a ring before a portal."""))
 
     def help_sceptre(self):
         """Display help for using sceptre treasures."""
@@ -448,7 +506,20 @@ class Shell(cmd.Cmd):
 
     def help_scale(self):
         """Display help for scale treasures."""
-        print("""Scales are treasures that score 2 points per pair.""")
+        print("""Scales score 1 point each but 4 per pair.""")
+
+    def help_skeleton(self):
+        """Display help for defeating skeletons."""
+        print(textwrap.dedent(f"""\
+            Skeletons usually fall to ALL clerics or champions but only ONE
+            fighter, mage, or thief:
+
+                    cleric skeleton             # Use a cleric
+                    champion skeleton           # Use a champion
+                    fighter skeleton            # Use a fighter
+                    talisman skeleton           # Talismans behave like clerics
+
+            {self.doc_hero_rules}"""))
 
     def help_sword(self):
         """Display help for using sword treasures."""
