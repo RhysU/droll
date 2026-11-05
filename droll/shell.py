@@ -9,7 +9,7 @@ import functools
 import sys
 import textwrap
 
-from . import display
+from . import display, struct
 from .game import Game, GameState
 from .struct import DrollError
 
@@ -274,16 +274,7 @@ class Shell(cmd.Cmd):
 
     # Overrides superclass behavior relying purely on do_XXX(...) methods.
     # Also, lies that help_XXX(...) present for completedefault(...) methods.
-    _HELP_TOPICS = (
-        "chest",
-        "dragon",
-        "goblin",
-        "ooze",
-        "potion",
-        "score",
-        "skeleton",
-        "treasure",
-    )
+    _HELP_TOPICS = (*struct.field_names(struct.Dungeon), "score", "treasure")
 
     def get_names(self):
         """Compute potential help topics from contextual completions."""
