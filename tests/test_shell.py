@@ -88,19 +88,37 @@ def test_shell_help():
     s.help_ability()
     s.help_bait()
     s.help_champion()
+    s.help_chest()
     s.help_cleric()
+    s.help_dragon()
     s.help_elixir()
     s.help_fighter()
+    s.help_goblin()
     s.help_mage()
+    s.help_ooze()
+    s.help_potion()
     s.help_ring()
     s.help_sceptre()
+    s.help_scale()
     s.help_scroll()
+    s.help_skeleton()
     s.help_sword()
     s.help_talisman()
     s.help_thief()
     s.help_tools()
     s.help_score()
     s.help_treasure()
+
+
+@pytest.mark.parametrize(
+    "topic", ["chest", "dragon", "goblin", "ooze", "potion", "skeleton"]
+)
+def test_shell_help_dungeon(topic):
+    """Confirm dungeon help defers to hero-specific rules."""
+    s = _mechanical_shell(Game())
+    with patch("sys.stdout", new_callable=io.StringIO) as fake_out:
+        s.onecmd(f"help {topic}")
+    assert s.doc_hero_rules in fake_out.getvalue()
 
 
 # Strategy for testing, further below, will turn docstrings into assertions
